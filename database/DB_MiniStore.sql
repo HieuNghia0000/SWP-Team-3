@@ -44,20 +44,12 @@ CREATE TABLE WorkSchedules
 	staff_id INT NOT NULL,
 	shift_id INT NOT NULL,
 	work_date DATE NOT NULL,
-	PRIMARY KEY (schedule_id),
-	FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id),
-	FOREIGN KEY (shift_id) REFERENCES Shifts(shift_id)
-);
-
-CREATE TABLE Attendance
-(
-	attendance_id INT IDENTITY(1,1) NOT NULL,
-	schedule_id INT NOT NULL,
 	check_in_time TIME,
 	check_out_time TIME,
 	status INT,
-	PRIMARY KEY (attendance_id),
-	FOREIGN KEY (schedule_id) REFERENCES WorkSchedules(schedule_id)
+	PRIMARY KEY (schedule_id),
+	FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id),
+	FOREIGN KEY (shift_id) REFERENCES Shifts(shift_id)
 );
 
 CREATE TABLE Products
@@ -70,17 +62,17 @@ CREATE TABLE Products
 	PRIMARY KEY (product_id)
 );
 
-CREATE TABLE Discount
+CREATE TABLE Vouchers
 (
-	discount_id INT IDENTITY(1,1) NOT NULL,
-	product_id INT NOT NULL,
-	discount_value FLOAT,
+	voucher_id INT IDENTITY(1,1) NOT NULL,
+	code NVARCHAR(200) NOT NULL,
+	voucher_type INT,
 	discount_type INT,
 	max_discount FLOAT,
-	start_date DATE,
-	end_date DATE,
-	PRIMARY KEY (discount_id),
-	FOREIGN KEY (product_id) REFERENCES Products(product_id)
+	valid_from DATE,
+	valid_to DATE,
+	used_count INT,
+	PRIMARY KEY (voucher_id)
 );
 
 CREATE TABLE LeaveRequests
@@ -129,5 +121,6 @@ CREATE TABLE OrderItems
 	quantity INT,
 	PRIMARY KEY (order_item_id),
 	FOREIGN KEY (order_id) REFERENCES Orders(order_id),
-	FOREIGN KEY (product_id) REFERENCES Products(product_id)
+	FOREIGN KEY (product_id) REFERENCES Products(product_id),
+	FOREIGN KEY (voucher_id) REFERENCES Vouchers(voucher_id)
 );
