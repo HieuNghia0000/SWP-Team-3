@@ -15,6 +15,15 @@ USE MiniStore
 GO
 
 -- Create Tables
+CREATE TABLE CheckInLocations
+(
+	location_id INT IDENTITY(1,1) NOT NULL,
+	name NVARCHAR(200) NOT NULL,
+	value NVARCHAR(200),
+	location_type INT,
+	PRIMARY KEY (location_id),
+);
+
 CREATE TABLE Staffs
 (
 	staff_id INT IDENTITY(1,1) NOT NULL,
@@ -24,6 +33,10 @@ CREATE TABLE Staffs
 	password NVARCHAR(100) NOT NULL,
 	phone_number NVARCHAR(20),
 	base_salary FLOAT,
+	status INT,
+	image NVARCHAR(200),
+	email NVARCHAR(200),
+	work_days NVARCHAR(200),
 	PRIMARY KEY (staff_id),
 );
 
@@ -43,13 +56,15 @@ CREATE TABLE WorkSchedules
 	schedule_id INT IDENTITY(1,1) NOT NULL,
 	staff_id INT NOT NULL,
 	shift_id INT NOT NULL,
+	location_id INT NOT NULL,
 	work_date DATE NOT NULL,
 	check_in_time TIME,
 	check_out_time TIME,
 	status INT,
 	PRIMARY KEY (schedule_id),
 	FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id),
-	FOREIGN KEY (shift_id) REFERENCES Shifts(shift_id)
+	FOREIGN KEY (shift_id) REFERENCES Shifts(shift_id),
+	FOREIGN KEY (location_id) REFERENCES CheckInLocations(location_id)
 );
 
 CREATE TABLE Products
@@ -69,8 +84,8 @@ CREATE TABLE Vouchers
 	voucher_type INT,
 	discount_type INT,
 	max_discount FLOAT,
-	valid_from DATE,
-	valid_to DATE,
+	valid_from DATETIME,
+	valid_to DATETIME,
 	used_count INT,
 	PRIMARY KEY (voucher_id)
 );
@@ -82,6 +97,7 @@ CREATE TABLE LeaveRequests
 	start_date DATE,
 	end_date DATE,
 	status INT,
+	comments NVARCHAR(500),
 	PRIMARY KEY (leave_request_id),
 	FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id)
 );
