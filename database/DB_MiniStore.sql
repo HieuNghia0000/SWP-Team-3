@@ -67,14 +67,34 @@ CREATE TABLE WorkSchedules
 	FOREIGN KEY (location_id) REFERENCES CheckInLocations(location_id)
 );
 
+CREATE TABLE Category
+(
+	category_id INT IDENTITY(1,1) NOT NULL,
+	name NVARCHAR(100),
+	PRIMARY KEY (category_id)
+);
+
+CREATE TABLE Suppliers
+(
+	supplier_id INT IDENTITY(1,1) NOT NULL,
+	name NVARCHAR(100),
+	contact NVARCHAR(100),
+	address NVARCHAR(200),
+	PRIMARY KEY (supplier_id)
+);
+
 CREATE TABLE Products
 (
 	product_id INT IDENTITY(1,1) NOT NULL,
-	name NVARCHAR(200) NOT NULL,
+	category_id INT,
+	supplier_id INT,
+	barcode NVARCHAR(20),
 	description NVARCHAR(400),
 	price FLOAT,
 	quantity INT,
-	PRIMARY KEY (product_id)
+	PRIMARY KEY (product_id),
+	FOREIGN KEY (category_id) REFERENCES Category(category_id),
+	FOREIGN KEY (category_id) REFERENCES Suppliers(supplier_id)
 );
 
 CREATE TABLE Vouchers
