@@ -1,9 +1,9 @@
 package com.team3.ministore.repository;
 
-import com.team3.ministore.model.Staff;
+import com.team3.ministore.model.Location;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface StaffRepository extends JpaRepository<Staff, Integer> {
+public interface LocationRepository extends JpaRepository<Location, Integer> {
 }

@@ -8,15 +8,19 @@ public class Staff {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    @Column(name = "staff_id")
+    private int staffId;
 
     @Column(name = "staff_name")
     private String staffName;
 
+    @Column(name = "role")
     private String role;
 
+    @Column(name = "username")
     private String username;
 
+    @Column(name = "password")
     private String password;
 
     @Column(name = "phone_number")
@@ -25,10 +29,13 @@ public class Staff {
     @Column(name = "base_salary")
     private Float baseSalary;
 
+    @Column(name = "status")
     private int status;
 
+    @Column(name = "image")
     private String image;
 
+    @Column(name = "email")
     private String email;
 
     @Column(name = "work_days")
@@ -51,12 +58,12 @@ public class Staff {
 
     }
 
-    public int getId() {
-        return id;
+    public int getStaffId() {
+        return staffId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setStaffId(int staffId) {
+        this.staffId = staffId;
     }
 
     public String getStaffName() {

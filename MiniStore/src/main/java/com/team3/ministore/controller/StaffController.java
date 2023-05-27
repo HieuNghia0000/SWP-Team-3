@@ -1,70 +1,55 @@
 package com.team3.ministore.controller;
 
 import com.team3.ministore.model.Staff;
-import com.team3.ministore.repository.StaffRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.team3.ministore.service.StaffService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/staff")
 public class StaffController {
-    private final StaffRepository staffRepository;
 
-    @Autowired
-    public StaffController(StaffRepository staffRepository) {
-        this.staffRepository = staffRepository;
+    private final StaffService staffService;
+
+    public StaffController(StaffService staffService) {
+        this.staffService = staffService;
     }
 
     //Create new staff
     @PostMapping("/")
     public ResponseEntity<Staff> createStaff(@RequestBody Staff staff) {
-        Staff createdStaff = staffRepository.save(staff);
-        return new ResponseEntity<>(createdStaff, HttpStatus.CREATED);
+        Staff createdStaff = staffService.createStaff(staff);
+        return new ResponseEntity<>(createdStaff, HttpStatus.OK);
     }
 
     //Read all staff
     @GetMapping("/")
     public ResponseEntity<List<Staff>> getAllStaff(@RequestBody Staff staff) {
-        List<Staff> staffList = staffRepository.findAll();
+        List<Staff> staffList = staffService.getAllStaff();
         return new ResponseEntity<>(staffList, HttpStatus.OK);
     }
 
     //Read a staff by ID
     @GetMapping("/{id}")
     public ResponseEntity<Staff> getStaffById(@PathVariable("id") Integer id) {
-        Optional<Staff> staff = staffRepository.findById(id);
-
-        return staff.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        Staff staff = staffService.getStaffById(id);
+        return new ResponseEntity<>(staff, HttpStatus.OK);
     }
 
     //Update an existing staff
     @PutMapping("/{id}")
-    public ResponseEntity<Staff> updateStaff(@PathVariable("id") Integer id, @RequestBody Staff updatedStaff) {
-        Optional<Staff> staff = staffRepository.findById(id);
-
-        return staff.map(value -> {
-            updatedStaff.setId(id);
-            Staff savedStaff = staffRepository.save(updatedStaff);
-            return new ResponseEntity<>(savedStaff, HttpStatus.OK);
-            }).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    public ResponseEntity<Staff> updateStaff(@PathVariable("id") Integer id, @RequestBody Staff staff) {
+        Staff updatedStaff = staffService.updateStaff(id, staff);
+        return new ResponseEntity<>(updatedStaff, HttpStatus.OK);
     }
 
     //Delete a staff
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteStaff(@PathVariable Integer id) {
-        Optional<Staff> staff = staffRepository.findById(id);
-        if (staff.isPresent()) {
-            staffRepository.deleteById(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-        else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        staffService.deleteStaff(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
