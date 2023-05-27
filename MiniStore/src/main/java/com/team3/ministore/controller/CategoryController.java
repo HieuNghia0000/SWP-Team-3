@@ -2,6 +2,7 @@ package com.team3.ministore.controller;
 
 import com.team3.ministore.model.Category;
 import com.team3.ministore.service.CategoryService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,11 +13,9 @@ import java.util.List;
 @RequestMapping("/controller")
 public class CategoryController {
 
-    private final CategoryService categoryService;
+    @Autowired
+    private CategoryService categoryService;
 
-    public CategoryController(CategoryService categoryService) {
-        this.categoryService = categoryService;
-    }
 
     @PostMapping("/")
     public ResponseEntity<Category> createCategory(@RequestBody Category category) {

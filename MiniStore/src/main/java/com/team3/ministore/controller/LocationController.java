@@ -2,6 +2,7 @@ package com.team3.ministore.controller;
 
 import com.team3.ministore.model.Location;
 import com.team3.ministore.service.LocationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,11 +13,9 @@ import java.util.List;
 @RequestMapping("/location")
 public class LocationController {
 
-    private final LocationService locationService;
+    @Autowired
+    private LocationService locationService;
 
-    public LocationController(LocationService locationService) {
-        this.locationService = locationService;
-    }
 
     //Create new location
     @PostMapping("/")

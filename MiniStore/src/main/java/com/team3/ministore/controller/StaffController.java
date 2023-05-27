@@ -2,6 +2,7 @@ package com.team3.ministore.controller;
 
 import com.team3.ministore.model.Staff;
 import com.team3.ministore.service.StaffService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,11 +13,9 @@ import java.util.List;
 @RequestMapping("/staff")
 public class StaffController {
 
-    private final StaffService staffService;
+    @Autowired
+    private StaffService staffService;
 
-    public StaffController(StaffService staffService) {
-        this.staffService = staffService;
-    }
 
     //Create new staff
     @PostMapping("/")

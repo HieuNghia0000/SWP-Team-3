@@ -1,8 +1,17 @@
 package com.team3.ministore.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "CheckInLocations")
 public class Location {
 
@@ -20,45 +29,4 @@ public class Location {
     @Column(name = "location_type")
     private int locationType;
 
-    public Location() {
-
-    }
-
-    public Location(String name, String value, int locationType) {
-        this.name = name;
-        this.value = value;
-        this.locationType = locationType;
-    }
-
-    public int getLocationId() {
-        return locationId;
-    }
-
-    public void setLocationId(int locationId) {
-        this.locationId = locationId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public int getLocationType() {
-        return locationType;
-    }
-
-    public void setLocationType(int locationType) {
-        this.locationType = locationType;
-    }
 }
