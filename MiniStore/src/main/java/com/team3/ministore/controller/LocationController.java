@@ -26,7 +26,7 @@ public class LocationController {
 
     //Read all location
     @GetMapping("/")
-    public ResponseEntity<List<Location>> getAllLocation(@RequestBody Location location) {
+    public ResponseEntity<List<Location>> getAllLocation() {
         List<Location> locationList = locationService.getAllLocation();
         return new ResponseEntity<>(locationList, HttpStatus.OK);
     }

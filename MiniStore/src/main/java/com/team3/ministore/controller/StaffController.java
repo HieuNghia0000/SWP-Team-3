@@ -26,7 +26,7 @@ public class StaffController {
 
     //Read all staff
     @GetMapping("/")
-    public ResponseEntity<List<Staff>> getAllStaff(@RequestBody Staff staff) {
+    public ResponseEntity<List<Staff>> getAllStaff() {
         List<Staff> staffList = staffService.getAllStaff();
         return new ResponseEntity<>(staffList, HttpStatus.OK);
     }

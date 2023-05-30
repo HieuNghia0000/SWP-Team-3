@@ -1,32 +1,20 @@
-USE master;
-GO
-
-IF EXISTS (SELECT * FROM sys.databases WHERE name='MiniStore')
-BEGIN
-	-- Close existing connection before drop
-	ALTER DATABASE MiniStore SET single_user WITH rollback immediate
-	-- Drop existing database 
-	DROP DATABASE MiniStore
-END
-GO
-CREATE DATABASE MiniStore
-GO
-USE MiniStore
-GO
+DROP DATABASE IF EXISTS MiniStore;
+CREATE DATABASE IF NOT EXISTS MiniStore;
+USE MiniStore;
 
 -- Create Tables
 CREATE TABLE CheckInLocations
 (
-	location_id INT IDENTITY(1,1) NOT NULL,
+	location_id INT AUTO_INCREMENT NOT NULL,
 	name NVARCHAR(200) NOT NULL,
 	value NVARCHAR(200),
 	location_type INT,
-	PRIMARY KEY (location_id),
+	PRIMARY KEY (location_id)
 );
 
 CREATE TABLE Staffs
 (
-	staff_id INT IDENTITY(1,1) NOT NULL,
+	staff_id INT AUTO_INCREMENT NOT NULL,
 	staff_name NVARCHAR(100) NOT NULL,
 	role NVARCHAR(50) NOT NULL,
 	username NVARCHAR(100) NOT NULL,
@@ -37,12 +25,12 @@ CREATE TABLE Staffs
 	image NVARCHAR(200),
 	email NVARCHAR(200),
 	work_days NVARCHAR(200),
-	PRIMARY KEY (staff_id),
+	PRIMARY KEY (staff_id)
 );
 
 CREATE TABLE Shifts
 (
-	shift_id INT IDENTITY(1,1) NOT NULL,
+	shift_id INT AUTO_INCREMENT NOT NULL,
 	start_time TIME,
 	end_time TIME,
 	sheet_number INT,
@@ -53,7 +41,7 @@ CREATE TABLE Shifts
 
 CREATE TABLE WorkSchedules
 (
-	schedule_id INT IDENTITY(1,1) NOT NULL,
+	schedule_id INT AUTO_INCREMENT NOT NULL,
 	staff_id INT NOT NULL,
 	shift_id INT NOT NULL,
 	location_id INT NOT NULL,
@@ -69,37 +57,26 @@ CREATE TABLE WorkSchedules
 
 CREATE TABLE Category
 (
-	category_id INT IDENTITY(1,1) NOT NULL,
+	category_id INT AUTO_INCREMENT NOT NULL,
 	name NVARCHAR(100),
 	PRIMARY KEY (category_id)
 );
 
-CREATE TABLE Suppliers
-(
-	supplier_id INT IDENTITY(1,1) NOT NULL,
-	name NVARCHAR(100),
-	contact NVARCHAR(100),
-	address NVARCHAR(200),
-	PRIMARY KEY (supplier_id)
-);
-
 CREATE TABLE Products
 (
-	product_id INT IDENTITY(1,1) NOT NULL,
+	product_id INT AUTO_INCREMENT NOT NULL,
 	category_id INT,
-	supplier_id INT,
 	barcode NVARCHAR(20),
 	description NVARCHAR(400),
 	price FLOAT,
 	quantity INT,
 	PRIMARY KEY (product_id),
-	FOREIGN KEY (category_id) REFERENCES Category(category_id),
-	FOREIGN KEY (category_id) REFERENCES Suppliers(supplier_id)
+	FOREIGN KEY (category_id) REFERENCES Category(category_id)
 );
 
 CREATE TABLE Vouchers
 (
-	voucher_id INT IDENTITY(1,1) NOT NULL,
+	voucher_id INT AUTO_INCREMENT NOT NULL,
 	code NVARCHAR(200) NOT NULL,
 	voucher_type INT,
 	discount_type INT,
@@ -112,27 +89,30 @@ CREATE TABLE Vouchers
 
 CREATE TABLE LeaveRequests
 (
-	leave_request_id INT IDENTITY(1,1) NOT NULL,
+	leave_request_id INT AUTO_INCREMENT NOT NULL,
 	staff_id INT NOT NULL,
 	start_date DATE,
 	end_date DATE,
 	status INT,
 	comments NVARCHAR(500),
+    admin_reply NVARCHAR(500),
 	PRIMARY KEY (leave_request_id),
 	FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id)
 );
 
 CREATE TABLE HolidayCoef
 (
-	holiday_coef_id INT IDENTITY(1,1) NOT NULL,
-	holiday_date DATE,
+	holiday_coef_id INT AUTO_INCREMENT NOT NULL,
+	name NVARCHAR(100),
+    start_date DATE,
+    end_date DATE,
 	coefficient FLOAT,
 	PRIMARY KEY (holiday_coef_id)
 );
 
 CREATE TABLE Revenue
 (
-	revenue_id INT IDENTITY(1,1) NOT NULL,
+	revenue_id INT AUTO_INCREMENT NOT NULL,
 	date DATE,
 	amount FLOAT,
 	PRIMARY KEY (revenue_id)
@@ -140,8 +120,7 @@ CREATE TABLE Revenue
 
 CREATE TABLE Orders
 (
-	order_id INT IDENTITY(1,1) NOT NULL,
-	customer_name NVARCHAR(100),
+	order_id INT AUTO_INCREMENT NOT NULL,
 	order_date DATE NOT NULL,
 	total_amount INT,
 	PRIMARY KEY (order_id)
@@ -149,7 +128,7 @@ CREATE TABLE Orders
 
 CREATE TABLE OrderItems
 (
-	order_item_id INT IDENTITY(1,1) NOT NULL,
+	order_item_id INT AUTO_INCREMENT NOT NULL,
 	order_id INT NOT NULL,
 	product_id INT NOT NULL,
 	voucher_id INT,
