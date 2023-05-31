@@ -3,7 +3,7 @@ CREATE DATABASE IF NOT EXISTS MiniStore;
 USE MiniStore;
 
 -- Create Tables
-CREATE TABLE CheckInLocations
+CREATE TABLE Check_In_Locations
 (
 	location_id INT AUTO_INCREMENT NOT NULL,
 	name NVARCHAR(200) NOT NULL,
@@ -52,7 +52,7 @@ CREATE TABLE WorkSchedules
 	PRIMARY KEY (schedule_id),
 	FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id),
 	FOREIGN KEY (shift_id) REFERENCES Shifts(shift_id),
-	FOREIGN KEY (location_id) REFERENCES CheckInLocations(location_id)
+	FOREIGN KEY (location_id) REFERENCES Check_In_Locations(location_id)
 );
 
 CREATE TABLE Category

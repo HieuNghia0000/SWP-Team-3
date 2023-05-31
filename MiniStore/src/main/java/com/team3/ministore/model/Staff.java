@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -19,6 +20,9 @@ public class Staff {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "staff_id")
     private int staffId;
+
+    @OneToMany(mappedBy = "staff")
+    private List<LeaveRequests> leaveRequests;
 
     @Column(name = "staff_name")
     private String staffName;
