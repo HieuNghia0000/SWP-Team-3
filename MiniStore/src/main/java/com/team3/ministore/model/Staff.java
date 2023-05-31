@@ -24,6 +24,9 @@ public class Staff {
     @OneToMany(mappedBy = "staff")
     private List<LeaveRequests> leaveRequests;
 
+    @OneToMany(mappedBy = "staff")
+    private List<WorkSchedules> workSchedules;
+
     @Column(name = "staff_name")
     private String staffName;
 

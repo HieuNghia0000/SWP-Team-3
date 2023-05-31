@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.sql.Time;
+import java.util.List;
 
 @Entity
 @Getter
@@ -19,6 +20,9 @@ public class Shifts {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "shift_id")
     private int shiftId;
+
+    @OneToMany(mappedBy = "shifts")
+    private List<WorkSchedules> workSchedules;
 
     @Column(name = "start_time")
     private Time startTime;

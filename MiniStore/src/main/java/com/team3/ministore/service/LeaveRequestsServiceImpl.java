@@ -32,6 +32,7 @@ public class LeaveRequestsServiceImpl implements LeaveRequestsService {
     public LeaveRequests updateLeaveRequests(Integer id, LeaveRequests leaveRequests) {
         LeaveRequests existingLeaveRequests = getLeaveRequestsById(id);
 
+        existingLeaveRequests.setStaff(leaveRequests.getStaff());
         existingLeaveRequests.setAdminReply(leaveRequests.getAdminReply());
         existingLeaveRequests.setComments(leaveRequests.getComments());
         existingLeaveRequests.setStatus(leaveRequests.getStatus());

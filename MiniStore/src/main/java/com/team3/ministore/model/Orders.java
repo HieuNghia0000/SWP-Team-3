@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Getter
@@ -18,6 +19,9 @@ public class Orders {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_id")
     private int orderId;
+
+    @OneToMany(mappedBy = "orders")
+    private List<OrderItems> orderItems;
 
     @Column(name = "order_date")
     private Date orderDate;

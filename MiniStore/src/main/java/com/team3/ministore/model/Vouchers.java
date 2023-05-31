@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
 @Getter
@@ -18,6 +19,9 @@ public class Vouchers {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "voucher_id")
     private int voucherId;
+
+    @OneToMany(mappedBy = "vouchers")
+    private List<OrderItems> orderItems;
 
     @Column(name = "code")
     private String code;
