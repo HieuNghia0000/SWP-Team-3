@@ -1,7 +1,6 @@
 // @refresh reload
-import { Suspense } from "solid-js";
+import { Suspense, createSignal } from "solid-js";
 import {
-  A,
   Body,
   ErrorBoundary,
   FileRoutes,
@@ -13,8 +12,12 @@ import {
   Title,
 } from "solid-start";
 import "./root.css";
+import Navbar from "./components/Navbar";
+import HeadBar from "./components/HeadBar";
 
 export default function Root() {
+  const [isNavOpen, setIsNavOpen] = createSignal(true);
+
   return (
     <Html lang="en">
       <Head>
@@ -25,11 +28,17 @@ export default function Root() {
       <Body>
         <Suspense>
           <ErrorBoundary>
-            <A href="/">Index</A>
-            <A href="/about">About</A>
-            <Routes>
-              <FileRoutes />
-            </Routes>
+            <div class="flex flex-row h-screen">
+              <Navbar isOpen={isNavOpen} setIsNavOpen={setIsNavOpen} />
+              <div class="flex-1">
+                <HeadBar isOpen={isNavOpen} setIsNavOpen={setIsNavOpen} />
+                <div class="overflow-auto">
+                  <Routes>
+                    <FileRoutes />
+                  </Routes>
+                </div>
+              </div>
+            </div>
           </ErrorBoundary>
         </Suspense>
         <Scripts />
