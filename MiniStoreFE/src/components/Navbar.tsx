@@ -92,7 +92,9 @@ const NavbarLink: Component<NavbarLinkProps> = (props) => {
         inactiveClass="text-gray-600 hover:bg-[#EFEFFD] hover:text-indigo-600"
         end
       >
-        <Show when={icon}>{<span class="text-lg">{icon}</span>}</Show>
+        <Show when={icon} fallback={<span class="w-[18px]"></span>}>
+          {<span class="text-lg">{icon}</span>}
+        </Show>
         <Show when={isOpen()}>
           <span>{text}</span>
         </Show>
