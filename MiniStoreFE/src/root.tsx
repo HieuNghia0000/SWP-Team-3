@@ -32,7 +32,7 @@ export default function Root() {
               <Navbar isOpen={isNavOpen} setIsNavOpen={setIsNavOpen} />
               <div class="flex-1">
                 <HeadBar isOpen={isNavOpen} setIsNavOpen={setIsNavOpen} />
-                <div class="overflow-auto">
+                <div class="overflow-auto py-8 px-6">
                   <Routes>
                     <FileRoutes />
                   </Routes>

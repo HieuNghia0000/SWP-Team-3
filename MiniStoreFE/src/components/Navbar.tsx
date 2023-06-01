@@ -2,6 +2,7 @@ import { Component, JSX, Show, children, createSignal } from "solid-js";
 import { TiThLargeOutline } from "solid-icons/ti";
 import { BiRegularShoppingBag } from "solid-icons/bi";
 import { RiSystemArrowDownSLine, RiSystemArrowUpSLine } from "solid-icons/ri";
+import { BsPeople } from "solid-icons/bs";
 import { A } from "@solidjs/router";
 import { Transition } from "solid-transition-group";
 
@@ -41,7 +42,7 @@ const Navbar: Component<NavbarProps> = (props) => {
           href="/products"
           isOpen={isOpen}
           icon={<BiRegularShoppingBag />}
-          text="Product"
+          text="Products"
         >
           <NavbarLink
             href="/products"
@@ -54,6 +55,14 @@ const Navbar: Component<NavbarProps> = (props) => {
             isOpen={isOpen}
           />
         </NavbarDropDown>
+
+        {/* Staff */}
+        <NavbarLink
+          href="/staff"
+          icon={<BsPeople />}
+          text="Staff&nbsp;Management"
+          isOpen={isOpen}
+        />
       </ul>
     </section>
   );
@@ -108,18 +117,17 @@ const NavbarDropDown: Component<NavbarDropDownProps> = (props) => {
       <li class="w-full relative">
         <A
           href={href}
-          class="flex flex-row items-center py-2 px-[11px] gap-2 rounded-lg w-full font-semibold z-20"
+          class="text-gray-600 flex flex-row items-center py-2 px-[11px] gap-2 rounded-lg w-full font-semibold z-20"
           classList={{
             "py-[11px]": !isOpen(),
-            "text-gray-600 bg-[#EFEFFD] text-indigo-600":
-              isDropdownOpen() && isOpen(),
+            "bg-[#EFEFFD] text-indigo-600": isDropdownOpen() && isOpen(),
           }}
           activeClass={
             !isOpen() || !isDropdownOpen()
               ? "bg-indigo-600 text-white"
               : "bg-[#EFEFFD] text-indigo-600"
           }
-          inactiveClass="text-gray-600 hover:bg-[#EFEFFD] hover:text-indigo-600"
+          inactiveClass="hover:bg-[#EFEFFD] hover:text-indigo-600"
         >
           <Show when={icon}>{<span class="text-lg">{icon}</span>}</Show>
           <span classList={{ hidden: !isOpen() }}>{text}</span>
