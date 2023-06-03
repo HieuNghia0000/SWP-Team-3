@@ -7,11 +7,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import java.util.List;
 
 @Configuration
-public class SpringConfig implements WebMvcConfigurer {
+public class SpringMvcConfig implements WebMvcConfigurer {
 
     private final CustomMessageConverterConfig config;
 
-    public SpringConfig(CustomMessageConverterConfig config) {
+    public SpringMvcConfig(CustomMessageConverterConfig config) {
         this.config = config;
     }
 
