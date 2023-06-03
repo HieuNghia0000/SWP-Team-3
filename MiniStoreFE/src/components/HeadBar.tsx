@@ -26,11 +26,11 @@ const HeadBar: Component<HeadBarProps> = (props) => {
               src="https://api.dicebear.com/5.x/adventurer/svg?seed=admin"
               alt="Profile Image"
             />
-            <div class="text-start">
+            <div class="text-start hidden sm:block">
               <p class="font-semibold">Jay Hargudson</p>
               <p class="text-xs text-gray-500 font-medium">Manager</p>
             </div>
-            <span class="text-lg">
+            <span class="text-lg hidden sm:block">
               <Show
                 when={!isDropdownOpen()}
                 fallback={<RiSystemArrowUpSLine />}

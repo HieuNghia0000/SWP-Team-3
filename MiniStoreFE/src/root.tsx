@@ -30,7 +30,7 @@ export default function Root() {
           <ErrorBoundary>
             <div class="flex flex-row h-screen">
               <Navbar isOpen={isNavOpen} setIsNavOpen={setIsNavOpen} />
-              <div class="flex-1">
+              <div class="flex-1 overflow-x-auto">
                 <HeadBar isOpen={isNavOpen} setIsNavOpen={setIsNavOpen} />
                 <div class="overflow-auto py-8 px-6">
                   <Routes>
