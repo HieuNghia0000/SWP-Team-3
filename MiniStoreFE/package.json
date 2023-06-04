@@ -19,6 +19,7 @@
   "dependencies": {
     "@solidjs/meta": "^0.28.2",
     "@solidjs/router": "^0.8.2",
+    "moment": "^2.29.4",
     "solid-form-handler": "^1.2.0",
     "solid-icons": "^1.0.4",
     "solid-js": "^1.7.2",

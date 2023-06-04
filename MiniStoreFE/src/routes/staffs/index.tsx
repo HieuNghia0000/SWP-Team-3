@@ -6,8 +6,61 @@ import { VsTrash } from "solid-icons/vs";
 import { createRouteData, useRouteData, useSearchParams } from "solid-start";
 import Pagination from "~/components/Pagination";
 import { A } from "@solidjs/router";
-import { Show, createSignal } from "solid-js";
+import { For, Show, createSignal } from "solid-js";
 import { CgClose } from "solid-icons/cg";
+import moment from "moment";
+
+const mockData = [
+  {
+    id: 1,
+    name: "Nguyen Van A",
+    username: "nguyenvana",
+    phone: "0123456789",
+    role: "Manager",
+    workDays: "TUE, THU, SAT, SUN",
+    status: 1,
+    baseSalary: "80.000",
+    createdAt: "2021-09-01T00:00:00.000Z",
+    updatedAt: "2021-09-01T00:00:00.000Z",
+  },
+  {
+    id: 2,
+    name: "Nguyen Van B",
+    username: "nguyenvanb",
+    phone: "0123456789",
+    role: "Manager",
+    workDays: "TUE, THU, SAT, SUN",
+    status: 2,
+    baseSalary: "80.000",
+    createdAt: "2021-09-01T00:00:00.000Z",
+    updatedAt: "2021-09-01T00:00:00.000Z",
+  },
+  {
+    id: 3,
+    name: "Nguyen Van B",
+    username: "nguyenvanb",
+    phone: "0123456789",
+    role: "Cashier",
+    workDays: "TUE, THU, SAT",
+    status: 2,
+    baseSalary: "60.000",
+    createdAt: "2021-09-01T00:00:00.000Z",
+    updatedAt: "2021-09-01T00:00:00.000Z",
+  },
+];
+
+type Staff = {
+  id: number;
+  name: string;
+  username: string;
+  phone: string;
+  role: string;
+  workDays: string;
+  status: number;
+  baseSalary: string;
+  createdAt: string;
+  updatedAt: string;
+};
 
 export function routeData() {
   const [searchParams] = useSearchParams();
@@ -18,7 +71,7 @@ export function routeData() {
       //   `https://hogwarts.deno.dev/students?perPage=${perPage}&curPage=${curPage}`
       // );
       // return await response.json();
-      return true;
+      return mockData as Staff[];
     },
     { key: () => [searchParams.perPage ?? 10, searchParams.curPage ?? 1] }
   );
@@ -28,7 +81,7 @@ export default function Staffs() {
   const [searchParams, setSearchParams] = useSearchParams();
   const data = useRouteData<typeof routeData>();
   const [showModal, setShowModal] = createSignal<boolean>(false);
-  const [modalData, setModalData] = createSignal<number>();
+  const [modalData, setModalData] = createSignal<Staff>();
 
   const totalItems = 100;
   const perPage = () => Number.parseInt(searchParams.perPage ?? 10);
@@ -59,9 +112,8 @@ export default function Staffs() {
   };
 
   const onViewDetails = (dataIndex: number) => {
-    console.log(dataIndex);
     setShowModal(true);
-    setModalData(dataIndex);
+    setModalData(data()![dataIndex]);
   };
 
   return (
@@ -72,22 +124,30 @@ export default function Staffs() {
 
         {/* Search bar */}
         <div class="mb-4 flex flex-row justify-between">
-          <form class="relative" onSubmit={onSearchSubmit}>
-            <input
-              type="text"
-              class="w-96 max-w-full border-gray-300 rounded-lg py-2 px-4 leading-tight pl-12 border-0 ring-1 ring-inset ring-gray-300 outline-0 focus:ring-1 focus:ring-inset focus:ring-indigo-600"
-              placeholder="Search (type text, then press Enter)"
-              name="search"
-              value=""
-            />
-            <button
-              class="absolute inset-y-0 left-0 flex items-center pl-4 text-lg"
-              type="submit"
-              title="Search"
+          <div class="flex flex-row gap-5 items-center">
+            <form class="relative" onSubmit={onSearchSubmit}>
+              <input
+                type="text"
+                class="w-96 max-w-full border-gray-300 rounded-lg py-2 px-4 leading-tight pl-12 border-0 ring-1 ring-inset ring-gray-300 outline-0 focus:ring-1 focus:ring-inset focus:ring-indigo-600"
+                placeholder="Search (type text, then press Enter)"
+                name="search"
+                value=""
+              />
+              <button
+                class="absolute inset-y-0 left-0 flex items-center pl-4 text-lg"
+                type="submit"
+                title="Search"
+              >
+                <AiOutlineSearch />
+              </button>
+            </form>
+            <A
+              href="/staffs/add"
+              class="text-base text-indigo-600 font-medium hover:text-indigo-500 hover:underline hover:underline-offset-2"
             >
-              <AiOutlineSearch />
-            </button>
-          </form>
+              Add new staff
+            </A>
+          </div>
           <div class="flex justify-center items-center mr-5">
             <label class="inline-block text-gray-600" for="email">
               Show
@@ -113,7 +173,7 @@ export default function Staffs() {
 
         {/* Table */}
         <div class="flex flex-col border border-gray-200 rounded-lg overflow-x-auto shadow-sm">
-          <table class="min-w-full divide-y divide-gray-200 table-fixed">
+          <table class="min-w-full table-fixed border-separate border-spacing-0.5 border-white">
             <thead class="bg-gray-50">
               <tr>
                 <th
@@ -155,83 +215,55 @@ export default function Staffs() {
               </tr>
             </thead>
             {/* <!-- Table row --> */}
-            <tbody class="bg-white divide-y divide-gray-200">
-              <tr class="hover:bg-gray-200">
-                <td class="px-6 py-4 whitespace-nowrap max-w-[150px] truncate md:hover:overflow-visible md:hover:whitespace-normal">
-                  John Bushmill
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap max-w-[150px] truncate md:hover:overflow-visible md:hover:whitespace-normal">
-                  0987654321
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap max-w-[150px] truncate md:hover:overflow-visible md:hover:whitespace-normal">
-                  Manager
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap max-w-[150px] truncate md:hover:overflow-visible md:hover:whitespace-normal">
-                  TUE, THU, SAT, SUN
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap max-w-[150px] truncate md:hover:overflow-visible md:hover:whitespace-normal">
-                  <span class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-bold text-white bg-green-500 rounded-full">
-                    Active
-                  </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap max-w-[150px] truncate md:hover:overflow-visible md:hover:whitespace-normal">
-                  <div class="flex flex-row gap-1">
-                    <button
-                      class="text-base text-gray-500 hover:text-indigo-500"
-                      onClick={[onViewDetails, 0]}
-                    >
-                      <IoEyeOutline />
-                    </button>
-                    <A
-                      href="/staffs/1"
-                      class="text-base text-gray-500 hover:text-indigo-500"
-                    >
-                      <OcPencil3 />
-                    </A>
-                    <button class="text-base text-gray-500 hover:text-indigo-500">
-                      <VsTrash />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr class="hover:bg-gray-200">
-                <td class="px-6 py-4 whitespace-nowrap max-w-[150px] truncate md:hover:overflow-visible md:hover:whitespace-normal">
-                  John Bushmill
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap max-w-[150px] truncate md:hover:overflow-visible md:hover:whitespace-normal">
-                  0987654321
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap max-w-[150px] truncate md:hover:overflow-visible md:hover:whitespace-normal">
-                  Manager
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap max-w-[150px] truncate md:hover:overflow-visible md:hover:whitespace-normal">
-                  TUE, THU, SAT, SUN
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap max-w-[150px] truncate md:hover:overflow-visible md:hover:whitespace-normal">
-                  <span class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-bold text-white bg-red-500 rounded-full">
-                    Disabled
-                  </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap max-w-[150px] truncate md:hover:overflow-visible md:hover:whitespace-normal">
-                  <div class="flex flex-row gap-1">
-                    <button
-                      class="text-base text-gray-500 hover:text-indigo-500"
-                      onClick={[onViewDetails, 1]}
-                    >
-                      <IoEyeOutline />
-                    </button>
-                    <A
-                      href="/staffs/1"
-                      class="text-base text-gray-500 hover:text-indigo-500"
-                    >
-                      <OcPencil3 />
-                    </A>
-                    <button class="text-base text-gray-500 hover:text-indigo-500">
-                      <VsTrash />
-                    </button>
-                  </div>
-                </td>
-              </tr>
+            <tbody class="">
+              <For each={data()}>
+                {(item, index) => (
+                  <tr class="hover:bg-gray-200 odd:bg-white even:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
+                      {item.name}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
+                      {item.phone}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
+                      {item.role}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
+                      {item.workDays}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
+                      <span
+                        class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-bold text-white rounded-full"
+                        classList={{
+                          "bg-green-500": item.status === 1,
+                          "bg-red-500": item.status === 2,
+                        }}
+                      >
+                        {item.status === 1 ? "Active" : "Disabled"}
+                      </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
+                      <div class="flex flex-row gap-1">
+                        <button
+                          class="text-base text-gray-500 hover:text-indigo-500"
+                          onClick={[onViewDetails, index()]}
+                        >
+                          <IoEyeOutline />
+                        </button>
+                        <A
+                          href="/staffs/1"
+                          class="text-base text-gray-500 hover:text-indigo-500"
+                        >
+                          <OcPencil3 />
+                        </A>
+                        <button class="text-base text-gray-500 hover:text-indigo-500">
+                          <VsTrash />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </For>
             </tbody>
           </table>
         </div>
@@ -250,13 +282,13 @@ export default function Staffs() {
       {/* <!-- Modal panel, show/hide based on modal state. --> */}
       <Show when={showModal()}>
         <div
-          class="absolute inset-0 z-20 flex bg-black bg-opacity-50 sm:justify-end sm:p-5 overflow-hidden"
+          class="absolute inset-0 z-20 flex bg-black bg-opacity-50 overflow-x-auto sm:justify-end sm:p-5 sm:overflow-hidden"
           aria-modal="true"
           onClick={(e) => {
             if (e.target.ariaModal) setShowModal(false);
           }}
         >
-          <div class="flex flex-col text-gray-500 bg-white shadow-lg sm:rounded-lg h-full overflow-auto slide-in-right">
+          <div class="min-w-[440px] flex flex-col text-gray-500 bg-white shadow-lg sm:rounded-lg h-full overflow-auto slide-in-right border">
             <div class="p-6 flex justify-between flex-row items-center text-black">
               <h4 class="text-2xl font-medium">Staff details</h4>
               <button
@@ -268,143 +300,101 @@ export default function Staffs() {
             </div>
             <div class="border"></div>
             <div class="p-6">
-              <form>
-                <div class="mb-4">
-                  <label class="inline-block mb-2 text-gray-500">
-                    Input Text{" "}
-                  </label>
-                  <input
-                    type="text"
-                    class="w-full px-4 py-2 text-gray-500 border rounded outline-none focus:border-blue-500 focus:shadow dark:bg-dark-card dark:border-gray-600"
-                    value="Mark Jhon"
-                    placeholder="Enter Name"
-                  />
-                </div>
-                <div class="mb-4">
-                  <label class="inline-block mb-2 text-gray-500">
-                    Email Input
-                  </label>
-                  <input
-                    type="email"
-                    class="w-full px-4 py-2 text-gray-500 border rounded outline-none focus:border-blue-500 focus:shadow dark:bg-dark-card dark:border-gray-600"
-                    value="markjohn@gmail.com"
-                    placeholder="Enter Email"
-                  />
-                </div>
-                <div class="mb-4">
-                  <label class="inline-block mb-2 text-gray-500">
-                    Url Input
-                  </label>
-                  <input
-                    type="url"
-                    class="w-full px-4 py-2 text-gray-500 border rounded outline-none focus:border-blue-500 focus:shadow dark:bg-dark-card dark:border-gray-600"
-                    value="https://tailwindui.com"
-                    placeholder="Enter Url"
-                  />
-                </div>
-                <div class="mb-4">
-                  <label class="inline-block mb-2 text-gray-500">
-                    Telephone Input
-                  </label>
-                  <input
-                    type="tel"
-                    class="w-full px-4 py-2 text-gray-500 border rounded outline-none focus:border-blue-500 focus:shadow dark:bg-dark-card dark:border-gray-600"
-                    value="1-(555)-555-5555"
-                  />
-                </div>
-                <div class="mb-4">
-                  <label class="inline-block mb-2 text-gray-500">
-                    Number Input
-                  </label>
-                  <input
-                    type="number"
-                    class="w-full px-4 py-2 text-gray-500 border rounded outline-none focus:border-blue-500 focus:shadow dark:bg-dark-card dark:border-gray-600"
-                    value="2356"
-                  />
-                </div>
-                <div class="mb-4">
-                  <label class="inline-block mb-2 text-gray-500">
-                    Password Input
-                  </label>
-                  <input
-                    type="password"
-                    class="w-full px-4 py-2 text-gray-500 border rounded outline-none focus:border-blue-500 focus:shadow dark:bg-dark-card dark:border-gray-600"
-                    value="markjhon123"
-                    placeholder="Enter Password"
-                  />
-                </div>
-                <div class="mb-4">
-                  <label class="inline-block mb-2 text-gray-500">
-                    Date Input
-                  </label>
-                  <input
-                    type="date"
-                    class="w-full px-4 py-2 text-gray-500 border rounded outline-none focus:border-blue-500 focus:shadow dark:bg-dark-card dark:border-gray-600"
-                    value="2019-12-18"
-                  />
-                </div>
-                <div class="mb-4">
-                  <label class="inline-block mb-2 text-gray-500">
-                    Month Input
-                  </label>
-                  <input
-                    type="month"
-                    class="w-full px-4 py-2 text-gray-500 border rounded outline-none focus:border-blue-500 focus:shadow dark:bg-dark-card dark:border-gray-600"
-                    value="2019-12"
-                  />
-                </div>
-                <div class="mb-4">
-                  <label class="inline-block mb-2 text-gray-500">
-                    Week Input
-                  </label>
-                  <input
-                    type="week"
-                    class="w-full px-4 py-2 text-gray-500 border rounded outline-none focus:border-blue-500 focus:shadow dark:bg-dark-card dark:border-gray-600"
-                    value="2019-W46"
-                  />
-                </div>
-                <div class="mb-4">
-                  <label class="inline-block mb-2 text-gray-500">
-                    Time Input
-                  </label>
-                  <input
-                    type="time"
-                    class="w-full px-4 py-2 text-gray-500 border rounded outline-none focus:border-blue-500 focus:shadow dark:bg-dark-card dark:border-gray-600"
-                    value="13:45"
-                  />
-                </div>
-                <div class="mb-4">
-                  <label class="inline-block mb-2 text-gray-500">
-                    Date and Time Input
-                  </label>
-                  <input
-                    type="datetime-local"
-                    class="w-full px-4 py-2 text-gray-500 border rounded outline-none focus:border-blue-500 focus:shadow dark:bg-dark-card dark:border-gray-600"
-                    value="2019-12-19T13:45:00"
-                  />
-                </div>
-                <div class="mb-4">
-                  <label class="inline-block mb-2 text-gray-500">
-                    Example textarea
-                  </label>
-                  <textarea
-                    class="w-full px-4 py-2 border rounded outline-none focus:border-blue-500 focus:shadow dark:bg-dark-card dark:border-gray-600"
-                    rows="5"
-                  ></textarea>
-                </div>
-                <button
-                  type="submit"
-                  class="inline-block px-6 py-2 text-white transition-all duration-500 ease-in-out bg-blue-500 border border-blue-500 rounded shadow-md hover:shadow-xl hover:bg-blue-600 hover:text-white"
-                >
-                  Submit
+              <div class="flex items-center mb-4">
+                <label class="w-3/4 sm:w-2/4 pr-2 mb-0 md:mr-0 mr-6">
+                  Staff ID:
+                </label>
+                <span class="w-full px-4 py-2 font-bold">
+                  {modalData()?.id}
+                </span>
+              </div>
+              <div class="flex items-center mb-4">
+                <label class="w-3/4 sm:w-2/4 pr-2 mb-0 md:mr-0 mr-6">
+                  Name:
+                </label>
+                <span class="w-full px-4 py-2 font-bold">
+                  {modalData()?.name}
+                </span>
+              </div>
+              <div class="flex items-center mb-4">
+                <label class="w-3/4 sm:w-2/4 pr-2 mb-0 md:mr-0 mr-6">
+                  Username:
+                </label>
+                <span class="w-full px-4 py-2 font-bold">
+                  {modalData()?.username}
+                </span>
+              </div>
+              <div class="flex items-center mb-4">
+                <label class="w-3/4 sm:w-2/4 pr-2 mb-0 md:mr-0 mr-6">
+                  Phone number:
+                </label>
+                <span class="w-full px-4 py-2 font-bold">
+                  {modalData()?.phone}
+                </span>
+              </div>
+              <div class="flex items-center mb-4">
+                <label class="w-3/4 sm:w-2/4 pr-2 mb-0 md:mr-0 mr-6">
+                  Role:
+                </label>
+                <span class="w-full px-4 py-2 font-bold">
+                  {modalData()?.role}
+                </span>
+              </div>
+              <div class="flex items-center mb-4">
+                <label class="w-3/4 sm:w-2/4 pr-2 mb-0 md:mr-0 mr-6">
+                  Salary per hour:
+                </label>
+                <span class="w-full px-4 py-2 font-bold">
+                  {modalData()?.baseSalary} VND
+                </span>
+              </div>
+              <div class="flex items-center mb-4">
+                <label class="w-3/4 sm:w-2/4 pr-2 mb-0 md:mr-0 mr-6">
+                  Working days:
+                </label>
+                <span class="w-full px-4 py-2 font-bold">
+                  {modalData()?.workDays}
+                </span>
+              </div>
+              <div class="flex items-center mb-4">
+                <label class="w-3/4 sm:w-2/4 pr-2 mb-0 md:mr-0 mr-6">
+                  Status:
+                </label>
+                <span class="w-full px-4 py-2 font-bold">
+                  {modalData()?.status === 1 ? "Active" : "Disabled"}
+                </span>
+              </div>
+              <div class="flex items-center mb-4">
+                <label class="w-3/4 sm:w-2/4 pr-2 mb-0 md:mr-0 mr-6">
+                  Created at:
+                </label>
+                <span class="w-full px-4 py-2 font-bold">
+                  {moment(modalData()?.createdAt!).format(
+                    "MMM Do YYYY, h:mm a"
+                  )}
+                </span>
+              </div>
+              <div class="flex items-center mb-4">
+                <label class="w-3/4 sm:w-2/4 pr-2 mb-0 md:mr-0 mr-6">
+                  Updated at:
+                </label>
+                <span class="w-full px-4 py-2 font-bold">
+                  {moment(modalData()?.updatedAt!).format(
+                    "MMM Do YYYY, h:mm a"
+                  )}
+                </span>
+              </div>
+              <div class="flex flex-row justify-end gap-3">
+                <button class="px-6 py-2 text-white bg-red-500 border border-red-500 rounded hover:bg-red-600 hover:text-white">
+                  Disable
                 </button>
-                <button
-                  type="submit"
-                  class="inline-block px-6 py-2 text-white transition-all duration-500 ease-in-out bg-red-500 border border-red-500 rounded shadow-md hover:shadow-xl hover:bg-red-600 hover:text-white"
+                <A
+                  href={`/staffs/${modalData()?.id}`}
+                  class="px-6 py-2 text-white bg-blue-500 border border-blue-500 rounded hover:bg-blue-600 hover:text-white"
                 >
-                  Cancel
-                </button>
-              </form>
+                  Edit
+                </A>
+              </div>
             </div>
           </div>
         </div>
