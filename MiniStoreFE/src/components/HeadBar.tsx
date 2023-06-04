@@ -41,7 +41,7 @@ const HeadBar: Component<HeadBarProps> = (props) => {
           </button>
         </div>
         <Show when={isDropdownOpen()}>
-          <div class="origin-top-right absolute right-0 top-16 z-10 w-48 rounded-md shadow-lg border border-gray-200">
+          <div class="origin-top-right absolute right-0 top-16 z-30 w-48 rounded-md shadow-lg border border-gray-200">
             <div class="py-1 rounded-md bg-white shadow-xs">
               <a
                 href="/logout"

@@ -35,6 +35,7 @@ const Navbar: Component<NavbarProps> = (props) => {
           icon={<TiThLargeOutline />}
           text="Dashboard"
           isOpen={isOpen}
+          end
         />
 
         {/* Product */}
@@ -49,16 +50,12 @@ const Navbar: Component<NavbarProps> = (props) => {
             text="Product&nbsp;List"
             isOpen={isOpen}
           />
-          <NavbarLink
-            href="/products/categories"
-            text="Categories"
-            isOpen={isOpen}
-          />
+          <NavbarLink href="/categories" text="Categories" isOpen={isOpen} />
         </NavbarDropDown>
 
         {/* Staff */}
         <NavbarLink
-          href="/staff"
+          href="/staffs"
           icon={<BsPeople />}
           text="Staff&nbsp;Management"
           isOpen={isOpen}
@@ -75,10 +72,11 @@ interface NavbarLinkProps {
   isOpen: () => boolean;
   icon?: JSX.Element;
   text?: string;
+  end?: boolean;
 }
 
 const NavbarLink: Component<NavbarLinkProps> = (props) => {
-  const { href, isOpen, icon, text } = props;
+  const { href, isOpen, icon, text, end } = props;
 
   return (
     <li class="w-full">
@@ -90,7 +88,7 @@ const NavbarLink: Component<NavbarLinkProps> = (props) => {
         }}
         activeClass="bg-indigo-600 text-white"
         inactiveClass="text-gray-600 hover:bg-[#EFEFFD] hover:text-indigo-600"
-        end
+        end={end}
       >
         <Show when={icon} fallback={<span class="w-[18px]"></span>}>
           {<span class="text-lg">{icon}</span>}

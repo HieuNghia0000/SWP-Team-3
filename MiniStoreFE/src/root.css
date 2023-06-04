@@ -5,3 +5,16 @@
 body {
   background-color: #f9f9fc;
 }
+
+@keyframes slide-in-right {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.slide-in-right {
+  animation: slide-in-right 0.2s ease-out;
+}

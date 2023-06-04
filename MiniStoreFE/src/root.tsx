@@ -17,6 +17,7 @@ import HeadBar from "./components/HeadBar";
 
 export default function Root() {
   const [isNavOpen, setIsNavOpen] = createSignal(true);
+  let mainRef;
 
   return (
     <Html lang="en">
@@ -30,12 +31,14 @@ export default function Root() {
           <ErrorBoundary>
             <div class="flex flex-row h-screen">
               <Navbar isOpen={isNavOpen} setIsNavOpen={setIsNavOpen} />
-              <div class="flex-1 overflow-x-auto">
+              <div class="flex-1 overflow-x-auto flex flex-col">
                 <HeadBar isOpen={isNavOpen} setIsNavOpen={setIsNavOpen} />
-                <div class="overflow-auto py-8 px-6">
-                  <Routes>
-                    <FileRoutes />
-                  </Routes>
+                <div class="relative flex-1">
+                  <div class="overflow-auto py-8 px-6 h-full">
+                    <Routes>
+                      <FileRoutes />
+                    </Routes>
+                  </div>
                 </div>
               </div>
             </div>
