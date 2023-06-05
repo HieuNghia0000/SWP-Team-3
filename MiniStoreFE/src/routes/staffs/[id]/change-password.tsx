@@ -1,4 +1,5 @@
 import { A, useRouteData } from "@solidjs/router";
+import { type } from "os";
 import { useFormHandler } from "solid-form-handler";
 import { yupSchema } from "solid-form-handler/yup";
 import { RouteDataArgs, createRouteData } from "solid-start";
@@ -12,22 +13,20 @@ type Staff = {
   id?: number;
   username?: string;
   name: string;
-  phone: string;
-  baseSalary: string;
-  role: number;
-  workDays?: string;
-  status?: number;
   image?: string;
+  status?: number;
 };
 
-const schema: yup.Schema<Staff> = yup.object({
-  name: yup.string().required("Vui lòng nhập họ tên"),
-  phone: yup.string().required("Vui lòng nhập số điện thoại"),
-  role: yup
-    .number()
-    .typeError("Vui lòng nhập số")
-    .required("Vui lòng chọn role"),
-  baseSalary: yup.string().required("Vui lòng nhập lương cơ bản"),
+type Password = {
+  curPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+};
+
+const schema: yup.Schema<Password> = yup.object({
+  curPassword: yup.string().required("Vui lòng nhập mật khẩu hiện tại"),
+  newPassword: yup.string().required("Vui lòng nhập mật khẩu mới"),
+  confirmPassword: yup.string().required("Vui lòng nhập lại mật khẩu mới"),
 });
 
 export function routeData({ params }: RouteDataArgs) {
@@ -41,11 +40,7 @@ export function routeData({ params }: RouteDataArgs) {
         id: Number.parseInt(key[1]),
         name: "Nguyen Van A",
         username: "nguyenvana",
-        phone: "0123456789",
-        role: 1,
-        workDays: "TUE, THU, SAT, SUN",
         status: 1,
-        baseSalary: "80000",
         image: "",
       } as Staff;
     },
@@ -53,7 +48,7 @@ export function routeData({ params }: RouteDataArgs) {
   );
 }
 
-export default function StaffEdit() {
+export default function ChangeStaffPassword() {
   const data = useRouteData<typeof routeData>();
   const formHandler = useFormHandler(yupSchema(schema), {
     validateOn: ["change"],
@@ -71,16 +66,16 @@ export default function StaffEdit() {
   };
 
   const reset = () => {
-    formHandler.fillForm(data()!);
+    formHandler.resetForm();
   };
 
   return (
     <main class="min-w-fit">
-      <h1 class="mb-2 text-2xl font-medium">Edit staff</h1>
+      <h1 class="mb-2 text-2xl font-medium">Change password</h1>
       <Breadcrumbs
         linkList={[
           { name: "Staff Management", link: routes.staffs },
-          { name: "Edit Staff" },
+          { name: "Change Staff Password" },
         ]}
       />
 
@@ -150,79 +145,38 @@ export default function StaffEdit() {
 
         <div class="flex flex-col bg-white border border-gray-200 rounded-lg min-w-[440px] max-w-5xl flex-1 shadow-sm">
           <div class="flex flex-auto px-6 pt-6">
-            <h4 class="text-lg font-medium">General Information</h4>
+            <h4 class="text-lg font-medium">
+              Keep your account safe with a strong password.
+            </h4>
           </div>
           <div class="p-6">
             <form class="space-y-4" onSubmit={submit}>
               <TextInput
-                id="name"
-                name="name"
-                label="Staff name"
-                value={data()?.name}
-                placeholder="Enter staff name"
+                type="password"
+                id="curPassword"
+                name="curPassword"
+                label="Current password"
+                placeholder="Enter current password"
                 formHandler={formHandler}
               />
 
               <TextInput
-                id="username"
-                name="username"
-                label="Username"
-                value={data()?.username}
-                disabled
-                placeholder="Enter staff username"
+                type="password"
+                id="newPassword"
+                name="newPassword"
+                label="New password"
+                placeholder="Enter new password"
                 formHandler={formHandler}
               />
 
               <TextInput
-                id="phone"
-                name="phone"
-                label="Phone number"
-                value={data()?.phone}
-                placeholder="Enter staff phone number"
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                label="Re-enter new password"
+                placeholder="Enter new password again"
                 formHandler={formHandler}
               />
-
-              <Select
-                id="role"
-                name="role"
-                label="Role"
-                value={data()?.role}
-                options={role}
-                formHandler={formHandler}
-              />
-
-              <TextInput
-                id="baseSalary"
-                name="baseSalary"
-                label="Base salary"
-                value={Number.parseInt(data()?.baseSalary!)}
-                type="number"
-                step={1000}
-                placeholder="Enter staff base salary"
-                formHandler={formHandler}
-              />
-
-              <TextInput
-                id="workDays"
-                name="workDays"
-                label="Work days"
-                value={data()?.workDays}
-                disabled
-                placeholder="Enter staff work days"
-                formHandler={formHandler}
-              />
-              <div class="space-x-3">
-                <p class="inline-block mb-2 text-gray-600">Status</p>
-                <span
-                  class="inline-block whitespace-nowrap px-2 py-0.5 text-sm text-center font-bold text-white rounded-full"
-                  classList={{
-                    "bg-green-500": data()?.status === 1,
-                    "bg-red-500": data()?.status === 2,
-                  }}
-                >
-                  {data()?.status === 1 ? "Active" : "Disabled"}
-                </span>
-              </div>
 
               <div class="space-x-3">
                 <button
