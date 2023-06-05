@@ -46,14 +46,16 @@ export const Select: Component<SelectProps> = (props) => {
       render={(field) => (
         <div class={local.class} classList={local.classList}>
           <Show when={local.label}>
-            <label for={field.props.id}>{local.label}</label>
+            <label for={field.props.id} class="inline-block mb-2 text-gray-600">
+              {local.label}
+            </label>
           </Show>
           <select
             {...rest}
             {...field.props}
-            class="w-full h-7 border border-gray-300 px-2 rounded truncate"
+            class="w-full border outline-none focus:border-indigo-500 focus:shadow px-4 py-2 rounded truncate"
             classList={{
-              "ring-1 ring-orange-600 focus:outline-none": field.helpers.error,
+              "ring-1 ring-red-400 focus:outline-none": field.helpers.error,
             }}
           >
             <For each={options()}>
@@ -68,7 +70,7 @@ export const Select: Component<SelectProps> = (props) => {
             </For>
           </select>
           <Show when={field.helpers.error}>
-            <p class="text-sm text-red-500">{field.helpers.errorMessage}</p>
+            <p class="text-sm text-red-400">{field.helpers.errorMessage}</p>
           </Show>
         </div>
       )}

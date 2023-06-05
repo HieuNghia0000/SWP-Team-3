@@ -415,7 +415,7 @@ export default function Staffs() {
                   Disable
                 </button>
                 <A
-                  href={`/staffs/${modalData()?.id}`}
+                  href={routes.staffEdit(modalData()?.id!)}
                   class="px-6 py-2 text-white bg-blue-500 border border-blue-500 rounded hover:bg-blue-600 hover:text-white"
                 >
                   Edit
