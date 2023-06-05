@@ -2,13 +2,14 @@ import Breadcrumbs from "~/components/Breadcrumbs";
 import { AiOutlineSearch } from "solid-icons/ai";
 import { IoEyeOutline } from "solid-icons/io";
 import { OcPencil3 } from "solid-icons/oc";
-import { VsTrash } from "solid-icons/vs";
+import { FiLock, FiUnlock } from "solid-icons/fi";
 import { createRouteData, useRouteData, useSearchParams } from "solid-start";
 import Pagination from "~/components/Pagination";
 import { A } from "@solidjs/router";
 import { For, Show, createSignal } from "solid-js";
 import { CgClose } from "solid-icons/cg";
 import moment from "moment";
+import routes from "~/utils/routes";
 
 const mockData = [
   {
@@ -142,7 +143,7 @@ export default function Staffs() {
               </button>
             </form>
             <A
-              href="/staffs/add"
+              href={routes.staffAdd}
               class="text-base text-indigo-600 font-medium hover:text-indigo-500 hover:underline hover:underline-offset-2"
             >
               Add new staff
@@ -220,7 +221,12 @@ export default function Staffs() {
                 {(item, index) => (
                   <tr class="hover:bg-gray-200 odd:bg-white even:bg-gray-50">
                     <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
-                      {item.name}
+                      <A
+                        href={routes.staff(item.id)}
+                        class="hover:text-indigo-500"
+                      >
+                        {item.name}
+                      </A>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
                       {item.phone}
@@ -244,21 +250,41 @@ export default function Staffs() {
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
                       <div class="flex flex-row gap-1">
-                        <button
-                          class="text-base text-gray-500 hover:text-indigo-500"
-                          onClick={[onViewDetails, index()]}
-                        >
-                          <IoEyeOutline />
-                        </button>
-                        <A
-                          href="/staffs/1"
-                          class="text-base text-gray-500 hover:text-indigo-500"
-                        >
-                          <OcPencil3 />
-                        </A>
-                        <button class="text-base text-gray-500 hover:text-indigo-500">
-                          <VsTrash />
-                        </button>
+                        <div class="relative">
+                          <button
+                            class="peer text-base text-gray-500 hover:text-indigo-500"
+                            onClick={[onViewDetails, index()]}
+                          >
+                            <IoEyeOutline />
+                          </button>
+                          <span class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
+                            Quick view
+                          </span>
+                        </div>
+                        <div class="relative">
+                          <A
+                            href={routes.staffEdit(item.id)}
+                            class="peer text-base text-gray-500 hover:text-indigo-500"
+                          >
+                            <OcPencil3 />
+                          </A>
+                          <span class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
+                            Edit
+                          </span>
+                        </div>
+                        <div class="relative">
+                          <button class="peer text-base text-gray-500 hover:text-indigo-500">
+                            <Show
+                              when={item.status === 1}
+                              fallback={<FiUnlock />}
+                            >
+                              <FiLock />
+                            </Show>
+                          </button>
+                          <span class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
+                            {item.status === 1 ? "Disable" : "Enable"}
+                          </span>
+                        </div>
                       </div>
                     </td>
                   </tr>

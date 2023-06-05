@@ -1,6 +1,7 @@
 import { A } from "@solidjs/router";
 import { RiSystemArrowRightSLine } from "solid-icons/ri";
 import { Component, For, Show } from "solid-js";
+import routes from "~/utils/routes";
 
 const Breadcrumbs: Component<{
   linkList: { name: string; link?: string }[];
@@ -9,7 +10,7 @@ const Breadcrumbs: Component<{
 
   return (
     <div class="flex flex-row justify-start items-center text-sm gap-3 font-medium mb-6">
-      <A href="/" class="text-indigo-600">
+      <A href={routes.dashboard} class="text-indigo-600">
         Dashboard
       </A>
       <For each={linkList}>

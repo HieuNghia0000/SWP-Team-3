@@ -1,5 +1,6 @@
 import { RiSystemArrowDownSLine, RiSystemArrowUpSLine } from "solid-icons/ri";
 import { Component, Show, createSignal } from "solid-js";
+import routes from "~/utils/routes";
 
 type HeadBarProps = {
   isOpen: () => boolean;
@@ -44,7 +45,7 @@ const HeadBar: Component<HeadBarProps> = (props) => {
           <div class="origin-top-right absolute right-0 top-16 z-30 w-48 rounded-md shadow-lg border border-gray-200">
             <div class="py-1 rounded-md bg-white shadow-xs">
               <a
-                href="/logout"
+                href={routes.logout}
                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
                 Logout

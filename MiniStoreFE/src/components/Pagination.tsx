@@ -53,14 +53,11 @@ const Pagination: Component<PaginationProps> = (props) => {
         </div>
         <div>
           <div>
-            <nav
-              class="isolate inline-flex -space-x-px rounded-md shadow-sm"
-              aria-label="Pagination"
-            >
+            <nav class="isolate inline-flex gap-1" aria-label="Pagination">
               <button
                 onClick={prev}
                 disabled={curPage() === 1}
-                class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+                class="relative inline-flex shadow-sm w-8 h-8 justify-center items-center rounded-lg font-semibold bg-white text-indigo-500 ring-1 ring-inset ring-gray-300 hover:bg-indigo-100 focus:z-20 focus:outline-offset-0"
               >
                 <span class="sr-only">Previous</span>
                 <svg
@@ -86,11 +83,11 @@ const Pagination: Component<PaginationProps> = (props) => {
                   >
                     <button
                       onClick={() => setPage(curPage() + pageNumber - 3)}
-                      class="relative inline-flex items-center px-4 py-2 text-sm font-semibold ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+                      class="relative inline-flex shadow-sm w-8 h-8 justify-center items-center font-semibold rounded-lg bg-white ring-1 ring-inset ring-gray-300 focus:z-20 focus:outline-offset-0"
                       classList={{
-                        "bg-indigo-600 text-white hover:bg-indigo-600 focus:outline-none focus:ring":
+                        "bg-indigo-500 text-white hover:bg-indigo-600 focus:outline-none focus:ring":
                           curPage() === curPage() + pageNumber - 3,
-                        "text-gray-900":
+                        "text-indigo-500 hover:bg-indigo-100":
                           curPage() !== curPage() + pageNumber - 3,
                       }}
                     >
@@ -102,7 +99,7 @@ const Pagination: Component<PaginationProps> = (props) => {
               <button
                 onClick={next}
                 disabled={curPage() === lastPage()}
-                class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+                class="relative inline-flex shadow-sm w-8 h-8 justify-center items-center font-semibold rounded-lg bg-white text-indigo-500 ring-1 ring-inset ring-gray-300 hover:bg-indigo-100 focus:z-20 focus:outline-offset-0"
               >
                 <span class="sr-only">Next</span>
                 <svg

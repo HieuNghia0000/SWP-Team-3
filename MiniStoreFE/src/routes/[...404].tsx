@@ -1,6 +1,7 @@
 import { A } from "@solidjs/router";
 import { Title } from "solid-start";
 import { HttpStatusCode } from "solid-start/server";
+import routes from "~/utils/routes";
 
 export default function NotFound() {
   return (
@@ -17,7 +18,7 @@ export default function NotFound() {
         </p>
         <div class="mt-10 flex items-center justify-center gap-x-6">
           <A
-            href="/"
+            href={routes.dashboard}
             class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             Back to home

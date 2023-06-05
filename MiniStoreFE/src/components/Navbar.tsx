@@ -5,6 +5,7 @@ import { RiSystemArrowDownSLine, RiSystemArrowUpSLine } from "solid-icons/ri";
 import { BsPeople } from "solid-icons/bs";
 import { A } from "@solidjs/router";
 import { Transition } from "solid-transition-group";
+import routes from "~/utils/routes";
 
 type NavbarProps = {
   isOpen: () => boolean;
@@ -20,7 +21,7 @@ const Navbar: Component<NavbarProps> = (props) => {
       classList={{ "w-[76px]": !isOpen() }}
     >
       <A
-        href="/"
+        href={routes.dashboard}
         class="flex justify-start items-center py-2 px-5 gap-2.5 w-full h-16"
       >
         <img src="/Logo.png" alt="logo" />
@@ -31,7 +32,7 @@ const Navbar: Component<NavbarProps> = (props) => {
       <ul class="w-full flex flex-col items-start gap-2 px-[18px] py-6">
         {/* Dashboard */}
         <NavbarLink
-          href="/"
+          href={routes.dashboard}
           icon={<TiThLargeOutline />}
           text="Dashboard"
           isOpen={isOpen}
@@ -40,22 +41,26 @@ const Navbar: Component<NavbarProps> = (props) => {
 
         {/* Product */}
         <NavbarDropDown
-          href="/products"
+          href={routes.products}
           isOpen={isOpen}
           icon={<BiRegularShoppingBag />}
           text="Products"
         >
           <NavbarLink
-            href="/products"
+            href={routes.products}
             text="Product&nbsp;List"
             isOpen={isOpen}
           />
-          <NavbarLink href="/categories" text="Categories" isOpen={isOpen} />
+          <NavbarLink
+            href={routes.categories}
+            text="Categories"
+            isOpen={isOpen}
+          />
         </NavbarDropDown>
 
         {/* Staff */}
         <NavbarLink
-          href="/staffs"
+          href={routes.staffs}
           icon={<BsPeople />}
           text="Staff&nbsp;Management"
           isOpen={isOpen}
