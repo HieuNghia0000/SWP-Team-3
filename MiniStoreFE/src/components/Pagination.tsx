@@ -1,7 +1,7 @@
 import { Component, For, Show } from "solid-js";
 
 type PaginationProps = {
-  totalItems: number;
+  totalItems: () => number;
   perPage: () => number;
   curPage: () => number;
   lastPage: () => number;
@@ -36,19 +36,19 @@ const Pagination: Component<PaginationProps> = (props) => {
           <p class="text-sm text-gray-700">
             Showing{" "}
             <span class="font-medium">
-              {(curPage() - 1) * perPage() + 1 > totalItems
-                ? totalItems
+              {(curPage() - 1) * perPage() + 1 > totalItems()
+                ? totalItems()
                 : (curPage() - 1) * perPage() + 1 < 0
                 ? 0
                 : (curPage() - 1) * perPage() + 1}
             </span>{" "}
             to{" "}
             <span class="font-medium">
-              {(curPage() - 1) * perPage() + perPage() > totalItems
-                ? totalItems
+              {(curPage() - 1) * perPage() + perPage() > totalItems()
+                ? totalItems()
                 : (curPage() - 1) * perPage() + perPage()}
             </span>{" "}
-            of <span class="font-medium">{totalItems}</span> results
+            of <span class="font-medium">{totalItems()}</span> results
           </p>
         </div>
         <div>
@@ -83,11 +83,11 @@ const Pagination: Component<PaginationProps> = (props) => {
                   >
                     <button
                       onClick={() => setPage(curPage() + pageNumber - 3)}
-                      class="relative inline-flex shadow-sm w-8 h-8 justify-center items-center font-semibold rounded-lg bg-white ring-1 ring-inset ring-gray-300 focus:z-20 focus:outline-offset-0"
+                      class="relative inline-flex shadow-sm w-8 h-8 justify-center items-center font-semibold rounded-lg ring-1 ring-inset ring-gray-300 focus:z-20 focus:outline-offset-0"
                       classList={{
                         "bg-indigo-500 text-white hover:bg-indigo-600 focus:outline-none focus:ring":
                           curPage() === curPage() + pageNumber - 3,
-                        "text-indigo-500 hover:bg-indigo-100":
+                        "text-indigo-500 bg-white hover:bg-indigo-100":
                           curPage() !== curPage() + pageNumber - 3,
                       }}
                     >

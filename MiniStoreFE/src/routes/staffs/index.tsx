@@ -84,10 +84,10 @@ export default function Staffs() {
   const [showModal, setShowModal] = createSignal<boolean>(false);
   const [modalData, setModalData] = createSignal<Staff>();
 
-  const totalItems = 100;
+  const totalItems = () => data()?.length ?? 0;
   const perPage = () => Number.parseInt(searchParams.perPage ?? 10);
   const curPage = () => Number.parseInt(searchParams.curPage ?? 1);
-  const lastPage = () => Math.ceil(totalItems / perPage());
+  const lastPage = () => Math.ceil(totalItems() / perPage());
 
   const prev = () => {
     setSearchParams({ curPage: Math.max(1, curPage() - 1) });

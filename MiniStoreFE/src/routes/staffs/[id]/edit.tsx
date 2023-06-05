@@ -143,7 +143,7 @@ export default function StaffEdit() {
           </div>
         </div>
 
-        <div class="flex flex-col bg-white border border-gray-200 rounded-lg min-w-[440px] flex-1 shadow-sm">
+        <div class="flex flex-col bg-white border border-gray-200 rounded-lg min-w-[440px] max-w-5xl flex-1 shadow-sm">
           <div class="flex flex-auto px-6 pt-6">
             <h4 class="text-lg font-medium">General Information</h4>
           </div>
