@@ -11,6 +11,8 @@ const routes = {
   staffDisable: (id: string | number) => `/staffs/${id}/disable`,
   categories: "/categories",
   logout: "/logout",
+  orders: "/orders",
+  orderAdd: "/orders/add",
 };
 
 export default routes;
