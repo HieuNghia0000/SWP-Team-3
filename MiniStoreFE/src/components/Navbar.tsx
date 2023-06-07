@@ -6,6 +6,7 @@ import { BsPeople } from "solid-icons/bs";
 import { A } from "@solidjs/router";
 import { Transition } from "solid-transition-group";
 import routes from "~/utils/routes";
+import { FiShoppingCart } from "solid-icons/fi";
 
 type NavbarProps = {
   isOpen: () => boolean;
@@ -63,6 +64,14 @@ const Navbar: Component<NavbarProps> = (props) => {
           href={routes.staffs}
           icon={<BsPeople />}
           text="Staff&nbsp;Management"
+          isOpen={isOpen}
+        />
+
+        {/* Orders */}
+        <NavbarLink
+          href={routes.orders}
+          icon={<FiShoppingCart />}
+          text="Orders"
           isOpen={isOpen}
         />
       </ul>

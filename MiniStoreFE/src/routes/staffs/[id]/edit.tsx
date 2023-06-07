@@ -208,7 +208,7 @@ export default function StaffEdit() {
                 label="Work days"
                 value={data()?.workDays}
                 disabled
-                placeholder="Enter staff work days"
+                placeholder="None"
                 formHandler={formHandler}
               />
               <div class="space-x-3">

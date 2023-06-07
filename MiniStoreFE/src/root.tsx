@@ -11,13 +11,13 @@ import {
   Scripts,
   Title,
 } from "solid-start";
+import "flatpickr/dist/flatpickr.css";
 import "./root.css";
 import Navbar from "./components/Navbar";
 import HeadBar from "./components/HeadBar";
 
 export default function Root() {
   const [isNavOpen, setIsNavOpen] = createSignal(true);
-  let mainRef;
 
   return (
     <Html lang="en">
