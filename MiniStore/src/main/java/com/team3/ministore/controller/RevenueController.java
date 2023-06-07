@@ -16,31 +16,31 @@ public class RevenueController {
     @Autowired
     private RevenueService revenueService;
 
-    @PostMapping("/")
+    @PostMapping("/add")
     public ResponseEntity<Revenue> createRevenue(@RequestBody Revenue revenue) {
         Revenue createdRevenue = revenueService.createRevenue(revenue);
         return new ResponseEntity<>(createdRevenue, HttpStatus.CREATED);
     }
 
-    @GetMapping("/")
+    @GetMapping("/list")
     public ResponseEntity<List<Revenue>> getAllRevenue() {
         List<Revenue> revenueList = revenueService.getAllRevenue();
         return new ResponseEntity<>(revenueList, HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/search/{id}")
     public ResponseEntity<Revenue> getRevenueById(@PathVariable("id") Integer id) {
         Revenue revenue = revenueService.getRevenueById(id);
         return new ResponseEntity<>(revenue, HttpStatus.OK);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Revenue> updateRevenue(@PathVariable("id") Integer id, @RequestBody Revenue revenue) {
         Revenue updatedRevenue = revenueService.updateRevenue(id, revenue);
         return new ResponseEntity<>(updatedRevenue, HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteRevenue(@PathVariable("id") Integer id) {
         revenueService.deleteRevenue(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

@@ -18,35 +18,35 @@ public class LocationController {
 
 
     //Create new location
-    @PostMapping("/")
+    @PostMapping("/add")
     public ResponseEntity<Location> createLocation(@RequestBody Location location) {
         Location createLocation = locationService.createLocation(location);
         return new ResponseEntity<>(createLocation, HttpStatus.CREATED);
     }
 
     //Read all location
-    @GetMapping("/")
+    @GetMapping("/list")
     public ResponseEntity<List<Location>> getAllLocation() {
         List<Location> locationList = locationService.getAllLocation();
         return new ResponseEntity<>(locationList, HttpStatus.OK);
     }
 
     //Read a location by ID
-    @GetMapping("/{id}")
+    @GetMapping("/search/{id}")
     public ResponseEntity<Location> getLocationById(@PathVariable("id") Integer id) {
         Location location = locationService.getLocationById(id);
         return new ResponseEntity<>(location, HttpStatus.OK);
     }
 
     //Update an existing location
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Location> updateLocation(@PathVariable("id") Integer id, @RequestBody Location location) {
         Location updatedLocation = locationService.updateLocation(id, location);
         return new ResponseEntity<>(updatedLocation, HttpStatus.OK);
     }
 
     //Delete a location
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteLocation(@PathVariable("id") Integer id) {
         locationService.deleteLocation(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

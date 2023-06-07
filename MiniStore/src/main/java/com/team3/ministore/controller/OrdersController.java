@@ -10,38 +10,38 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Repository
+@RestController
 @RequestMapping("/orders")
 public class OrdersController {
 
     @Autowired
     private OrdersService ordersService;
 
-    @PostMapping("/")
+    @PostMapping("/add")
     public ResponseEntity<Orders> createOrders(@RequestBody Orders orders) {
         Orders createdOrders = ordersService.createOrders(orders);
         return new ResponseEntity<>(createdOrders, HttpStatus.CREATED);
     }
 
-    @GetMapping("/")
+    @GetMapping("/list")
     public ResponseEntity<List<Orders>> getAllOrders() {
         List<Orders> ordersList = ordersService.getAllOrders();
         return new ResponseEntity<>(ordersList, HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/search/{id}")
     public ResponseEntity<Orders> getOrdersById(@PathVariable("id") Integer id) {
         Orders orders = ordersService.getOrdersById(id);
         return new ResponseEntity<>(orders, HttpStatus.OK);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Orders> updateOrders(@PathVariable("id") Integer id, @RequestBody Orders orders) {
         Orders updatedOrders = ordersService.updateOrders(id, orders);
         return new ResponseEntity<>(updatedOrders, HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteOrders(@PathVariable("id") Integer id) {
         ordersService.deleteOrders(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

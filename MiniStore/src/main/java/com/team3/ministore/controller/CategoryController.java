@@ -17,31 +17,31 @@ public class CategoryController {
     private CategoryService categoryService;
 
 
-    @PostMapping("/")
+    @PostMapping("/add")
     public ResponseEntity<Category> createCategory(@RequestBody Category category) {
         Category createdCategory = categoryService.createCategory(category);
         return new ResponseEntity<>(createdCategory, HttpStatus.CREATED);
     }
 
-    @GetMapping("/")
+    @GetMapping("/list")
     public ResponseEntity<List<Category>> getAllCategory() {
         List<Category> categoryList = categoryService.getAllCategory();
         return new ResponseEntity<>(categoryList, HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/search/{id}")
     public ResponseEntity<Category> getCategoryById(@PathVariable("id") Integer id) {
         Category category = categoryService.getCategoryById(id);
         return new ResponseEntity<>(category, HttpStatus.OK);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Category> updateCategory(@PathVariable("id") Integer id, @RequestBody Category category) {
         Category updatedCategory = categoryService.updateCategory(id, category);
         return new ResponseEntity<>(updatedCategory, HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable("id") Integer id) {
         categoryService.deleteCategory(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

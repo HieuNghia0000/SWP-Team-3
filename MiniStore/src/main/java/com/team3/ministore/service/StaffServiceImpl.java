@@ -2,6 +2,9 @@ package com.team3.ministore.service;
 
 import com.team3.ministore.model.Staff;
 import com.team3.ministore.repository.StaffRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +26,11 @@ public class StaffServiceImpl implements StaffService {
     @Override
     public Staff getStaffById(Integer id) {
         return staffRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid staff ID: " + id));
+    }
+
+    @Override
+    public List<Staff> getStaffByNameLike(String staffName) {
+        return staffRepository.findByStaffNameLike(staffName);
     }
 
     @Override
@@ -51,5 +59,11 @@ public class StaffServiceImpl implements StaffService {
     @Override
     public void deleteStaff(Integer id) {
         staffRepository.deleteById(id);
+    }
+
+    @Override
+    public Page<Staff> findAllPagingStaff(int pageIndex, int pageSize) {
+        Pageable pageable = PageRequest.of(pageIndex - 1, pageSize);
+        return staffRepository.findAllPagingStaff(pageable);
     }
 }

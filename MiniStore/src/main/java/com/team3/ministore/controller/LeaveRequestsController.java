@@ -16,31 +16,31 @@ public class LeaveRequestsController {
     @Autowired
     private LeaveRequestsService leaveRequestsService;
 
-    @PostMapping("/")
+    @PostMapping("/add")
     public ResponseEntity<LeaveRequests> createLeaveRequests(@RequestBody LeaveRequests leaveRequests) {
         LeaveRequests createdLeaveRequests = leaveRequestsService.createLeaveRequests(leaveRequests);
         return new ResponseEntity<>(createdLeaveRequests, HttpStatus.CREATED);
     }
 
-    @GetMapping("/")
+    @GetMapping("/list")
     public ResponseEntity<List<LeaveRequests>> getAllLeaveRequests() {
         List<LeaveRequests> leaveRequestsList = leaveRequestsService.getAllLeaveRequests();
         return new ResponseEntity<>(leaveRequestsList, HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/search/{id}")
     public ResponseEntity<LeaveRequests> getLeaveRequestsById(@PathVariable("id") Integer id) {
         LeaveRequests leaveRequests = leaveRequestsService.getLeaveRequestsById(id);
         return new ResponseEntity<>(leaveRequests, HttpStatus.OK);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<LeaveRequests> updateLeaveRequests(@PathVariable("id") Integer id, @RequestBody LeaveRequests leaveRequests) {
         LeaveRequests updatedLeaveRequests = leaveRequestsService.updateLeaveRequests(id, leaveRequests);
         return new ResponseEntity<>(updatedLeaveRequests, HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteLeaveRequests(@PathVariable("id") Integer id) {
         leaveRequestsService.deleteLeaveRequests(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

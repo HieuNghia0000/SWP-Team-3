@@ -16,31 +16,31 @@ public class WorkSchedulesController {
     @Autowired
     private WorkSchedulesService workSchedulesService;
 
-    @PostMapping("/")
+    @PostMapping("/add")
     public ResponseEntity<WorkSchedules> createWorkSchedules(@RequestBody WorkSchedules workSchedules) {
         WorkSchedules createdWorkSchedules = workSchedulesService.createWorkSchedules(workSchedules);
         return new ResponseEntity<>(createdWorkSchedules, HttpStatus.CREATED);
     }
 
-    @GetMapping("/")
+    @GetMapping("/list")
     public ResponseEntity<List<WorkSchedules>> getAllWorkSchedules() {
         List<WorkSchedules> workSchedulesList = workSchedulesService.getAllWorkSchedules();
         return new ResponseEntity<>(workSchedulesList, HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/search/{id}")
     public ResponseEntity<WorkSchedules> getWorkSchedulesById(@PathVariable("id") Integer id) {
         WorkSchedules workSchedules = workSchedulesService.getWorkSchedulesById(id);
         return new ResponseEntity<>(workSchedules, HttpStatus.OK);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<WorkSchedules> updateWorkSchedules(@PathVariable("id") Integer id, @RequestBody WorkSchedules workSchedules) {
         WorkSchedules updatedWorkSchedules = workSchedulesService.updateWorkSchedules(id, workSchedules);
         return new ResponseEntity<>(updatedWorkSchedules, HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteWorkSchedules(@PathVariable("id") Integer id) {
         workSchedulesService.deleteWorkSchedules(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

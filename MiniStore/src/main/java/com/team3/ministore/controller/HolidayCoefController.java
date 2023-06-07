@@ -15,31 +15,31 @@ public class HolidayCoefController {
     @Autowired
     private HolidayCoefService holidayCoefService;
 
-    @PostMapping("/")
+    @PostMapping("/add")
     public ResponseEntity<HolidayCoef> createHolidayCoef(@RequestBody HolidayCoef holidayCoef) {
         HolidayCoef createdHolidayCoef = holidayCoefService.createHolidayCoef(holidayCoef);
         return new ResponseEntity<>(createdHolidayCoef, HttpStatus.CREATED);
     }
 
-    @GetMapping("/")
+    @GetMapping("/list")
     public ResponseEntity<List<HolidayCoef>> getAllHolidayCoef() {
         List<HolidayCoef> holidayCoefList = holidayCoefService.getAllHolidayCoef();
         return new ResponseEntity<>(holidayCoefList, HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/search/{id}")
     public ResponseEntity<HolidayCoef> getHolidayCoefById(@PathVariable("id") Integer id) {
         HolidayCoef holidayCoef = holidayCoefService.getHolidayCoefById(id);
         return new ResponseEntity<>(holidayCoef, HttpStatus.OK);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<HolidayCoef> updateHolidayCoef(@PathVariable("id") Integer id, @RequestBody HolidayCoef holidayCoef) {
         HolidayCoef updatedHolidayCoef = holidayCoefService.updateHolidayCoef(id, holidayCoef);
         return new ResponseEntity<>(updatedHolidayCoef, HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteHolidayCoef(@PathVariable("id") Integer id) {
         holidayCoefService.deleteHolidayCoef(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
