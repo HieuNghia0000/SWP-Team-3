@@ -1,7 +1,8 @@
-package com.team3.ministore.service;
+package com.team3.ministore.service.impl;
 
 import com.team3.ministore.model.Vouchers;
 import com.team3.ministore.repository.VouchersRepository;
+import com.team3.ministore.service.VouchersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

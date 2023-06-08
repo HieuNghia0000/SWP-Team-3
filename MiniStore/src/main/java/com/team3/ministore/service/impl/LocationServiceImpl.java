@@ -1,7 +1,8 @@
-package com.team3.ministore.service;
+package com.team3.ministore.service.impl;
 
 import com.team3.ministore.model.Location;
 import com.team3.ministore.repository.LocationRepository;
+import com.team3.ministore.service.LocationService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

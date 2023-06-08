@@ -1,7 +1,8 @@
-package com.team3.ministore.service;
+package com.team3.ministore.service.impl;
 
 import com.team3.ministore.model.Staff;
 import com.team3.ministore.repository.StaffRepository;
+import com.team3.ministore.service.StaffService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

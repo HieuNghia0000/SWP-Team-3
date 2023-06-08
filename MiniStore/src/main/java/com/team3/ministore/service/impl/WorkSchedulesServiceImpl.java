@@ -1,7 +1,8 @@
-package com.team3.ministore.service;
+package com.team3.ministore.service.impl;
 
 import com.team3.ministore.model.WorkSchedules;
 import com.team3.ministore.repository.WorkSchedulesRepository;
+import com.team3.ministore.service.WorkSchedulesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
