@@ -1,17 +1,13 @@
 package com.team3.ministore.model;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
 import javax.persistence.*;
 import java.sql.Time;
 import java.util.Date;
 
 @Entity
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 @Table(name = "workschedules")
 public class WorkSchedules {
 

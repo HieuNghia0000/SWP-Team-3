@@ -1,20 +1,20 @@
 package com.team3.ministore.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.team3.ministore.common.entity.BaseEntity;
+import com.team3.ministore.utils.Role;
+import com.team3.ministore.utils.StaffStatus;
+import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Entity
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
+@Data
+@EqualsAndHashCode(callSuper = false)
 @Table(name = "staffs")
-public class Staff {
+public class Staff extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,13 +30,22 @@ public class Staff {
     @Column(name = "staff_name")
     private String staffName;
 
+    @NotNull
+    @Enumerated(EnumType.STRING)
     @Column(name = "role")
-    private String role;
+    private Role role;
 
+    @NotNull
     @Column(name = "username")
     private String username;
 
+    @NotNull
+    @Column(name = "email")
+    private String email;
+
     @Column(name = "password")
+    @NotNull
+    @JsonIgnore
     private String password;
 
     @Column(name = "phone_number")
@@ -46,13 +55,11 @@ public class Staff {
     private Float baseSalary;
 
     @Column(name = "status")
-    private int status;
+    @Enumerated(EnumType.ORDINAL)
+    private StaffStatus status;
 
     @Column(name = "image")
     private String image;
-
-    @Column(name = "email")
-    private String email;
 
     @Column(name = "work_days")
     private String workDays;
