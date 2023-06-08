@@ -1,13 +1,17 @@
 package com.team3.ministore.controller;
 
+import com.team3.ministore.common.responsehandler.ResponseHandler;
+import com.team3.ministore.dto.RegisterDto;
 import com.team3.ministore.model.Staff;
 import com.team3.ministore.service.StaffService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -20,9 +24,12 @@ public class StaffController {
 
     //Create new staff
     @PostMapping("/add")
-    public ResponseEntity<Staff> createStaff(@RequestBody Staff staff) {
-        Staff createdStaff = staffService.createStaff(staff);
-        return new ResponseEntity<>(createdStaff, HttpStatus.OK);
+    public Object register(@Valid @RequestBody RegisterDto dto, BindingResult errors) {
+        if (errors.hasErrors())
+            return ResponseHandler.getResponse(errors, HttpStatus.BAD_REQUEST);
+
+        Staff staff = staffService.createStaff(dto);
+        return ResponseHandler.getResponse(staff, HttpStatus.CREATED);
     }
 
     //Read all staff

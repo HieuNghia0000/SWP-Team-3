@@ -21,4 +21,7 @@ public interface StaffRepository extends JpaRepository<Staff, Integer> {
 
     @Query("SELECT s FROM Staff s")
     Page<Staff> findAllPagingStaff(Pageable pageable);
+
+    @Query("SELECT s FROM Staff s WHERE s.email = :email")
+    Staff getStaffByEmail(@Param("email") String email);
 }
