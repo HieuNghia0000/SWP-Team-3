@@ -3,12 +3,10 @@ CREATE DATABASE IF NOT EXISTS MiniStore;
 USE MiniStore;
 
 -- Create Tables
-CREATE TABLE Check_In_Locations
+CREATE TABLE Locations
 (
 	location_id INT AUTO_INCREMENT NOT NULL,
-	name NVARCHAR(200) NOT NULL,
-	value NVARCHAR(200),
-	location_type INT,
+	computer_id NVARCHAR(100),
 	PRIMARY KEY (location_id)
 );
 
@@ -33,9 +31,10 @@ CREATE TABLE Shifts
 	shift_id INT AUTO_INCREMENT NOT NULL,
 	start_time TIME,
 	end_time TIME,
-	sheet_number INT,
+	slots INT,
 	day_of_week INT,
 	salary_coefficient FLOAT,
+    role NVARCHAR(50),
 	PRIMARY KEY (shift_id)
 );
 
@@ -44,15 +43,13 @@ CREATE TABLE WorkSchedules
 	schedule_id INT AUTO_INCREMENT NOT NULL,
 	staff_id INT NOT NULL,
 	shift_id INT NOT NULL,
-	location_id INT NOT NULL,
 	work_date DATE NOT NULL,
 	check_in_time TIME,
 	check_out_time TIME,
 	status INT,
 	PRIMARY KEY (schedule_id),
 	FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id),
-	FOREIGN KEY (shift_id) REFERENCES Shifts(shift_id),
-	FOREIGN KEY (location_id) REFERENCES Check_In_Locations(location_id)
+	FOREIGN KEY (shift_id) REFERENCES Shifts(shift_id)
 );
 
 CREATE TABLE Category
@@ -87,7 +84,7 @@ CREATE TABLE Vouchers
 	PRIMARY KEY (voucher_id)
 );
 
-CREATE TABLE LeaveRequests
+CREATE TABLE TimeOffRequest
 (
 	leave_request_id INT AUTO_INCREMENT NOT NULL,
 	staff_id INT NOT NULL,
@@ -121,7 +118,7 @@ CREATE TABLE Revenue
 CREATE TABLE Orders
 (
 	order_id INT AUTO_INCREMENT NOT NULL,
-	order_date DATE NOT NULL,
+	order_date DATETIME NOT NULL,
 	total_amount INT,
 	PRIMARY KEY (order_id)
 );

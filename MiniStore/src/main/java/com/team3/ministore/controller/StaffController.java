@@ -13,9 +13,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/staff")
+@RequestMapping("/staffs")
 public class StaffController {
 
     @Autowired
@@ -32,25 +33,11 @@ public class StaffController {
         return ResponseHandler.getResponse(staff, HttpStatus.CREATED);
     }
 
-    //Read all staff
-    @GetMapping("/list")
-    public ResponseEntity<List<Staff>> getAllStaff() {
-        List<Staff> staffList = staffService.getAllStaff();
-        return new ResponseEntity<>(staffList, HttpStatus.OK);
-    }
-
     //Read a staff by ID
     @GetMapping("/search/{id}")
     public ResponseEntity<Staff> getStaffById(@PathVariable("id") Integer id) {
         Staff staff = staffService.getStaffById(id);
         return new ResponseEntity<>(staff, HttpStatus.OK);
-    }
-
-    //Read a staff by staff name
-    @GetMapping("/search/{name}")
-    public ResponseEntity<List<Staff>> getStaffByNameLike(@PathVariable("name") String name) {
-        List<Staff> staffList = staffService.getStaffByNameLike(name);
-        return new ResponseEntity<>(staffList, HttpStatus.OK);
     }
 
     //Update an existing staff
@@ -67,13 +54,64 @@ public class StaffController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/paging/{pageIndex}/{pageSize}")
-    @ResponseBody
-    public ResponseEntity<Page<Staff>> paging(@PathVariable int pageIndex, @PathVariable int pageSize) {
-        Page<Staff> staff = staffService.findAllPagingStaff(pageIndex - 1, pageSize);
-        if (staff.getSize() == 0) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    @GetMapping("")
+    public ResponseEntity<?> getStaffs(@RequestParam("search") Optional<String> searchParam,
+                                       @RequestParam("curPage") Optional<Integer> curPageParam,
+                                       @RequestParam("perPage") Optional<Integer> perPageParam) {
+        Page<Staff> staffPage = null;
+        List<Staff> staffList = null;
+
+        if (searchParam.isPresent()) {
+            String search = searchParam.get();
+
+            staffList = staffService.getStaffByNameLike(search);
         }
-        return new ResponseEntity<Page<Staff>>(staff, HttpStatus.OK);
+        if (curPageParam.isPresent() || perPageParam.isPresent()) {
+            int curPage = curPageParam.orElse(1);
+            int perPage = perPageParam.orElse(10);
+
+            staffPage = staffService.findAllPagingStaff(curPage, perPage);
+            if (staffPage.getSize() == 0) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+        }
+        else {
+            int curPage = 1;
+            int perPage = 10;
+
+            staffPage = staffService.findAllPagingStaff(curPage, perPage);
+            if (staffPage.getSize() == 0) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+        }
+
+        StaffResponse response = new StaffResponse(staffList, staffPage);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    private static class StaffResponse {
+        private List<Staff> staffList;
+        private Page<Staff> staffPage;
+
+        public StaffResponse(List<Staff> staffList, Page<Staff> staffPage) {
+            this.staffList = staffList;
+            this.staffPage = staffPage;
+        }
+
+        public List<Staff> getStaffList() {
+            return staffList;
+        }
+
+        public void setStaffList(List<Staff> staffList) {
+            this.staffList = staffList;
+        }
+
+        public Page<Staff> getStaffPage() {
+            return staffPage;
+        }
+
+        public void setStaffPage(Page<Staff> staffPage) {
+            this.staffPage = staffPage;
+        }
     }
 }

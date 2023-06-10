@@ -35,9 +35,7 @@ public class LocationServiceImpl implements LocationService {
     public Location updateLocation(Integer id, Location location) {
         Location existingLocation = getLocationById(id);
 
-        existingLocation.setName(location.getName());
-        existingLocation.setValue(location.getValue());
-        existingLocation.setLocationType(location.getLocationType());
+        existingLocation.setComputerId(location.getComputerId());
 
         return locationRepository.save(existingLocation);
     }

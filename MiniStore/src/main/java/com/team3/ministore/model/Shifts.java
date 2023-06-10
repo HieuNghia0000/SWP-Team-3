@@ -25,8 +25,8 @@ public class Shifts {
     @Column(name = "end_time")
     private Time endTime;
 
-    @Column(name = "sheet_number")
-    private int sheetNumber;
+    @Column(name = "slots")
+    private int slots;
 
     @Column(name = "day_of_week")
     private int dayOfWeek;

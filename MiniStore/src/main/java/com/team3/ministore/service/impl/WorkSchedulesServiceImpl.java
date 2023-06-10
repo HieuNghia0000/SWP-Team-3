@@ -35,7 +35,6 @@ public class WorkSchedulesServiceImpl implements WorkSchedulesService {
 
         existingWorkSchedules.setStaff(workSchedules.getStaff());
         existingWorkSchedules.setShifts(workSchedules.getShifts());
-        existingWorkSchedules.setLocation(workSchedules.getLocation());
         existingWorkSchedules.setWorkDate(workSchedules.getWorkDate());
         existingWorkSchedules.setCheckInTime(workSchedules.getCheckInTime());
         existingWorkSchedules.setCheckOutTime(workSchedules.getCheckOutTime());

@@ -6,6 +6,8 @@ import com.team3.ministore.service.OrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -42,5 +44,33 @@ public class OrdersServiceImpl implements OrdersService {
     @Override
     public void deleteOrders(Integer id) {
         ordersRepository.deleteById(id);
+    }
+
+    @Override
+    public List<Orders> getOrdersFromTimeAgo(String ago) {
+        Date currentDate = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(currentDate);
+
+        switch (ago) {
+            case "12months":
+                calendar.add(Calendar.MONTH, -12);
+                break;
+            case "30days":
+                calendar.add(Calendar.DAY_OF_YEAR, -30);
+                break;
+            case "7days":
+                calendar.add(Calendar.DAY_OF_YEAR, -7);
+                break;
+            case "24hours":
+                calendar.add(Calendar.HOUR_OF_DAY, -24);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid time: " + ago);
+        }
+
+        Date targetDate = calendar.getTime();
+
+        return ordersRepository.findByOrderDateGreaterThanEqual(targetDate);
     }
 }

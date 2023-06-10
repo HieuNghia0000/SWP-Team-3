@@ -24,10 +24,6 @@ public class WorkSchedules {
     @JoinColumn(name = "shift_id", referencedColumnName = "shift_id")
     private Shifts shifts;
 
-    @ManyToOne
-    @JoinColumn(name = "location_id", referencedColumnName = "location_id")
-    private Location location;
-
     @Column(name = "work_date")
     private Date workDate;
 

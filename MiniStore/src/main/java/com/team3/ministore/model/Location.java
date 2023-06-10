@@ -7,7 +7,7 @@ import java.util.List;
 
 @Entity
 @Data
-@Table(name = "check_in_locations")
+@Table(name = "locations")
 public class Location {
 
     @Id
@@ -15,16 +15,7 @@ public class Location {
     @Column(name = "location_id")
     private int locationId;
 
-    @OneToMany(mappedBy = "location")
-    private List<WorkSchedules> workSchedules;
-
-    @Column(name = "name")
-    private String name;
-
-    @Column(name = "value")
-    private String value;
-
-    @Column(name = "location_type")
-    private int locationType;
+    @Column(name = "computer_id")
+    private String computerId;
 
 }

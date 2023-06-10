@@ -14,4 +14,6 @@ public interface OrdersService {
     Orders updateOrders(Integer id, Orders orders);
 
     void deleteOrders(Integer id);
+
+    List<Orders> getOrdersFromTimeAgo(String ago);
 }

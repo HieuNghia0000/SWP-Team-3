@@ -16,7 +16,7 @@ public interface StaffRepository extends JpaRepository<Staff, Integer> {
     @Query("SELECT s FROM Staff s WHERE s.username = :username")
     Staff findByUsername(@Param("username") String username);
 
-    @Query("SELECT s FROM Staff s WHERE s.staffName LIKE :staffName")
+    @Query("SELECT s FROM Staff s WHERE s.staffName LIKE %:staffName%")
     List<Staff> findByStaffNameLike(@Param("staffName") String staffName);
 
     @Query("SELECT s FROM Staff s")

@@ -7,8 +7,8 @@ import java.util.Date;
 
 @Entity
 @Data
-@Table(name = "leaverequests")
-public class LeaveRequests {
+@Table(name = "timeoffrequest")
+public class TimeOffRequests {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

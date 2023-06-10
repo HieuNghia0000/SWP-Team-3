@@ -5,10 +5,10 @@ import com.team3.ministore.service.OrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/orders")
@@ -21,12 +21,6 @@ public class OrdersController {
     public ResponseEntity<Orders> createOrders(@RequestBody Orders orders) {
         Orders createdOrders = ordersService.createOrders(orders);
         return new ResponseEntity<>(createdOrders, HttpStatus.CREATED);
-    }
-
-    @GetMapping("/list")
-    public ResponseEntity<List<Orders>> getAllOrders() {
-        List<Orders> ordersList = ordersService.getAllOrders();
-        return new ResponseEntity<>(ordersList, HttpStatus.OK);
     }
 
     @GetMapping("/search/{id}")
@@ -45,5 +39,19 @@ public class OrdersController {
     public ResponseEntity<Void> deleteOrders(@PathVariable("id") Integer id) {
         ordersService.deleteOrders(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("")
+    public ResponseEntity<List<Orders>> getOrders(@RequestParam(value = "ago") Optional<String> agoParam) {
+        List<Orders> ordersList;
+
+        if (agoParam.isPresent()) {
+            String ago = agoParam.get();
+            ordersList = ordersService.getOrdersFromTimeAgo(ago);
+        }
+        else {
+            ordersList = ordersService.getAllOrders();
+        }
+        return new ResponseEntity<>(ordersList, HttpStatus.OK);
     }
 }

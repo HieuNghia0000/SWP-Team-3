@@ -22,7 +22,7 @@ public class Staff extends BaseEntity {
     private int staffId;
 
     @OneToMany(mappedBy = "staff")
-    private List<LeaveRequests> leaveRequests;
+    private List<TimeOffRequests> timeOffRequests;
 
     @OneToMany(mappedBy = "staff")
     private List<WorkSchedules> workSchedules;
