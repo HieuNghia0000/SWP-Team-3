@@ -1,21 +1,12 @@
 import { A, useRouteData } from "@solidjs/router";
-import { type } from "os";
 import { useFormHandler } from "solid-form-handler";
 import { yupSchema } from "solid-form-handler/yup";
 import { RouteDataArgs, createRouteData } from "solid-start";
 import * as yup from "yup";
 import Breadcrumbs from "~/components/Breadcrumbs";
-import { Select } from "~/components/form/Select";
 import { TextInput } from "~/components/form/TextInput";
+import { Staff } from "~/types";
 import routes from "~/utils/routes";
-
-type Staff = {
-  id?: number;
-  username?: string;
-  name: string;
-  image?: string;
-  status?: number;
-};
 
 type Password = {
   curPassword: string;
@@ -37,8 +28,8 @@ export function routeData({ params }: RouteDataArgs) {
       // );
       // return await response.json();
       return {
-        id: Number.parseInt(key[1]),
-        name: "Nguyen Van A",
+        staffId: Number.parseInt(key[1]),
+        staffName: "Nguyen Van A",
         username: "nguyenvana",
         status: 1,
         image: "",
@@ -90,13 +81,13 @@ export default function ChangeStaffPassword() {
             />
           </div>
           <div class="mt-2 text-center">
-            <p class="font-medium text-lg">{data()?.name}</p>
+            <p class="font-medium text-lg">{data()?.staffName}</p>
             <p class="font-medium text-sm text-gray-500">@{data()?.username}</p>
           </div>
           <div class="border my-5 w-full"></div>
           <div class="flex flex-col gap-3">
             <A
-              href={routes.staffEdit(data()?.id!)}
+              href={routes.staffEdit(data()?.staffId!)}
               class="text-base font-medium"
               activeClass="text-gray-500 cursor-default"
               inactiveClass="text-indigo-600 hover:text-indigo-500 underline underline-offset-2"
@@ -105,7 +96,7 @@ export default function ChangeStaffPassword() {
               Update profile details
             </A>
             <A
-              href={routes.staffImageEdit(data()?.id!)}
+              href={routes.staffImageEdit(data()?.staffId!)}
               class="text-base font-medium"
               activeClass="text-gray-500 cursor-default"
               inactiveClass="text-indigo-600 hover:text-indigo-500 underline underline-offset-2"
@@ -114,7 +105,7 @@ export default function ChangeStaffPassword() {
               Update profile image
             </A>
             <A
-              href={routes.staffChangePassword(data()?.id!)}
+              href={routes.staffChangePassword(data()?.staffId!)}
               class="text-base font-medium"
               activeClass="text-gray-500 cursor-default"
               inactiveClass="text-indigo-600 hover:text-indigo-500 underline underline-offset-2"
@@ -123,7 +114,7 @@ export default function ChangeStaffPassword() {
               Update password
             </A>
             <A
-              href={routes.staffUpdateSchedule(data()?.id!)}
+              href={routes.staffUpdateSchedule(data()?.staffId!)}
               class="text-base font-medium"
               activeClass="text-gray-500 cursor-default"
               inactiveClass="text-indigo-600 hover:text-indigo-500 underline underline-offset-2"
@@ -132,7 +123,7 @@ export default function ChangeStaffPassword() {
               Update work schedule
             </A>
             <A
-              href={routes.staffDisable(data()?.id!)}
+              href={routes.staffDisable(data()?.staffId!)}
               class="text-base font-medium"
               activeClass="text-gray-500 cursor-default"
               inactiveClass="text-indigo-600 hover:text-indigo-500 underline underline-offset-2"
@@ -200,10 +191,3 @@ export default function ChangeStaffPassword() {
     </main>
   );
 }
-
-const role = [
-  { value: 1, label: "Admin" },
-  { value: 2, label: "Manager" },
-  { value: 3, label: "Cashier" },
-  { value: 4, label: "Guard" },
-];

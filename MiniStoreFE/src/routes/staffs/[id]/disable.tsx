@@ -1,17 +1,10 @@
 import { A } from "@solidjs/router";
-import { Show, createSignal } from "solid-js";
+import { Show } from "solid-js";
 import { RouteDataArgs, useRouteData } from "solid-start";
 import { createServerData$ } from "solid-start/server";
 import Breadcrumbs from "~/components/Breadcrumbs";
+import { Staff, Status } from "~/types";
 import routes from "~/utils/routes";
-
-type Staff = {
-  id?: number;
-  username?: string;
-  name: string;
-  image?: string;
-  status?: number;
-};
 
 export function routeData({ params }: RouteDataArgs) {
   return createServerData$(
@@ -21,11 +14,11 @@ export function routeData({ params }: RouteDataArgs) {
       // );
       // return await response.json();
       return {
-        id: Number.parseInt(key[1]),
-        name: "Nguyen Van A",
+        staffId: Number.parseInt(key[1]),
+        staffName: "Nguyen Van A",
         username: "nguyenvana",
         image: "",
-        status: 1,
+        status: 0,
       } as Staff;
     },
     { key: () => ["staffs", params.id] }
@@ -56,13 +49,13 @@ export default function DisablingStaff() {
             />
           </div>
           <div class="mt-2 text-center">
-            <p class="font-medium text-lg">{data()?.name}</p>
+            <p class="font-medium text-lg">{data()?.staffName}</p>
             <p class="font-medium text-sm text-gray-500">@{data()?.username}</p>
           </div>
           <div class="border my-5 w-full"></div>
           <div class="flex flex-col gap-3">
             <A
-              href={routes.staffEdit(data()?.id!)}
+              href={routes.staffEdit(data()?.staffId!)}
               class="text-base font-medium"
               activeClass="text-gray-500 cursor-default"
               inactiveClass="text-indigo-600 hover:text-indigo-500 underline underline-offset-2"
@@ -71,7 +64,7 @@ export default function DisablingStaff() {
               Update profile details
             </A>
             <A
-              href={routes.staffImageEdit(data()?.id!)}
+              href={routes.staffImageEdit(data()?.staffId!)}
               class="text-base font-medium"
               activeClass="text-gray-500 cursor-default"
               inactiveClass="text-indigo-600 hover:text-indigo-500 underline underline-offset-2"
@@ -80,7 +73,7 @@ export default function DisablingStaff() {
               Update profile image
             </A>
             <A
-              href={routes.staffChangePassword(data()?.id!)}
+              href={routes.staffChangePassword(data()?.staffId!)}
               class="text-base font-medium"
               activeClass="text-gray-500 cursor-default"
               inactiveClass="text-indigo-600 hover:text-indigo-500 underline underline-offset-2"
@@ -89,7 +82,7 @@ export default function DisablingStaff() {
               Update password
             </A>
             <A
-              href={routes.staffUpdateSchedule(data()?.id!)}
+              href={routes.staffUpdateSchedule(data()?.staffId!)}
               class="text-base font-medium"
               activeClass="text-gray-500 cursor-default"
               inactiveClass="text-indigo-600 hover:text-indigo-500 underline underline-offset-2"
@@ -98,7 +91,7 @@ export default function DisablingStaff() {
               Update work schedule
             </A>
             <A
-              href={routes.staffDisable(data()?.id!)}
+              href={routes.staffDisable(data()?.staffId!)}
               class="text-base font-medium"
               activeClass="text-gray-500 cursor-default"
               inactiveClass="text-indigo-600 hover:text-indigo-500 underline underline-offset-2"
@@ -115,13 +108,13 @@ export default function DisablingStaff() {
               <h4 class="text-lg font-medium">Disable staff</h4>
             </div>
             <p class="text-gray-500 italic">
-              {data()?.status === 1
+              {data()?.status === Status.ACTIVATED
                 ? "This staff is currently enabled. You can disable this staff by clicking the button below."
                 : "This staff is currently disabled. You can enable this staff by clicking the button below."}
             </p>
             <div>
               <Show
-                when={data()?.status === 1}
+                when={data()?.status === Status.ACTIVATED}
                 fallback={
                   <button
                     class="block ml-auto p-2 px-6 py-2 text-center text-white bg-blue-500 border border-blue-500 rounded hover:bg-blue-600 hover:text-white"

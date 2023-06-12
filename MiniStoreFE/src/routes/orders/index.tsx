@@ -237,12 +237,12 @@ export default function Orders() {
                 use:clickOutside={() => setFilterDropdown(!filterDropdown())}
               >
                 <div class="py-1 rounded-md bg-white shadow-xs">
-                  <a
+                  <A
                     href={routes.logout}
                     class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     Logout
-                  </a>
+                  </A>
                 </div>
               </div>
             </Show>

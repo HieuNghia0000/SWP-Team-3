@@ -1,5 +1,5 @@
 // @refresh reload
-import { Suspense, createSignal } from "solid-js";
+import { Suspense } from "solid-js";
 import {
   Body,
   ErrorBoundary,
@@ -13,12 +13,10 @@ import {
 } from "solid-start";
 import "flatpickr/dist/flatpickr.css";
 import "./root.css";
-import Navbar from "./components/Navbar";
-import HeadBar from "./components/HeadBar";
+import { AuthProvider } from "./context/Auth";
+import LayoutSwitcher from "./layout/LayoutSwitcher";
 
 export default function Root() {
-  const [isNavOpen, setIsNavOpen] = createSignal(true);
-
   return (
     <Html lang="en">
       <Head>
@@ -29,19 +27,13 @@ export default function Root() {
       <Body>
         <Suspense>
           <ErrorBoundary>
-            <div class="flex flex-row h-screen">
-              <Navbar isOpen={isNavOpen} setIsNavOpen={setIsNavOpen} />
-              <div class="flex-1 overflow-x-auto flex flex-col">
-                <HeadBar isOpen={isNavOpen} setIsNavOpen={setIsNavOpen} />
-                <div class="relative flex-1">
-                  <div class="overflow-auto py-8 px-6 h-full">
-                    <Routes>
-                      <FileRoutes />
-                    </Routes>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <AuthProvider>
+              <LayoutSwitcher>
+                <Routes>
+                  <FileRoutes />
+                </Routes>
+              </LayoutSwitcher>
+            </AuthProvider>
           </ErrorBoundary>
         </Suspense>
         <Scripts />

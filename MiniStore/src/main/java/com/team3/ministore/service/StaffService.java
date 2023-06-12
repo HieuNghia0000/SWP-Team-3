@@ -1,8 +1,10 @@
 package com.team3.ministore.service;
 
+import com.team3.ministore.dto.CurrentStaffDto;
 import com.team3.ministore.dto.RegisterDto;
 import com.team3.ministore.model.Staff;
 import org.springframework.data.domain.Page;
+import org.springframework.validation.BindingResult;
 
 import java.util.List;
 
@@ -24,4 +26,7 @@ public interface StaffService {
     Staff getStaffByEmail(String email);
 
     Staff getStaffByUsername(String username);
+
+    CurrentStaffDto getCurrentStaffByUsername(String username);
+
 }

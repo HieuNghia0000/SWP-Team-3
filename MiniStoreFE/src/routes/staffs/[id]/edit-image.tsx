@@ -3,15 +3,8 @@ import { Show, createSignal } from "solid-js";
 import { RouteDataArgs, useRouteData } from "solid-start";
 import { createServerData$ } from "solid-start/server";
 import Breadcrumbs from "~/components/Breadcrumbs";
+import { Staff } from "~/types";
 import routes from "~/utils/routes";
-
-type Staff = {
-  id?: number;
-  username?: string;
-  name: string;
-  image?: string;
-  status?: number;
-};
 
 export function routeData({ params }: RouteDataArgs) {
   return createServerData$(
@@ -21,8 +14,8 @@ export function routeData({ params }: RouteDataArgs) {
       // );
       // return await response.json();
       return {
-        id: Number.parseInt(key[1]),
-        name: "Nguyen Van A",
+        staffId: Number.parseInt(key[1]),
+        staffName: "Nguyen Van A",
         username: "nguyenvana",
         image: "",
         status: 1,
@@ -63,13 +56,13 @@ export default function EditStaffImage() {
             />
           </div>
           <div class="mt-2 text-center">
-            <p class="font-medium text-lg">{data()?.name}</p>
+            <p class="font-medium text-lg">{data()?.staffName}</p>
             <p class="font-medium text-sm text-gray-500">@{data()?.username}</p>
           </div>
           <div class="border my-5 w-full"></div>
           <div class="flex flex-col gap-3">
             <A
-              href={routes.staffEdit(data()?.id!)}
+              href={routes.staffEdit(data()?.staffId!)}
               class="text-base font-medium"
               activeClass="text-gray-500 cursor-default"
               inactiveClass="text-indigo-600 hover:text-indigo-500 underline underline-offset-2"
@@ -78,7 +71,7 @@ export default function EditStaffImage() {
               Update profile details
             </A>
             <A
-              href={routes.staffImageEdit(data()?.id!)}
+              href={routes.staffImageEdit(data()?.staffId!)}
               class="text-base font-medium"
               activeClass="text-gray-500 cursor-default"
               inactiveClass="text-indigo-600 hover:text-indigo-500 underline underline-offset-2"
@@ -87,7 +80,7 @@ export default function EditStaffImage() {
               Update profile image
             </A>
             <A
-              href={routes.staffChangePassword(data()?.id!)}
+              href={routes.staffChangePassword(data()?.staffId!)}
               class="text-base font-medium"
               activeClass="text-gray-500 cursor-default"
               inactiveClass="text-indigo-600 hover:text-indigo-500 underline underline-offset-2"
@@ -96,7 +89,7 @@ export default function EditStaffImage() {
               Update password
             </A>
             <A
-              href={routes.staffUpdateSchedule(data()?.id!)}
+              href={routes.staffUpdateSchedule(data()?.staffId!)}
               class="text-base font-medium"
               activeClass="text-gray-500 cursor-default"
               inactiveClass="text-indigo-600 hover:text-indigo-500 underline underline-offset-2"
@@ -105,7 +98,7 @@ export default function EditStaffImage() {
               Update work schedule
             </A>
             <A
-              href={routes.staffDisable(data()?.id!)}
+              href={routes.staffDisable(data()?.staffId!)}
               class="text-base font-medium"
               activeClass="text-gray-500 cursor-default"
               inactiveClass="text-indigo-600 hover:text-indigo-500 underline underline-offset-2"

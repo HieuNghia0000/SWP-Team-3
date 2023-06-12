@@ -6,21 +6,10 @@ import * as yup from "yup";
 import Breadcrumbs from "~/components/Breadcrumbs";
 import { Select } from "~/components/form/Select";
 import { TextInput } from "~/components/form/TextInput";
+import { Role, Staff, Status } from "~/types";
 import routes from "~/utils/routes";
 
-type Staff = {
-  id?: number;
-  username?: string;
-  name: string;
-  phone: string;
-  baseSalary: string;
-  role: number;
-  workDays?: string;
-  status?: number;
-  image?: string;
-};
-
-const schema: yup.Schema<Staff> = yup.object({
+const schema: yup.Schema = yup.object({
   name: yup.string().required("Vui lòng nhập họ tên"),
   phone: yup.string().required("Vui lòng nhập số điện thoại"),
   role: yup
@@ -38,14 +27,14 @@ export function routeData({ params }: RouteDataArgs) {
       // );
       // return await response.json();
       return {
-        id: Number.parseInt(key[1]),
-        name: "Nguyen Van A",
+        staffId: Number.parseInt(key[1]),
+        staffName: "Nguyen Van A",
         username: "nguyenvana",
-        phone: "0123456789",
-        role: 1,
+        phoneNumber: "0123456789",
+        role: Role.ADMIN,
         workDays: "TUE, THU, SAT, SUN",
-        status: 1,
-        baseSalary: "80000",
+        status: Status.ACTIVATED,
+        baseSalary: 80000,
         image: "",
       } as Staff;
     },
@@ -95,13 +84,13 @@ export default function StaffEdit() {
             />
           </div>
           <div class="mt-2 text-center">
-            <p class="font-medium text-lg">{data()?.name}</p>
+            <p class="font-medium text-lg">{data()?.staffName}</p>
             <p class="font-medium text-sm text-gray-500">@{data()?.username}</p>
           </div>
           <div class="border my-5 w-full"></div>
           <div class="flex flex-col gap-3">
             <A
-              href={routes.staffEdit(data()?.id!)}
+              href={routes.staffEdit(data()?.staffId!)}
               class="text-base font-medium"
               activeClass="text-gray-500 cursor-default"
               inactiveClass="text-indigo-600 hover:text-indigo-500 underline underline-offset-2"
@@ -110,7 +99,7 @@ export default function StaffEdit() {
               Update profile details
             </A>
             <A
-              href={routes.staffImageEdit(data()?.id!)}
+              href={routes.staffImageEdit(data()?.staffId!)}
               class="text-base font-medium"
               activeClass="text-gray-500 cursor-default"
               inactiveClass="text-indigo-600 hover:text-indigo-500 underline underline-offset-2"
@@ -119,7 +108,7 @@ export default function StaffEdit() {
               Update profile image
             </A>
             <A
-              href={routes.staffChangePassword(data()?.id!)}
+              href={routes.staffChangePassword(data()?.staffId!)}
               class="text-base font-medium"
               activeClass="text-gray-500 cursor-default"
               inactiveClass="text-indigo-600 hover:text-indigo-500 underline underline-offset-2"
@@ -128,7 +117,7 @@ export default function StaffEdit() {
               Update password
             </A>
             <A
-              href={routes.staffUpdateSchedule(data()?.id!)}
+              href={routes.staffUpdateSchedule(data()?.staffId!)}
               class="text-base font-medium"
               activeClass="text-gray-500 cursor-default"
               inactiveClass="text-indigo-600 hover:text-indigo-500 underline underline-offset-2"
@@ -137,7 +126,7 @@ export default function StaffEdit() {
               Update work schedule
             </A>
             <A
-              href={routes.staffDisable(data()?.id!)}
+              href={routes.staffDisable(data()?.staffId!)}
               class="text-base font-medium"
               activeClass="text-gray-500 cursor-default"
               inactiveClass="text-indigo-600 hover:text-indigo-500 underline underline-offset-2"
@@ -158,7 +147,7 @@ export default function StaffEdit() {
                 id="name"
                 name="name"
                 label="Staff name"
-                value={data()?.name}
+                value={data()?.staffName}
                 placeholder="Enter staff name"
                 formHandler={formHandler}
               />
@@ -177,7 +166,7 @@ export default function StaffEdit() {
                 id="phone"
                 name="phone"
                 label="Phone number"
-                value={data()?.phone}
+                value={data()?.phoneNumber}
                 placeholder="Enter staff phone number"
                 formHandler={formHandler}
               />
@@ -195,7 +184,7 @@ export default function StaffEdit() {
                 id="baseSalary"
                 name="baseSalary"
                 label="Base salary"
-                value={Number.parseInt(data()?.baseSalary!)}
+                value={data()?.baseSalary}
                 type="number"
                 step={1000}
                 placeholder="Enter staff base salary"
@@ -216,11 +205,11 @@ export default function StaffEdit() {
                 <span
                   class="inline-block whitespace-nowrap px-2 py-0.5 text-sm text-center font-bold text-white rounded-full"
                   classList={{
-                    "bg-green-500": data()?.status === 1,
-                    "bg-red-500": data()?.status === 2,
+                    "bg-green-500": data()?.status === Status.ACTIVATED,
+                    "bg-red-500": data()?.status === Status.DISABLED,
                   }}
                 >
-                  {data()?.status === 1 ? "Active" : "Disabled"}
+                  {data()?.status === Status.ACTIVATED ? "Active" : "Disabled"}
                 </span>
               </div>
 
@@ -248,8 +237,8 @@ export default function StaffEdit() {
 }
 
 const role = [
-  { value: 1, label: "Admin" },
-  { value: 2, label: "Manager" },
-  { value: 3, label: "Cashier" },
-  { value: 4, label: "Guard" },
+  { value: Role.ADMIN, label: "Admin" },
+  { value: Role.MANAGER, label: "Manager" },
+  { value: Role.CASHIER, label: "Cashier" },
+  { value: Role.GUARD, label: "Guard" },
 ];

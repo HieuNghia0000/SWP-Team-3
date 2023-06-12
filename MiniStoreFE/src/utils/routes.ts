@@ -1,4 +1,6 @@
 const routes = {
+  login: "/login",
+  logout: "/logout",
   dashboard: "/",
   products: "/products",
   staffs: "/staffs",
@@ -10,9 +12,13 @@ const routes = {
   staffUpdateSchedule: (id: string | number) => `/staffs/${id}/update-schedule`,
   staffDisable: (id: string | number) => `/staffs/${id}/disable`,
   categories: "/categories",
-  logout: "/logout",
   orders: "/orders",
   orderAdd: "/orders/add",
+};
+
+export const apiRoutes = {
+  login: "/auth/login",
+  currentUser: "/auth/current-staff",
 };
 
 export default routes;

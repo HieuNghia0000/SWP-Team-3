@@ -1,3 +1,4 @@
+import { A } from "@solidjs/router";
 import { RiSystemArrowDownSLine, RiSystemArrowUpSLine } from "solid-icons/ri";
 import { Component, Show, createSignal } from "solid-js";
 import routes from "~/utils/routes";
@@ -44,12 +45,12 @@ const HeadBar: Component<HeadBarProps> = (props) => {
         <Show when={isDropdownOpen()}>
           <div class="origin-top-right absolute right-0 top-16 z-30 w-48 rounded-md shadow-lg border border-gray-200">
             <div class="py-1 rounded-md bg-white shadow-xs">
-              <a
+              <A
                 href={routes.logout}
                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
                 Logout
-              </a>
+              </A>
             </div>
           </div>
         </Show>

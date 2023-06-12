@@ -23,6 +23,15 @@ public class ResponseHandler {
         return new ResponseEntity<>(map, status);
     }
 
+    public static ResponseEntity<Object> getResponse(Exception error, HttpStatus status) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("content", "");
+        map.put("errors", error.getMessage());
+        map.put("timestamp", DateUtils.toString(LocalDateTime.now()));
+        map.put("status", status.value());
+
+        return new ResponseEntity<>(map, status);
+    }
 
     public static ResponseEntity<Object> getResponse(BindingResult errors, HttpStatus status) {
         Map<String, Object> map = new HashMap<>();

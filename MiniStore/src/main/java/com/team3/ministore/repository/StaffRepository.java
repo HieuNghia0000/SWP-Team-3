@@ -1,5 +1,6 @@
 package com.team3.ministore.repository;
 
+import com.team3.ministore.dto.CurrentStaffDto;
 import com.team3.ministore.model.Staff;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -1,5 +1,6 @@
 package com.team3.ministore.service.impl;
 
+import com.team3.ministore.dto.CurrentStaffDto;
 import com.team3.ministore.dto.RegisterDto;
 import com.team3.ministore.model.Staff;
 import com.team3.ministore.repository.StaffRepository;
@@ -97,6 +98,25 @@ public class StaffServiceImpl implements StaffService {
     @Override
     public Staff getStaffByUsername(String username) {
         return staffRepository.findByUsername(username);
+    }
+
+    @Override
+    public CurrentStaffDto getCurrentStaffByUsername(String username) {
+        CurrentStaffDto result = new CurrentStaffDto();
+        Staff foundStaff = staffRepository.findByUsername(username);
+
+        result.setStaffId(foundStaff.getStaffId());
+        result.setUsername(foundStaff.getUsername());
+        result.setStaffName(foundStaff.getStaffName());
+        result.setRole(foundStaff.getRole());
+        result.setEmail(foundStaff.getEmail());
+        result.setPhoneNumber(foundStaff.getPhoneNumber());
+        result.setStatus(foundStaff.getStatus());
+        result.setBaseSalary(foundStaff.getBaseSalary());
+        result.setWorkDays(foundStaff.getWorkDays());
+        result.setImage(foundStaff.getImage());
+
+        return result;
     }
 
     private Staff saveStaff(Staff staff, String staffName, Role role, String username, String password, String phoneNumber, Float baseSalary, StaffStatus status, String image, String email, String workDays) {

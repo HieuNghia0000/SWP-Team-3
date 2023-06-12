@@ -10,58 +10,46 @@ import { For, Show, createSignal } from "solid-js";
 import { CgClose } from "solid-icons/cg";
 import moment from "moment";
 import routes from "~/utils/routes";
+import { Staff, Status } from "~/types";
 
 const mockData = [
   {
-    id: 1,
-    name: "Nguyen Van A",
+    staffId: 1,
+    staffName: "Nguyen Van A",
     username: "nguyenvana",
-    phone: "0123456789",
+    phoneNumber: "0123456789",
+    role: "Manager",
+    workDays: "TUE, THU, SAT, SUN",
+    status: 0,
+    baseSalary: 80.0,
+    createdAt: "2021-09-01T00:00:00.000Z",
+    updatedAt: "2021-09-01T00:00:00.000Z",
+  },
+  {
+    staffId: 2,
+    staffName: "Nguyen Van B",
+    username: "nguyenvanb",
+    phoneNumber: "0123456789",
     role: "Manager",
     workDays: "TUE, THU, SAT, SUN",
     status: 1,
-    baseSalary: "80.000",
+    baseSalary: 80.0,
     createdAt: "2021-09-01T00:00:00.000Z",
     updatedAt: "2021-09-01T00:00:00.000Z",
   },
   {
-    id: 2,
-    name: "Nguyen Van B",
+    staffId: 3,
+    staffName: "Nguyen Van B",
     username: "nguyenvanb",
-    phone: "0123456789",
-    role: "Manager",
-    workDays: "TUE, THU, SAT, SUN",
-    status: 2,
-    baseSalary: "80.000",
-    createdAt: "2021-09-01T00:00:00.000Z",
-    updatedAt: "2021-09-01T00:00:00.000Z",
-  },
-  {
-    id: 3,
-    name: "Nguyen Van B",
-    username: "nguyenvanb",
-    phone: "0123456789",
+    phoneNumber: "0123456789",
     role: "Cashier",
     workDays: "TUE, THU, SAT",
-    status: 2,
-    baseSalary: "60.000",
+    status: 1,
+    baseSalary: 60.0,
     createdAt: "2021-09-01T00:00:00.000Z",
     updatedAt: "2021-09-01T00:00:00.000Z",
   },
 ];
-
-type Staff = {
-  id: number;
-  name: string;
-  username: string;
-  phone: string;
-  role: string;
-  workDays: string;
-  status: number;
-  baseSalary: string;
-  createdAt: string;
-  updatedAt: string;
-};
 
 export function routeData() {
   const [searchParams] = useSearchParams();
@@ -222,14 +210,14 @@ export default function Staffs() {
                   <tr class="hover:bg-gray-200 odd:bg-white even:bg-gray-50">
                     <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
                       <A
-                        href={routes.staff(item.id)}
+                        href={routes.staff(item.staffId)}
                         class="hover:text-indigo-500"
                       >
-                        {item.name}
+                        {item.staffName}
                       </A>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
-                      {item.phone}
+                      {item.phoneNumber}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
                       {item.role}
@@ -241,11 +229,13 @@ export default function Staffs() {
                       <span
                         class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-bold text-white rounded-full"
                         classList={{
-                          "bg-green-500": item.status === 1,
-                          "bg-red-500": item.status === 2,
+                          "bg-green-500": item.status === Status.ACTIVATED,
+                          "bg-red-500": item.status === Status.DISABLED,
                         }}
                       >
-                        {item.status === 1 ? "Active" : "Disabled"}
+                        {item.status === Status.ACTIVATED
+                          ? "Active"
+                          : "Disabled"}
                       </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
@@ -263,7 +253,7 @@ export default function Staffs() {
                         </div>
                         <div class="relative">
                           <A
-                            href={routes.staffEdit(item.id)}
+                            href={routes.staffEdit(item.staffId)}
                             class="peer text-base text-gray-500 hover:text-indigo-500"
                           >
                             <OcPencil3 />
@@ -275,14 +265,16 @@ export default function Staffs() {
                         <div class="relative">
                           <button class="peer text-base text-gray-500 hover:text-indigo-500">
                             <Show
-                              when={item.status === 1}
+                              when={item.status === Status.ACTIVATED}
                               fallback={<FiUnlock />}
                             >
                               <FiLock />
                             </Show>
                           </button>
                           <span class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
-                            {item.status === 1 ? "Disable" : "Enable"}
+                            {item.status === Status.ACTIVATED
+                              ? "Disable"
+                              : "Enable"}
                           </span>
                         </div>
                       </div>
@@ -331,7 +323,7 @@ export default function Staffs() {
                   Staff ID:
                 </label>
                 <span class="w-full px-4 py-2 font-bold">
-                  {modalData()?.id}
+                  {modalData()?.staffId}
                 </span>
               </div>
               <div class="flex items-center mb-4">
@@ -339,7 +331,7 @@ export default function Staffs() {
                   Name:
                 </label>
                 <span class="w-full px-4 py-2 font-bold">
-                  {modalData()?.name}
+                  {modalData()?.staffName}
                 </span>
               </div>
               <div class="flex items-center mb-4">
@@ -355,7 +347,7 @@ export default function Staffs() {
                   Phone number:
                 </label>
                 <span class="w-full px-4 py-2 font-bold">
-                  {modalData()?.phone}
+                  {modalData()?.phoneNumber}
                 </span>
               </div>
               <div class="flex items-center mb-4">
@@ -387,7 +379,9 @@ export default function Staffs() {
                   Status:
                 </label>
                 <span class="w-full px-4 py-2 font-bold">
-                  {modalData()?.status === 1 ? "Active" : "Disabled"}
+                  {modalData()?.status === Status.ACTIVATED
+                    ? "Active"
+                    : "Disabled"}
                 </span>
               </div>
               <div class="flex items-center mb-4">
@@ -415,7 +409,7 @@ export default function Staffs() {
                   Disable
                 </button>
                 <A
-                  href={routes.staffEdit(modalData()?.id!)}
+                  href={routes.staffEdit(modalData()?.staffId!)}
                   class="px-6 py-2 text-white bg-blue-500 border border-blue-500 rounded hover:bg-blue-600 hover:text-white"
                 >
                   Edit
