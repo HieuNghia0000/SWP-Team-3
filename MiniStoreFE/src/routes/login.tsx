@@ -39,7 +39,12 @@ export default function Login() {
   };
 
   return (
-    <div class="h-screen grid place-items-center">
+    <div
+      class="h-screen grid place-items-center"
+      classList={{
+        "cursor-progress": user.state === "unresolved" || user.loading,
+      }}
+    >
       <div
         class="bg-white w-full max-w-xs mx-auto p-8 rounded-lg shadow-md"
         x-data="loginForm"
@@ -71,8 +76,9 @@ export default function Login() {
           </div>
           <div>
             <button
-              class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-4 rounded focus:shadow-outline w-full"
+              class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-4 rounded focus:shadow-outline w-full disabled:bg-indigo-200"
               type="submit"
+              disabled={user.loading || user.state === "unresolved"}
             >
               Log In
             </button>

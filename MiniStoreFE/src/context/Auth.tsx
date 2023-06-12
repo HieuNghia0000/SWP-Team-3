@@ -3,7 +3,6 @@ import {
   JSX,
   Resource,
   ResourceFetcher,
-  Show,
   createContext,
   createEffect,
   createResource,
@@ -14,7 +13,7 @@ import {
 import Cookies from "js-cookie";
 import routes, { apiRoutes } from "~/utils/routes";
 import { Staff } from "~/types";
-import axios, { AxiosError, isAxiosError } from "axios";
+import axios, { isAxiosError } from "axios";
 import { useNavigate } from "solid-start";
 
 export const apiInstance = axios.create({
@@ -101,6 +100,7 @@ const fetchData: ResourceFetcher<
       const { data } = await apiInstance.get<DataResponse<Staff>>(
         apiRoutes.currentUser
       );
+
       return data.content;
     }
     return undefined;
@@ -160,7 +160,6 @@ export const AuthProvider: Component<AuthProviderProps> = (props) => {
       clearItem("token");
     } else if (user()) {
       console.log("user", user());
-      navigate(routes.dashboard);
     }
   });
 
