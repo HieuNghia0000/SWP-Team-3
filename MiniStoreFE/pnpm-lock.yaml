@@ -35,6 +35,9 @@ dependencies:
   solid-js:
     specifier: ^1.7.2
     version: 1.7.2
+  solid-progressbar:
+    specifier: ^0.1.1
+    version: 0.1.1(@solidjs/router@0.8.2)(solid-js@1.7.2)
   solid-start:
     specifier: ^0.2.26
     version: 0.2.26(@solidjs/meta@0.28.2)(@solidjs/router@0.8.2)(solid-js@1.7.2)(solid-start-node@0.2.19)(vite@4.1.4)
@@ -3031,6 +3034,10 @@ packages:
     dependencies:
       path-key: 4.0.0
 
+  /nprogress@0.2.0:
+    resolution: {integrity: sha512-I19aIingLgR1fmhftnbWWO3dXc0hSxqHQHQb3H8m+K3TnEn/iSeTZZOyvKXWqQESMwuUVnatlCnZdLBZZt2VSA==}
+    dev: false
+
   /object-assign@4.1.1:
     resolution: {integrity: sha512-rJgTQnkUnH1sFw8yT6VSU3zD3sWmu6sZhIseY8VX+GRu3P6F7Fu+JNDoXfklElbLJSnc3FUQHVe4cU5hj+BcUg==}
     engines: {node: '>=0.10.0'}
@@ -3402,6 +3409,17 @@ packages:
     dependencies:
       csstype: 3.1.2
       seroval: 0.5.1
+
+  /solid-progressbar@0.1.1(@solidjs/router@0.8.2)(solid-js@1.7.2):
+    resolution: {integrity: sha512-55AN8qXvlBdexcT9FMGVFTMsUWh/4smivamuiESH05POTKRRyRuOL+hAFJ7DjxQ5UPmJIQo0s4m1rFhoQUCNBA==}
+    peerDependencies:
+      '@solidjs/router': '*'
+      solid-js: '*'
+    dependencies:
+      '@solidjs/router': 0.8.2(solid-js@1.7.2)
+      nprogress: 0.2.0
+      solid-js: 1.7.2
+    dev: false
 
   /solid-refresh@0.5.2(solid-js@1.7.2):
     resolution: {integrity: sha512-I69HmFj0LsGRJ3n8CEMVjyQFgVtuM2bSjznu2hCnsY+i5oOxh8ioWj00nnHBv0UYD3WpE/Sq4Q3TNw2IKmKN7A==}

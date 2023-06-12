@@ -17,17 +17,37 @@ export default createHandler(
       const cookie = event.request.headers.get("Cookie");
       // console.log(cookie);
       const token = getCookie(cookie, "token");
+      let user: Staff | null = null;
 
+      if (token) {
+        try {
+          const data = await fetch(
+            process.env.API_ENDPOINT + apiRoutes.currentUser,
+            {
+              headers: {
+                Authorization: "Bearer " + token,
+              },
+            }
+          );
+          const { content } = await data.json();
+          if (content) {
+            // console.log(content);
+            user = content;
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      }
       // if user accesses a non public route, and he is not authenticated - redirect him to the login page
       if (
         !publicRoutes.includes(new URL(event.request.url).pathname) &&
-        !token
+        !user
       ) {
         return redirect(routes.login);
       }
 
       // if user accesses a public route, and he is authenticated - redirect him to the main page
-      if (publicRoutes.includes(new URL(event.request.url).pathname) && token) {
+      if (publicRoutes.includes(new URL(event.request.url).pathname) && user) {
         return redirect(routes.dashboard);
       }
 

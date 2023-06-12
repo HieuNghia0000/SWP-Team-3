@@ -146,6 +146,7 @@ interface AuthProviderProps {
 
 export const AuthProvider: Component<AuthProviderProps> = (props) => {
   const [isClient, setIsClient] = createSignal(false);
+
   const [user, { mutate, refetch }] = createResource(isClient, fetchData);
 
   onMount(() => {

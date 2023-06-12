@@ -3,7 +3,9 @@ import * as yup from "yup";
 import { useFormHandler } from "solid-form-handler";
 import { yupSchema } from "solid-form-handler/yup";
 import { useAuth } from "~/context/Auth";
-import { Show } from "solid-js";
+import { Show, createEffect } from "solid-js";
+import { useNavigate } from "solid-start";
+import routes from "~/utils/routes";
 
 type Login = {
   username: string;
@@ -16,11 +18,18 @@ const schema: yup.Schema<Login> = yup.object({
 });
 
 export default function Login() {
+  const navigate = useNavigate();
   const { logIn, user } = useAuth();
   const formHandler = useFormHandler(yupSchema(schema), {
     validateOn: ["change"],
   });
   const { formData } = formHandler;
+
+  createEffect(() => {
+    if (!user.error && user()) {
+      navigate(routes.dashboard);
+    }
+  });
 
   const submit = async (event: Event) => {
     event.preventDefault();

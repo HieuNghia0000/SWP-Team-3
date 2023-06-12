@@ -15,6 +15,7 @@ import "flatpickr/dist/flatpickr.css";
 import "./root.css";
 import { AuthProvider } from "./context/Auth";
 import LayoutSwitcher from "./layout/LayoutSwitcher";
+import { SolidNProgress } from "solid-progressbar";
 
 export default function Root() {
   return (
@@ -25,7 +26,12 @@ export default function Root() {
         <Meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
       <Body>
-        <Suspense>
+        <SolidNProgress color="#4F46E5" />
+        <Suspense
+          fallback={
+            <div class="h-screen grid place-items-center">Loading...</div>
+          }
+        >
           <ErrorBoundary>
             <AuthProvider>
               <LayoutSwitcher>
