@@ -11,10 +11,9 @@ import {
   useContext,
 } from "solid-js";
 import Cookies from "js-cookie";
-import routes, { apiRoutes } from "~/utils/routes";
+import { apiRoutes } from "~/utils/routes";
 import { Staff } from "~/types";
 import axios, { isAxiosError } from "axios";
-import { useNavigate } from "solid-start";
 
 export const apiInstance = axios.create({
   baseURL: Cookies.get("endpoint"),
@@ -122,9 +121,11 @@ const fetchData: ResourceFetcher<
         // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
         // http.ClientRequest in node.js
         console.log(error.request);
+        throw new Error("No response from server");
       } else {
         // Something happened in setting up the request that triggered an Error
         console.log("Error", error.message);
+        throw new Error("Something went wrong. Please try again");
       }
       // console.log(error.config);
     }
@@ -144,11 +145,9 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: Component<AuthProviderProps> = (props) => {
-  const navigate = useNavigate();
-  const [isClient, setIsClient] = createSignal<boolean>(false);
+  const [isClient, setIsClient] = createSignal(false);
   const [user, { mutate, refetch }] = createResource(isClient, fetchData);
 
-  // fetch current user data on mount (only on client side)
   onMount(() => {
     setIsClient(true);
   });
@@ -166,7 +165,6 @@ export const AuthProvider: Component<AuthProviderProps> = (props) => {
   const logOut = () => {
     mutate(undefined);
     clearItem("token");
-    navigate(routes.login);
   };
 
   const logIn = (username: string, password: string) => {

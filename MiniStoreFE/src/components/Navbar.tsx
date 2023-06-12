@@ -7,6 +7,7 @@ import { A } from "@solidjs/router";
 import { Transition } from "solid-transition-group";
 import routes from "~/utils/routes";
 import { FiShoppingCart } from "solid-icons/fi";
+import { IoCalendarOutline } from "solid-icons/io";
 
 type NavbarProps = {
   isOpen: () => boolean;
@@ -38,6 +39,13 @@ const Navbar: Component<NavbarProps> = (props) => {
           text="Dashboard"
           isOpen={isOpen}
           end
+        />
+        {/* Dashboard */}
+        <NavbarLink
+          href={routes.shiftPlanning}
+          icon={<IoCalendarOutline />}
+          text="Shift&nbsp;Planning"
+          isOpen={isOpen}
         />
 
         {/* Product */}

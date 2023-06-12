@@ -11,6 +11,9 @@ dependencies:
   '@solidjs/router':
     specifier: ^0.8.2
     version: 0.8.2(solid-js@1.7.2)
+  '@thisbeyond/solid-dnd':
+    specifier: ^0.7.4
+    version: 0.7.4(solid-js@1.7.2)
   axios:
     specifier: ^1.4.0
     version: 1.4.0
@@ -1790,6 +1793,14 @@ packages:
       solid-js: ^1.5.3
     dependencies:
       solid-js: 1.7.2
+
+  /@thisbeyond/solid-dnd@0.7.4(solid-js@1.7.2):
+    resolution: {integrity: sha512-jgV9EtR3gAtVsILG8p1OAGrhHIgnK4W04YxpyLgJRCDKEFYQWuDrMdUe8F5Kc6pcVXlC4IMXr4cB8fS2Ut3/Ow==}
+    peerDependencies:
+      solid-js: ^1.5
+    dependencies:
+      solid-js: 1.7.2
+    dev: false
 
   /@types/babel__core@7.20.1:
     resolution: {integrity: sha512-aACu/U/omhdk15O4Nfb+fHgH/z3QsfQzpnvRZhYhThms83ZnAOZz7zZAWO7mn2yyNQaA4xTO8GLK3uqFU4bYYw==}

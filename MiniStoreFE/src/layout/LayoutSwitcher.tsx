@@ -19,11 +19,25 @@ const LayoutSwitcher: Component<{ children: JSX.Element }> = (props) => {
         <div class="h-screen grid place-items-center">Loading...</div>
       </Match>
 
-      <Match when={!user.error && user() && location.pathname !== routes.login}>
-        <DashboardLayout>{props.children}</DashboardLayout>
+      {/* Navigate to login page when error occurs or user logged out */}
+      <Match
+        when={(user.error || !user()) && location.pathname !== routes.login}
+        keyed
+      >
+        <Navigate href={routes.login} />
       </Match>
+
+      {/* Navigate to Dashboard page when has valid user data */}
       <Match when={!user.error && user() && location.pathname === routes.login}>
         <Navigate href={routes.dashboard} />
+      </Match>
+
+      {/* Apply DashboardLayout for protected routes */}
+      <Match
+        when={!user.error && user() && location.pathname !== routes.login}
+        keyed
+      >
+        <DashboardLayout>{props.children}</DashboardLayout>
       </Match>
     </Switch>
   );

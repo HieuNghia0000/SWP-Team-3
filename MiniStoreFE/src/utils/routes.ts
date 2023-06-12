@@ -14,6 +14,7 @@ const routes = {
   categories: "/categories",
   orders: "/orders",
   orderAdd: "/orders/add",
+  shiftPlanning: "/shift-planning",
 };
 
 export const apiRoutes = {
