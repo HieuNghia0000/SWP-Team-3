@@ -17,6 +17,9 @@ dependencies:
   axios:
     specifier: ^1.4.0
     version: 1.4.0
+  big.js:
+    specifier: ^6.2.1
+    version: 6.2.1
   flatpickr:
     specifier: ^4.6.13
     version: 4.6.13
@@ -52,6 +55,9 @@ dependencies:
     version: 1.2.0
 
 devDependencies:
+  '@types/big.js':
+    specifier: ^6.1.6
+    version: 6.1.6
   '@types/js-cookie':
     specifier: ^3.0.3
     version: 3.0.3
@@ -1830,6 +1836,10 @@ packages:
     dependencies:
       '@babel/types': 7.22.4
 
+  /@types/big.js@6.1.6:
+    resolution: {integrity: sha512-0r9J+Zz9rYm2hOTwiMAVkm3XFQ4u5uTK37xrQMhc9bysn/sf/okzovWMYYIBMFTn/yrEZ11pusgLEaoarTlQbA==}
+    dev: true
+
   /@types/cookie@0.5.1:
     resolution: {integrity: sha512-COUnqfB2+ckwXXSFInsFdOAWQzCCx+a5hq2ruyj+Vjund94RJQd4LG2u9hnvJrTgunKAaax7ancBYlDrNYxA0g==}
 
@@ -1990,6 +2000,10 @@ packages:
   /big-integer@1.6.51:
     resolution: {integrity: sha512-GPEid2Y9QU1Exl1rpO9B2IPJGHPSupF5GnVIP0blYvNOMer2bTvSWs1jGOUg04hTmu67nmLsQ9TBo1puaotBHg==}
     engines: {node: '>=0.6'}
+
+  /big.js@6.2.1:
+    resolution: {integrity: sha512-bCtHMwL9LeDIozFn+oNhhFoq+yQ3BNdnsLSASUxLciOb1vgvpHsIO1dsENiGMgbb4SkP5TrzWzRiLddn8ahVOQ==}
+    dev: false
 
   /binary-extensions@2.2.0:
     resolution: {integrity: sha512-jDctJ/IVQbZoJykoeHbhXpOlNBqGNcwXJKJog42E5HDPUwQTSdjCHdihjj0DlnheQ7blbT6dHOafNAiS8ooQKA==}

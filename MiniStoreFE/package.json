@@ -7,6 +7,7 @@
   },
   "type": "module",
   "devDependencies": {
+    "@types/big.js": "^6.1.6",
     "@types/js-cookie": "^3.0.3",
     "@types/node": "^18.11.18",
     "autoprefixer": "^10.4.14",
@@ -22,6 +23,7 @@
     "@solidjs/router": "^0.8.2",
     "@thisbeyond/solid-dnd": "^0.7.4",
     "axios": "^1.4.0",
+    "big.js": "^6.2.1",
     "flatpickr": "^4.6.13",
     "js-cookie": "^3.0.5",
     "moment": "^2.29.4",

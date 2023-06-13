@@ -39,17 +39,17 @@ export default createHandler(
         }
       }
       // if user accesses a non public route, and he is not authenticated - redirect him to the login page
-      if (
-        !publicRoutes.includes(new URL(event.request.url).pathname) &&
-        !user
-      ) {
-        return redirect(routes.login);
-      }
+      // if (
+      //   !publicRoutes.includes(new URL(event.request.url).pathname) &&
+      //   !user
+      // ) {
+      //   return redirect(routes.login);
+      // }
 
       // if user accesses a public route, and he is authenticated - redirect him to the main page
-      if (publicRoutes.includes(new URL(event.request.url).pathname) && user) {
-        return redirect(routes.dashboard);
-      }
+      // if (publicRoutes.includes(new URL(event.request.url).pathname) && user) {
+      //   return redirect(routes.dashboard);
+      // }
 
       return forward(event); // if we got here, and the pathname is inside the `protectedPaths` array - a user is logged in
     };
