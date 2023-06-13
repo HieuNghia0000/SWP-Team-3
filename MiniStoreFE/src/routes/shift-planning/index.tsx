@@ -15,20 +15,41 @@ import {
 } from "@thisbeyond/solid-dnd";
 import { createStore } from "solid-js/store";
 import { Component, For, batch } from "solid-js";
+import { Role } from "~/types";
 
-const Sortable: Component<{ item: WorkSchedule }> = (props) => {
-  const sortable = createSortable(props.item.id);
+const Sortable: Component<{
+  item: WorkSchedule;
+  width: () => number | undefined;
+}> = (props) => {
+  const sortable = createSortable(props.item.id, {
+    width: props.width(),
+    shift: props.item,
+  });
 
   return (
     <button
       // @ts-ignore
       use:sortable
       type="button"
-      id={props.item.toString()}
-      class="rounded mx-0.5 px-1.5 py-1 relative text-left bg-blue-100 hover:bg-blue-200"
-      classList={{ "opacity-25": sortable.isActiveDraggable }}
+      id={props.item.id.toString()}
+      class="rounded mx-0.5 px-1.5 py-1 relative text-left"
+      classList={{
+        "opacity-25": sortable.isActiveDraggable,
+        "bg-blue-100 hover:bg-blue-200": props.item.role === Role.CASHIER,
+        "bg-yellow-100 hover:bg-yellow-200": props.item.role === Role.GUARD,
+        "bg-red-100 hover:bg-red-200": props.item.role === Role.MANAGER,
+        "bg-gray-100 hover:bg-gray-200": props.item.role === Role.ADMIN,
+      }}
     >
-      <i class="bg-blue-700 absolute top-1 left-1 bottom-1 w-1.5 rounded"></i>
+      <i
+        class="bg-blue-700 absolute top-1 left-1 bottom-1 w-1.5 rounded"
+        classList={{
+          "bg-blue-500": props.item.role === Role.CASHIER,
+          "bg-yellow-500": props.item.role === Role.GUARD,
+          "bg-red-500": props.item.role === Role.MANAGER,
+          "bg-gray-500": props.item.role === Role.ADMIN,
+        }}
+      ></i>
       <p class="ml-3 font-semibold text-sm">9am - 5pm</p>
       <p class="ml-3 font-normal text-xs text-gray-600">
         Cashier {props.item.id}
@@ -40,15 +61,19 @@ const Sortable: Component<{ item: WorkSchedule }> = (props) => {
 const Column: Component<{ id: string; items: WorkSchedule[] }> = (props) => {
   const droppable = createDroppable(props.id);
   0 && droppable;
+  let divRef: HTMLDivElement | undefined = undefined;
 
   return (
     <div
       // @ts-ignore
       use:droppable
-      class="flex flex-col border-r border-b border-gray-200 flex-1 overflow-hidden bg-white pt-0.5"
+      ref={divRef}
+      class="flex flex-col border-r border-b border-gray-200 flex-1 overflow-hidden bg-white pt-0.5 gap-y-0.5"
     >
       <SortableProvider ids={props.items.map((item) => item.id)}>
-        <For each={props.items}>{(item) => <Sortable item={item} />}</For>
+        <For each={props.items}>
+          {(item) => <Sortable item={item} width={() => divRef?.offsetWidth} />}
+        </For>
       </SortableProvider>
     </div>
   );
@@ -89,6 +114,7 @@ function transformData(data: ShiftPlanningData) {
 type WorkSchedule = {
   id: number; //unique id
   date: string;
+  role: Role;
 };
 interface ShiftPlanningData {
   dates: string[];
@@ -100,39 +126,43 @@ export default function ShiftPlanning() {
     dates: ["1", "2", "3", "4", "5", "6", "7"],
     staffs: {
       "Open Shifts": [
-        { id: 10, date: "1" },
-        { id: 11, date: "2" },
-        { id: 12, date: "1" },
+        { id: 10, date: "1", role: Role.GUARD },
+        { id: 11, date: "2", role: Role.GUARD },
+        { id: 12, date: "1", role: Role.GUARD },
       ],
       Hieu: [
-        { id: 1, date: "2" },
-        { id: 2, date: "1" },
-        { id: 3, date: "1" },
+        { id: 1, date: "2", role: Role.MANAGER },
+        { id: 2, date: "1", role: Role.MANAGER },
+        { id: 3, date: "1", role: Role.MANAGER },
       ],
       Khoa: [
-        { id: 4, date: "5" },
-        { id: 5, date: "4" },
-        { id: 6, date: "5" },
+        { id: 4, date: "5", role: Role.MANAGER },
+        { id: 5, date: "4", role: Role.MANAGER },
+        { id: 6, date: "5", role: Role.MANAGER },
       ],
       Nghia: [
-        { id: 7, date: "3" },
-        { id: 8, date: "4" },
-        { id: 9, date: "1" },
+        { id: 7, date: "3", role: Role.CASHIER },
+        { id: 8, date: "4", role: Role.CASHIER },
+        { id: 9, date: "1", role: Role.CASHIER },
       ],
     },
   });
   const [tableData, setTableData] = createStore(transformData(data));
 
-  function getShiftsByBoxId(droppableBoxId: string): WorkSchedule[] {
+  function getShiftsByBoxId(droppableBoxId: string) {
     if (!tableData.cels.hasOwnProperty(droppableBoxId)) {
       return []; // Key does not exist in transformed data
     }
 
     const shiftIds = tableData.cels[droppableBoxId];
 
-    const shifts = tableData.shifts.filter((shift) =>
-      shiftIds.includes(shift.id)
-    );
+    const shifts = [];
+    for (let shiftId of shiftIds) {
+      const shift = tableData.shifts.find((shift) => shift.id === shiftId);
+      if (shift) {
+        shifts.push(shift);
+      }
+    }
 
     return shifts;
   }
@@ -230,6 +260,7 @@ export default function ShiftPlanning() {
         ]);
       });
     }
+    console.log(tableData.cels);
   };
 
   const onDragOver: DragEventHandler = ({ draggable, droppable }) => {
@@ -299,7 +330,7 @@ export default function ShiftPlanning() {
               <For each={Object.keys(data.staffs)}>
                 {(staff) => (
                   <div class="flex">
-                    <div class="sticky -left-6 px-3 py-1.5 flex flex-col border border-t-0 border-gray-200 w-52 flex-auto flex-grow-0 flex-shrink-0 overflow-visible bg-[#f8fafc]">
+                    <div class="sticky -left-6 z-10 px-3 py-1.5 flex flex-col border border-t-0 border-gray-200 w-52 flex-auto flex-grow-0 flex-shrink-0 overflow-visible bg-[#f8fafc]">
                       <div class="font-semibold text-sm text-gray-500">
                         {staff}
                       </div>
@@ -325,12 +356,43 @@ export default function ShiftPlanning() {
                   <button
                     type="button"
                     id={draggable?.id as string}
-                    class="rounded mx-0.5 px-1.5 py-1 relative text-left bg-blue-200"
+                    class="rounded mx-0.5 px-1.5 py-1 relative text-left"
+                    style={{ width: `${draggable?.data?.width}px` }}
+                    classList={{
+                      "bg-blue-200":
+                        (draggable?.data.shift as WorkSchedule).role ===
+                        Role.CASHIER,
+                      "bg-yellow-200":
+                        (draggable?.data.shift as WorkSchedule).role ===
+                        Role.GUARD,
+                      "bg-red-200":
+                        (draggable?.data.shift as WorkSchedule).role ===
+                        Role.MANAGER,
+                      "bg-gray-200":
+                        (draggable?.data.shift as WorkSchedule).role ===
+                        Role.ADMIN,
+                    }}
                   >
-                    <i class="bg-blue-700 absolute top-1 left-1 bottom-1 w-1.5 rounded"></i>
+                    <i
+                      class="bg-blue-700 absolute top-1 left-1 bottom-1 w-1.5 rounded"
+                      classList={{
+                        "bg-blue-700":
+                          (draggable?.data.shift as WorkSchedule).role ===
+                          Role.CASHIER,
+                        "bg-yellow-700":
+                          (draggable?.data.shift as WorkSchedule).role ===
+                          Role.GUARD,
+                        "bg-red-700":
+                          (draggable?.data.shift as WorkSchedule).role ===
+                          Role.MANAGER,
+                        "bg-gray-700":
+                          (draggable?.data.shift as WorkSchedule).role ===
+                          Role.ADMIN,
+                      }}
+                    ></i>
                     <p class="ml-3 font-semibold text-sm">9am - 5pm</p>
                     <p class="ml-3 font-normal text-xs text-gray-600">
-                      Cashier {draggable?.id}
+                      Cashier {(draggable?.data.shift as WorkSchedule).id}
                     </p>
                   </button>
                 )}
