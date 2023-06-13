@@ -19,20 +19,28 @@ import {
   Accessor,
   Component,
   For,
+  JSX,
   Setter,
   Show,
   batch,
   createContext,
-  createEffect,
   createSignal,
-  splitProps,
+  onCleanup,
+  onMount,
   useContext,
 } from "solid-js";
 import { Role, Staff, Status } from "~/types";
 import { CgClose } from "solid-icons/cg";
 import moment from "moment";
-import { A } from "@solidjs/router";
+import { A, useSearchParams } from "@solidjs/router";
 import routes from "~/utils/routes";
+import flatpickr from "flatpickr";
+import { RiSystemCloseLine } from "solid-icons/ri";
+import { FiCalendar } from "solid-icons/fi";
+import { IoCopySharp } from "solid-icons/io";
+import clickOutside from "~/hooks/clickOutside";
+
+0 && clickOutside;
 
 type SPContext = {
   shiftModalData: Accessor<WorkSchedule | undefined>;
@@ -182,13 +190,52 @@ export default function ShiftPlanning() {
       ],
     },
   });
+  const [searchParams, setSearchParams] = useSearchParams();
+  let dateRef: HTMLInputElement | undefined = undefined;
+  let fp: flatpickr.Instance | undefined = undefined;
   const [tableData, setTableData] = createStore(transformData(data));
+  const [dateStr, setDateStr] = createSignal<string>("");
 
   const [showShiftModal, setShowShiftModal] = createSignal<boolean>(false);
   const [shiftModalData, setShiftModalData] = createSignal<WorkSchedule>();
 
   const [showStaffModal, setShowStaffModal] = createSignal<boolean>(false);
   const [staffModalData, setStaffModalData] = createSignal<Staff>();
+
+  onMount(() => {
+    fp = flatpickr(dateRef!, {
+      mode: "range",
+      dateFormat: "M-d-Y",
+      onClose: (selectedDates, dateStr, instance) => {
+        if (selectedDates.length === 0) {
+          setSearchParams({ from: undefined, to: undefined });
+        }
+        if (selectedDates.length === 2) {
+          const start = instance.formatDate(selectedDates[0], "Y-m-d");
+          const end = instance.formatDate(selectedDates[1], "Y-m-d");
+          if (start && end) {
+            setSearchParams({
+              from: start,
+              to: end,
+            });
+          }
+          setDateStr(dateStr);
+        }
+      },
+      onChange: (selectedDates, dateStr) => {
+        if (selectedDates.length === 0) {
+          setDateStr("");
+        }
+        if (selectedDates.length === 2) {
+          setDateStr(dateStr);
+        }
+      },
+    });
+  });
+
+  onCleanup(() => {
+    fp?.destroy();
+  });
 
   function getShiftsByBoxId(droppableBoxId: string) {
     if (!tableData.cels.hasOwnProperty(droppableBoxId)) {
@@ -330,6 +377,75 @@ export default function ShiftPlanning() {
           <Breadcrumbs linkList={[{ name: "Shift Planning" }]} />
 
           {/* Tool bar */}
+          <div class="mb-4 flex flex-row justify-between">
+            <div class="flex flex-row gap-5 items-center">
+              <div class="flex flex-row gap-1 bg-white border-gray-200 border rounded-lg p-1">
+                <DateRangeButton
+                  active={() =>
+                    searchParams.rendition === undefined ||
+                    searchParams.rendition === "grid"
+                  }
+                  text="Grid"
+                  param="grid"
+                  cb={() => fp?.clear()}
+                />
+                <DateRangeButton
+                  active={() => searchParams.rendition === "list"}
+                  text="List"
+                  param="list"
+                  cb={() => fp?.clear()}
+                />
+              </div>
+            </div>
+            <div class="flex justify-center items-center mr-5 gap-4">
+              <Show when={dateStr()}>
+                <div class="flex justify-center items-center gap-2">
+                  <button
+                    class="text-base hover:text-indigo-700"
+                    onClick={() => {
+                      setSearchParams({
+                        ago: undefined,
+                        from: undefined,
+                        to: undefined,
+                      });
+                      fp?.clear();
+                    }}
+                  >
+                    <RiSystemCloseLine />
+                  </button>
+                  <label class="text-gray-500 font-medium">{dateStr()}</label>
+                </div>
+              </Show>
+              <button
+                ref={dateRef}
+                type="button"
+                class="range_flatpicker flex flex-row gap-2 justify-center items-center border border-gray-300 rounded-lg py-2 px-3.5 font-medium text-sm text-gray-500 hover:text-indigo-600 hover:border-indigo-600"
+              >
+                <FiCalendar />
+                Select Dates
+              </button>
+              <DropDownBtn text="Copy" icon={<IoCopySharp />}>
+                <A
+                  href="/"
+                  class="py-1.5 px-2.5 text-sm text-gray-600 hover:bg-gray-100 whitespace-nowrap block"
+                >
+                  Copy Previous Week
+                </A>
+                <A
+                  href="/"
+                  class="py-1.5 px-2.5 text-sm text-gray-600 hover:bg-gray-100 whitespace-nowrap block"
+                >
+                  Create Week Template
+                </A>
+                <A
+                  href="/"
+                  class="py-1.5 px-2.5 text-sm text-gray-600 hover:bg-gray-100 whitespace-nowrap block"
+                >
+                  Apply Week Template
+                </A>
+              </DropDownBtn>
+            </div>
+          </div>
 
           {/* Table */}
           <div class="w-full">
@@ -712,5 +828,60 @@ const StaffDetailsModal: Component<{
         </div>
       </div>
     </Show>
+  );
+};
+
+function DateRangeButton(props: {
+  active: () => boolean;
+  text: string;
+  param?: string;
+  cb: () => void;
+}) {
+  const { active, text, param, cb } = props;
+  const [, setSearchParams] = useSearchParams();
+
+  return (
+    <button
+      class="py-1.5 px-3 font-semibold rounded-md text-sm"
+      classList={{
+        "bg-indigo-100 text-indigo-700": active(),
+        "text-gray-500 hover:bg-indigo-50": !active(),
+      }}
+      onClick={() => {
+        setSearchParams({ rendition: param });
+        cb();
+      }}
+    >
+      {text}
+    </button>
+  );
+}
+
+const DropDownBtn: Component<{
+  text: string;
+  icon?: JSX.Element;
+  children: JSX.Element;
+}> = (props) => {
+  const [filterDropdown, setFilterDropdown] = createSignal(false);
+
+  return (
+    <div class="relative">
+      <button
+        type="button"
+        onClick={() => setFilterDropdown(!filterDropdown())}
+        class="flex flex-row gap-2 justify-center items-center border border-gray-300 rounded-lg py-2 px-3.5 font-medium text-sm text-gray-500 hover:text-indigo-600 hover:border-indigo-600"
+      >
+        <Show when={props.icon}>{props.icon}</Show>
+        {props.text}
+      </button>
+      <Show when={filterDropdown()}>
+        <div
+          class="origin-top-right absolute right-0 top-11 z-40 min-w-[200px] rounded-lg shadow-lg border border-gray-200"
+          use:clickOutside={() => setFilterDropdown(!filterDropdown())}
+        >
+          <div class="rounded-sm bg-white shadow-xs">{props.children}</div>
+        </div>
+      </Show>
+    </div>
   );
 };
