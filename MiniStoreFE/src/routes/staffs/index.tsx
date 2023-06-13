@@ -300,13 +300,13 @@ export default function Staffs() {
       {/* <!-- Modal panel, show/hide based on modal state. --> */}
       <Show when={showModal()}>
         <div
-          class="absolute inset-0 z-20 flex bg-black bg-opacity-50 overflow-x-auto sm:justify-end sm:p-5 sm:overflow-hidden"
+          class="fixed inset-0 z-20 flex bg-black bg-opacity-50 overflow-x-auto sm:justify-end sm:p-5 sm:overflow-hidden"
           aria-modal="true"
           onClick={(e) => {
             if (e.target.ariaModal) setShowModal(false);
           }}
         >
-          <div class="min-w-[440px] flex flex-col text-gray-500 bg-white shadow-lg sm:rounded-lg h-full overflow-auto slide-in-right border">
+          <div class="min-w-full sm:min-w-[440px] flex flex-col text-gray-500 bg-white shadow-lg sm:rounded-lg h-full overflow-auto slide-in-right border">
             <div class="p-6 flex justify-between flex-row items-center text-black">
               <h4 class="text-2xl font-medium">Staff details</h4>
               <button

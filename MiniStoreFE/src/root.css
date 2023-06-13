@@ -6,15 +6,17 @@ body {
   background-color: #f9f9fc;
 }
 
-@keyframes slide-in-right {
+@keyframes zoom-in {
   0% {
-    transform: translateX(100%);
+    opacity: 0;
+    transform: scale(0.8);
   }
   100% {
-    transform: translateX(0);
+    transform: scale(1);
+    opacity: 1;
   }
 }
 
-.slide-in-right {
-  animation: slide-in-right 0.2s ease-out;
+.zoom-in {
+  animation: zoom-in 0.2s ease-out;
 }
