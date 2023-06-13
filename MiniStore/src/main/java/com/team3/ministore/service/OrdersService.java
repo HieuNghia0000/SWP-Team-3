@@ -2,6 +2,7 @@ package com.team3.ministore.service;
 
 import com.team3.ministore.model.Orders;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface OrdersService {
@@ -16,4 +17,6 @@ public interface OrdersService {
     void deleteOrders(Integer id);
 
     List<Orders> getOrdersFromTimeAgo(String ago);
+
+    List<Orders> getOrdersBetweenDate(LocalDateTime fromDate, LocalDateTime toDate);
 }

@@ -3,7 +3,7 @@ package com.team3.ministore.model;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -20,7 +20,7 @@ public class Orders {
     private List<OrderItems> orderItems;
 
     @Column(name = "order_date")
-    private Date orderDate;
+    private LocalDateTime orderDate;
 
     @Column(name = "total_amount")
     private int totalAmount;
