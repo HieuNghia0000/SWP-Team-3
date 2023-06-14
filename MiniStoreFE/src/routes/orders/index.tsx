@@ -180,7 +180,7 @@ export default function Orders() {
           </div>
           <A
             href={routes.orderAdd}
-            class="text-sm font-semibold text-white bg-indigo-600 py-2.5 px-3.5 rounded-lg hover:bg-indigo-700"
+            class="text-sm font-semibold text-white bg-indigo-600 py-2 px-3.5 rounded-lg hover:bg-indigo-700"
           >
             + Add Order
           </A>
@@ -366,7 +366,7 @@ function DateRangeButton(props: {
 
   return (
     <button
-      class="py-1.5 px-3 font-semibold rounded-md text-sm"
+      class="py-1 px-3 font-semibold rounded-md text-sm"
       classList={{
         "bg-indigo-100 text-indigo-700": active(),
         "text-gray-500 hover:bg-indigo-50": !active(),

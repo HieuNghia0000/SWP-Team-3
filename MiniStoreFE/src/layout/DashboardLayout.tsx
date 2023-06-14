@@ -11,7 +11,7 @@ const DashboardLayout: Component<{ children: JSX.Element }> = (props) => {
       <div class="flex-1 overflow-x-auto flex flex-col">
         <HeadBar isOpen={isNavOpen} setIsNavOpen={setIsNavOpen} />
         <div class="relative flex-1 overflow-auto">
-          <div class="py-8 px-6 h-full">{props.children}</div>
+          <div class="py-8 px-6 h-full min-w-[1024px]">{props.children}</div>
         </div>
       </div>
     </div>

@@ -6,11 +6,12 @@ import { FiLock, FiUnlock } from "solid-icons/fi";
 import { createRouteData, useRouteData, useSearchParams } from "solid-start";
 import Pagination from "~/components/Pagination";
 import { A } from "@solidjs/router";
-import { For, Show, createSignal } from "solid-js";
-import { CgClose } from "solid-icons/cg";
+import { Accessor, Component, For, Setter, Show, createSignal } from "solid-js";
 import moment from "moment";
 import routes from "~/utils/routes";
 import { Staff, Status } from "~/types";
+import PopupModal from "~/components/PopupModal";
+import { FaSolidPencil } from "solid-icons/fa";
 
 const mockData = [
   {
@@ -298,127 +299,110 @@ export default function Staffs() {
       </main>
 
       {/* <!-- Modal panel, show/hide based on modal state. --> */}
-      <Show when={showModal()}>
-        <div
-          class="fixed inset-0 z-20 flex bg-black bg-opacity-50 overflow-x-auto sm:justify-end sm:p-5 sm:overflow-hidden"
-          aria-modal="true"
-          onClick={(e) => {
-            if (e.target.ariaModal) setShowModal(false);
-          }}
-        >
-          <div class="min-w-full sm:min-w-[440px] flex flex-col text-gray-500 bg-white shadow-lg sm:rounded-lg h-full overflow-auto slide-in-right border">
-            <div class="p-6 flex justify-between flex-row items-center text-black">
-              <h4 class="text-2xl font-medium">Staff details</h4>
-              <button
-                onClick={[setShowModal, false]}
-                class="text-xl hover:text-indigo-700"
-              >
-                <CgClose />
-              </button>
-            </div>
-            <div class="border"></div>
-            <div class="p-6">
-              <div class="flex items-center mb-4">
-                <label class="w-3/4 sm:w-2/4 pr-2 mb-0 md:mr-0 mr-6">
-                  Staff ID:
-                </label>
-                <span class="w-full px-4 py-2 font-bold">
-                  {modalData()?.staffId}
-                </span>
-              </div>
-              <div class="flex items-center mb-4">
-                <label class="w-3/4 sm:w-2/4 pr-2 mb-0 md:mr-0 mr-6">
-                  Name:
-                </label>
-                <span class="w-full px-4 py-2 font-bold">
-                  {modalData()?.staffName}
-                </span>
-              </div>
-              <div class="flex items-center mb-4">
-                <label class="w-3/4 sm:w-2/4 pr-2 mb-0 md:mr-0 mr-6">
-                  Username:
-                </label>
-                <span class="w-full px-4 py-2 font-bold">
-                  {modalData()?.username}
-                </span>
-              </div>
-              <div class="flex items-center mb-4">
-                <label class="w-3/4 sm:w-2/4 pr-2 mb-0 md:mr-0 mr-6">
-                  Phone number:
-                </label>
-                <span class="w-full px-4 py-2 font-bold">
-                  {modalData()?.phoneNumber}
-                </span>
-              </div>
-              <div class="flex items-center mb-4">
-                <label class="w-3/4 sm:w-2/4 pr-2 mb-0 md:mr-0 mr-6">
-                  Role:
-                </label>
-                <span class="w-full px-4 py-2 font-bold">
-                  {modalData()?.role}
-                </span>
-              </div>
-              <div class="flex items-center mb-4">
-                <label class="w-3/4 sm:w-2/4 pr-2 mb-0 md:mr-0 mr-6">
-                  Salary per hour:
-                </label>
-                <span class="w-full px-4 py-2 font-bold">
-                  {modalData()?.baseSalary} VND
-                </span>
-              </div>
-              <div class="flex items-center mb-4">
-                <label class="w-3/4 sm:w-2/4 pr-2 mb-0 md:mr-0 mr-6">
-                  Working days:
-                </label>
-                <span class="w-full px-4 py-2 font-bold">
-                  {modalData()?.workDays}
-                </span>
-              </div>
-              <div class="flex items-center mb-4">
-                <label class="w-3/4 sm:w-2/4 pr-2 mb-0 md:mr-0 mr-6">
-                  Status:
-                </label>
-                <span class="w-full px-4 py-2 font-bold">
-                  {modalData()?.status === Status.ACTIVATED
-                    ? "Active"
-                    : "Disabled"}
-                </span>
-              </div>
-              <div class="flex items-center mb-4">
-                <label class="w-3/4 sm:w-2/4 pr-2 mb-0 md:mr-0 mr-6">
-                  Created at:
-                </label>
-                <span class="w-full px-4 py-2 font-bold">
-                  {moment(modalData()?.createdAt!).format(
-                    "MMM Do YYYY, h:mm a"
-                  )}
-                </span>
-              </div>
-              <div class="flex items-center mb-4">
-                <label class="w-3/4 sm:w-2/4 pr-2 mb-0 md:mr-0 mr-6">
-                  Updated at:
-                </label>
-                <span class="w-full px-4 py-2 font-bold">
-                  {moment(modalData()?.updatedAt!).format(
-                    "MMM Do YYYY, h:mm a"
-                  )}
-                </span>
-              </div>
-              <div class="flex flex-row justify-end gap-3">
-                <button class="px-6 py-2 text-white bg-red-500 border border-red-500 rounded hover:bg-red-600 hover:text-white">
-                  Disable
-                </button>
-                <A
-                  href={routes.staffEdit(modalData()?.staffId!)}
-                  class="px-6 py-2 text-white bg-blue-500 border border-blue-500 rounded hover:bg-blue-600 hover:text-white"
-                >
-                  Edit
-                </A>
-              </div>
-            </div>
-          </div>
-        </div>
-      </Show>
+      <StaffDetailsModal
+        showModal={showModal}
+        modalData={modalData}
+        setShowModal={setShowModal}
+      />
     </>
   );
 }
+
+const StaffDetailsModal: Component<{
+  showModal: Accessor<boolean>;
+  modalData: Accessor<Staff | undefined>;
+  setShowModal: Setter<boolean>;
+}> = ({ showModal, modalData, setShowModal }) => {
+  return (
+    <PopupModal
+      title="Staff Details"
+      close={() => setShowModal(false)}
+      open={showModal}
+      footer={
+        <A
+          href={routes.staffEdit(1)}
+          class="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-2"
+        >
+          <span class="">
+            <FaSolidPencil />
+          </span>
+          Edit Staff
+        </A>
+      }
+    >
+      <div class="text-lg mb-2.5 font-semibold text-center text-gray-800">
+        <p>Nguyen Van A</p>
+        <p class="text-sm text-gray-400">ID: 1</p>
+      </div>
+      <div class="border-t border-gray-300 border-dotted text-gray-600 text-sm">
+        <div class="flex border-b border-gray-300 border-dotted">
+          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
+            <span class="font-semibold text-gray-500">Email:</span>
+            <span>nguyenvana@gmail.com</span>
+          </div>
+        </div>
+        <div class="flex border-b border-gray-300 border-dotted">
+          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
+            <span class="font-semibold text-gray-500">Username:</span>
+            <span>nguyenvana</span>
+          </div>
+        </div>
+        <div class="flex border-b border-gray-300 border-dotted">
+          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
+            <span class="font-semibold text-gray-500">Phone Number:</span>
+            <span>0987654321</span>
+          </div>
+          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
+            <span class="font-semibold text-gray-500">Hourly Wage:</span>
+            <span>$0.00</span>
+          </div>
+        </div>
+        <div class="flex border-b border-gray-300 border-dotted">
+          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
+            <span class="font-semibold text-gray-500">Role:</span>
+            <span
+              class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-semibold text-red-700 rounded-full"
+              classList={{
+                "bg-red-200": true,
+              }}
+            >
+              Manager
+            </span>
+          </div>
+          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
+            <span class="font-semibold text-gray-500">Status:</span>
+            <span
+              class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-semibold text-white rounded-full"
+              classList={{
+                "bg-green-500": true,
+              }}
+            >
+              {true ? "Activated" : "Disabled"}
+            </span>
+          </div>
+        </div>
+        <div class="flex border-b border-gray-300 border-dotted">
+          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
+            <span class="font-semibold text-gray-500">Working days:</span>
+            <span>TUE, THU, SAT, SUN</span>
+          </div>
+        </div>
+        <div class="flex border-b border-gray-300 border-dotted">
+          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
+            <span class="font-semibold text-gray-500">Created At:</span>
+            <span>Sep 1st 2021, 7:00 am</span>
+          </div>
+          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
+            <span class="font-semibold text-gray-500">Updated At:</span>
+            <span>Sep 1st 2021, 7:00 am</span>
+          </div>
+        </div>
+        <div class="flex flex-row justify-end gap-3 pt-2">
+          <button class="px-3.5 py-2 text-white bg-red-500 border border-red-500 rounded hover:bg-red-600 hover:text-white">
+            Disable
+          </button>
+        </div>
+      </div>
+    </PopupModal>
+  );
+};

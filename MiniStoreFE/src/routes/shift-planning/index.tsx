@@ -1,5 +1,5 @@
 import Breadcrumbs from "~/components/Breadcrumbs";
-import { FaSolidPencil } from "solid-icons/fa";
+import { FaSolidCheck, FaSolidPencil } from "solid-icons/fa";
 import {
   CollisionDetector,
   DragDropProvider,
@@ -19,7 +19,6 @@ import {
   Accessor,
   Component,
   For,
-  JSX,
   Setter,
   Show,
   batch,
@@ -30,7 +29,6 @@ import {
   useContext,
 } from "solid-js";
 import { Role, Staff, Status } from "~/types";
-import { CgClose } from "solid-icons/cg";
 import moment from "moment";
 import { A, useSearchParams } from "@solidjs/router";
 import routes from "~/utils/routes";
@@ -38,11 +36,18 @@ import flatpickr from "flatpickr";
 import { RiSystemCloseLine } from "solid-icons/ri";
 import { FiCalendar } from "solid-icons/fi";
 import { IoCopySharp } from "solid-icons/io";
-import clickOutside from "~/hooks/clickOutside";
-import Dismiss from "solid-dismiss";
 import DropDownBtn from "~/components/DropDownBtn";
+import PopupModal from "~/components/PopupModal";
 
-0 && clickOutside;
+type WorkSchedule = {
+  id: number; //unique id
+  date: string;
+  role: Role;
+};
+interface ShiftPlanningData {
+  dates: string[];
+  staffs: Record<string, WorkSchedule[]>;
+}
 
 type SPContext = {
   shiftModalData: Accessor<WorkSchedule | undefined>;
@@ -154,16 +159,6 @@ function transformData(data: ShiftPlanningData) {
   }
 
   return transformedData;
-}
-
-type WorkSchedule = {
-  id: number; //unique id
-  date: string;
-  role: Role;
-};
-interface ShiftPlanningData {
-  dates: string[];
-  staffs: Record<string, WorkSchedule[]>;
 }
 
 export default function ShiftPlanning() {
@@ -400,6 +395,15 @@ export default function ShiftPlanning() {
               </div>
             </div>
             <div class="flex justify-center items-center mr-5 gap-4">
+              <button
+                type="button"
+                class="flex flex-row items-center gap-1 text-sm font-semibold text-white bg-indigo-600 py-2 px-3.5 rounded-lg hover:bg-indigo-700"
+              >
+                <span class="text-base">
+                  <FaSolidCheck />
+                </span>
+                Publish
+              </button>
               <Show when={dateStr()}>
                 <div class="flex justify-center items-center gap-2">
                   <button
@@ -454,7 +458,7 @@ export default function ShiftPlanning() {
             <div class="min-w-[1024px]">
               {/* Header */}
               <div class="sticky top-0 z-30 flex shadow-sm border border-gray-200 rounded-t-md">
-                <div class="sticky -left-6 z-30 px-3 py-2 flex flex-col justify-center border border-gray-200 w-52 flex-auto flex-grow-0 flex-shrink-0 overflow-visible bg-white"></div>
+                <div class="sticky left-0 z-30 px-3 py-2 flex flex-col justify-center border border-gray-200 w-52 flex-auto flex-grow-0 flex-shrink-0 overflow-visible bg-white"></div>
                 <div class="px-3 py-2 flex flex-col justify-center border border-gray-200 flex-1 items-center overflow-hidden bg-white">
                   <div class="font-semibold text-sm text-gray-600">
                     Mon, Jun 5
@@ -525,7 +529,7 @@ export default function ShiftPlanning() {
                   <For each={Object.keys(data.staffs)}>
                     {(staff) => (
                       <div class="flex">
-                        <div class="sticky -left-6 z-10 px-3 py-1.5 flex flex-col border border-t-0 border-gray-200 w-52 flex-auto flex-grow-0 flex-shrink-0 overflow-visible bg-white">
+                        <div class="sticky left-0 z-10 px-3 py-1.5 flex flex-col border border-t-0 border-gray-200 w-52 flex-auto flex-grow-0 flex-shrink-0 overflow-visible bg-white">
                           <button
                             onClick={() => {
                               // setStaffModalData(staff);
@@ -626,111 +630,79 @@ const ShiftDetailsModal: Component<{
   setShowModal: Setter<boolean>;
 }> = ({ showModal, modalData, setShowModal }) => {
   return (
-    <Show when={showModal()}>
-      <div
-        class="fixed inset-0 z-40 bg-black bg-opacity-50 overflow-y-auto overflow-x-hidden sm:justify-end sm:p-5"
-        aria-modal="true"
-        onClick={(e) => {
-          if (e.target.ariaModal) setShowModal(false);
-        }}
-      >
-        <div class="zoom-in col-span-1 bg-white shadow-md w-[600px] min-w-fit min-h-[100px] rounded-md mx-auto my-8 flex flex-col">
-          {/* Header */}
-          <div class="py-3.5 px-5 rounded-t-md flex justify-between items-center flex-wrap font-semibold border-b border-gray-300 text-gray-600 bg-gray-50">
-            Shift Details
-            <button
-              onClick={[setShowModal, false]}
-              class="text-xl hover:text-indigo-700"
-            >
-              <CgClose />
-            </button>
+    <PopupModal
+      title="Shift Details"
+      close={() => setShowModal(false)}
+      open={showModal}
+      footer={
+        <A
+          href={routes.staffEdit(1)}
+          class="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-2"
+        >
+          <span class="">
+            <FaSolidPencil />
+          </span>
+          Edit Shift
+        </A>
+      }
+    >
+      <div class="text-lg mb-2.5 font-semibold text-center text-gray-800">
+        Hieu Vo
+      </div>
+      <div class="border-t border-gray-300 border-dotted text-gray-600 text-sm">
+        <div class="flex border-b border-gray-300 border-dotted">
+          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
+            <span class="font-semibold text-gray-500">Team Member:</span>
+            <span>Hieu Vo</span>
           </div>
-
-          {/* Body */}
-          <div class="flex-1 p-5">
-            <div class="p-5 -m-5">
-              <div class="text-lg mb-2.5 font-semibold text-center text-gray-800">
-                Hieu Vo
-              </div>
-              <div class="border-t border-gray-300 border-dotted text-gray-600 text-sm">
-                <div class="flex border-b border-gray-300 border-dotted">
-                  <div class="flex-1 py-2.5 overflow-hidden space-x-1">
-                    <span class="font-semibold text-gray-500">
-                      Team Member:
-                    </span>
-                    <span>Hieu Vo</span>
-                  </div>
-                  <div class="flex-1 py-2.5 overflow-hidden space-x-1">
-                    <span class="font-semibold text-gray-500">
-                      Hourly Wage:
-                    </span>
-                    <span>$0.00</span>
-                  </div>
-                </div>
-                <div class="flex border-b border-gray-300 border-dotted">
-                  <div class="flex-1 py-2.5 overflow-hidden space-x-1">
-                    <span class="font-semibold text-gray-500">Role:</span>
-                    <span
-                      class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-semibold text-red-700 rounded-full"
-                      classList={{
-                        "bg-red-200": true,
-                      }}
-                    >
-                      Manager
-                    </span>
-                  </div>
-                </div>
-                <div class="flex border-b border-gray-300 border-dotted">
-                  <div class="flex-1 py-2.5 overflow-hidden space-x-1">
-                    <span class="font-semibold text-gray-500">Date:</span>
-                    <span>Mon Jun 5, 2023</span>
-                  </div>
-                  <div class="flex-1 py-2.5 overflow-hidden space-x-1">
-                    <span class="font-semibold text-gray-500">Start Time:</span>
-                    <span>12:00pm</span>
-                  </div>
-                  <div class="flex-1 py-2.5 overflow-hidden space-x-1">
-                    <span class="font-semibold text-gray-500">End Time:</span>
-                    <span>6:00pm</span>
-                  </div>
-                </div>
-                <div class="flex">
-                  <div class="flex-1 py-2.5 overflow-hidden space-x-1">
-                    <span class="font-semibold text-gray-500">Status:</span>
-                    <span>Not yet</span>
-                  </div>
-                  <div class="flex-1 py-2.5 overflow-hidden space-x-1">
-                    <span class="font-semibold text-gray-500">
-                      Check-in Time:
-                    </span>
-                    <span>Not yet</span>
-                  </div>
-                  <div class="flex-1 py-2.5 overflow-hidden space-x-1">
-                    <span class="font-semibold text-gray-500">
-                      Check-out Time:
-                    </span>
-                    <span>Not yet</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
+            <span class="font-semibold text-gray-500">Hourly Wage:</span>
+            <span>$0.00</span>
           </div>
-
-          {/* Footer */}
-          <div class="rounded-b-md px-5 py-3.5 border-t border-gray-300 flex items-center justify-start bg-gray-50">
-            <A
-              href={routes.staffEdit(1)}
-              class="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-2"
+        </div>
+        <div class="flex border-b border-gray-300 border-dotted">
+          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
+            <span class="font-semibold text-gray-500">Role:</span>
+            <span
+              class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-semibold text-red-700 rounded-full"
+              classList={{
+                "bg-red-200": true,
+              }}
             >
-              <span class="">
-                <FaSolidPencil />
-              </span>
-              Edit Shift
-            </A>
+              Manager
+            </span>
+          </div>
+        </div>
+        <div class="flex border-b border-gray-300 border-dotted">
+          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
+            <span class="font-semibold text-gray-500">Date:</span>
+            <span>Mon Jun 5, 2023</span>
+          </div>
+          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
+            <span class="font-semibold text-gray-500">Start Time:</span>
+            <span>12:00pm</span>
+          </div>
+          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
+            <span class="font-semibold text-gray-500">End Time:</span>
+            <span>6:00pm</span>
+          </div>
+        </div>
+        <div class="flex">
+          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
+            <span class="font-semibold text-gray-500">Status:</span>
+            <span>Not yet</span>
+          </div>
+          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
+            <span class="font-semibold text-gray-500">Check-in Time:</span>
+            <span>Not yet</span>
+          </div>
+          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
+            <span class="font-semibold text-gray-500">Check-out Time:</span>
+            <span>Not yet</span>
           </div>
         </div>
       </div>
-    </Show>
+    </PopupModal>
   );
 };
 
@@ -740,96 +712,68 @@ const StaffDetailsModal: Component<{
   setShowModal: Setter<boolean>;
 }> = ({ showModal, modalData, setShowModal }) => {
   return (
-    <Show when={showModal()}>
-      <div
-        class="fixed inset-0 z-40 bg-black bg-opacity-50 overflow-y-auto overflow-x-hidden sm:justify-end sm:p-5"
-        aria-modal="true"
-        onClick={(e) => {
-          if (e.target.ariaModal) setShowModal(false);
-        }}
-      >
-        <div class="zoom-in col-span-1 bg-white shadow-md w-[600px] min-w-fit min-h-[100px] rounded-md mx-auto my-8 flex flex-col">
-          {/* Header */}
-          <div class="py-3.5 px-5 rounded-t-md flex justify-between items-center flex-wrap font-semibold border-b border-gray-300 text-gray-600 bg-gray-50">
-            Staff Details
-            <button
-              onClick={[setShowModal, false]}
-              class="text-xl hover:text-indigo-700"
-            >
-              <CgClose />
-            </button>
+    <PopupModal
+      title="Staff Details"
+      close={() => setShowModal(false)}
+      open={showModal}
+      footer={
+        <A
+          href={routes.staffEdit(1)}
+          class="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-2"
+        >
+          <span class="">
+            <FaSolidPencil />
+          </span>
+          Edit Staff
+        </A>
+      }
+    >
+      <div class="text-lg mb-2.5 font-semibold text-center text-gray-800">
+        Hieu Vo
+      </div>
+      <div class="border-t border-gray-300 border-dotted text-gray-600 text-sm">
+        <div class="flex border-b border-gray-300 border-dotted">
+          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
+            <span class="font-semibold text-gray-500">Email:</span>
+            <span>voanhhieu10250@gmail.com</span>
           </div>
-
-          {/* Body */}
-          <div class="flex-1 p-5">
-            <div class="p-5 -m-5">
-              <div class="text-lg mb-2.5 font-semibold text-center text-gray-800">
-                Hieu Vo
-              </div>
-              <div class="border-t border-gray-300 border-dotted text-gray-600 text-sm">
-                <div class="flex border-b border-gray-300 border-dotted">
-                  <div class="flex-1 py-2.5 overflow-hidden space-x-1">
-                    <span class="font-semibold text-gray-500">Email:</span>
-                    <span>voanhhieu10250@gmail.com</span>
-                  </div>
-                </div>
-                <div class="flex border-b border-gray-300 border-dotted">
-                  <div class="flex-1 py-2.5 overflow-hidden space-x-1">
-                    <span class="font-semibold text-gray-500">
-                      Phone Number:
-                    </span>
-                    <span>0987654321</span>
-                  </div>
-                  <div class="flex-1 py-2.5 overflow-hidden space-x-1">
-                    <span class="font-semibold text-gray-500">
-                      Hourly Wage:
-                    </span>
-                    <span>$0.00</span>
-                  </div>
-                </div>
-                <div class="flex">
-                  <div class="flex-1 py-2.5 overflow-hidden space-x-1">
-                    <span class="font-semibold text-gray-500">Role:</span>
-                    <span
-                      class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-semibold text-red-700 rounded-full"
-                      classList={{
-                        "bg-red-200": true,
-                      }}
-                    >
-                      Manager
-                    </span>
-                  </div>
-                  <div class="flex-1 py-2.5 overflow-hidden space-x-1">
-                    <span class="font-semibold text-gray-500">Status:</span>
-                    <span
-                      class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-semibold text-white rounded-full"
-                      classList={{
-                        "bg-green-500": true,
-                      }}
-                    >
-                      {true ? "Activated" : "Disabled"}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
+        </div>
+        <div class="flex border-b border-gray-300 border-dotted">
+          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
+            <span class="font-semibold text-gray-500">Phone Number:</span>
+            <span>0987654321</span>
           </div>
-
-          {/* Footer */}
-          <div class="rounded-b-md px-5 py-3.5 border-t border-gray-300 flex items-center justify-start bg-gray-50">
-            <A
-              href={routes.staffEdit(1)}
-              class="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-2"
+          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
+            <span class="font-semibold text-gray-500">Hourly Wage:</span>
+            <span>$0.00</span>
+          </div>
+        </div>
+        <div class="flex">
+          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
+            <span class="font-semibold text-gray-500">Role:</span>
+            <span
+              class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-semibold text-red-700 rounded-full"
+              classList={{
+                "bg-red-200": true,
+              }}
             >
-              <span class="">
-                <FaSolidPencil />
-              </span>
-              Edit Staff
-            </A>
+              Manager
+            </span>
+          </div>
+          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
+            <span class="font-semibold text-gray-500">Status:</span>
+            <span
+              class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-semibold text-white rounded-full"
+              classList={{
+                "bg-green-500": true,
+              }}
+            >
+              {true ? "Activated" : "Disabled"}
+            </span>
           </div>
         </div>
       </div>
-    </Show>
+    </PopupModal>
   );
 };
 
