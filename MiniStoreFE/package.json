@@ -27,6 +27,7 @@
     "flatpickr": "^4.6.13",
     "js-cookie": "^3.0.5",
     "moment": "^2.29.4",
+    "solid-dismiss": "^1.7.121",
     "solid-form-handler": "^1.2.0",
     "solid-icons": "^1.0.4",
     "solid-js": "^1.7.2",

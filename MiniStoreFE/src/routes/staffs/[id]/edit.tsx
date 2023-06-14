@@ -12,10 +12,7 @@ import routes from "~/utils/routes";
 const schema: yup.Schema = yup.object({
   name: yup.string().required("Vui lòng nhập họ tên"),
   phone: yup.string().required("Vui lòng nhập số điện thoại"),
-  role: yup
-    .number()
-    .typeError("Vui lòng nhập số")
-    .required("Vui lòng chọn role"),
+  role: yup.string().required("Vui lòng chọn role"),
   baseSalary: yup.string().required("Vui lòng nhập lương cơ bản"),
 });
 

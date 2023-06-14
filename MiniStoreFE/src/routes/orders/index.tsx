@@ -10,17 +10,7 @@ import routes from "~/utils/routes";
 import flatpickr from "flatpickr";
 import { RiSystemCloseLine } from "solid-icons/ri";
 import { BiRegularDollar } from "solid-icons/bi";
-import clickOutside from "~/hooks/clickOutside";
-
-0 && clickOutside;
-
-declare module "solid-js" {
-  namespace JSX {
-    interface Directives {
-      clickOutside: () => void;
-    }
-  }
-}
+import DropDownBtn from "~/components/DropDownBtn";
 
 const mockData = [
   {
@@ -222,31 +212,14 @@ export default function Orders() {
             <FiCalendar />
             Select Dates
           </button>
-          <div class="relative">
-            <button
-              type="button"
-              onClick={() => setFilterDropdown(!filterDropdown())}
-              class="range_flatpicker flex flex-row gap-2 justify-center items-center border border-gray-300 rounded-lg py-2 px-3.5 font-medium text-sm text-gray-500 hover:text-indigo-600 hover:border-indigo-600"
+          <DropDownBtn text="Amount" icon={<BiRegularDollar />}>
+            <A
+              href={routes.logout}
+              class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
-              <BiRegularDollar />
-              Amount
-            </button>
-            <Show when={filterDropdown()}>
-              <div
-                class="origin-top-right absolute right-0 top-11 z-30 w-48 rounded-lg shadow-lg border border-gray-200"
-                use:clickOutside={() => setFilterDropdown(!filterDropdown())}
-              >
-                <div class="py-1 rounded-md bg-white shadow-xs">
-                  <A
-                    href={routes.logout}
-                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Logout
-                  </A>
-                </div>
-              </div>
-            </Show>
-          </div>
+              Logout
+            </A>
+          </DropDownBtn>
         </div>
       </div>
 

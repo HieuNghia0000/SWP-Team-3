@@ -1,4 +1,5 @@
 import { A } from "@solidjs/router";
+import Dismiss from "solid-dismiss";
 import { RiSystemArrowDownSLine, RiSystemArrowUpSLine } from "solid-icons/ri";
 import { Component, Show, createSignal } from "solid-js";
 import routes from "~/utils/routes";
@@ -11,6 +12,7 @@ type HeadBarProps = {
 const HeadBar: Component<HeadBarProps> = (props) => {
   const { isOpen, setIsNavOpen } = props;
   const [isDropdownOpen, setIsDropdownOpen] = createSignal(false);
+  let btnEl;
 
   return (
     <nav class="flex flex-row justify-between items-center py-4 px-6 gap-4 h-[72px] bg-white border-b-1 border-gray-200 shadow-md">
@@ -20,7 +22,7 @@ const HeadBar: Component<HeadBarProps> = (props) => {
       <div class="relative ml-3">
         <div class="h-full items-center flex">
           <button
-            onClick={() => setIsDropdownOpen(!isDropdownOpen())}
+            ref={btnEl}
             class="text-sm rounded-full flex items-center justify-center gap-3"
           >
             <img
@@ -42,7 +44,11 @@ const HeadBar: Component<HeadBarProps> = (props) => {
             </span>
           </button>
         </div>
-        <Show when={isDropdownOpen()}>
+        <Dismiss
+          menuButton={btnEl}
+          open={isDropdownOpen}
+          setOpen={setIsDropdownOpen}
+        >
           <div class="origin-top-right absolute right-0 top-16 z-30 w-48 rounded-md shadow-lg border border-gray-200">
             <div class="py-1 rounded-md bg-white shadow-xs">
               <A
@@ -53,7 +59,7 @@ const HeadBar: Component<HeadBarProps> = (props) => {
               </A>
             </div>
           </div>
-        </Show>
+        </Dismiss>
       </div>
     </nav>
   );

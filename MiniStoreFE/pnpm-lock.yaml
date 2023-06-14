@@ -29,6 +29,9 @@ dependencies:
   moment:
     specifier: ^2.29.4
     version: 2.29.4
+  solid-dismiss:
+    specifier: ^1.7.121
+    version: 1.7.121(solid-js@1.7.2)
   solid-form-handler:
     specifier: ^1.2.0
     version: 1.2.0(solid-js@1.7.2)
@@ -3400,6 +3403,14 @@ packages:
       '@polka/url': 1.0.0-next.21
       mrmime: 1.0.1
       totalist: 3.0.1
+
+  /solid-dismiss@1.7.121(solid-js@1.7.2):
+    resolution: {integrity: sha512-bQmzzBy90zvKTnV2G8iTdd1TpdIgL0EecrarnTJdhLRK08dte0fN9VE+bFOl5S3wXOMkFSj8L0BA7GUqTAYGTA==}
+    peerDependencies:
+      solid-js: '1'
+    dependencies:
+      solid-js: 1.7.2
+    dev: false
 
   /solid-form-handler@1.2.0(solid-js@1.7.2):
     resolution: {integrity: sha512-T+bIzu9xJgfuZUrN1w7zhl8Dy8FYHZQ+iqtmmfO0dE5qerPbSRWDhSK3tykpfC7cEbW4Ts+ZfNM5IKyqiAALsg==}

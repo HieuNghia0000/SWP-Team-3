@@ -39,6 +39,8 @@ import { RiSystemCloseLine } from "solid-icons/ri";
 import { FiCalendar } from "solid-icons/fi";
 import { IoCopySharp } from "solid-icons/io";
 import clickOutside from "~/hooks/clickOutside";
+import Dismiss from "solid-dismiss";
+import DropDownBtn from "~/components/DropDownBtn";
 
 0 && clickOutside;
 
@@ -856,32 +858,3 @@ function DateRangeButton(props: {
     </button>
   );
 }
-
-const DropDownBtn: Component<{
-  text: string;
-  icon?: JSX.Element;
-  children: JSX.Element;
-}> = (props) => {
-  const [filterDropdown, setFilterDropdown] = createSignal(false);
-
-  return (
-    <div class="relative">
-      <button
-        type="button"
-        onClick={() => setFilterDropdown(!filterDropdown())}
-        class="flex flex-row gap-2 justify-center items-center border border-gray-300 rounded-lg py-2 px-3.5 font-medium text-sm text-gray-500 hover:text-indigo-600 hover:border-indigo-600"
-      >
-        <Show when={props.icon}>{props.icon}</Show>
-        {props.text}
-      </button>
-      <Show when={filterDropdown()}>
-        <div
-          class="origin-top-right absolute right-0 top-11 z-40 min-w-[200px] rounded-lg shadow-lg border border-gray-200"
-          use:clickOutside={() => setFilterDropdown(!filterDropdown())}
-        >
-          <div class="rounded-sm bg-white shadow-xs">{props.children}</div>
-        </div>
-      </Show>
-    </div>
-  );
-};
