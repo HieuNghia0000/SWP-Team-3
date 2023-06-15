@@ -11,6 +11,9 @@ import flatpickr from "flatpickr";
 import { RiSystemCloseLine } from "solid-icons/ri";
 import { BiRegularDollar } from "solid-icons/bi";
 import DropDownBtn from "~/components/DropDownBtn";
+import { Instance } from "flatpickr/dist/types/instance";
+import { isServer } from "solid-js/web";
+import moment from "moment";
 
 const mockData = [
   {
@@ -80,22 +83,53 @@ export function routeData() {
 }
 export default function Orders() {
   const [searchParams, setSearchParams] = useSearchParams();
+  if (isServer && (searchParams.from || searchParams.to)) {
+    const from = moment(searchParams.from);
+    const to = moment(searchParams.to);
+
+    // check for the 'from' and 'to' params to be valid dates
+    if (!from.isValid() || !to.isValid()) {
+      setSearchParams({ from: undefined, to: undefined });
+      return <></>;
+    }
+
+    // check for the 'from' param to always be less than the 'to' param
+    if (from.isAfter(to)) {
+      setSearchParams({
+        from: to.format("YYYY-MM-DD"),
+        to: from.format("YYYY-MM-DD"),
+      });
+      return <></>;
+    }
+  }
   const data = useRouteData<typeof routeData>();
   let dateRef: HTMLInputElement | undefined = undefined;
   let fp: flatpickr.Instance | undefined = undefined;
   const [dateStr, setDateStr] = createSignal<string>("");
-  const [filterDropdown, setFilterDropdown] = createSignal(false);
 
   const totalItems = () => data()?.length ?? 0;
   const perPage = () => Number.parseInt(searchParams.perPage ?? 10);
   const curPage = () => Number.parseInt(searchParams.curPage ?? 1);
   const lastPage = () => Math.ceil(totalItems() / perPage());
 
+  const updateDateStr = (selectedDates: Date[], instance: Instance) => {
+    if (selectedDates.length === 0) {
+      setDateStr("");
+    }
+    if (selectedDates.length === 2) {
+      const start = instance.formatDate(selectedDates[0], "F j");
+      const end = instance.formatDate(selectedDates[1], "F j, Y");
+      if (end.startsWith(start)) setDateStr(end);
+      else setDateStr(`${start} - ${end}`);
+    }
+  };
+
   onMount(() => {
     fp = flatpickr(dateRef!, {
       mode: "range",
-      dateFormat: "d-m-Y",
-      onClose: (selectedDates, dateStr, instance) => {
+      dateFormat: "Y-m-d",
+      defaultDate: [searchParams.from, searchParams.to],
+      onChange: (selectedDates, dateStr, instance) => {
         if (selectedDates.length === 0) {
           setSearchParams({ ago: undefined, from: undefined, to: undefined });
         }
@@ -109,16 +143,11 @@ export default function Orders() {
               ago: undefined,
             });
           }
-          setDateStr(dateStr);
+          updateDateStr(selectedDates, instance);
         }
       },
-      onChange: (selectedDates, dateStr) => {
-        if (selectedDates.length === 0) {
-          setDateStr("");
-        }
-        if (selectedDates.length === 2) {
-          setDateStr(dateStr);
-        }
+      onReady: (selectedDates, dateStr, instance) => {
+        updateDateStr(selectedDates, instance);
       },
     });
   });
@@ -151,31 +180,46 @@ export default function Orders() {
             <DateRangeButton
               active={() => searchParams.ago === undefined}
               text="All time"
-              cb={() => fp?.clear()}
+              cb={() => {
+                setDateStr("");
+                fp?.clear();
+              }}
             />
             <DateRangeButton
               active={() => searchParams.ago === "12months"}
               text="12 months"
               param="12months"
-              cb={() => fp?.clear()}
+              cb={() => {
+                setDateStr("");
+                fp?.clear();
+              }}
             />
             <DateRangeButton
               active={() => searchParams.ago === "30days"}
               text="30 days"
               param="30days"
-              cb={() => fp?.clear()}
+              cb={() => {
+                setDateStr("");
+                fp?.clear();
+              }}
             />
             <DateRangeButton
               active={() => searchParams.ago === "7days"}
               text="7 days"
               param="7days"
-              cb={() => fp?.clear()}
+              cb={() => {
+                setDateStr("");
+                fp?.clear();
+              }}
             />
             <DateRangeButton
               active={() => searchParams.ago === "24hours"}
               text="24 hours"
               param="24hours"
-              cb={() => fp?.clear()}
+              cb={() => {
+                setDateStr("");
+                fp?.clear();
+              }}
             />
           </div>
           <A
@@ -186,13 +230,13 @@ export default function Orders() {
           </A>
         </div>
         <div class="flex justify-center items-center mr-5 gap-4">
-          <Show when={dateStr()}>
-            <div class="flex justify-center items-center gap-2">
+          <div class="flex justify-center items-center gap-2">
+            <Show when={dateStr()}>
               <button
                 class="text-base hover:text-indigo-700"
                 onClick={() => {
+                  setDateStr("");
                   setSearchParams({
-                    ago: undefined,
                     from: undefined,
                     to: undefined,
                   });
@@ -201,17 +245,16 @@ export default function Orders() {
               >
                 <RiSystemCloseLine />
               </button>
-              <label class="text-gray-500 font-medium">{dateStr()}</label>
-            </div>
-          </Show>
-          <button
-            ref={dateRef}
-            type="button"
-            class="range_flatpicker flex flex-row gap-2 justify-center items-center border border-gray-300 rounded-lg py-2 px-3.5 font-medium text-sm text-gray-500 hover:text-indigo-600 hover:border-indigo-600"
-          >
-            <FiCalendar />
-            Select Dates
-          </button>
+            </Show>
+            <button
+              ref={dateRef}
+              type="button"
+              class="range_flatpicker flex flex-row gap-2 justify-center items-center border border-gray-300 rounded-lg py-2 px-3.5 font-medium text-sm text-gray-500 hover:text-indigo-600 hover:border-indigo-600"
+            >
+              <FiCalendar />
+              {dateStr() || "Select Dates"}
+            </button>
+          </div>
           <DropDownBtn text="Amount" icon={<BiRegularDollar />}>
             <A
               href={routes.logout}

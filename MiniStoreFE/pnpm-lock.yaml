@@ -47,6 +47,9 @@ dependencies:
   solid-start:
     specifier: ^0.2.26
     version: 0.2.26(@solidjs/meta@0.28.2)(@solidjs/router@0.8.2)(solid-js@1.7.2)(solid-start-node@0.2.19)(vite@4.1.4)
+  solid-toast:
+    specifier: ^0.5.0
+    version: 0.5.0(solid-js@1.7.2)
   solid-transition-group:
     specifier: ^0.2.2
     version: 0.2.2(solid-js@1.7.2)
@@ -3549,6 +3552,14 @@ packages:
       wait-on: 6.0.1(debug@4.3.4)
     transitivePeerDependencies:
       - supports-color
+
+  /solid-toast@0.5.0(solid-js@1.7.2):
+    resolution: {integrity: sha512-t770JakjyS2P9b8Qa1zMLOD51KYKWXbTAyJePVUoYex5c5FH5S/HtUBUbZAWFcqRCKmAE8KhyIiCvDZA8bOnxQ==}
+    peerDependencies:
+      solid-js: ^1.5.4
+    dependencies:
+      solid-js: 1.7.2
+    dev: false
 
   /solid-transition-group@0.2.2(solid-js@1.7.2):
     resolution: {integrity: sha512-6nB90UM2PB6VsIo/UCkmZmlIJb9mnmP7QPGrePqQJWtpUiRs5PbhkB8fvdyv9g/RPHWYpdJhQgxL6n++WmTt5A==}
