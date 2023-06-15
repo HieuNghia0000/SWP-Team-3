@@ -6,6 +6,7 @@ import com.team3.ministore.model.Staff;
 import com.team3.ministore.service.StaffService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/staffs")
@@ -41,7 +43,7 @@ public class StaffController {
     }
 
     //Update an existing staff
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}/edit")
     public ResponseEntity<Staff> updateStaff(@PathVariable("id") Integer id, @RequestBody Staff staff) {
         Staff updatedStaff = staffService.updateStaff(id, staff);
         return new ResponseEntity<>(updatedStaff, HttpStatus.OK);
@@ -80,9 +82,15 @@ public class StaffController {
             int perPage = 10;
 
             staffPage = staffService.findAllPagingStaff(curPage, perPage);
-            if (staffPage.getSize() == 0) {
+            if (staffPage.isEmpty() && (staffList == null || staffList.isEmpty())) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
+        }
+
+        if (staffList != null) {
+            List<Staff> filteredStaffs = staffPage.stream().filter(staffList::contains).collect(Collectors.toList());
+
+            staffPage = new PageImpl<>(filteredStaffs, staffPage.getPageable(), filteredStaffs.size());
         }
 
         StaffResponse response = new StaffResponse(staffList, staffPage);

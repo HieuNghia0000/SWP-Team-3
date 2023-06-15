@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,12 +48,21 @@ public class OrdersController {
     @GetMapping("")
     public ResponseEntity<List<Orders>> getOrders(@RequestParam("ago") Optional<String> agoParam,
                                                   @RequestParam("from") Optional<String> fromDateParam,
-                                                  @RequestParam("to") Optional<String> toDateParam) {
+                                                  @RequestParam("to") Optional<String> toDateParam,
+                                                  @RequestParam("fromAmount") Optional<Integer> fromAmountParam,
+                                                  @RequestParam("toAmount") Optional<Integer> toAmountParam) {
         List<Orders> ordersList;
 
         if (agoParam.isPresent()) {
             String ago = agoParam.get();
             ordersList = ordersService.getOrdersFromTimeAgo(ago);
+
+            if (fromAmountParam.isPresent() && toAmountParam.isPresent()) {
+                int fromAmount = fromAmountParam.get();
+                int toAmount = toAmountParam.get();
+
+                ordersList = filterOrdersByAmount(ordersList, fromAmount, toAmount);
+            }
         } else if (fromDateParam.isPresent() && toDateParam.isPresent()) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             LocalDate fromDate = LocalDate.parse(fromDateParam.get(), formatter);
@@ -62,9 +72,35 @@ public class OrdersController {
             LocalDateTime toDateTime = toDate.atStartOfDay().plusDays(1).minusNanos(1);
 
             ordersList = ordersService.getOrdersBetweenDate(fromDateTime, toDateTime);
+
+            if (fromAmountParam.isPresent() && toAmountParam.isPresent()) {
+                int fromAmount = fromAmountParam.get();
+                int toAmount = toAmountParam.get();
+
+                ordersList = filterOrdersByAmount(ordersList, fromAmount, toAmount);
+            }
+        } else if (fromAmountParam.isPresent() && toAmountParam.isPresent()) {
+            int fromAmount = fromAmountParam.get();
+            int toAmount = toAmountParam.get();
+
+            ordersList = ordersService.getOrdersBetweenAmount(fromAmount, toAmount);
         } else {
             ordersList = ordersService.getAllOrders();
         }
         return new ResponseEntity<>(ordersList, HttpStatus.OK);
+    }
+
+    private List<Orders> filterOrdersByAmount(List<Orders> ordersList, int fromAmount, int toAmount) {
+        List<Orders> filteredOrders = new ArrayList<>();
+
+        for (Orders orders : ordersList) {
+            int orderAmount = orders.getTotalAmount();
+
+            if (orderAmount >= fromAmount && orderAmount <= toAmount) {
+                filteredOrders.add(orders);
+            }
+        }
+
+        return filteredOrders;
     }
 }

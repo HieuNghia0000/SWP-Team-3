@@ -4,6 +4,9 @@ import com.team3.ministore.model.Orders;
 import com.team3.ministore.repository.OrdersRepository;
 import com.team3.ministore.service.OrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -74,6 +77,17 @@ public class OrdersServiceImpl implements OrdersService {
     @Override
     public List<Orders> getOrdersBetweenDate(LocalDateTime fromDate, LocalDateTime toDate) {
         return ordersRepository.findOrdersByOrderDateBetween(fromDate, toDate);
+    }
+
+    @Override
+    public List<Orders> getOrdersBetweenAmount(Integer fromAmount, Integer toAmount) {
+        return ordersRepository.findOrdersByTotalAmountBetween(fromAmount, toAmount);
+    }
+
+    @Override
+    public Page<Orders> findAllPagingOrders(int pageIndex, int pageSize) {
+        Pageable pageable = PageRequest.of(pageIndex - 1, pageSize);
+        return ordersRepository.findAllPagingOrders(pageable);
     }
 
 }
