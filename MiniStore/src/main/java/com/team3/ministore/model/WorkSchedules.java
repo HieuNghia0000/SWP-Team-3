@@ -35,4 +35,7 @@ public class WorkSchedules {
 
     @Column(name = "status")
     private int status;
+
+    @Column(name = "published")
+    private boolean published;
 }

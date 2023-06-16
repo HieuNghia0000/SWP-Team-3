@@ -47,6 +47,7 @@ CREATE TABLE WorkSchedules
 	check_in_time TIME,
 	check_out_time TIME,
 	status INT,
+	published TINYINT(1),
 	PRIMARY KEY (schedule_id),
 	FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id),
 	FOREIGN KEY (shift_id) REFERENCES Shifts(shift_id)
