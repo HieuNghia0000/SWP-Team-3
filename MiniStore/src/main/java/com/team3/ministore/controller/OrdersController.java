@@ -56,29 +56,12 @@ public class OrdersController {
         if (agoParam.isPresent()) {
             String ago = agoParam.get();
             ordersList = ordersService.getOrdersFromTimeAgo(ago);
-
-            if (fromAmountParam.isPresent() && toAmountParam.isPresent()) {
-                int fromAmount = fromAmountParam.get();
-                int toAmount = toAmountParam.get();
-
-                ordersList = filterOrdersByAmount(ordersList, fromAmount, toAmount);
-            }
         } else if (fromDateParam.isPresent() && toDateParam.isPresent()) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDate fromDate = LocalDate.parse(fromDateParam.get(), formatter);
-            LocalDate toDate = LocalDate.parse(toDateParam.get(), formatter);
-
-            LocalDateTime fromDateTime = fromDate.atStartOfDay();
-            LocalDateTime toDateTime = toDate.atStartOfDay().plusDays(1).minusNanos(1);
+            LocalDateTime fromDateTime = parseDateTime(fromDateParam.get());
+            LocalDateTime toDateTime = parseDateTime(toDateParam.get()).plusDays(1).minusSeconds(1);
 
             ordersList = ordersService.getOrdersBetweenDate(fromDateTime, toDateTime);
 
-            if (fromAmountParam.isPresent() && toAmountParam.isPresent()) {
-                int fromAmount = fromAmountParam.get();
-                int toAmount = toAmountParam.get();
-
-                ordersList = filterOrdersByAmount(ordersList, fromAmount, toAmount);
-            }
         } else if (fromAmountParam.isPresent() && toAmountParam.isPresent()) {
             int fromAmount = fromAmountParam.get();
             int toAmount = toAmountParam.get();
@@ -87,7 +70,22 @@ public class OrdersController {
         } else {
             ordersList = ordersService.getAllOrders();
         }
+
+        if (fromAmountParam.isPresent() && toAmountParam.isPresent()) {
+            int fromAmount = fromAmountParam.get();
+            int toAmount = toAmountParam.get();
+
+            ordersList = filterOrdersByAmount(ordersList, fromAmount, toAmount);
+        }
+
         return new ResponseEntity<>(ordersList, HttpStatus.OK);
+    }
+
+    private LocalDateTime parseDateTime(String dateString) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate date = LocalDate.parse(dateString, formatter);
+
+        return date.atStartOfDay();
     }
 
     private List<Orders> filterOrdersByAmount(List<Orders> ordersList, int fromAmount, int toAmount) {
