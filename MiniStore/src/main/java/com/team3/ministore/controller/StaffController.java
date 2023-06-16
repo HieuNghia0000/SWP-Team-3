@@ -57,10 +57,10 @@ public class StaffController {
     }
 
     @GetMapping("")
-    public ResponseEntity<?> getStaffs(@RequestParam("search") Optional<String> searchParam,
-                                       @RequestParam("curPage") Optional<Integer> curPageParam,
-                                       @RequestParam("perPage") Optional<Integer> perPageParam) {
-        Page<Staff> staffPage = null;
+    public ResponseEntity<Page<Staff>> getStaffs(@RequestParam("search") Optional<String> searchParam,
+                                               @RequestParam("curPage") Optional<Integer> curPageParam,
+                                               @RequestParam("perPage") Optional<Integer> perPageParam) {
+        Page<Staff> staffPage;
         List<Staff> staffList = null;
 
         if (searchParam.isPresent()) {
@@ -93,33 +93,7 @@ public class StaffController {
             staffPage = new PageImpl<>(filteredStaffs, staffPage.getPageable(), filteredStaffs.size());
         }
 
-        StaffResponse response = new StaffResponse(staffList, staffPage);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity<>(staffPage, HttpStatus.OK);
     }
 
-    private static class StaffResponse {
-        private List<Staff> staffList;
-        private Page<Staff> staffPage;
-
-        public StaffResponse(List<Staff> staffList, Page<Staff> staffPage) {
-            this.staffList = staffList;
-            this.staffPage = staffPage;
-        }
-
-        public List<Staff> getStaffList() {
-            return staffList;
-        }
-
-        public void setStaffList(List<Staff> staffList) {
-            this.staffList = staffList;
-        }
-
-        public Page<Staff> getStaffPage() {
-            return staffPage;
-        }
-
-        public void setStaffPage(Page<Staff> staffPage) {
-            this.staffPage = staffPage;
-        }
-    }
 }

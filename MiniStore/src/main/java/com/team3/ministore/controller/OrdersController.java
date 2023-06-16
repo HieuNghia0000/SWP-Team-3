@@ -3,6 +3,8 @@ package com.team3.ministore.controller;
 import com.team3.ministore.model.Orders;
 import com.team3.ministore.service.OrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +15,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/orders")
@@ -46,12 +49,14 @@ public class OrdersController {
     }
 
     @GetMapping("")
-    public ResponseEntity<List<Orders>> getOrders(@RequestParam("ago") Optional<String> agoParam,
+    public ResponseEntity<Page<Orders>> getOrders(@RequestParam("ago") Optional<String> agoParam,
                                                   @RequestParam("from") Optional<String> fromDateParam,
                                                   @RequestParam("to") Optional<String> toDateParam,
                                                   @RequestParam("fromAmount") Optional<Integer> fromAmountParam,
-                                                  @RequestParam("toAmount") Optional<Integer> toAmountParam) {
+                                                  @RequestParam("toAmount") Optional<Integer> toAmountParam,
+                                                  @RequestParam("curPage") Optional<Integer> curPageParam) {
         List<Orders> ordersList;
+        Page<Orders> ordersPage;
 
         if (agoParam.isPresent()) {
             String ago = agoParam.get();
@@ -78,7 +83,32 @@ public class OrdersController {
             ordersList = filterOrdersByAmount(ordersList, fromAmount, toAmount);
         }
 
-        return new ResponseEntity<>(ordersList, HttpStatus.OK);
+        if (curPageParam.isPresent()) {
+            int curPage = curPageParam.get();
+            int perPage = 10;
+
+            ordersPage = ordersService.findAllPagingOrders(curPage, perPage);
+            if (ordersPage.getSize() == 0) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+        }
+        else {
+            int curPage = 1;
+            int perPage = 10;
+
+            ordersPage = ordersService.findAllPagingOrders(curPage, perPage);
+            if (ordersPage.getSize() == 0) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+        }
+
+        if (ordersList != null) {
+            List<Orders> filteredOrders = ordersPage.stream().filter(ordersList::contains).collect(Collectors.toList());
+
+            ordersPage = new PageImpl<>(filteredOrders, ordersPage.getPageable(), filteredOrders.size());
+        }
+
+        return new ResponseEntity<>(ordersPage, HttpStatus.OK);
     }
 
     private LocalDateTime parseDateTime(String dateString) {
