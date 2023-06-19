@@ -1,0 +1,132 @@
+{
+  "content": [
+    {
+      "staffId": 1,
+      "staffName": "hieu vo",
+      "role": "ADMIN",
+      "username": "hieuvo",
+      "phoneNumber": "0123456789",
+      "baseSalary": "10000000",
+      "status": 0,
+      "image": "",
+      "email": "hieuvo@gmail.com",
+      "workDays": "WED, SAT",
+      "leaveBlance": 14,
+      "workSchedule": [
+        {
+          "scheduleId": 1,
+          "shift": {
+            "shiftId": 1,
+            "shiftName": "Ca Sáng",
+            "startTime": "08:00:00",
+            "endTime": "16:00:00",
+            "dateOfWeek": "WED",
+            "salaryCoefficient": 1.0,
+            "role": "CASHIER"
+          },
+          "date": "2023-06-15",
+          "checkInTime": null,
+          "checkOutTime": null,
+          "published": true
+        }
+      ]
+    },
+    {
+      "staffId": 2,
+      "staffName": "Khoa Do",
+      "role": "MANAGER",
+      "username": "khoa",
+      "phoneNumber": "0123456789",
+      "baseSalary": "10000000",
+      "status": 0,
+      "image": "",
+      "email": "khoa@gmail.com",
+      "workDays": "WED, SAT",
+      "leaveBlance": 14,
+      "workSchedule": [
+        {
+          "scheduleId": 2,
+          "shift": {
+            "shiftId": 2,
+            "shiftName": "Ca Chiều",
+            "startTime": "16:00:00",
+            "endTime": "24:00:00",
+            "dateOfWeek": "WED",
+            "salaryCoefficient": 1.0,
+            "role": "MANAGER"
+          },
+          "date": "2023-06-17",
+          "checkInTime": null,
+          "checkOutTime": null,
+          "published": true
+        },
+        {
+          "scheduleId": 3,
+          "shift": {
+            "shiftId": 2,
+            "shiftName": "Ca Khuya",
+            "startTime": "24:00:00",
+            "endTime": "08:00:00",
+            "dateOfWeek": "WED",
+            "salaryCoefficient": 1.0,
+            "role": "MANAGER"
+          },
+          "date": "2023-06-14",
+          "checkInTime": null,
+          "checkOutTime": null,
+          "published": true
+        }
+      ]
+    },
+    {
+      "staffId": 3,
+      "staffName": "John Smith",
+      "role": "GUARD",
+      "username": "johnsmith",
+      "phoneNumber": "0123456789",
+      "baseSalary": "8000000",
+      "status": 0,
+      "image": "",
+      "email": "johnsmith@gmail.com",
+      "workDays": "MON, TUE, WED, THU, FRI",
+      "leaveBlance": 14,
+      "workSchedule": [
+        {
+          "scheduleId": 4,
+          "shift": {
+            "shiftId": 3,
+            "shiftName": "Morning Shift",
+            "startTime": "08:00:00",
+            "endTime": "12:00:00",
+            "dateOfWeek": "MON",
+            "salaryCoefficient": 0.8,
+            "role": "GUARD"
+          },
+          "date": "2023-06-18",
+          "checkInTime": null,
+          "checkOutTime": null,
+          "published": true
+        },
+        {
+          "scheduleId": 5,
+          "shift": {
+            "shiftId": 4,
+            "shiftName": "Afternoon Shift",
+            "startTime": "12:00:00",
+            "endTime": "16:00:00",
+            "dateOfWeek": "TUE",
+            "salaryCoefficient": 0.8,
+            "role": "GUARD"
+          },
+          "date": "2023-06-12",
+          "checkInTime": null,
+          "checkOutTime": null,
+          "published": true
+        }
+      ]
+    }
+  ],
+  "error": "",
+  "status": 300,
+  "timestamp": "2019-01-01T00:00:00Z"
+}

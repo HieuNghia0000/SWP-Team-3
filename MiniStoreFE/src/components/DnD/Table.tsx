@@ -13,23 +13,21 @@ import {
   createSortable,
 } from "@thisbeyond/solid-dnd";
 import moment from "moment";
-import { Component, For, Resource, Show, batch } from "solid-js";
+import { Accessor, Component, For, Resource, Show, batch } from "solid-js";
 import { SetStoreFunction } from "solid-js/store";
 import {
   DataTable,
   ShiftPlanningData,
-  WorkSchedule,
   useShiftPlanning,
 } from "~/routes/shift-planning";
-import { Role } from "~/types";
+import { Role, WorkSchedule } from "~/types";
 
 type DnDTableProps = {
-  data: Resource<ShiftPlanningData | undefined>;
   tableData: DataTable;
   setTableData: SetStoreFunction<DataTable>;
 };
 
-const Table: Component<DnDTableProps> = ({ tableData, setTableData, data }) => {
+const Table: Component<DnDTableProps> = ({ tableData, setTableData }) => {
   const { setStaffModalData, setShowStaffModal } = useShiftPlanning();
 
   function getShiftsByBoxId(droppableBoxId: string) {
@@ -41,7 +39,9 @@ const Table: Component<DnDTableProps> = ({ tableData, setTableData, data }) => {
 
     const shifts = [];
     for (let shiftId of shiftIds) {
-      const shift = tableData.shifts.find((shift) => shift.id === shiftId);
+      const shift = tableData.shifts.find(
+        (shift) => shift.scheduleId === shiftId
+      );
       if (shift) {
         shifts.push(shift);
       }
@@ -160,27 +160,25 @@ const Table: Component<DnDTableProps> = ({ tableData, setTableData, data }) => {
     <div class="w-full">
       <div class="min-w-[1024px]">
         {/* Header */}
-        <Show when={data()}>
-          <div class="sticky top-0 z-30 flex shadow-sm border border-gray-200 rounded-t-md">
-            <div class="sticky left-0 z-30 px-3 py-2 flex flex-col justify-center border border-gray-200 w-52 flex-auto flex-grow-0 flex-shrink-0 overflow-visible bg-white"></div>
-            <For each={data()?.dates}>
-              {(date) => (
-                <div class="px-3 py-2 flex flex-col justify-center border border-gray-200 flex-1 items-center overflow-hidden bg-white">
-                  <div class="font-semibold text-sm text-gray-600">
-                    {moment(date).format("ddd, MMM D")}
-                  </div>
-                  <div class="font-normal text-sm text-gray-400">
-                    19.5 hrs / $0
-                  </div>
+        <div class="sticky top-0 z-30 flex shadow-sm border border-gray-200 rounded-t-md">
+          <div class="sticky left-0 z-30 px-3 py-2 flex flex-col justify-center border border-gray-200 w-52 flex-auto flex-grow-0 flex-shrink-0 overflow-visible bg-white"></div>
+          <For each={tableData.dates}>
+            {(date) => (
+              <div class="px-3 py-2 flex flex-col justify-center border border-gray-200 flex-1 items-center overflow-hidden bg-white">
+                <div class="font-semibold text-sm text-gray-600">
+                  {moment(date).format("ddd, MMM D")}
                 </div>
-              )}
-            </For>
-          </div>
-        </Show>
+                <div class="font-normal text-sm text-gray-400">
+                  19.5 hrs / $0
+                </div>
+              </div>
+            )}
+          </For>
+        </div>
 
-        {/* Drag container */}
+        {/* Body - Drag container */}
         <div class="relative shadow-sm border border-gray-200">
-          <Show when={data()}>
+          <Show when={tableData.staffs.length !== 0}>
             <DragDropProvider
               onDragOver={onDragOver}
               onDragEnd={onDragEnd}
@@ -188,28 +186,28 @@ const Table: Component<DnDTableProps> = ({ tableData, setTableData, data }) => {
             >
               <DragDropSensors />
               {/* Row */}
-              <For each={Object.keys(data()!.staffs)}>
+              <For each={tableData.staffs}>
                 {(staff) => (
                   <div class="flex">
                     <div class="sticky left-0 z-10 px-3 py-1.5 flex flex-col border border-t-0 border-gray-200 w-52 flex-auto flex-grow-0 flex-shrink-0 overflow-visible bg-white">
                       <button
                         onClick={() => {
-                          // setStaffModalData(staff);
+                          setStaffModalData(staff);
                           setShowStaffModal(true);
                         }}
                         class="font-semibold text-sm text-gray-600 text-start"
                       >
-                        {staff}
+                        {staff.staffName}
                       </button>
                       <div class="font-normal text-sm text-gray-400">
                         0 hrs / $0
                       </div>
                     </div>
-                    <For each={data()!.dates}>
+                    <For each={tableData.dates}>
                       {(date) => (
-                        <Column
-                          id={`${staff}-${date}`}
-                          items={getShiftsByBoxId(`${staff}-${date}`)}
+                        <TableCel
+                          id={`${staff.username}-${date}`}
+                          items={getShiftsByBoxId(`${staff.username}-${date}`)}
                         />
                       )}
                     </For>
@@ -227,16 +225,16 @@ const Table: Component<DnDTableProps> = ({ tableData, setTableData, data }) => {
                     style={{ width: `${draggable?.data?.width()}px` }}
                     classList={{
                       "bg-blue-200":
-                        (draggable?.data.shift as WorkSchedule).role ===
+                        (draggable?.data.shift as WorkSchedule).shift.role ===
                         Role.CASHIER,
                       "bg-yellow-200":
-                        (draggable?.data.shift as WorkSchedule).role ===
+                        (draggable?.data.shift as WorkSchedule).shift.role ===
                         Role.GUARD,
                       "bg-red-200":
-                        (draggable?.data.shift as WorkSchedule).role ===
+                        (draggable?.data.shift as WorkSchedule).shift.role ===
                         Role.MANAGER,
                       "bg-gray-200":
-                        (draggable?.data.shift as WorkSchedule).role ===
+                        (draggable?.data.shift as WorkSchedule).shift.role ===
                         Role.ADMIN,
                     }}
                   >
@@ -244,22 +242,22 @@ const Table: Component<DnDTableProps> = ({ tableData, setTableData, data }) => {
                       class="bg-blue-700 absolute top-1 left-1 bottom-1 w-1.5 rounded"
                       classList={{
                         "bg-blue-700":
-                          (draggable?.data.shift as WorkSchedule).role ===
+                          (draggable?.data.shift as WorkSchedule).shift.role ===
                           Role.CASHIER,
                         "bg-yellow-700":
-                          (draggable?.data.shift as WorkSchedule).role ===
+                          (draggable?.data.shift as WorkSchedule).shift.role ===
                           Role.GUARD,
                         "bg-red-700":
-                          (draggable?.data.shift as WorkSchedule).role ===
+                          (draggable?.data.shift as WorkSchedule).shift.role ===
                           Role.MANAGER,
                         "bg-gray-700":
-                          (draggable?.data.shift as WorkSchedule).role ===
+                          (draggable?.data.shift as WorkSchedule).shift.role ===
                           Role.ADMIN,
                       }}
                     ></i>
                     <p class="ml-3 font-semibold text-sm">9am - 5pm</p>
                     <p class="ml-3 font-normal text-xs text-gray-600">
-                      Cashier {(draggable?.data.shift as WorkSchedule).id}
+                      {(draggable?.data.shift as WorkSchedule).staff?.staffName}
                     </p>
                   </button>
                 )}
@@ -279,7 +277,7 @@ const Sortable: Component<{
   width: () => number | undefined;
 }> = ({ item, width }) => {
   const { setShiftModalData, setShowShiftModal } = useShiftPlanning();
-  const sortable = createSortable(item.id, {
+  const sortable = createSortable(item.scheduleId, {
     width: width,
     shift: item,
   });
@@ -297,28 +295,30 @@ const Sortable: Component<{
       class="rounded mx-0.5 px-1.5 py-1 relative text-left"
       classList={{
         "opacity-25": sortable.isActiveDraggable,
-        "bg-blue-100 hover:bg-blue-200": item.role === Role.CASHIER,
-        "bg-yellow-100 hover:bg-yellow-200": item.role === Role.GUARD,
-        "bg-red-100 hover:bg-red-200": item.role === Role.MANAGER,
-        "bg-gray-100 hover:bg-gray-200": item.role === Role.ADMIN,
+        "bg-blue-100 hover:bg-blue-200": item.shift.role === Role.CASHIER,
+        "bg-yellow-100 hover:bg-yellow-200": item.shift.role === Role.GUARD,
+        "bg-red-100 hover:bg-red-200": item.shift.role === Role.MANAGER,
+        "bg-gray-100 hover:bg-gray-200": item.shift.role === Role.ADMIN,
       }}
     >
       <i
         class="bg-blue-700 absolute top-1 left-1 bottom-1 w-1.5 rounded"
         classList={{
-          "bg-blue-500": item.role === Role.CASHIER,
-          "bg-yellow-500": item.role === Role.GUARD,
-          "bg-red-500": item.role === Role.MANAGER,
-          "bg-gray-500": item.role === Role.ADMIN,
+          "bg-blue-500": item.shift.role === Role.CASHIER,
+          "bg-yellow-500": item.shift.role === Role.GUARD,
+          "bg-red-500": item.shift.role === Role.MANAGER,
+          "bg-gray-500": item.shift.role === Role.ADMIN,
         }}
       ></i>
       <p class="ml-3 font-semibold text-sm">9am - 5pm</p>
-      <p class="ml-3 font-normal text-xs text-gray-600">{item.date}</p>
+      <p class="ml-3 font-normal text-xs text-gray-600">
+        {item.staff?.staffName}
+      </p>
     </button>
   );
 };
 
-const Column: Component<{
+const TableCel: Component<{
   id: string;
   items: WorkSchedule[];
 }> = (props) => {
@@ -333,7 +333,7 @@ const Column: Component<{
       ref={divRef}
       class="flex flex-col border-r border-b border-gray-200 flex-1 overflow-hidden bg-[#f8fafc] pt-0.5 gap-y-0.5"
     >
-      <SortableProvider ids={props.items.map((item) => item.id)}>
+      <SortableProvider ids={props.items.map((item) => item.scheduleId)}>
         <For each={props.items}>
           {(item) => <Sortable item={item} width={() => divRef?.offsetWidth} />}
         </For>

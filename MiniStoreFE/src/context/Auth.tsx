@@ -12,11 +12,12 @@ import {
 } from "solid-js";
 import Cookies from "js-cookie";
 import { apiRoutes } from "~/utils/routes";
-import { Staff } from "~/types";
+import { DataResponse, Staff } from "~/types";
 import axios, { isAxiosError } from "axios";
+import getEndPoint from "~/utils/getEndPoint";
 
 export const apiInstance = axios.create({
-  baseURL: Cookies.get("endpoint"),
+  baseURL: getEndPoint(),
 });
 
 const addItem = (key: string, value = "") => {
@@ -65,13 +66,6 @@ const isTokenExists = () => {
 const setApiAuthorization = (token: string) => {
   apiInstance.defaults.headers.common["Authorization"] = "Bearer " + token;
 };
-
-interface DataResponse<T> extends Response {
-  content: T;
-  errors: string[] | string;
-  timestamp: string;
-  status: number;
-}
 
 const fetchData: ResourceFetcher<
   boolean,

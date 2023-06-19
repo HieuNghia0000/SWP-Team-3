@@ -6,7 +6,7 @@ import {
 } from "solid-start/entry-server";
 import routes, { apiRoutes } from "./utils/routes";
 import { createCookieVariable, getCookie } from "./utils/getCookie";
-import { Staff } from "./types";
+import { DataResponse, Staff } from "./types";
 
 const protectedRoutes = [];
 const publicRoutes = [routes.login];
@@ -29,7 +29,7 @@ export default createHandler(
               },
             }
           );
-          const { content } = await data.json();
+          const { content } = (await data.json()) as DataResponse<Staff>;
           if (content) {
             // console.log(content);
             user = content;

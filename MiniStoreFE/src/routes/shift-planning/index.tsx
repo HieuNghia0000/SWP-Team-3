@@ -9,17 +9,19 @@ import { createStore } from "solid-js/store";
 import {
   Accessor,
   Component,
-  Setter,
   createContext,
   createEffect,
+  createResource,
   createSignal,
   onCleanup,
   onMount,
+  ResourceFetcher,
+  Setter,
   useContext,
 } from "solid-js";
-import { Role, Staff } from "~/types";
+import { DataResponse, Role, Staff, Status, WorkSchedule } from "~/types";
 import moment from "moment";
-import { A, useRouteData, useSearchParams } from "@solidjs/router";
+import { A, useSearchParams } from "@solidjs/router";
 import routes from "~/utils/routes";
 import flatpickr from "flatpickr";
 import { FiCalendar } from "solid-icons/fi";
@@ -31,45 +33,48 @@ import {
   getWeekDateStings,
   getWeekFirstAndLastDates,
 } from "~/utils/getWeekDates";
-import { createRouteData } from "solid-start";
 import Table from "~/components/DnD/Table";
+import getEndPoint from "~/utils/getEndPoint";
 
-export type WorkSchedule = {
-  id: number; //unique id
-  date: string;
-  role: Role;
-};
 export interface ShiftPlanningData {
   dates: string[];
-  staffs: Record<string, WorkSchedule[]>;
+  staffs: Staff[];
 }
-export type DataTable = {
+export interface DataTable extends ShiftPlanningData {
   shifts: WorkSchedule[];
   cels: { [key: string]: number[] };
-};
+}
 
-function transformData(data: ShiftPlanningData) {
-  const transformedData: DataTable = { shifts: [], cels: {} };
+function transformData(data: ShiftPlanningData): DataTable {
+  const transformedData: DataTable = {
+    shifts: [],
+    cels: {},
+    dates: data.dates,
+    staffs: data.staffs,
+  };
 
-  const staffKeys = Object.keys(data.staffs);
+  if (data.staffs.length === 0) return transformedData;
 
-  for (let staffKey of staffKeys) {
-    const staffShifts = data.staffs[staffKey];
-
-    for (let shift of staffShifts) {
-      transformedData.shifts.push(shift);
+  for (let staff of data.staffs) {
+    for (let shift of staff.workSchedule) {
+      transformedData.shifts.push({
+        ...shift,
+        staff: { ...staff, workSchedule: [] },
+      });
     }
 
     for (let date of data.dates) {
-      const droppableId = `${staffKey}-${date}`;
-      const matchingShifts = staffShifts.filter((shift) => shift.date === date);
+      const celId = `${staff.username}-${date}`;
+      const matchingShifts = staff.workSchedule.filter((s) =>
+        moment(s.date).isSame(date, "day")
+      );
 
-      if (!transformedData.cels.hasOwnProperty(droppableId)) {
-        transformedData.cels[droppableId] = [];
+      if (!transformedData.cels.hasOwnProperty(celId)) {
+        transformedData.cels[celId] = [];
       }
 
       for (let shift of matchingShifts) {
-        transformedData.cels[droppableId].push(shift.id);
+        transformedData.cels[celId].push(shift.scheduleId);
       }
     }
   }
@@ -78,133 +83,54 @@ function transformData(data: ShiftPlanningData) {
 }
 
 type ParamType = {
-  picked_date: string;
-  from: string;
-  to: string;
   rendition: "grid" | "list";
+  picked_date: string;
 };
 
-export function routeData() {
-  const [searchParams] = useSearchParams();
+const fetchShiftPlanningData: ResourceFetcher<
+  boolean | string,
+  ShiftPlanningData
+> = async (source) => {
+  const dates = getWeekDateStings(source as string);
+  const from = dates[0];
+  const to = dates[dates.length - 1];
 
-  return createRouteData(
-    async ([perPage, curPage]) => {
-      // const response = await fetch(
-      //   `https://hogwarts.deno.dev/students?perPage=${perPage}&curPage=${curPage}`
-      // );
-      // return await response.json();
-      const data = {
-        dates: getWeekDateStings(searchParams.picked_date),
-        staffs: {
-          "Open Shifts": [
-            {
-              id: 10,
-              date: getWeekDateStings(searchParams.picked_date)[
-                Math.floor(Math.random() * 7)
-              ],
-              role: Role.GUARD,
-            },
-            {
-              id: 11,
-              date: getWeekDateStings(searchParams.picked_date)[
-                Math.floor(Math.random() * 7)
-              ],
-              role: Role.GUARD,
-            },
-            {
-              id: 12,
-              date: getWeekDateStings(searchParams.picked_date)[
-                Math.floor(Math.random() * 7)
-              ],
-              role: Role.GUARD,
-            },
-          ],
-          Hieu: [
-            {
-              id: 1,
-              date: getWeekDateStings(searchParams.picked_date)[
-                Math.floor(Math.random() * 7)
-              ],
-              role: Role.MANAGER,
-            },
-            {
-              id: 2,
-              date: getWeekDateStings(searchParams.picked_date)[
-                Math.floor(Math.random() * 7)
-              ],
-              role: Role.MANAGER,
-            },
-            {
-              id: 3,
-              date: getWeekDateStings(searchParams.picked_date)[
-                Math.floor(Math.random() * 7)
-              ],
-              role: Role.MANAGER,
-            },
-          ],
-          Khoa: [
-            {
-              id: 4,
-              date: getWeekDateStings(searchParams.picked_date)[
-                Math.floor(Math.random() * 7)
-              ],
-              role: Role.MANAGER,
-            },
-            {
-              id: 5,
-              date: getWeekDateStings(searchParams.picked_date)[
-                Math.floor(Math.random() * 7)
-              ],
-              role: Role.MANAGER,
-            },
-            {
-              id: 6,
-              date: getWeekDateStings(searchParams.picked_date)[
-                Math.floor(Math.random() * 7)
-              ],
-              role: Role.MANAGER,
-            },
-          ],
-          Nghia: [
-            {
-              id: 7,
-              date: getWeekDateStings(searchParams.picked_date)[
-                Math.floor(Math.random() * 7)
-              ],
-              role: Role.CASHIER,
-            },
-            {
-              id: 8,
-              date: getWeekDateStings(searchParams.picked_date)[
-                Math.floor(Math.random() * 7)
-              ],
-              role: Role.CASHIER,
-            },
-            {
-              id: 9,
-              date: getWeekDateStings(searchParams.picked_date)[
-                Math.floor(Math.random() * 7)
-              ],
-              role: Role.CASHIER,
-            },
-          ],
-        },
-      } as ShiftPlanningData;
-
-      return data;
-    },
-    { key: () => [searchParams.perPage ?? 10, searchParams.curPage ?? 1] }
+  // const response = await fetch(
+  //   `${getEndPoint()}/shift-planning?from_date=${from}&to_date=${to}`
+  // );
+  const response = await fetch(
+    `http://localhost:3000/shift-planning-${source}.json`
   );
-}
+  const data: DataResponse<Staff[]> = await response.json();
+
+  return {
+    dates,
+    staffs: data.content,
+  };
+};
+
 export default function ShiftPlanning() {
   const [searchParams, setSearchParams] = useSearchParams<ParamType>();
-  const data = useRouteData<typeof routeData>();
-  let dateRef: HTMLInputElement | undefined = undefined;
-  let fp: flatpickr.Instance | undefined = undefined;
+  const [datePicked, setDatePicked] = createSignal<string>();
+  // const { data } = useRouteData<typeof routeData>();
+  const [data, { refetch, mutate }] = createResource(
+    datePicked,
+    fetchShiftPlanningData,
+    {
+      initialValue: {
+        dates: [],
+        staffs: [],
+      },
+    }
+  );
   const [tableData, setTableData] = createStore<DataTable>({
     cels: {},
     shifts: [],
+    dates: [],
+    staffs: [],
   });
+  let dateRef: HTMLInputElement | undefined = undefined;
+  let fp: flatpickr.Instance | undefined = undefined;
   const [dateStr, setDateStr] = createSignal<string>("");
 
   const [showShiftModal, setShowShiftModal] = createSignal<boolean>(false);
@@ -214,18 +140,18 @@ export default function ShiftPlanning() {
   const [staffModalData, setStaffModalData] = createSignal<Staff>();
 
   createEffect(() => {
-    if (!data.loading && data() !== undefined)
-      setTableData(transformData(data()!));
+    // console.log(data.loading, data.state, data());
+    if (!data.loading && data.state === "ready")
+      setTableData(transformData(data()));
   });
 
   onMount(() => {
-    const pickedDate = moment(searchParams.picked_date);
+    const defaultDate = moment().format("YYYY-MM-DD");
+    setDatePicked(defaultDate);
     fp = flatpickr(dateRef!, {
       mode: "single",
       dateFormat: "Y-m-d",
-      defaultDate: pickedDate.isValid()
-        ? pickedDate.format("YYYY-MM-DD")
-        : moment().format("YYYY-MM-DD"),
+      defaultDate: defaultDate,
       onChange: updateDateStr,
       onReady: updateDateStr,
     });
@@ -241,21 +167,13 @@ export default function ShiftPlanning() {
     instance: Instance
   ) => {
     if (selectedDates.length === 0) {
-      setSearchParams({
-        picked_date: undefined,
-        from: undefined,
-        to: undefined,
-      });
+      setDatePicked(undefined);
       setDateStr("");
     }
     if (selectedDates.length === 1) {
       const pickedDate = dateStr;
       const [from, to] = getWeekFirstAndLastDates(pickedDate);
-      setSearchParams({
-        from: from.format("YYYY-MM-DD"),
-        to: to.format("YYYY-MM-DD"),
-        picked_date: pickedDate,
-      });
+      setDatePicked(pickedDate);
       const start = instance.formatDate(from.toDate(), "F j");
       const end = instance.formatDate(to.toDate(), "F j, Y");
       setDateStr(`${start} - ${end}`);
@@ -263,18 +181,16 @@ export default function ShiftPlanning() {
   };
 
   const goToPrevWeek = () => {
-    const pickedDate = moment(searchParams.picked_date);
-    const [from, to] = getWeekFirstAndLastDates(
+    const pickedDate = moment(datePicked()!);
+    const [from] = getWeekFirstAndLastDates(
       pickedDate.subtract(1, "week").format()
     );
     fp?.setDate(from.toDate(), true);
   };
 
   const goToNextWeek = () => {
-    const pickedDate = moment(searchParams.picked_date);
-    const [from, to] = getWeekFirstAndLastDates(
-      pickedDate.add(1, "week").format()
-    );
+    const pickedDate = moment(datePicked()!);
+    const [from] = getWeekFirstAndLastDates(pickedDate.add(1, "week").format());
     fp?.setDate(from.toDate(), true);
   };
 
@@ -374,7 +290,7 @@ export default function ShiftPlanning() {
         </div>
 
         {/* Shift Planning Table */}
-        <Table data={data} setTableData={setTableData} tableData={tableData} />
+        <Table setTableData={setTableData} tableData={tableData} />
       </main>
 
       {/* <!-- Modal panel, show/hide based on modal state. --> */}
@@ -419,7 +335,7 @@ const ShiftDetailsModal: Component<{
       open={showModal}
       footer={
         <A
-          href={routes.staffEdit(1)}
+          href={"/"}
           class="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-2"
         >
           <span class="">
@@ -430,44 +346,55 @@ const ShiftDetailsModal: Component<{
       }
     >
       <div class="text-lg mb-2.5 font-semibold text-center text-gray-800">
-        Hieu Vo
+        {modalData()?.shift.shiftName}
       </div>
       <div class="border-t border-gray-300 border-dotted text-gray-600 text-sm">
         <div class="flex border-b border-gray-300 border-dotted">
           <div class="flex-1 py-2.5 overflow-hidden space-x-1">
             <span class="font-semibold text-gray-500">Team Member:</span>
-            <span>Hieu Vo</span>
+            <span>{modalData()?.staff?.staffName}</span>
           </div>
           <div class="flex-1 py-2.5 overflow-hidden space-x-1">
-            <span class="font-semibold text-gray-500">Hourly Wage:</span>
-            <span>$0.00</span>
+            <span class="font-semibold text-gray-500">Salary Coefficient:</span>
+            <span>{modalData()?.shift.salaryCoefficient}</span>
           </div>
         </div>
         <div class="flex border-b border-gray-300 border-dotted">
           <div class="flex-1 py-2.5 overflow-hidden space-x-1">
             <span class="font-semibold text-gray-500">Role:</span>
             <span
-              class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-semibold text-red-700 rounded-full"
+              class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-semibold rounded-full"
               classList={{
-                "bg-red-200": true,
+                "bg-blue-200 text-blue-700":
+                  modalData()?.shift.role === Role.CASHIER,
+                "bg-yellow-200 text-yellow-700":
+                  modalData()?.shift.role === Role.GUARD,
+                "bg-red-200 text-red-700":
+                  modalData()?.shift.role === Role.MANAGER,
+                "bg-gray-200 text-gray-700":
+                  modalData()?.shift.role === Role.ADMIN,
               }}
             >
-              Manager
+              {modalData()?.shift.role}
             </span>
           </div>
         </div>
         <div class="flex border-b border-gray-300 border-dotted">
           <div class="flex-1 py-2.5 overflow-hidden space-x-1">
             <span class="font-semibold text-gray-500">Date:</span>
-            <span>Mon Jun 5, 2023</span>
+            <span>{moment(modalData()?.date).format("ddd MMM D, YYYY")}</span>
           </div>
           <div class="flex-1 py-2.5 overflow-hidden space-x-1">
             <span class="font-semibold text-gray-500">Start Time:</span>
-            <span>12:00pm</span>
+            <span>
+              {moment(modalData()?.shift.startTime, "h:mm:ss").format("h:mma")}
+            </span>
           </div>
           <div class="flex-1 py-2.5 overflow-hidden space-x-1">
             <span class="font-semibold text-gray-500">End Time:</span>
-            <span>6:00pm</span>
+            <span>
+              {moment(modalData()?.shift.endTime, "h:mm:ss").format("h:mma")}
+            </span>
           </div>
         </div>
         <div class="flex">
@@ -501,7 +428,7 @@ const StaffDetailsModal: Component<{
       open={showModal}
       footer={
         <A
-          href={routes.staffEdit(1)}
+          href={routes.staffEdit(modalData()?.staffId ?? 0)}
           class="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-2"
         >
           <span class="">
@@ -512,35 +439,39 @@ const StaffDetailsModal: Component<{
       }
     >
       <div class="text-lg mb-2.5 font-semibold text-center text-gray-800">
-        Hieu Vo
+        {modalData()?.staffName}
       </div>
       <div class="border-t border-gray-300 border-dotted text-gray-600 text-sm">
         <div class="flex border-b border-gray-300 border-dotted">
           <div class="flex-1 py-2.5 overflow-hidden space-x-1">
             <span class="font-semibold text-gray-500">Email:</span>
-            <span>voanhhieu10250@gmail.com</span>
+            <span>{modalData()?.email}</span>
           </div>
         </div>
         <div class="flex border-b border-gray-300 border-dotted">
           <div class="flex-1 py-2.5 overflow-hidden space-x-1">
             <span class="font-semibold text-gray-500">Phone Number:</span>
-            <span>0987654321</span>
+            <span>{modalData()?.phoneNumber}</span>
           </div>
           <div class="flex-1 py-2.5 overflow-hidden space-x-1">
             <span class="font-semibold text-gray-500">Hourly Wage:</span>
-            <span>$0.00</span>
+            <span>{modalData()?.baseSalary}</span>
           </div>
         </div>
         <div class="flex">
           <div class="flex-1 py-2.5 overflow-hidden space-x-1">
             <span class="font-semibold text-gray-500">Role:</span>
             <span
-              class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-semibold text-red-700 rounded-full"
+              class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-semibold rounded-full"
               classList={{
-                "bg-red-200": true,
+                "bg-blue-200 text-blue-700": modalData()?.role === Role.CASHIER,
+                "bg-yellow-200 text-yellow-700":
+                  modalData()?.role === Role.GUARD,
+                "bg-red-200 text-red-700": modalData()?.role === Role.MANAGER,
+                "bg-gray-200 text-gray-700": modalData()?.role === Role.ADMIN,
               }}
             >
-              Manager
+              {modalData()?.role}
             </span>
           </div>
           <div class="flex-1 py-2.5 overflow-hidden space-x-1">
@@ -548,7 +479,8 @@ const StaffDetailsModal: Component<{
             <span
               class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-semibold text-white rounded-full"
               classList={{
-                "bg-green-500": true,
+                "bg-green-500": modalData()?.status === Status.ACTIVATED,
+                "bg-red-500": modalData()?.status === Status.DISABLED,
               }}
             >
               {true ? "Activated" : "Disabled"}
