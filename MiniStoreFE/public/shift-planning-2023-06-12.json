@@ -58,7 +58,7 @@
           "date": "2023-06-17",
           "checkInTime": null,
           "checkOutTime": null,
-          "published": true
+          "published": false
         },
         {
           "scheduleId": 3,
