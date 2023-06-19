@@ -111,8 +111,9 @@ const fetchShiftPlanningData: ResourceFetcher<
 
 export default function ShiftPlanning() {
   const [searchParams, setSearchParams] = useSearchParams<ParamType>();
-  const [datePicked, setDatePicked] = createSignal<string>();
-  // const { data } = useRouteData<typeof routeData>();
+  const [datePicked, setDatePicked] = createSignal<string>(
+    searchParams.picked_date
+  );
   const [data, { refetch, mutate }] = createResource(
     datePicked,
     fetchShiftPlanningData,
@@ -146,7 +147,10 @@ export default function ShiftPlanning() {
   });
 
   onMount(() => {
-    const defaultDate = moment().format("YYYY-MM-DD");
+    const pickedDateM = moment(searchParams.picked_date);
+    const defaultDate = pickedDateM.isValid()
+      ? pickedDateM.format("YYYY-MM-DD")
+      : moment().format("YYYY-MM-DD");
     setDatePicked(defaultDate);
     fp = flatpickr(dateRef!, {
       mode: "single",
@@ -167,13 +171,15 @@ export default function ShiftPlanning() {
     instance: Instance
   ) => {
     if (selectedDates.length === 0) {
-      setDatePicked(undefined);
+      setDatePicked("");
+      setSearchParams({ picked_date: undefined });
       setDateStr("");
     }
     if (selectedDates.length === 1) {
       const pickedDate = dateStr;
       const [from, to] = getWeekFirstAndLastDates(pickedDate);
       setDatePicked(pickedDate);
+      setSearchParams({ picked_date: pickedDate });
       const start = instance.formatDate(from.toDate(), "F j");
       const end = instance.formatDate(to.toDate(), "F j, Y");
       setDateStr(`${start} - ${end}`);
