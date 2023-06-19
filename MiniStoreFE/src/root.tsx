@@ -16,6 +16,7 @@ import "./root.css";
 import { AuthProvider } from "./context/Auth";
 import LayoutSwitcher from "./layout/LayoutSwitcher";
 import { SolidNProgress } from "solid-progressbar";
+import { Toaster } from "solid-toast";
 
 export default function Root() {
   return (
@@ -27,6 +28,7 @@ export default function Root() {
       </Head>
       <Body>
         <SolidNProgress color="#4F46E5" />
+        <Toaster position="top-center" />
         <Suspense
           fallback={
             <div class="h-screen grid place-items-center">Loading...</div>

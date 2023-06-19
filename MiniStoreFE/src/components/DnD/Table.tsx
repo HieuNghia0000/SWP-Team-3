@@ -13,14 +13,11 @@ import {
   createSortable,
 } from "@thisbeyond/solid-dnd";
 import moment from "moment";
-import { Accessor, Component, For, Resource, Show, batch } from "solid-js";
+import { Component, For, Show, batch } from "solid-js";
 import { SetStoreFunction } from "solid-js/store";
-import {
-  DataTable,
-  ShiftPlanningData,
-  useShiftPlanning,
-} from "~/routes/shift-planning";
+import { DataTable, useShiftPlanning } from "~/routes/shift-planning";
 import { Role, WorkSchedule } from "~/types";
+import createUniqueNumberId from "~/utils/createUniqueNumberId";
 
 type DnDTableProps = {
   tableData: DataTable;
@@ -322,9 +319,14 @@ const TableCel: Component<{
   id: string;
   items: WorkSchedule[];
 }> = (props) => {
+  const { setShowNewShiftModal, setNewShiftModalData } = useShiftPlanning();
   const droppable = createDroppable(props.id);
   0 && droppable;
   let divRef: HTMLDivElement | undefined = undefined;
+
+  const onAddNewShift = () => {
+    setShowNewShiftModal(true);
+  };
 
   return (
     <div
@@ -338,6 +340,12 @@ const TableCel: Component<{
           {(item) => <Sortable item={item} width={() => divRef?.offsetWidth} />}
         </For>
       </SortableProvider>
+      <button
+        class="flex flex-1 text-gray-400 min-h-[20px] items-center justify-center font-bold my-3 opacity-0 hover:opacity-100"
+        onClick={onAddNewShift}
+      >
+        +
+      </button>
     </div>
   );
 };
