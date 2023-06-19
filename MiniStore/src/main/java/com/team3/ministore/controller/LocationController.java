@@ -33,21 +33,21 @@ public class LocationController {
 
     //Read a location by ID
     @GetMapping("/search/{id}")
-    public ResponseEntity<Location> getLocationById(@PathVariable("id") Integer id) {
+    public ResponseEntity<Location> getLocationById(@PathVariable("id") String id) {
         Location location = locationService.getLocationById(id);
         return new ResponseEntity<>(location, HttpStatus.OK);
     }
 
     //Update an existing location
     @PutMapping("/update/{id}")
-    public ResponseEntity<Location> updateLocation(@PathVariable("id") Integer id, @RequestBody Location location) {
+    public ResponseEntity<Location> updateLocation(@PathVariable("id") String id, @RequestBody Location location) {
         Location updatedLocation = locationService.updateLocation(id, location);
         return new ResponseEntity<>(updatedLocation, HttpStatus.OK);
     }
 
     //Delete a location
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteLocation(@PathVariable("id") Integer id) {
+    public ResponseEntity<Void> deleteLocation(@PathVariable("id") String id) {
         locationService.deleteLocation(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

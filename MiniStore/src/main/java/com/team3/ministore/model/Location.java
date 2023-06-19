@@ -11,11 +11,9 @@ import java.util.List;
 public class Location {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "location_id")
+    @Column(name = "location_id", length = 100)
     private int locationId;
 
-    @Column(name = "computer_id")
-    private String computerId;
-
+    @Column(name = "description", length = 100)
+    private String description;
 }

@@ -24,17 +24,14 @@ public class WorkSchedules {
     @JoinColumn(name = "shift_id", referencedColumnName = "shift_id")
     private Shifts shifts;
 
-    @Column(name = "work_date")
-    private Date workDate;
+    @Column(name = "date")
+    private Date date;
 
     @Column(name = "check_in_time")
     private Time checkInTime;
 
     @Column(name = "check_out_time")
     private Time checkOutTime;
-
-    @Column(name = "status")
-    private int status;
 
     @Column(name = "published")
     private boolean published;

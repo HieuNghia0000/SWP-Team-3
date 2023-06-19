@@ -45,4 +45,7 @@ public class RegisterDto {
 
     @Nullable
     private String workDays;
+
+    @Nullable
+    private Integer leaveBalance;
 }

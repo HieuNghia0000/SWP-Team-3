@@ -22,33 +22,33 @@ public class Staff extends BaseEntity {
     private int staffId;
 
     @OneToMany(mappedBy = "staff")
-    private List<TimeOffRequests> timeOffRequests;
+    private List<LeaveRequest> leaveRequests;
 
     @OneToMany(mappedBy = "staff")
     private List<WorkSchedules> workSchedules;
 
-    @Column(name = "staff_name")
+    @Column(name = "staff_name", length = 100)
     private String staffName;
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(name = "role")
+    @Column(name = "role", length = 50)
     private Role role;
 
     @NotNull
-    @Column(name = "username")
+    @Column(name = "username", length = 100)
     private String username;
 
     @NotNull
-    @Column(name = "email")
+    @Column(name = "email", length = 200)
     private String email;
 
-    @Column(name = "password")
+    @Column(name = "password", length = 100)
     @NotNull
     @JsonIgnore
     private String password;
 
-    @Column(name = "phone_number")
+    @Column(name = "phone_number", length = 20)
     private String phoneNumber;
 
     @Column(name = "base_salary")
@@ -58,10 +58,12 @@ public class Staff extends BaseEntity {
     @Enumerated(EnumType.ORDINAL)
     private StaffStatus status;
 
-    @Column(name = "image")
+    @Column(name = "image", length = 200)
     private String image;
 
-    @Column(name = "work_days")
+    @Column(name = "work_days", length = 200)
     private String workDays;
 
+    @Column(name = "leave_balance")
+    private Integer leaveBalance;
 }

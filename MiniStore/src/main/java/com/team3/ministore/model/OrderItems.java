@@ -23,7 +23,7 @@ public class OrderItems {
     private Product product;
 
     @ManyToOne
-    @JoinColumn(name = "voucher_id", referencedColumnName = "voucher_id")
+    @JoinColumn(name = "voucher_code", referencedColumnName = "voucher_code")
     private Vouchers vouchers;
 
     @Column(name = "price")

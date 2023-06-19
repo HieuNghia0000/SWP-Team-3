@@ -25,12 +25,15 @@ public class Shifts {
     @Column(name = "end_time")
     private Time endTime;
 
-    @Column(name = "slots")
-    private int slots;
+    @Column(name = "shift_name", length = 50)
+    private int shiftName;
 
     @Column(name = "day_of_week")
     private int dayOfWeek;
 
     @Column(name = "salary_coefficient")
     private float salaryCoefficient;
+
+    @Column(name = "role", length = 50)
+    private String role;
 }

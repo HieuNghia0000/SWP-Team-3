@@ -7,8 +7,8 @@ import java.util.Date;
 
 @Entity
 @Data
-@Table(name = "timeoffrequest")
-public class TimeOffRequests {
+@Table(name = "leaverequest")
+public class LeaveRequest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,6 +19,9 @@ public class TimeOffRequests {
     @JoinColumn(name = "staff_id", referencedColumnName = "staff_id")
     private Staff staff;
 
+    @Column(name = "leave_type", length = 20)
+    private String leaveType;
+
     @Column(name = "start_date")
     private Date startDate;
 
@@ -28,9 +31,9 @@ public class TimeOffRequests {
     @Column(name = "status")
     private int status;
 
-    @Column(name = "comments")
-    private String comments;
+    @Column(name = "reason", length = 500)
+    private String reason;
 
-    @Column(name = "admin_reply")
+    @Column(name = "admin_reply", length = 500)
     private String adminReply;
 }

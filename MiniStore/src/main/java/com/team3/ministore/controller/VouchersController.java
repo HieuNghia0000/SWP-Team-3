@@ -28,21 +28,21 @@ public class VouchersController {
         return new ResponseEntity<>(vouchersList, HttpStatus.OK);
     }
 
-    @GetMapping("/search/{id}")
-    public ResponseEntity<Vouchers> getVouchersById(@PathVariable("id") Integer id) {
-        Vouchers vouchers = vouchersService.getVouchersById(id);
+    @GetMapping("/search/{code}")
+    public ResponseEntity<Vouchers> getVouchersById(@PathVariable("code") String code) {
+        Vouchers vouchers = vouchersService.getVouchersById(code);
         return new ResponseEntity<>(vouchers, HttpStatus.OK);
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<Vouchers> updateVouchers(@PathVariable("id") Integer id, @RequestBody Vouchers vouchers) {
-        Vouchers updatedVouchers = vouchersService.updateVouchers(id, vouchers);
+    @PutMapping("/update/{code}")
+    public ResponseEntity<Vouchers> updateVouchers(@PathVariable("code") String code, @RequestBody Vouchers vouchers) {
+        Vouchers updatedVouchers = vouchersService.updateVouchers(code, vouchers);
         return new ResponseEntity<>(updatedVouchers, HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteVouchers(@PathVariable("id") Integer id) {
-        vouchersService.deleteVouchers(id);
+    @DeleteMapping("/delete/{code}")
+    public ResponseEntity<Void> deleteVouchers(@PathVariable("code") String code) {
+        vouchersService.deleteVouchers(code);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

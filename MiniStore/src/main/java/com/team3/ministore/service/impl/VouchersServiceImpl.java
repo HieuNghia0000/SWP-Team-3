@@ -25,15 +25,14 @@ public class VouchersServiceImpl implements VouchersService {
     }
 
     @Override
-    public Vouchers getVouchersById(Integer id) {
-        return vouchersRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid Vouchers ID: " + id));
+    public Vouchers getVouchersById(String code) {
+        return vouchersRepository.findById(code).orElseThrow(() -> new IllegalArgumentException("Invalid Vouchers ID: " + code));
     }
 
     @Override
-    public Vouchers updateVouchers(Integer id, Vouchers vouchers) {
-        Vouchers existingVouchers = getVouchersById(id);
+    public Vouchers updateVouchers(String code, Vouchers vouchers) {
+        Vouchers existingVouchers = getVouchersById(code);
 
-        existingVouchers.setCode(vouchers.getCode());
         existingVouchers.setVoucherType(vouchers.getVoucherType());
         existingVouchers.setDiscountType(vouchers.getDiscountType());
         existingVouchers.setMaxDiscount(vouchers.getMaxDiscount());
@@ -45,7 +44,7 @@ public class VouchersServiceImpl implements VouchersService {
     }
 
     @Override
-    public void deleteVouchers(Integer id) {
+    public void deleteVouchers(String id) {
         vouchersRepository.deleteById(id);
     }
 }

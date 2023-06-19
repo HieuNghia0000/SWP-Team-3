@@ -15,7 +15,7 @@ public class HolidayCoef {
     @Column(name = "holiday_coef_id")
     private int holidayCoefId;
 
-    @Column(name = "name")
+    @Column(name = "name", length = 100)
     private String name;
 
     @Column(name = "start_date")

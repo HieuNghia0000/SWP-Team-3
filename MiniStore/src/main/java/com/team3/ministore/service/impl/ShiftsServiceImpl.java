@@ -37,7 +37,8 @@ public class ShiftsServiceImpl implements ShiftsService {
         existingShifts.setStartTime(shifts.getStartTime());
         existingShifts.setEndTime(shifts.getEndTime());
         existingShifts.setSalaryCoefficient(shifts.getSalaryCoefficient());
-        existingShifts.setSlots(shifts.getSlots());
+        existingShifts.setShiftName(shifts.getShiftName());
+        existingShifts.setRole(shifts.getRole());
 
         return shiftsRepository.save(existingShifts);
     }

@@ -27,21 +27,21 @@ public class LocationServiceImpl implements LocationService {
     }
 
     @Override
-    public Location getLocationById(Integer id) {
+    public Location getLocationById(String id) {
         return locationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid location ID: " + id));
     }
 
     @Override
-    public Location updateLocation(Integer id, Location location) {
+    public Location updateLocation(String id, Location location) {
         Location existingLocation = getLocationById(id);
 
-        existingLocation.setComputerId(location.getComputerId());
+        existingLocation.setDescription(location.getDescription());
 
         return locationRepository.save(existingLocation);
     }
 
     @Override
-    public void deleteLocation(Integer id) {
+    public void deleteLocation(String id) {
         locationRepository.deleteById(id);
     }
 }

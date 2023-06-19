@@ -56,7 +56,8 @@ public class StaffServiceImpl implements StaffService {
                 staffDto.getStatus(),
                 staffDto.getImage(),
                 staffDto.getEmail(),
-                staffDto.getWorkDays()
+                staffDto.getWorkDays(),
+                staffDto.getLeaveBalance()
         );
     }
 
@@ -75,7 +76,8 @@ public class StaffServiceImpl implements StaffService {
                 staff.getStatus(),
                 staff.getImage(),
                 staff.getEmail(),
-                staff.getWorkDays()
+                staff.getWorkDays(),
+                staff.getLeaveBalance()
         );
     }
 
@@ -115,11 +117,12 @@ public class StaffServiceImpl implements StaffService {
         result.setBaseSalary(foundStaff.getBaseSalary());
         result.setWorkDays(foundStaff.getWorkDays());
         result.setImage(foundStaff.getImage());
+        result.setLeaveBalance(foundStaff.getLeaveBalance());
 
         return result;
     }
 
-    private Staff saveStaff(Staff staff, String staffName, Role role, String username, String password, String phoneNumber, Float baseSalary, StaffStatus status, String image, String email, String workDays) {
+    private Staff saveStaff(Staff staff, String staffName, Role role, String username, String password, String phoneNumber, Float baseSalary, StaffStatus status, String image, String email, String workDays, Integer leaveBalance) {
         staff.setStaffName(staffName);
         staff.setRole(role);
         staff.setUsername(username);
@@ -130,6 +133,7 @@ public class StaffServiceImpl implements StaffService {
         staff.setImage(image);
         staff.setEmail(email);
         staff.setWorkDays(workDays);
+        staff.setLeaveBalance(leaveBalance);
 
         return staffRepository.save(staff);
     }

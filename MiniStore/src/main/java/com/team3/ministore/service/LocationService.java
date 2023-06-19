@@ -9,9 +9,9 @@ public interface LocationService {
 
     Location createLocation(Location location);
 
-    Location getLocationById(Integer id);
+    Location getLocationById(String id);
 
-    Location updateLocation(Integer id, Location location);
+    Location updateLocation(String id, Location location);
 
-    void deleteLocation(Integer id);
+    void deleteLocation(String id);
 }

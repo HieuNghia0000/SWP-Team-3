@@ -9,9 +9,9 @@ public interface VouchersService {
 
     Vouchers createVouchers(Vouchers vouchers);
 
-    Vouchers getVouchersById(Integer id);
+    Vouchers getVouchersById(String id);
 
-    Vouchers updateVouchers(Integer id, Vouchers vouchers);
+    Vouchers updateVouchers(String id, Vouchers vouchers);
 
-    void deleteVouchers(Integer id);
+    void deleteVouchers(String id);
 }
