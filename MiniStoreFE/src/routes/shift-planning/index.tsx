@@ -135,6 +135,9 @@ export default function ShiftPlanning() {
     shifts: [],
     dates: [],
     staffs: [],
+    // newAdded: [],
+    // updated: [],
+    // isDirty: false,
   });
 
   const [showShiftModal, setShowShiftModal] = createSignal<boolean>(false);

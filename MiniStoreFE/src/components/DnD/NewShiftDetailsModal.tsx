@@ -1,99 +1,146 @@
 import { Accessor, Component, Setter } from "solid-js";
 import PopupModal from "../PopupModal";
 import { Role, WorkSchedule } from "~/types";
-import { A } from "@solidjs/router";
-import { FaSolidPencil } from "solid-icons/fa";
-import moment from "moment";
+import { Select } from "../form/Select";
+import { useFormHandler } from "solid-form-handler";
+import { yupSchema } from "solid-form-handler/yup";
+import * as yup from "yup";
+import { TextInput } from "../form/TextInput";
+
+const schema: yup.Schema = yup.object({
+  name: yup.string().required("Vui lòng nhập họ tên"),
+  phone: yup.string().required("Vui lòng nhập số điện thoại"),
+  role: yup.string().required("Vui lòng chọn role"),
+  baseSalary: yup.string().required("Vui lòng nhập lương cơ bản"),
+});
 
 const NewShiftDetailsModal: Component<{
   showModal: Accessor<boolean>;
   modalData: Accessor<WorkSchedule | undefined>;
   setShowModal: Setter<boolean>;
 }> = ({ showModal, modalData, setShowModal }) => {
+  const formHandler = useFormHandler(yupSchema(schema), {
+    validateOn: ["change"],
+  });
+  const { formData } = formHandler;
+
+  const submit = async (event: Event) => {
+    event.preventDefault();
+    try {
+      await formHandler.validateForm();
+      alert("Data sent with success: " + JSON.stringify(formData()));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const reset = () => {
+    formHandler.resetForm();
+  };
+
   return (
     <PopupModal
       title="New Shift"
       close={() => setShowModal(false)}
       open={showModal}
       footer={
-        <A
-          href={"/"}
-          class="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-2"
-        >
-          <span class="">
-            <FaSolidPencil />
-          </span>
-          Edit Shift
-        </A>
+        <div class="w-full flex justify-end items-center gap-2">
+          <button
+            type="button"
+            class="py-1.5 px-3 font-semibold text-gray-600 border border-gray-300 text-sm rounded hover:text-black"
+          >
+            Save & Publish
+          </button>
+          <button
+            type="button"
+            class="py-1.5 px-3 font-semibold text-white border border-blue-600 bg-blue-500 text-sm rounded hover:bg-blue-600"
+          >
+            Save
+          </button>
+        </div>
       }
     >
-      <div class="text-lg mb-2.5 font-semibold text-center text-gray-800">
-        {modalData()?.shift.shiftName}
-      </div>
-      <div class="border-t border-gray-300 border-dotted text-gray-600 text-sm">
-        <div class="flex border-b border-gray-300 border-dotted">
-          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
-            <span class="font-semibold text-gray-500">Team Member:</span>
-            <span>{modalData()?.staff?.staffName}</span>
-          </div>
-          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
-            <span class="font-semibold text-gray-500">Salary Coefficient:</span>
-            <span>{modalData()?.shift.salaryCoefficient}</span>
-          </div>
-        </div>
-        <div class="flex border-b border-gray-300 border-dotted">
-          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
-            <span class="font-semibold text-gray-500">Role:</span>
-            <span
-              class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-semibold rounded-full"
-              classList={{
-                "bg-blue-200 text-blue-700":
-                  modalData()?.shift.role === Role.CASHIER,
-                "bg-yellow-200 text-yellow-700":
-                  modalData()?.shift.role === Role.GUARD,
-                "bg-red-200 text-red-700":
-                  modalData()?.shift.role === Role.MANAGER,
-                "bg-gray-200 text-gray-700":
-                  modalData()?.shift.role === Role.ADMIN,
-              }}
-            >
-              {modalData()?.shift.role}
-            </span>
-          </div>
-        </div>
-        <div class="flex border-b border-gray-300 border-dotted">
-          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
-            <span class="font-semibold text-gray-500">Date:</span>
-            <span>{moment(modalData()?.date).format("ddd MMM D, YYYY")}</span>
-          </div>
-          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
-            <span class="font-semibold text-gray-500">Start Time:</span>
-            <span>
-              {moment(modalData()?.shift.startTime, "h:mm:ss").format("h:mma")}
-            </span>
-          </div>
-          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
-            <span class="font-semibold text-gray-500">End Time:</span>
-            <span>
-              {moment(modalData()?.shift.endTime, "h:mm:ss").format("h:mma")}
-            </span>
-          </div>
-        </div>
+      <form class="text-sm" onSubmit={submit}>
         <div class="flex">
-          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
-            <span class="font-semibold text-gray-500">Status:</span>
-            <span>Not yet</span>
-          </div>
-          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
-            <span class="font-semibold text-gray-500">Check-in Time:</span>
-            <span>Not yet</span>
-          </div>
-          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
-            <span class="font-semibold text-gray-500">Check-out Time:</span>
-            <span>Not yet</span>
+          <div class="flex-1 py-2.5 flex flex-col gap-1 overflow-hidden">
+            <label for="shift" class="text-gray-700 font-semibold">
+              Shift Template
+            </label>
+            <Select
+              id="shift"
+              name="shift"
+              value={0}
+              options={[
+                { value: 0, label: "No Shift Template" },
+                { value: 1, label: "8:30am - 1:30pm" },
+                { value: 2, label: "10am - 5pm" },
+                { value: 3, label: "1:30pm - 10pm" },
+              ]}
+              formHandler={formHandler}
+            />
           </div>
         </div>
-      </div>
+        <div class="flex gap-2">
+          <div class="flex-1 py-2.5 flex flex-col gap-1 overflow-hidden">
+            <label for="staff" class="text-gray-700 font-semibold">
+              Staff Members
+            </label>
+            <Select
+              id="staff"
+              name="staff"
+              value="hieuvo"
+              options={[
+                { value: "hieuvo", label: "hieu vo" },
+                { value: "khoado", label: "Khoa Do" },
+              ]}
+              formHandler={formHandler}
+            />
+          </div>
+          <div class="flex-1 py-2.5 max-w-[140px] flex flex-col gap-1 overflow-hidden">
+            <label for="coefficient" class="text-gray-700 font-semibold">
+              Salary Coefficient
+            </label>
+            <TextInput
+              id="coefficient"
+              name="coefficient"
+              type="number"
+              step={0.1}
+              value={1}
+              formHandler={formHandler}
+            />
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <div class="flex-1 py-2.5 flex flex-col gap-1 overflow-hidden">
+            <label for="role" class="text-gray-700 font-semibold">
+              Role
+            </label>
+            <Select
+              id="role"
+              name="role"
+              value="ADMIN"
+              options={[
+                { value: Role.ADMIN, label: "Admin" },
+                { value: Role.MANAGER, label: "Manager" },
+                { value: Role.CASHIER, label: "Cashier" },
+                { value: Role.GUARD, label: "Guard" },
+              ]}
+              formHandler={formHandler}
+            />
+          </div>
+          <div class="flex-1 py-2.5 flex flex-col gap-1 overflow-hidden">
+            <label for="date" class="text-gray-700 font-semibold">
+              Salary Coefficient
+            </label>
+            <TextInput
+              id="date"
+              name="date"
+              type="date"
+              formHandler={formHandler}
+            />
+          </div>
+        </div>
+      </form>
     </PopupModal>
   );
 };
