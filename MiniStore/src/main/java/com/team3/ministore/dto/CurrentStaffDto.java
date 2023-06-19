@@ -17,4 +17,5 @@ public class CurrentStaffDto {
     private String phoneNumber;
     private Float baseSalary;
     private String workDays;
+    private Integer leaveBalance;
 }

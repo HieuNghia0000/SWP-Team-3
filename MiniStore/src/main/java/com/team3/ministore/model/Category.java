@@ -14,8 +14,11 @@ public class Category {
     @Column(name = "category_id")
     private int categoryId;
 
-    @Column(name = "name")
+    @Column(name = "name", length = 100)
     private String name;
+
+    @Column(name = "description", length = 300)
+    private String description;
 
     @OneToMany(mappedBy = "category")
     private List<Product> products;

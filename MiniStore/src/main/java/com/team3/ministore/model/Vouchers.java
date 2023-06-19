@@ -12,15 +12,11 @@ import java.util.List;
 public class Vouchers {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "voucher_id")
-    private int voucherId;
+    @Column(name = "voucher_code")
+    private int voucherCode;
 
     @OneToMany(mappedBy = "vouchers")
     private List<OrderItems> orderItems;
-
-    @Column(name = "code")
-    private String code;
 
     @Column(name = "voucher_type")
     private int voucherType;

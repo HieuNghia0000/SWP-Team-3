@@ -22,10 +22,10 @@ public class Product {
     @OneToMany(mappedBy = "product")
     private List<OrderItems> orderItems;
 
-    @Column(name = "barcode")
+    @Column(name = "barcode", length = 20)
     private String barCode;
 
-    @Column(name = "description")
+    @Column(name = "description", length = 400)
     private String description;
 
     @Column(name = "price")
