@@ -97,6 +97,10 @@ export type Category = {
   categoryId: number;
   name: string;
   description: string;
+
+  // add on
+  sales?: number;
+  stock?: number;
 };
 
 export type Voucher = {

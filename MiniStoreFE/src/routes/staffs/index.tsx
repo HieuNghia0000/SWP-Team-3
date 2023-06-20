@@ -7,11 +7,11 @@ import { createRouteData, useRouteData, useSearchParams } from "solid-start";
 import Pagination from "~/components/Pagination";
 import { A } from "@solidjs/router";
 import { Accessor, Component, For, Setter, Show, createSignal } from "solid-js";
-import moment from "moment";
 import routes from "~/utils/routes";
 import { Staff, Status } from "~/types";
 import PopupModal from "~/components/PopupModal";
 import { FaSolidLock, FaSolidPencil, FaSolidUnlock } from "solid-icons/fa";
+import { RiSystemAddFill } from "solid-icons/ri";
 
 const mockData = [
   {
@@ -52,6 +52,12 @@ const mockData = [
   },
 ];
 
+type ParamType = {
+  perPage?: string;
+  curPage?: string;
+  search?: string;
+};
+
 export function routeData() {
   const [searchParams] = useSearchParams();
 
@@ -68,14 +74,14 @@ export function routeData() {
 }
 
 export default function Staffs() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams<ParamType>();
   const data = useRouteData<typeof routeData>();
   const [showModal, setShowModal] = createSignal<boolean>(false);
   const [modalData, setModalData] = createSignal<Staff>();
 
   const totalItems = () => data()?.length ?? 0;
-  const perPage = () => Number.parseInt(searchParams.perPage ?? 10);
-  const curPage = () => Number.parseInt(searchParams.curPage ?? 1);
+  const perPage = () => Number.parseInt(searchParams.perPage || "10");
+  const curPage = () => Number.parseInt(searchParams.curPage || "1");
   const lastPage = () => Math.ceil(totalItems() / perPage());
 
   const prev = () => {
@@ -133,9 +139,12 @@ export default function Staffs() {
             </form>
             <A
               href={routes.staffAdd}
-              class="text-base text-indigo-600 font-medium hover:text-indigo-500 hover:underline hover:underline-offset-2"
+              class="flex gap-1 justify-center items-center pl-3 pr-4 py-2 text-sm text-white bg-indigo-500 font-medium rounded-lg hover:bg-indigo-600"
             >
-              Add new staff
+              <span class="text-lg">
+                <RiSystemAddFill />
+              </span>
+              <span>Add Staff</span>
             </A>
           </div>
           <div class="flex justify-center items-center mr-5">

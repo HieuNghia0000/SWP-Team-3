@@ -1,7 +1,6 @@
 import { A, useRouteData, useSearchParams } from "@solidjs/router";
-import { FiCalendar, FiLock, FiUnlock } from "solid-icons/fi";
+import { FiCalendar } from "solid-icons/fi";
 import { IoEyeOutline, IoTrashOutline } from "solid-icons/io";
-import { OcPencil3 } from "solid-icons/oc";
 import { For, Show, createSignal, onCleanup, onMount } from "solid-js";
 import { createRouteData } from "solid-start";
 import Breadcrumbs from "~/components/Breadcrumbs";
@@ -15,7 +14,6 @@ import { Instance } from "flatpickr/dist/types/instance";
 import { isServer } from "solid-js/web";
 import moment from "moment";
 import { DataResponse, Order } from "~/types";
-import { FaRegularTrashCan } from "solid-icons/fa";
 
 type ParamType = {
   perPage?: string;

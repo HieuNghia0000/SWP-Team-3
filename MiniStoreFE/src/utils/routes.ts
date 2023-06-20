@@ -2,7 +2,7 @@ const routes = {
   login: "/login",
   logout: "/logout",
   dashboard: "/",
-  products: "/products",
+  shiftPlanning: "/shift-planning",
   staffs: "/staffs",
   staff: (id: string | number) => `/staffs/${id}`,
   staffAdd: "/staffs/add",
@@ -11,11 +11,16 @@ const routes = {
   staffChangePassword: (id: string | number) => `/staffs/${id}/change-password`,
   staffUpdateSchedule: (id: string | number) => `/staffs/${id}/update-schedule`,
   staffDisable: (id: string | number) => `/staffs/${id}/disable`,
-  categories: "/categories",
   orders: "/orders",
   order: (id: string | number) => `/orders/${id}`,
   orderAdd: "/orders/add",
-  shiftPlanning: "/shift-planning",
+  products: "/products",
+  product: (id: string | number) => `/products/${id}`,
+  productEdit: (id: string | number) => `/products/${id}/edit`,
+  productAdd: "/products/add",
+  categories: "/categories",
+  category: (id: string | number) => `/categories/${id}`,
+  categoryEdit: (id: string | number) => `/categories/${id}/edit`,
 };
 
 export const apiRoutes = {
