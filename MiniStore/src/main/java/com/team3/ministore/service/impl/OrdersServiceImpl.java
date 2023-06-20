@@ -40,7 +40,8 @@ public class OrdersServiceImpl implements OrdersService {
         Orders existingOrders = getOrdersById(id);
 
         existingOrders.setOrderDate(orders.getOrderDate());
-        existingOrders.setTotalAmount(orders.getTotalAmount());
+        existingOrders.setTotalPrice(orders.getTotalPrice());
+        existingOrders.setVouchers(orders.getVouchers());
 
         return ordersRepository.save(existingOrders);
     }

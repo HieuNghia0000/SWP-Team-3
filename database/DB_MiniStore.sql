@@ -42,7 +42,7 @@ CREATE TABLE Shifts
 CREATE TABLE WorkSchedules
 (
 	schedule_id INT AUTO_INCREMENT NOT NULL,
-	staff_id INT NOT NULL,
+	staff_id INT,
 	shift_id INT NOT NULL,
 	date DATE NOT NULL,
 	check_in_time TIME,
@@ -66,6 +66,7 @@ CREATE TABLE Products
 	product_id INT AUTO_INCREMENT NOT NULL,
 	category_id INT,
 	barcode NVARCHAR(20),
+    name NVARCHAR(100),
 	description NVARCHAR(400),
 	price FLOAT,
 	quantity INT,
@@ -75,9 +76,9 @@ CREATE TABLE Products
 
 CREATE TABLE Vouchers
 (
-	voucher_code NVARCHAR(200) NOT NULL,
-	voucher_type INT,
-	discount_type INT,
+	voucher_code NVARCHAR(100) NOT NULL,
+	discount_type NVARCHAR(10),
+    discount_value FLOAT,
 	max_discount FLOAT,
 	valid_from DATETIME,
 	valid_to DATETIME,
@@ -121,8 +122,10 @@ CREATE TABLE Orders
 (
 	order_id INT AUTO_INCREMENT NOT NULL,
 	order_date DATETIME NOT NULL,
-	total_amount INT,
-	PRIMARY KEY (order_id)
+	total_price INT,
+    voucher_code NVARCHAR(100),
+	PRIMARY KEY (order_id),
+    FOREIGN KEY (voucher_code) REFERENCES Vouchers(voucher_code)
 );
 
 CREATE TABLE OrderItems
@@ -130,11 +133,8 @@ CREATE TABLE OrderItems
 	order_item_id INT AUTO_INCREMENT NOT NULL,
 	order_id INT NOT NULL,
 	product_id INT NOT NULL,
-	voucher_code NVARCHAR(100),
-	price FLOAT,
 	quantity INT,
 	PRIMARY KEY (order_item_id),
 	FOREIGN KEY (order_id) REFERENCES Orders(order_id),
-	FOREIGN KEY (product_id) REFERENCES Products(product_id),
-	FOREIGN KEY (voucher_code) REFERENCES Vouchers(voucher_code)
+	FOREIGN KEY (product_id) REFERENCES Products(product_id)
 );

@@ -22,13 +22,6 @@ public class OrderItems {
     @JoinColumn(name = "product_id", referencedColumnName = "product_id")
     private Product product;
 
-    @ManyToOne
-    @JoinColumn(name = "voucher_code", referencedColumnName = "voucher_code")
-    private Vouchers vouchers;
-
-    @Column(name = "price")
-    private float price;
-
     @Column(name = "quantity")
     private int quantity;
 }

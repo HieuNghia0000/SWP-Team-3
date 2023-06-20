@@ -23,7 +23,7 @@ public interface OrdersRepository extends JpaRepository<Orders, Integer> {
     @Query("SELECT o FROM Orders o WHERE o.orderDate >= :fromDate AND o.orderDate <= :toDate")
     List<Orders> findOrdersByOrderDateBetween(@Param("fromDate") LocalDateTime fromDate, @Param("toDate") LocalDateTime toDate);
 
-    @Query("SELECT o FROM Orders o WHERE o.totalAmount >= :fromAmount AND o.totalAmount <= :toAmount")
+    @Query("SELECT o FROM Orders o WHERE o.totalPrice >= :fromAmount AND o.totalPrice <= :toAmount")
     List<Orders> findOrdersByTotalAmountBetween(@Param("fromAmount") int fromAmount, @Param("toAmount") int toAmount);
 
     @Query("SELECT o FROM Orders o")
