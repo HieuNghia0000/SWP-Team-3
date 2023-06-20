@@ -216,6 +216,12 @@ export default function Vouchers() {
                 scope="col"
                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
+                Used Count
+              </th>
+              <th
+                scope="col"
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
                 Actions
               </th>
             </tr>
@@ -245,6 +251,9 @@ export default function Vouchers() {
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
                     {moment(item.validTo).format("DD/MM/YYYY")}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
+                    {item.usedCount}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
                     <div class="flex flex-row gap-1">

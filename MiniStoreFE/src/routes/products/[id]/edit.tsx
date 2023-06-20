@@ -5,8 +5,8 @@ import { TextInput } from "~/components/form/TextInput";
 import routes from "~/utils/routes";
 import * as yup from "yup";
 import { Select } from "~/components/form/Select";
-import { RiSystemAddFill } from "solid-icons/ri";
 import { CgClose } from "solid-icons/cg";
+import { FiSave } from "solid-icons/fi";
 
 type FormValues = {
   productName: string;
@@ -140,9 +140,9 @@ export default function EditProduct() {
               class="flex gap-1 justify-center items-center pl-3 pr-4 py-2 text-sm text-white bg-indigo-500 border border-indigo-500 font-medium rounded-lg hover:bg-indigo-600"
             >
               <span class="text-lg">
-                <RiSystemAddFill />
+                <FiSave />
               </span>
-              <span>Create new product</span>
+              <span>Update</span>
             </button>
           </div>
         </div>

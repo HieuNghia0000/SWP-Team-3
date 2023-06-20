@@ -1,5 +1,5 @@
 import { CgClose } from "solid-icons/cg";
-import { FiSave } from "solid-icons/fi";
+import { OcPencil3 } from "solid-icons/oc";
 import { A } from "solid-start";
 import Breadcrumbs from "~/components/Breadcrumbs";
 import { Select } from "~/components/form/Select";
@@ -91,11 +91,11 @@ export default function ProductDetails() {
               <span>Remove</span>
             </button>
             <A
-              href={routes.product(1)}
+              href={routes.productEdit(1)}
               class="flex gap-1 justify-center items-center pl-3 pr-4 py-2 text-sm text-white bg-indigo-500 border border-indigo-500 font-medium rounded-lg hover:bg-indigo-600"
             >
               <span class="text-lg">
-                <FiSave />
+                <OcPencil3 />
               </span>
               <span>Update product</span>
             </A>
