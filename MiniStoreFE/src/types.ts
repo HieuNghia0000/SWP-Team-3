@@ -56,6 +56,59 @@ export interface Shift {
   updatedAt?: string;
 }
 
+export type Order = {
+  orderId: number;
+  orderDate: string;
+  totalPrice: number;
+  voucherCode?: string;
+  created_at?: string;
+  updated_at?: string;
+
+  // relationship
+  items: OrderItem[];
+  voucher?: Voucher;
+};
+
+export type OrderItem = {
+  orderItemId: number;
+  orderId: number;
+  quantity: number;
+  productId: number;
+
+  // relationship
+  product: Product;
+  order?: Order;
+};
+
+export type Product = {
+  productId: number;
+  barcode: string;
+  name: string;
+  description: string;
+  price: number;
+  quantity: number;
+  categoryId?: number;
+
+  // relationship
+  category?: Category;
+};
+
+export type Category = {
+  categoryId: number;
+  name: string;
+  description: string;
+};
+
+export type Voucher = {
+  voucherCode: string;
+  discountValue: number;
+  discountType: "PERCENTAGE" | "AMOUNT";
+  maxDiscount: number;
+  validFrom: string;
+  validTo: string;
+  usedCount: number;
+};
+
 export interface DataResponse<T> extends Response {
   content: T;
   errors: string[] | string;

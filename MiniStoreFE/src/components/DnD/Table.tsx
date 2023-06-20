@@ -20,6 +20,9 @@ import { DataTable, useShiftPlanning } from "~/routes/shift-planning";
 import { Role, WorkSchedule } from "~/types";
 import createUniqueNumberId from "~/utils/createUniqueNumberId";
 
+// a cel is a droppable box
+// a shift is a draggable item
+
 type DnDTableProps = {
   tableData: DataTable;
   setTableData: SetStoreFunction<DataTable>;
@@ -58,14 +61,15 @@ const Table: Component<DnDTableProps> = ({ tableData, setTableData }) => {
 
   // Find the droppable box id of a draggable id
   const getDroppableBoxId = (draggableId: Id) => {
-    for (let droppableBoxId in tableData.cels) {
-      const shiftIds = tableData.cels[droppableBoxId];
+    for (let celId in tableData.cels) {
+      const shiftIds = tableData.cels[celId];
       if (shiftIds.includes(draggableId as number)) {
-        return droppableBoxId;
+        return celId;
       }
     }
 
-    return ""; // Shift ID not found
+    // If the draggable id is not found in any droppable box
+    return "";
   };
 
   const closestContainerOrItem: CollisionDetector = (
@@ -117,24 +121,23 @@ const Table: Component<DnDTableProps> = ({ tableData, setTableData }) => {
     droppable: Droppable,
     onlyWhenChangingContainer = true
   ) => {
-    const draggableContainer = getDroppableBoxId(draggable.id);
-    const droppableContainer = isDroppableBoxId(droppable.id as string)
+    // Get the droppable box id of the draggable
+    const draggableContainerId = getDroppableBoxId(draggable.id);
+    // Get the droppable box id of the droppable
+    const droppableId = isDroppableBoxId(droppable.id as string)
       ? (droppable.id as string)
       : getDroppableBoxId(droppable.id);
 
-    if (
-      draggableContainer != droppableContainer ||
-      !onlyWhenChangingContainer
-    ) {
-      const containerItemIds = tableData.cels[droppableContainer];
+    if (draggableContainerId != droppableId || !onlyWhenChangingContainer) {
+      const containerItemIds = tableData.cels[droppableId];
       let index = containerItemIds.indexOf(droppable.id as number);
       if (index === -1) index = containerItemIds.length;
 
       batch(() => {
-        setTableData("cels", draggableContainer, (items) =>
+        setTableData("cels", draggableContainerId, (items) =>
           items.filter((item) => item !== draggable.id)
         );
-        setTableData("cels", droppableContainer, (items) => [
+        setTableData("cels", droppableId, (items) => [
           ...items.slice(0, index),
           draggable.id as number,
           ...items.slice(index),
@@ -179,7 +182,7 @@ const Table: Component<DnDTableProps> = ({ tableData, setTableData }) => {
         <div class="relative shadow-sm border border-gray-200 border-t-0">
           <Show when={tableData.staffs.length !== 0}>
             <DragDropProvider
-              onDragOver={onDragOver}
+              // onDragOver={onDragOver}
               onDragEnd={onDragEnd}
               collisionDetector={closestContainerOrItem}
             >
@@ -221,7 +224,7 @@ const Table: Component<DnDTableProps> = ({ tableData, setTableData }) => {
                     type="button"
                     id={draggable?.id as string}
                     class="rounded mx-0.5 px-1.5 py-1 relative text-left bg-[#edf2f7] border border-gray-200"
-                    style={{ width: `${draggable?.data?.width()}px` }}
+                    style={{ width: `${draggable?.data?.width() - 4}px` }}
                     classList={{
                       "hover:bg-[repeating-linear-gradient(-45deg,white,white_5px,#eaf0f6_5px,#eaf0f6_10px)]":
                         !(draggable?.data.shift as WorkSchedule).published,

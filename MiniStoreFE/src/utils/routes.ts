@@ -13,6 +13,7 @@ const routes = {
   staffDisable: (id: string | number) => `/staffs/${id}/disable`,
   categories: "/categories",
   orders: "/orders",
+  order: (id: string | number) => `/orders/${id}`,
   orderAdd: "/orders/add",
   shiftPlanning: "/shift-planning",
 };

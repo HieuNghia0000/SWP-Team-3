@@ -11,7 +11,7 @@ import moment from "moment";
 import routes from "~/utils/routes";
 import { Staff, Status } from "~/types";
 import PopupModal from "~/components/PopupModal";
-import { FaSolidPencil } from "solid-icons/fa";
+import { FaSolidLock, FaSolidPencil, FaSolidUnlock } from "solid-icons/fa";
 
 const mockData = [
   {
@@ -241,7 +241,7 @@ export default function Staffs() {
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
                       <div class="flex flex-row gap-1">
-                        <div class="relative">
+                        <div class="relative flex justify-center items-center">
                           <button
                             class="peer text-base text-gray-500 hover:text-indigo-500"
                             onClick={[onViewDetails, index()]}
@@ -252,7 +252,7 @@ export default function Staffs() {
                             Quick view
                           </span>
                         </div>
-                        <div class="relative">
+                        <div class="relative flex justify-center items-center">
                           <A
                             href={routes.staffEdit(item.staffId)}
                             class="peer text-base text-gray-500 hover:text-indigo-500"
@@ -263,7 +263,7 @@ export default function Staffs() {
                             Edit
                           </span>
                         </div>
-                        <div class="relative">
+                        <div class="relative flex justify-center items-center">
                           <button class="peer text-base text-gray-500 hover:text-indigo-500">
                             <Show
                               when={item.status === Status.ACTIVATED}
@@ -319,15 +319,28 @@ const StaffDetailsModal: Component<{
       close={() => setShowModal(false)}
       open={showModal}
       footer={
-        <A
-          href={routes.staffEdit(1)}
-          class="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-2"
-        >
-          <span class="">
-            <FaSolidPencil />
-          </span>
-          Edit Staff
-        </A>
+        <div class="flex w-full items-center justify-start gap-3">
+          <A
+            href={routes.staffEdit(1)}
+            class="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-2"
+          >
+            <span class="">
+              <FaSolidPencil />
+            </span>
+            Edit Staff
+          </A>
+          <button class="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-2">
+            <span class="">
+              <Show
+                when={modalData()?.status === Status.ACTIVATED}
+                fallback={<FaSolidUnlock />}
+              >
+                <FaSolidLock />
+              </Show>
+            </span>
+            {modalData()?.status === Status.ACTIVATED ? "Disable" : "Enable"}
+          </button>
+        </div>
       }
     >
       <div class="text-lg mb-2.5 font-semibold text-center text-gray-800">
@@ -397,11 +410,11 @@ const StaffDetailsModal: Component<{
             <span>Sep 1st 2021, 7:00 am</span>
           </div>
         </div>
-        <div class="flex flex-row justify-end gap-3 pt-2">
+        {/* <div class="flex flex-row justify-end gap-3 pt-2">
           <button class="px-3.5 py-2 text-white bg-red-500 border border-red-500 rounded hover:bg-red-600 hover:text-white">
             Disable
           </button>
-        </div>
+        </div> */}
       </div>
     </PopupModal>
   );
