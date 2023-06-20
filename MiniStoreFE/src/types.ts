@@ -113,6 +113,14 @@ export type Voucher = {
   usedCount: number;
 };
 
+export type TimeClock = {
+  staff: Staff;
+  checkIn: string;
+  checkOut: String;
+  totalTime: String;
+  role: Role;
+};
+
 export interface DataResponse<T> extends Response {
   content: T;
   errors: string[] | string;

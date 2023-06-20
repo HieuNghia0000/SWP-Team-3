@@ -25,6 +25,7 @@ const routes = {
   voucherAdd: "/vouchers/add",
   voucher: (id: string | number) => `/vouchers/${id}`,
   voucherEdit: (id: string | number) => `/vouchers/${id}/edit`,
+  timeClock: "/time-clock"
 };
 
 export const apiRoutes = {
