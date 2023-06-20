@@ -21,6 +21,10 @@ const routes = {
   categories: "/categories",
   category: (id: string | number) => `/categories/${id}`,
   categoryEdit: (id: string | number) => `/categories/${id}/edit`,
+  vouchers: "/vouchers",
+  voucherAdd: "/vouchers/add",
+  voucher: (id: string | number) => `/vouchers/${id}`,
+  voucherEdit: (id: string | number) => `/vouchers/${id}/edit`,
 };
 
 export const apiRoutes = {

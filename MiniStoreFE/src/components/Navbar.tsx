@@ -2,7 +2,7 @@ import { Component, JSX, Show, children, createSignal } from "solid-js";
 import { TiThLargeOutline } from "solid-icons/ti";
 import { BiRegularShoppingBag } from "solid-icons/bi";
 import { RiSystemArrowDownSLine, RiSystemArrowUpSLine } from "solid-icons/ri";
-import { BsPeople } from "solid-icons/bs";
+import { BsPeople, BsTicketPerforated } from "solid-icons/bs";
 import { A } from "@solidjs/router";
 import { Transition } from "solid-transition-group";
 import routes from "~/utils/routes";
@@ -80,6 +80,14 @@ const Navbar: Component<NavbarProps> = (props) => {
           href={routes.orders}
           icon={<FiShoppingCart />}
           text="Orders"
+          isOpen={isOpen}
+        />
+
+        {/* Voucher */}
+        <NavbarLink
+          href={routes.vouchers}
+          icon={<BsTicketPerforated />}
+          text="Vouchers"
           isOpen={isOpen}
         />
       </ul>
