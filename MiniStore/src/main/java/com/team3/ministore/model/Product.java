@@ -25,6 +25,9 @@ public class Product {
     @Column(name = "barcode", length = 20)
     private String barCode;
 
+    @Column(name = "name", length = 100)
+    private String name;
+
     @Column(name = "description", length = 400)
     private String description;
 

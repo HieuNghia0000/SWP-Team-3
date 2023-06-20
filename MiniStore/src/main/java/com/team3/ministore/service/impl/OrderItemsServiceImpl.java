@@ -35,8 +35,6 @@ public class OrderItemsServiceImpl implements OrderItemsService {
 
         existingOrderItems.setOrders(orderItems.getOrders());
         existingOrderItems.setProduct(orderItems.getProduct());
-        existingOrderItems.setVouchers(orderItems.getVouchers());
-        existingOrderItems.setPrice(orderItems.getPrice());
         existingOrderItems.setQuantity(orderItems.getQuantity());
 
         return orderItemsRepository.save(existingOrderItems);

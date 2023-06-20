@@ -22,6 +22,10 @@ public class Orders {
     @Column(name = "order_date")
     private LocalDateTime orderDate;
 
-    @Column(name = "total_amount")
-    private int totalAmount;
+    @Column(name = "total_price")
+    private int totalPrice;
+
+    @ManyToOne
+    @JoinColumn(name = "voucher_code", referencedColumnName = "voucher_code")
+    private Vouchers vouchers;
 }

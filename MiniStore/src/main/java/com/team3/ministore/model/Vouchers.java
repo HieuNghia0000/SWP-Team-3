@@ -12,17 +12,17 @@ import java.util.List;
 public class Vouchers {
 
     @Id
-    @Column(name = "voucher_code")
-    private int voucherCode;
+    @Column(name = "voucher_code", length = 100)
+    private String voucherCode;
 
     @OneToMany(mappedBy = "vouchers")
-    private List<OrderItems> orderItems;
+    private List<Orders> orders;
 
-    @Column(name = "voucher_type")
-    private int voucherType;
-
-    @Column(name = "discount_type")
+    @Column(name = "discount_type", length = 10)
     private int discountType;
+
+    @Column(name = "discount_value")
+    private float discountValue;
 
     @Column(name = "max_discount")
     private float maxDiscount;

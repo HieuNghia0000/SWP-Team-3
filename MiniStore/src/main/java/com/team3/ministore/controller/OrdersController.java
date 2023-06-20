@@ -52,8 +52,8 @@ public class OrdersController {
     public ResponseEntity<Page<Orders>> getOrders(@RequestParam("ago") Optional<String> agoParam,
                                                   @RequestParam("from") Optional<String> fromDateParam,
                                                   @RequestParam("to") Optional<String> toDateParam,
-                                                  @RequestParam("fromAmount") Optional<Integer> fromAmountParam,
-                                                  @RequestParam("toAmount") Optional<Integer> toAmountParam,
+                                                  @RequestParam("amount_from") Optional<Integer> fromAmountParam,
+                                                  @RequestParam("amount_to") Optional<Integer> toAmountParam,
                                                   @RequestParam("curPage") Optional<Integer> curPageParam) {
         List<Orders> ordersList;
         Page<Orders> ordersPage;
@@ -122,7 +122,7 @@ public class OrdersController {
         List<Orders> filteredOrders = new ArrayList<>();
 
         for (Orders orders : ordersList) {
-            int orderAmount = orders.getTotalAmount();
+            int orderAmount = orders.getTotalPrice();
 
             if (orderAmount >= fromAmount && orderAmount <= toAmount) {
                 filteredOrders.add(orders);

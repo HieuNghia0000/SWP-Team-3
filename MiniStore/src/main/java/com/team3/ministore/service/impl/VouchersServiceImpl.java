@@ -33,8 +33,8 @@ public class VouchersServiceImpl implements VouchersService {
     public Vouchers updateVouchers(String code, Vouchers vouchers) {
         Vouchers existingVouchers = getVouchersById(code);
 
-        existingVouchers.setVoucherType(vouchers.getVoucherType());
         existingVouchers.setDiscountType(vouchers.getDiscountType());
+        existingVouchers.setDiscountValue(vouchers.getDiscountValue());
         existingVouchers.setMaxDiscount(vouchers.getMaxDiscount());
         existingVouchers.setValidFrom(vouchers.getValidFrom());
         existingVouchers.setValidTo(vouchers.getValidTo());
