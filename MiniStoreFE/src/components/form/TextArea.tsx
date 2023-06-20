@@ -31,7 +31,7 @@ export const TextArea: Component<TextAreaInputProps> = (props) => {
             rows={local.rows}
             classList={{
               "ring-1 ring-orange-600 focus:outline-none": field.helpers.error,
-              "border border-gray-300 py-2 px-2 rounded": true,
+              "border border-gray-300 py-2 px-4 rounded": true,
               "w-full": !local.cols,
             }}
           />
