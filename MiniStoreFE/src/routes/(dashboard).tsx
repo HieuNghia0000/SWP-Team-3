@@ -40,7 +40,7 @@ export default function Page() {
         style="z-index: -1;"
       >
         <img
-          src="../public/top-header.png"
+          src="/top-header.png"
           alt="header"
           class="animated-scaleX object-cover w-screen h-full rounded-2xl"
         ></img>
@@ -119,7 +119,7 @@ export default function Page() {
                           <circle
                             class="text-cyan-400"
                             stroke-width="5"
-                            stroke-dasharray="360" 
+                            stroke-dasharray="360"
                             stroke-dashoffset="200"
                             stroke-linecap="round"
                             stroke="currentColor"
