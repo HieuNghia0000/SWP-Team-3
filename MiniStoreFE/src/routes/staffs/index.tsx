@@ -323,11 +323,87 @@ const StaffDetailsModal: Component<{
   setShowModal: Setter<boolean>;
 }> = ({ showModal, modalData, setShowModal }) => {
   return (
-    <PopupModal
+    <PopupModal.Wrapper
       title="Staff Details"
       close={() => setShowModal(false)}
       open={showModal}
-      footer={
+    >
+      <PopupModal.Body>
+        <div class="text-lg mb-2.5 font-semibold text-center text-gray-800">
+          <p>Nguyen Van A</p>
+          <p class="text-sm text-gray-400">ID: 1</p>
+        </div>
+        <div class="border-t border-gray-300 border-dotted text-gray-600 text-sm">
+          <div class="flex border-b border-gray-300 border-dotted">
+            <div class="flex-1 py-2.5 overflow-hidden space-x-1">
+              <span class="font-semibold text-gray-500">Email:</span>
+              <span>nguyenvana@gmail.com</span>
+            </div>
+          </div>
+          <div class="flex border-b border-gray-300 border-dotted">
+            <div class="flex-1 py-2.5 overflow-hidden space-x-1">
+              <span class="font-semibold text-gray-500">Username:</span>
+              <span>nguyenvana</span>
+            </div>
+          </div>
+          <div class="flex border-b border-gray-300 border-dotted">
+            <div class="flex-1 py-2.5 overflow-hidden space-x-1">
+              <span class="font-semibold text-gray-500">Phone Number:</span>
+              <span>0987654321</span>
+            </div>
+            <div class="flex-1 py-2.5 overflow-hidden space-x-1">
+              <span class="font-semibold text-gray-500">Hourly Wage:</span>
+              <span>$0.00</span>
+            </div>
+          </div>
+          <div class="flex border-b border-gray-300 border-dotted">
+            <div class="flex-1 py-2.5 overflow-hidden space-x-1">
+              <span class="font-semibold text-gray-500">Role:</span>
+              <span
+                class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-semibold text-red-700 rounded-full"
+                classList={{
+                  "bg-red-200": true,
+                }}
+              >
+                Manager
+              </span>
+            </div>
+            <div class="flex-1 py-2.5 overflow-hidden space-x-1">
+              <span class="font-semibold text-gray-500">Status:</span>
+              <span
+                class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-semibold text-white rounded-full"
+                classList={{
+                  "bg-green-500": true,
+                }}
+              >
+                {true ? "Activated" : "Disabled"}
+              </span>
+            </div>
+          </div>
+          <div class="flex border-b border-gray-300 border-dotted">
+            <div class="flex-1 py-2.5 overflow-hidden space-x-1">
+              <span class="font-semibold text-gray-500">Working days:</span>
+              <span>TUE, THU, SAT, SUN</span>
+            </div>
+          </div>
+          <div class="flex border-b border-gray-300 border-dotted">
+            <div class="flex-1 py-2.5 overflow-hidden space-x-1">
+              <span class="font-semibold text-gray-500">Created At:</span>
+              <span>Sep 1st 2021, 7:00 am</span>
+            </div>
+            <div class="flex-1 py-2.5 overflow-hidden space-x-1">
+              <span class="font-semibold text-gray-500">Updated At:</span>
+              <span>Sep 1st 2021, 7:00 am</span>
+            </div>
+          </div>
+          {/* <div class="flex flex-row justify-end gap-3 pt-2">
+          <button class="px-3.5 py-2 text-white bg-red-500 border border-red-500 rounded hover:bg-red-600 hover:text-white">
+            Disable
+          </button>
+        </div> */}
+        </div>
+      </PopupModal.Body>
+      <PopupModal.Footer>
         <div class="flex w-full items-center justify-start gap-3">
           <A
             href={routes.staffEdit(1)}
@@ -350,81 +426,7 @@ const StaffDetailsModal: Component<{
             {modalData()?.status === Status.ACTIVATED ? "Disable" : "Enable"}
           </button>
         </div>
-      }
-    >
-      <div class="text-lg mb-2.5 font-semibold text-center text-gray-800">
-        <p>Nguyen Van A</p>
-        <p class="text-sm text-gray-400">ID: 1</p>
-      </div>
-      <div class="border-t border-gray-300 border-dotted text-gray-600 text-sm">
-        <div class="flex border-b border-gray-300 border-dotted">
-          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
-            <span class="font-semibold text-gray-500">Email:</span>
-            <span>nguyenvana@gmail.com</span>
-          </div>
-        </div>
-        <div class="flex border-b border-gray-300 border-dotted">
-          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
-            <span class="font-semibold text-gray-500">Username:</span>
-            <span>nguyenvana</span>
-          </div>
-        </div>
-        <div class="flex border-b border-gray-300 border-dotted">
-          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
-            <span class="font-semibold text-gray-500">Phone Number:</span>
-            <span>0987654321</span>
-          </div>
-          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
-            <span class="font-semibold text-gray-500">Hourly Wage:</span>
-            <span>$0.00</span>
-          </div>
-        </div>
-        <div class="flex border-b border-gray-300 border-dotted">
-          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
-            <span class="font-semibold text-gray-500">Role:</span>
-            <span
-              class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-semibold text-red-700 rounded-full"
-              classList={{
-                "bg-red-200": true,
-              }}
-            >
-              Manager
-            </span>
-          </div>
-          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
-            <span class="font-semibold text-gray-500">Status:</span>
-            <span
-              class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-semibold text-white rounded-full"
-              classList={{
-                "bg-green-500": true,
-              }}
-            >
-              {true ? "Activated" : "Disabled"}
-            </span>
-          </div>
-        </div>
-        <div class="flex border-b border-gray-300 border-dotted">
-          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
-            <span class="font-semibold text-gray-500">Working days:</span>
-            <span>TUE, THU, SAT, SUN</span>
-          </div>
-        </div>
-        <div class="flex border-b border-gray-300 border-dotted">
-          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
-            <span class="font-semibold text-gray-500">Created At:</span>
-            <span>Sep 1st 2021, 7:00 am</span>
-          </div>
-          <div class="flex-1 py-2.5 overflow-hidden space-x-1">
-            <span class="font-semibold text-gray-500">Updated At:</span>
-            <span>Sep 1st 2021, 7:00 am</span>
-          </div>
-        </div>
-        {/* <div class="flex flex-row justify-end gap-3 pt-2">
-          <button class="px-3.5 py-2 text-white bg-red-500 border border-red-500 rounded hover:bg-red-600 hover:text-white">
-            Disable
-          </button>
-        </div> */}
-      </div>
-    </PopupModal>
+      </PopupModal.Footer>
+    </PopupModal.Wrapper>
   );
 };

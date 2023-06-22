@@ -1,16 +1,14 @@
 import { CgClose } from "solid-icons/cg";
-import { Component, JSX, Show, children } from "solid-js";
+import { Component, JSX, Show } from "solid-js";
 
 type Props = {
   open: () => boolean;
   close: () => void;
   title: string;
   children: JSX.Element;
-  footer: JSX.Element;
 };
 
-const PopupModal: Component<Props> = (props) => {
-  const resolved = children(() => <>{props.children}</>);
+const Wrapper: Component<Props> = (props) => {
   return (
     <Show when={props.open()}>
       <div
@@ -30,18 +28,11 @@ const PopupModal: Component<Props> = (props) => {
           </div>
 
           {/* Body */}
-          <div class="flex-1 p-5">
-            <div class="p-5 -m-5">{resolved()}</div>
-          </div>
-
-          {/* Footer */}
-          <div class="rounded-b-md px-5 py-3.5 border-t border-gray-300 flex items-center justify-start bg-gray-50">
-            {props.footer}
-          </div>
+          {props.children}
         </div>
       </div>
     </Show>
   );
 };
 
-export default PopupModal;
+export default Wrapper;
