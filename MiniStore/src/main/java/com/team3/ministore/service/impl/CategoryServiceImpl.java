@@ -3,6 +3,9 @@ package com.team3.ministore.service.impl;
 import com.team3.ministore.model.Category;
 import com.team3.ministore.repository.CategoryRepository;
 import com.team3.ministore.service.CategoryService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -44,5 +47,16 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public void deleteCategory(Integer id) {
         categoryRepository.deleteById(id);
+    }
+
+    @Override
+    public List<Category> getCategoryByNameLike(String name) {
+        return categoryRepository.getCategoryByNameLike(name);
+    }
+
+    @Override
+    public Page<Category> findAllPagingCategory(int pageIndex, int pageSize) {
+        Pageable pageable = PageRequest.of(pageIndex - 1, pageSize);
+        return categoryRepository.findAllPagingCategory(pageable);
     }
 }

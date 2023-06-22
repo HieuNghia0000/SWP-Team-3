@@ -41,7 +41,7 @@ public class ProductController {
 
     @GetMapping("")
     public ResponseEntity<Page<Product>> getProducts(@RequestParam("search") Optional<String> searchParam,
-                                                     @RequestParam("amouunt_from") Optional<Float> fromAmountParam,
+                                                     @RequestParam("amount_from") Optional<Float> fromAmountParam,
                                                      @RequestParam("amount_to") Optional<Float> toAmountParam,
                                                      @RequestParam("curPage") Optional<Integer> curPageParam) {
         List<Product> productList;
