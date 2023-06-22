@@ -21,6 +21,7 @@ import NewShiftDetailsModal from "~/components/DnD/NewShiftDetailsModal";
 import { ModalContext, PageDataContext } from "~/context/ShiftPlanning";
 import { useSearchParams } from "solid-start";
 import ShiftTemplateModal from "~/components/DnD/ShiftTemplateModal";
+import Spinner from "~/components/Spinner";
 
 export type ParamType = {
   rendition: "grid" | "list";
@@ -236,8 +237,8 @@ export default function ShiftPlanning() {
             <Show
               when={!tableData.preparingData}
               fallback={
-                <div class="animate-pulse w-full min-w-[1024px] grid place-items-center">
-                  Loading...
+                <div class="w-full min-w-[1024px] min-h-[300px] grid place-items-center">
+                  <Spinner />
                 </div>
               }
             >

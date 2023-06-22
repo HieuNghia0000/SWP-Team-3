@@ -21,7 +21,6 @@
             "shiftName": "Ca Sáng",
             "startTime": "08:00:00",
             "endTime": "16:00:00",
-            "dateOfWeek": "WED",
             "salaryCoefficient": 1.0,
             "role": "CASHIER"
           },
@@ -53,7 +52,6 @@
             "shiftName": "Ca Chiều",
             "startTime": "16:00:00",
             "endTime": "24:00:00",
-            "dateOfWeek": "WED",
             "salaryCoefficient": 1.0,
             "role": "MANAGER"
           },
@@ -66,11 +64,10 @@
           "staffId": 2,
           "scheduleId": 3,
           "shift": {
-            "shiftId": 2,
+            "shiftId": 3,
             "shiftName": "Ca Khuya",
             "startTime": "24:00:00",
             "endTime": "08:00:00",
-            "dateOfWeek": "WED",
             "salaryCoefficient": 1.0,
             "role": "MANAGER"
           },
@@ -102,7 +99,6 @@
             "shiftName": "Morning Shift",
             "startTime": "08:00:00",
             "endTime": "12:00:00",
-            "dateOfWeek": "MON",
             "salaryCoefficient": 0.8,
             "role": "GUARD"
           },
@@ -119,7 +115,6 @@
             "shiftName": "Afternoon Shift",
             "startTime": "12:00:00",
             "endTime": "16:00:00",
-            "dateOfWeek": "TUE",
             "salaryCoefficient": 0.8,
             "role": "GUARD"
           },
