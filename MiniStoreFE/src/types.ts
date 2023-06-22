@@ -49,7 +49,6 @@ export interface Shift {
   shiftName: string;
   startTime: string;
   endTime: string;
-  dayOfWeek: string;
   salaryCoefficient: number;
   role: Role;
   createdAt?: string;

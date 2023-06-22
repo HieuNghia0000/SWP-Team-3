@@ -1,18 +1,14 @@
 import Breadcrumbs from "~/components/Breadcrumbs";
-import { createStore, SetStoreFunction } from "solid-js/store";
+import { createStore, unwrap } from "solid-js/store";
 import {
-  Accessor,
-  createContext,
   createEffect,
   createResource,
   createSignal,
-  InitializedResource,
+  on,
   ResourceFetcher,
-  Setter,
   Show,
-  useContext,
 } from "solid-js";
-import { DataResponse, Staff, WorkSchedule } from "~/types";
+import { DataResponse, Shift, Staff, WorkSchedule } from "~/types";
 import moment from "moment";
 import { getWeekDateStings } from "~/utils/getWeekDates";
 import Table from "~/components/DnD/Table";
@@ -22,51 +18,27 @@ import ShiftDetailsModal from "~/components/DnD/ShiftDetailsModal";
 import StaffDetailsModal from "~/components/DnD/StaffDetailsModal";
 import ToolBar from "~/components/DnD/ToolBar";
 import NewShiftDetailsModal from "~/components/DnD/NewShiftDetailsModal";
+import { ModalContext, PageDataContext } from "~/context/ShiftPlanning";
+import { useSearchParams } from "solid-start";
+import ShiftTemplateModal from "~/components/DnD/ShiftTemplateModal";
 
-type SPModalContext = {
-  shiftModalData: Accessor<WorkSchedule | undefined>;
-  setShiftModalData: Setter<WorkSchedule | undefined>;
-  showShiftModal: Accessor<boolean>;
-  setShowShiftModal: Setter<boolean>;
-  staffModalData: Accessor<Staff | undefined>;
-  setStaffModalData: Setter<Staff | undefined>;
-  showStaffModal: Accessor<boolean>;
-  setShowStaffModal: Setter<boolean>;
-  newShiftModalData: Accessor<WorkSchedule | undefined>;
-  setNewShiftModalData: Setter<WorkSchedule | undefined>;
-  showNewShiftModal: Accessor<boolean>;
-  setShowNewShiftModal: Setter<boolean>;
+export type ParamType = {
+  rendition: "grid" | "list";
+  picked_date: string;
 };
-
-const ModalContext = createContext<SPModalContext>();
-
-export function useShiftPlanningModals(): SPModalContext {
-  return useContext(ModalContext)!;
-}
-
-type SPDataContext = {
-  tableData: DataTable;
-  setTableData: SetStoreFunction<DataTable>;
-  fetchedData: InitializedResource<FetcherData>;
-};
-
-const PageDataContext = createContext<SPDataContext>();
-
-export function useSPData(): SPDataContext {
-  return useContext(PageDataContext)!;
-}
-
 export interface FetcherData {
   dates: string[];
   staffs: Staff[];
 }
+
 export interface DataTable extends FetcherData {
   originShifts: { [key: WorkSchedule["scheduleId"]]: WorkSchedule };
   shifts: { [key: WorkSchedule["scheduleId"]]: WorkSchedule };
   cels: { [key: string]: WorkSchedule["scheduleId"][] };
-  isChanged: boolean;
   isErrored: boolean;
   preparingData: boolean;
+  isChanged: boolean;
+  changedShifts: { [key: WorkSchedule["scheduleId"]]: boolean };
 }
 
 export const celIdGenerator = (staff: Staff, date: string) =>
@@ -84,18 +56,18 @@ export function shiftTimes(startTime: string, endTime: string) {
   return `${formattedStart} - ${formattedEnd}`;
 }
 
-function transformData(
-  data: FetcherData,
-  { isErrored, isChanged }: { isErrored: boolean; isChanged: boolean }
-): DataTable {
+// TODO: add another transform function to transform data fetched from add new shift endpoint
+// without losing the current data
+function transformData(data: FetcherData): DataTable {
   const transformedData: DataTable = {
     originShifts: {},
     shifts: {},
     cels: {},
     dates: data.dates,
     staffs: data.staffs,
-    isChanged,
-    isErrored,
+    changedShifts: {},
+    isChanged: false,
+    isErrored: false,
     preparingData: false,
   };
 
@@ -103,8 +75,9 @@ function transformData(
 
   for (let staff of data.staffs) {
     for (let shift of staff.workSchedule) {
-      transformedData.shifts[shift.scheduleId] = shift;
-      transformedData.originShifts[shift.scheduleId] = shift;
+      transformedData.shifts[shift.scheduleId] = { ...shift };
+      transformedData.originShifts[shift.scheduleId] = { ...shift };
+      transformedData.changedShifts[shift.scheduleId] = false;
     }
 
     for (let date of data.dates) {
@@ -125,12 +98,6 @@ function transformData(
 
   return transformedData;
 }
-
-export type ParamType = {
-  rendition: "grid" | "list";
-  picked_date: string;
-};
-
 const fetcher: ResourceFetcher<boolean | string, FetcherData> = async (
   source
 ) => {
@@ -153,6 +120,7 @@ const fetcher: ResourceFetcher<boolean | string, FetcherData> = async (
 };
 
 export default function ShiftPlanning() {
+  const [searchParams, setSearchParams] = useSearchParams<ParamType>();
   const [datePicked, setDatePicked] = createSignal<string>();
   const [data, { refetch, mutate }] = createResource(datePicked, fetcher, {
     initialValue: {
@@ -169,7 +137,10 @@ export default function ShiftPlanning() {
     originShifts: {},
     dates: [],
     staffs: [],
-    isChanged: false,
+    changedShifts: {},
+    get isChanged() {
+      return Object.values(this.changedShifts).some((v) => v);
+    },
     preparingData: true,
     isErrored: false,
   });
@@ -185,38 +156,49 @@ export default function ShiftPlanning() {
   const [newShiftModalData, setNewShiftModalData] =
     createSignal<WorkSchedule>();
 
-  createEffect(() => {
-    // Because the data is fetched from the server, we need to wait for the data to be ready
-    if (!data.loading && data.state === "ready") {
-      const tData = transformData(data(), {
-        isErrored: tableData.isErrored,
-        isChanged: tableData.isChanged,
-      });
-      setTableData(tData);
-    }
+  const [showShiftTemplateModal, setShowShiftTemplateModal] =
+    createSignal<boolean>(false);
+  const [shiftTemplateModalData, setShiftTemplateModalData] =
+    createSignal<Shift>();
 
-    if (data.state === "errored" && datePicked() !== undefined) {
-      setTableData({
-        cels: {},
-        shifts: [],
-        dates: getWeekDateStings(datePicked()!),
-        staffs: [],
-      });
+  createEffect(
+    on(
+      () => data.state,
+      () => {
+        // Because the data is fetched from the server, we need to wait for the data to be ready
+        if (!data.loading && data.state === "ready") {
+          const tData = transformData(data());
+          setTableData(tData);
+        }
 
-      toast.error("Error!", {
-        duration: 2000,
-        style: {
-          color: "#dc2626",
-          background: "#fecaca",
-          border: "1px solid #b91c1c",
-        },
-      });
-    }
-  });
+        if (data.state === "errored" && datePicked() !== undefined) {
+          setTableData({
+            cels: {},
+            shifts: [],
+            dates: getWeekDateStings(datePicked()!),
+            staffs: [],
+          });
+
+          toast.error("Error!", {
+            duration: 2000,
+            style: {
+              color: "#dc2626",
+              background: "#fecaca",
+              border: "1px solid #b91c1c",
+            },
+          });
+        }
+      }
+    )
+  );
 
   return (
     <PageDataContext.Provider
-      value={{ tableData, setTableData, fetchedData: data }}
+      value={{
+        tableData,
+        setTableData,
+        fetchedData: data,
+      }}
     >
       <ModalContext.Provider
         value={{
@@ -235,6 +217,11 @@ export default function ShiftPlanning() {
           setShowNewShiftModal,
           newShiftModalData,
           setNewShiftModalData,
+          // shift template
+          showShiftTemplateModal,
+          setShowShiftTemplateModal,
+          shiftTemplateModalData,
+          setShiftTemplateModalData,
         }}
       >
         <main>
@@ -244,17 +231,18 @@ export default function ShiftPlanning() {
           {/* Tool bar */}
           <ToolBar datePicked={datePicked} setDatePicked={setDatePicked} />
 
-          {/* Shift Planning Table */}
-
-          <Show
-            when={!tableData.preparingData}
-            fallback={
-              <div class="animate-pulse w-full min-w-[1024px] grid place-items-center">
-                Loading...
-              </div>
-            }
-          >
-            <Table />
+          <Show when={searchParams.rendition === undefined}>
+            {/* Shift Planning Table */}
+            <Show
+              when={!tableData.preparingData}
+              fallback={
+                <div class="animate-pulse w-full min-w-[1024px] grid place-items-center">
+                  Loading...
+                </div>
+              }
+            >
+              <Table />
+            </Show>
           </Show>
         </main>
 
@@ -273,6 +261,11 @@ export default function ShiftPlanning() {
           showModal={showNewShiftModal}
           modalData={newShiftModalData}
           setShowModal={setShowNewShiftModal}
+        />
+        <ShiftTemplateModal
+          showModal={showShiftTemplateModal}
+          modalData={shiftTemplateModalData}
+          setShowModal={setShowShiftTemplateModal}
         />
       </ModalContext.Provider>
     </PageDataContext.Provider>

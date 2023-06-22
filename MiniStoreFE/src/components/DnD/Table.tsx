@@ -11,14 +11,10 @@ import {
 } from "@thisbeyond/solid-dnd";
 import moment from "moment";
 import { Component, For, Show, batch } from "solid-js";
-import {
-  celIdGenerator,
-  shiftTimes,
-  useSPData,
-  useShiftPlanningModals,
-} from "~/routes/shift-planning";
+import { celIdGenerator, shiftTimes } from "~/routes/shift-planning";
 import { Role, WorkSchedule } from "~/types";
 import TableCel from "./TableCel";
+import { useShiftPlanningModals, useSPData } from "~/context/ShiftPlanning";
 
 // a cel is a droppable box
 // a shift is a draggable item
@@ -136,6 +132,10 @@ const Table: Component<DnDTableProps> = (props) => {
           draggable.id as number,
           ...items.slice(index),
         ]);
+        setTableData("shifts", draggable.id as number, () => {
+          const item = draggable.data.item as WorkSchedule;
+          return { staffId: item.staffId, date: item.date };
+        });
       });
     }
   };

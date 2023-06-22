@@ -14,6 +14,7 @@
       "leaveBlance": 14,
       "workSchedule": [
         {
+          "staffId": 1,
           "scheduleId": 1,
           "shift": {
             "shiftId": 1,
@@ -45,6 +46,7 @@
       "leaveBlance": 14,
       "workSchedule": [
         {
+          "staffId": 2,
           "scheduleId": 2,
           "shift": {
             "shiftId": 2,
@@ -61,6 +63,7 @@
           "published": false
         },
         {
+          "staffId": 2,
           "scheduleId": 3,
           "shift": {
             "shiftId": 2,
@@ -92,6 +95,7 @@
       "leaveBlance": 14,
       "workSchedule": [
         {
+          "staffId": 3,
           "scheduleId": 4,
           "shift": {
             "shiftId": 3,
@@ -108,6 +112,7 @@
           "published": true
         },
         {
+          "staffId": 3,
           "scheduleId": 5,
           "shift": {
             "shiftId": 4,

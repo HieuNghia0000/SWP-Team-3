@@ -4,9 +4,9 @@ import {
   SortableProvider,
 } from "@thisbeyond/solid-dnd";
 import { Component, For } from "solid-js";
-import { useShiftPlanningModals } from "~/routes/shift-planning";
 import { Staff, WorkSchedule } from "~/types";
 import Sortable from "./Sortable";
+import { useShiftPlanningModals } from "~/context/ShiftPlanning";
 
 const TableCel: Component<{
   id: string;
@@ -40,6 +40,7 @@ const TableCel: Component<{
               item={item}
               width={() => divRef?.offsetWidth}
               staff={props.staff}
+              date={props.date}
             />
           )}
         </For>

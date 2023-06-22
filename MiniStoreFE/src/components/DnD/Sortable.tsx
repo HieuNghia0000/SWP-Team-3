@@ -1,22 +1,34 @@
 import { createSortable } from "@thisbeyond/solid-dnd";
-import { Component, batch } from "solid-js";
-import {
-  shiftTimes,
-  useSPData,
-  useShiftPlanningModals,
-} from "~/routes/shift-planning";
+import { Component, batch, createEffect } from "solid-js";
+import { useShiftPlanningModals, useSPData } from "~/context/ShiftPlanning";
+import { shiftTimes } from "~/routes/shift-planning";
 import { WorkSchedule, Role, Staff } from "~/types";
 
 const Sortable: Component<{
   item: WorkSchedule;
   width: () => number | undefined;
   staff: Staff;
-}> = ({ item, width, staff }) => {
+  date: string;
+}> = ({ item, width, staff, date }) => {
   const { setShiftModalData, setShowShiftModal } = useShiftPlanningModals();
-  const { fetchedData } = useSPData();
+  const { fetchedData, tableData, setTableData } = useSPData();
+
+  const isOrigin =
+    tableData.originShifts[item.scheduleId].staffId === staff.staffId &&
+    tableData.originShifts[item.scheduleId].date === date;
+
   const sortable = createSortable(item.scheduleId, {
     width: width,
-    item,
+    item: { ...item, date, staffId: staff.staffId },
+    isOrigin,
+  });
+
+  createEffect(() => {
+    if (!isOrigin) {
+      setTableData("changedShifts", item.scheduleId, true);
+    } else {
+      setTableData("changedShifts", item.scheduleId, false);
+    }
   });
 
   return (
@@ -28,15 +40,21 @@ const Sortable: Component<{
       onClick={() => {
         if (sortable.isActiveDraggable) return;
         batch(() => {
-          setShiftModalData({ ...item, staffId: staff.staffId, staff });
+          setShiftModalData({ ...item, staffId: staff.staffId, staff, date });
           setShowShiftModal(true);
         });
       }}
-      class="rounded mx-0.5 px-1.5 py-1 relative text-left bg-white hover:bg-[#edf2f7] border border-gray-200 select-none"
+      class="rounded mx-0.5 px-1.5 py-1 relative text-left select-none"
       classList={{
         "opacity-25": sortable.isActiveDraggable,
+        "bg-white hover:bg-[#edf2f7] text-black border border-gray-200":
+          item.published && isOrigin,
+        "bg-blue-100 hover:bg-blue-200 text-blue-500 border border-blue-100":
+          item.published && !isOrigin,
         "bg-[repeating-linear-gradient(-45deg,white,white_5px,#eff4f8_5px,#eff4f8_10px)] hover:bg-[repeating-linear-gradient(-45deg,white,white_5px,#eaf0f6_5px,#eaf0f6_10px)]":
-          !item.published,
+          !item.published && isOrigin,
+        "bg-[repeating-linear-gradient(-45deg,#e7f7ff,#e7f7ff_5px,#ceefff_5px,#ceefff_10px)] hover:bg-[repeating-linear-gradient(-45deg,#e7f7ff,#e7f7ff_5px,#bfeaff_5px,#bfeaff_10px)]":
+          !item.published && !isOrigin,
         "animate-pulse": fetchedData.loading,
       }}
     >

@@ -24,7 +24,7 @@ const ShiftDetailsModal: Component<{
           <div class="flex border-b border-gray-300 border-dotted">
             <div class="flex-1 py-2.5 overflow-hidden space-x-1">
               <span class="font-semibold text-gray-500">Team Member:</span>
-              <span>{modalData()?.staff?.staffName}</span>
+              <span>{modalData()?.staff!.staffName}</span>
             </div>
             <div class="flex-1 py-2.5 overflow-hidden space-x-1">
               <span class="font-semibold text-gray-500">
