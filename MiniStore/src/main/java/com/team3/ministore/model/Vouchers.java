@@ -19,7 +19,7 @@ public class Vouchers {
     private List<Orders> orders;
 
     @Column(name = "discount_type", length = 10)
-    private int discountType;
+    private String discountType;
 
     @Column(name = "discount_value")
     private float discountValue;

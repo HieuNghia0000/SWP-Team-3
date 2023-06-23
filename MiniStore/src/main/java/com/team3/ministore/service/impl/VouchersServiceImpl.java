@@ -4,6 +4,9 @@ import com.team3.ministore.model.Vouchers;
 import com.team3.ministore.repository.VouchersRepository;
 import com.team3.ministore.service.VouchersService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -46,5 +49,21 @@ public class VouchersServiceImpl implements VouchersService {
     @Override
     public void deleteVouchers(String id) {
         vouchersRepository.deleteById(id);
+    }
+
+    @Override
+    public List<Vouchers> getVouchersByVoucherCodeLike(String voucherCode) {
+        return vouchersRepository.getVouchersByVoucherCodeLike(voucherCode);
+    }
+
+    @Override
+    public Page<Vouchers> findAllPagingVouchers(int pageIndex, int pageSize) {
+        Pageable pageable = PageRequest.of(pageIndex - 1, pageSize);
+        return vouchersRepository.findAllPagingVouchers(pageable);
+    }
+
+    @Override
+    public List<Vouchers> getVouchersByMaxDiscountBetween(float fromAmount, float toAmount) {
+        return vouchersRepository.getVouchersByMaxDiscountBetween(fromAmount, toAmount);
     }
 }
