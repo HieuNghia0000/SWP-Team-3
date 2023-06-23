@@ -1,5 +1,5 @@
 import Breadcrumbs from "~/components/Breadcrumbs";
-import { createStore, unwrap } from "solid-js/store";
+import { createStore } from "solid-js/store";
 import {
   createEffect,
   createResource,
@@ -11,17 +11,17 @@ import {
 import { DataResponse, Shift, Staff, WorkSchedule } from "~/types";
 import moment from "moment";
 import { getWeekDateStings } from "~/utils/getWeekDates";
-import Table from "~/components/DnD/Table";
 import getEndPoint from "~/utils/getEndPoint";
 import toast from "solid-toast";
-import ShiftDetailsModal from "~/components/DnD/ShiftDetailsModal";
-import StaffDetailsModal from "~/components/DnD/StaffDetailsModal";
-import ToolBar from "~/components/DnD/ToolBar";
-import NewShiftDetailsModal from "~/components/DnD/NewShiftDetailsModal";
 import { ModalContext, PageDataContext } from "~/context/ShiftPlanning";
 import { useSearchParams } from "solid-start";
-import ShiftTemplateModal from "~/components/DnD/ShiftTemplateModal";
 import Spinner from "~/components/Spinner";
+import NewShiftDetailsModal from "~/components/shift-planning/NewShiftDetailsModal";
+import ShiftDetailsModal from "~/components/shift-planning/ShiftDetailsModal";
+import ShiftTemplateModal from "~/components/shift-planning/ShiftTemplateModal";
+import StaffDetailsModal from "~/components/shift-planning/StaffDetailsModal";
+import Table from "~/components/shift-planning/Table";
+import ToolBar from "~/components/shift-planning/ToolBar";
 
 export type ParamType = {
   rendition: "grid" | "list";
