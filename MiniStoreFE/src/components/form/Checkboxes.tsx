@@ -1,5 +1,5 @@
 import { Field, FieldProps } from "solid-form-handler";
-import { Component, For, Show } from "solid-js";
+import { Component, For, JSX, Show } from "solid-js";
 
 type SelectableOption = {
   value: string | number;
@@ -8,9 +8,13 @@ type SelectableOption = {
 };
 
 export type CheckboxesProps = FieldProps & {
+  display?: "switch";
   label?: string;
   options?: Array<SelectableOption>;
-  value?: string | number;
+  onChange?: JSX.DOMAttributes<HTMLInputElement>["onChange"];
+  onBlur?: JSX.DOMAttributes<HTMLInputElement>["onBlur"];
+  value?: Array<string | number>;
+  triggers?: string[];
   class?: string;
 };
 
@@ -19,7 +23,6 @@ export const Checkboxes: Component<CheckboxesProps> = (props) => {
     <Field
       {...props}
       mode="checkbox-group"
-      name="favoriteFoods"
       render={(field) => (
         <div>
           <Show when={props.label}>
