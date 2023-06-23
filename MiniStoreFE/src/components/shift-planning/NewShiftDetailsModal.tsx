@@ -36,15 +36,21 @@ type NewScheduleForm = {
 
 const validTimeOptions = timeOptions().map((item) => item.label);
 const schema: yup.Schema<NewScheduleForm> = yup.object({
-  shiftId: yup.number().required("Please select a shift template"),
-  staffId: yup.number().required("Please select a staff"),
+  shiftId: yup
+    .number()
+    .min(1, "Please select a shift template")
+    .required("Please select a shift template"),
+  staffId: yup
+    .number()
+    .min(1, "Please select a staff")
+    .required("Please select a staff"),
   startTime: yup
     .string()
-    .oneOf(validTimeOptions)
+    .oneOf(validTimeOptions, "Invalid time options")
     .required("Please select a start time"),
   endTime: yup
     .string()
-    .oneOf(validTimeOptions)
+    .oneOf(validTimeOptions, "Invalid time options")
     .required("Please select a end time"),
   role: yup
     .string()
@@ -53,7 +59,10 @@ const schema: yup.Schema<NewScheduleForm> = yup.object({
       "Invalid role"
     )
     .required("Please select a role"),
-  coefficient: yup.number().required("Please select a coefficient"),
+  coefficient: yup
+    .number()
+    .min(1, "Coefficient can not below 1")
+    .required("Please select a coefficient"),
   date: yup.date().required("Please select a date"),
 });
 
@@ -82,12 +91,10 @@ const NewShiftDetailsModal: Component<{
     fetcher
   );
   const [chosenTemplate, setChosenTemplate] = createSignal<number>(0);
-  const formHandler = useFormHandler(yupSchema(schema), {
-    validateOn: ["change"],
-  });
+  const formHandler = useFormHandler(yupSchema(schema));
   const { formData, setFieldValue } = formHandler;
 
-  const submit = async (event: Event) => {
+  const submit = async (publish: boolean, event: Event) => {
     event.preventDefault();
     try {
       await formHandler.validateForm();
@@ -97,6 +104,8 @@ const NewShiftDetailsModal: Component<{
             ...formData(),
             startTime: readableToTimeStr(formData().startTime),
             endTime: readableToTimeStr(formData().endTime),
+            role: formData().role === "All roles" ? "" : formData().role,
+            published: publish,
           })
       );
     } catch (error) {
@@ -124,8 +133,8 @@ const NewShiftDetailsModal: Component<{
     const template = shiftTemplates()?.find(
       (shift) => shift.shiftId === chosenTemplate()
     );
-    const coefficient = template?.salaryCoefficient;
-    const role = template?.role ? template.role : "All roles";
+    const coefficient = template?.salaryCoefficient || 0;
+    const role = template?.role || "All roles";
     const startTime = template?.startTime;
     const endTime = template?.endTime;
 
@@ -150,7 +159,7 @@ const NewShiftDetailsModal: Component<{
           </div>
         </Show>
         <Show when={!shiftTemplates.loading}>
-          <form class="text-sm" onSubmit={submit}>
+          <form class="text-sm" onSubmit={[submit, false]}>
             <div class="flex">
               <div class="flex-1 py-2.5 flex flex-col gap-1">
                 <label for="shiftId" class="text-gray-700 font-semibold">
@@ -202,7 +211,7 @@ const NewShiftDetailsModal: Component<{
             <div class="flex gap-2">
               <div class="flex-1 py-2.5 flex flex-col gap-1">
                 <label for="role" class="text-gray-700 font-semibold">
-                  Role
+                  Required Role
                 </label>
                 <TextInput
                   id="role"
@@ -214,7 +223,7 @@ const NewShiftDetailsModal: Component<{
               </div>
               <div class="flex-1 py-2.5 flex flex-col gap-1 overflow-hidden">
                 <label for="date" class="text-gray-700 font-semibold">
-                  Date:
+                  Date
                 </label>
                 <TextInput
                   id="date"
@@ -239,9 +248,9 @@ const NewShiftDetailsModal: Component<{
                   formHandler={formHandler}
                 />
               </div>
-              <div class="flex-1 py-2.5 flex flex-col gap-1 overflow-hidden">
+              <div class="flex-1 py-2.5 flex flex-col gap-1">
                 <label for="endTime" class="text-gray-700 font-semibold">
-                  End Time:
+                  End Time
                 </label>
                 <TextInput
                   id="endTime"
@@ -260,13 +269,14 @@ const NewShiftDetailsModal: Component<{
         <div class="w-full flex justify-end items-center gap-2">
           <button
             type="button"
+            onClick={[submit, true]}
             class="py-1.5 px-3 font-semibold text-gray-600 border border-gray-300 text-sm rounded hover:text-black"
           >
             Save & Publish
           </button>
           <button
             type="button"
-            onClick={submit}
+            onClick={[submit, false]}
             class="py-1.5 px-3 font-semibold text-white border border-blue-600 bg-blue-500 text-sm rounded hover:bg-blue-600"
           >
             Create

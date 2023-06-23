@@ -19,10 +19,11 @@ import { useFormHandler } from "solid-form-handler";
 import { yupSchema } from "solid-form-handler/yup";
 import * as yup from "yup";
 import { TextInput } from "../form/TextInput";
-import moment from "moment";
 import Spinner from "../Spinner";
-import { shiftTimes } from "./utils/shiftTimes";
+import { readableToTimeStr, shiftTimes } from "./utils/shiftTimes";
 import { timeOptions } from "./utils/timeOptions";
+import { FaSolidTrash } from "solid-icons/fa";
+import { capitalize } from "~/utils/capitalize";
 
 const fetcher: ResourceFetcher<
   boolean,
@@ -137,10 +138,9 @@ const List: Component<ListProps> = ({
                   </div>
                   <div class="text-gray-500 tracking-wide">
                     {shiftTemplate.shiftName} -{" "}
-                    {
-                      roles.find((role) => role.value === shiftTemplate.role)
-                        ?.label
-                    }
+                    {!shiftTemplate.role
+                      ? "All roles"
+                      : capitalize(shiftTemplate.role)}
                   </div>
                 </div>
               )}
@@ -166,13 +166,69 @@ const List: Component<ListProps> = ({
   );
 };
 
+type ShiftTemplateForm = {
+  shiftName: string;
+  startTime: string;
+  endTime: string;
+  role: Role | "All roles";
+  salaryCoefficient: number;
+};
+const validTimeOptions = timeOptions().map((item) => item.value);
+const schema: yup.Schema<ShiftTemplateForm> = yup.object({
+  shiftName: yup.string().required("Please enter a shift name"),
+  startTime: yup
+    .string()
+    .oneOf(validTimeOptions, "Invalid time options")
+    .required("Please select a start time"),
+  endTime: yup
+    .string()
+    .oneOf(validTimeOptions, "Invalid time options")
+    .required("Please select a end time"),
+  role: yup
+    .string()
+    .oneOf(
+      [Role.MANAGER, Role.CASHIER, Role.GUARD, "All roles"],
+      "Invalid role"
+    )
+    .required("Please select a role"),
+  salaryCoefficient: yup
+    .number()
+    .min(1, "Coefficient can not below 1")
+    .required("Please select a coefficient"),
+});
+
 const Create: Component<TemplateProps> = ({ setState }) => {
+  const formHandler = useFormHandler(yupSchema(schema));
+  const { formData, setFieldValue } = formHandler;
+
+  const submit = async (event: Event) => {
+    event.preventDefault();
+    try {
+      await formHandler.validateForm();
+      alert(
+        "Data sent with success: " +
+          JSON.stringify({
+            ...formData(),
+            startTime: readableToTimeStr(formData().startTime),
+            endTime: readableToTimeStr(formData().endTime),
+            role: formData().role === "All roles" ? "" : formData().role,
+          })
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const reset = () => {
+    formHandler.resetForm();
+  };
+
   return (
     <>
       <PopupModal.Body>
-        <div class="text-sm max-w-[560px] mx-auto">
+        <form onSubmit={submit} class="text-sm max-w-[560px] mx-auto">
           <div class="flex">
-            <div class="flex-1 py-2.5 flex flex-col gap-1 overflow-hidden">
+            <div class="flex-1 py-2.5 flex flex-col gap-1">
               <label for="shiftName" class="text-gray-700 font-semibold">
                 Shift Name
               </label>
@@ -180,50 +236,52 @@ const Create: Component<TemplateProps> = ({ setState }) => {
                 id="shiftName"
                 name="shiftName"
                 placeholder="e.g. Morning Shift"
-                // formHandler={formHandler}
+                formHandler={formHandler}
               />
             </div>
           </div>
           <div class="flex gap-2">
-            <div class="flex-1 py-2.5 flex flex-col gap-1 overflow-hidden">
+            <div class="flex-1 py-2.5 flex flex-col gap-1">
               <label for="shift" class="text-gray-700 font-semibold">
                 Start Time
               </label>
               <Select
                 id="startTime"
                 name="startTime"
-                value={""}
+                value={0}
+                placeholder="Select Start Time"
                 options={timeOptions()}
-                // formHandler={formHandler}
+                formHandler={formHandler}
               />
             </div>
-            <div class="flex-1 py-2.5 flex flex-col gap-1 overflow-hidden">
+            <div class="flex-1 py-2.5 flex flex-col gap-1">
               <label for="shift" class="text-gray-700 font-semibold">
                 End Time
               </label>
               <Select
                 id="endTime"
                 name="endTime"
-                value={""}
+                value={0}
+                placeholder="Select End Time"
                 options={timeOptions()}
-                // formHandler={formHandler}
+                formHandler={formHandler}
               />
             </div>
           </div>
           <div class="flex gap-2">
-            <div class="flex-1 py-2.5 flex flex-col gap-1 overflow-hidden">
+            <div class="flex-1 py-2.5 flex flex-col gap-1">
               <label for="staff" class="text-gray-700 font-semibold">
-                Role
+                Required Role
               </label>
               <Select
                 id="role"
                 name="role"
-                value={""}
+                value={"All roles"}
                 options={roles}
-                // formHandler={formHandler}
+                formHandler={formHandler}
               />
             </div>
-            <div class="flex-1 py-2.5 max-w-[140px] flex flex-col gap-1 overflow-hidden">
+            <div class="flex-1 py-2.5 max-w-[140px] flex flex-col gap-1">
               <label
                 for="salaryCoefficient"
                 class="text-gray-700 font-semibold"
@@ -236,23 +294,27 @@ const Create: Component<TemplateProps> = ({ setState }) => {
                 type="number"
                 step={0.1}
                 value={1}
-                // formHandler={formHandler}
+                formHandler={formHandler}
               />
             </div>
           </div>
-        </div>
+        </form>
       </PopupModal.Body>
       <PopupModal.Footer>
         <div class="w-full flex justify-between items-center gap-2">
           <button
             type="button"
-            onClick={[setState, "list"]}
+            onClick={() => {
+              reset();
+              setState("list");
+            }}
             class="flex gap-2 justify-center items-center px-3 text-gray-500 text-sm hover:text-gray-700"
           >
             Back to list
           </button>
           <button
             type="button"
+            onClick={submit}
             class="flex gap-2 justify-center items-center py-1.5 px-3 font-semibold text-white border border-sky-500 bg-sky-500 text-sm rounded hover:bg-sky-600"
           >
             Create
@@ -268,12 +330,42 @@ interface EditProps extends TemplateProps {
   setShiftFocus: Setter<Shift | undefined>;
 }
 const Edit: Component<EditProps> = ({ setState, shift, setShiftFocus }) => {
+  const formHandler = useFormHandler(yupSchema(schema));
+  const { formData, setFieldValue } = formHandler;
+
+  const submit = async (event: Event) => {
+    event.preventDefault();
+    try {
+      await formHandler.validateForm();
+      alert(
+        "Data sent with success: " +
+          JSON.stringify({
+            ...formData(),
+            startTime: readableToTimeStr(formData().startTime),
+            endTime: readableToTimeStr(formData().endTime),
+            role: formData().role === "All roles" ? "" : formData().role,
+            shiftId: shift()?.shiftId,
+          })
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const reset = () => {
+    formHandler.resetForm();
+  };
+
+  const onDelete = async () => {
+    alert("Delete");
+  };
+
   return (
     <>
       <PopupModal.Body>
-        <div class="text-sm max-w-[560px] mx-auto">
+        <form onSubmit={submit} class="text-sm max-w-[560px] mx-auto">
           <div class="flex">
-            <div class="flex-1 py-2.5 flex flex-col gap-1 overflow-hidden">
+            <div class="flex-1 py-2.5 flex flex-col gap-1">
               <label for="shiftName" class="text-gray-700 font-semibold">
                 Shift Name
               </label>
@@ -281,13 +373,13 @@ const Edit: Component<EditProps> = ({ setState, shift, setShiftFocus }) => {
                 id="shiftName"
                 name="shiftName"
                 placeholder="e.g. Morning Shift"
-                value={shift()?.shiftName}
-                // formHandler={formHandler}
+                value={shift()?.shiftName || ""}
+                formHandler={formHandler}
               />
             </div>
           </div>
           <div class="flex gap-2">
-            <div class="flex-1 py-2.5 flex flex-col gap-1 overflow-hidden">
+            <div class="flex-1 py-2.5 flex flex-col gap-1">
               <label for="shift" class="text-gray-700 font-semibold">
                 Start Time
               </label>
@@ -296,10 +388,10 @@ const Edit: Component<EditProps> = ({ setState, shift, setShiftFocus }) => {
                 name="startTime"
                 value={shift()?.startTime}
                 options={timeOptions()}
-                // formHandler={formHandler}
+                formHandler={formHandler}
               />
             </div>
-            <div class="flex-1 py-2.5 flex flex-col gap-1 overflow-hidden">
+            <div class="flex-1 py-2.5 flex flex-col gap-1">
               <label for="shift" class="text-gray-700 font-semibold">
                 End Time
               </label>
@@ -308,24 +400,24 @@ const Edit: Component<EditProps> = ({ setState, shift, setShiftFocus }) => {
                 name="endTime"
                 value={shift()?.endTime}
                 options={timeOptions()}
-                // formHandler={formHandler}
+                formHandler={formHandler}
               />
             </div>
           </div>
           <div class="flex gap-2">
-            <div class="flex-1 py-2.5 flex flex-col gap-1 overflow-hidden">
+            <div class="flex-1 py-2.5 flex flex-col gap-1">
               <label for="staff" class="text-gray-700 font-semibold">
-                Role
+                Required Role
               </label>
               <Select
                 id="role"
                 name="role"
-                value={shift()?.role}
+                value={shift()?.role || "All roles"}
                 options={roles}
-                // formHandler={formHandler}
+                formHandler={formHandler}
               />
             </div>
-            <div class="flex-1 py-2.5 max-w-[140px] flex flex-col gap-1 overflow-hidden">
+            <div class="flex-1 py-2.5 max-w-[140px] flex flex-col gap-1">
               <label
                 for="salaryCoefficient"
                 class="text-gray-700 font-semibold"
@@ -337,20 +429,24 @@ const Edit: Component<EditProps> = ({ setState, shift, setShiftFocus }) => {
                 name="salaryCoefficient"
                 type="number"
                 step={0.1}
-                value={shift()?.salaryCoefficient}
-                // formHandler={formHandler}
+                value={shift()?.salaryCoefficient || 0}
+                formHandler={formHandler}
               />
             </div>
           </div>
-        </div>
+        </form>
       </PopupModal.Body>
       <PopupModal.Footer>
         <div class="w-full flex justify-between items-center gap-2">
           <button
             type="button"
+            onClick={onDelete}
             class="flex gap-2 justify-center items-center px-3 text-gray-500 text-sm hover:text-gray-700"
           >
-            Delete
+            <span>
+              <FaSolidTrash />
+            </span>
+            <span>Delete</span>
           </button>
           <div class="flex gap-2 justify-center items-center">
             <button
@@ -359,6 +455,7 @@ const Edit: Component<EditProps> = ({ setState, shift, setShiftFocus }) => {
                 batch(() => {
                   setState("list");
                   setShiftFocus(undefined);
+                  reset();
                 });
               }}
               class="flex gap-2 justify-center items-center px-3 text-gray-500 text-sm hover:text-gray-700"
@@ -367,6 +464,7 @@ const Edit: Component<EditProps> = ({ setState, shift, setShiftFocus }) => {
             </button>
             <button
               type="button"
+              onClick={submit}
               class="flex gap-2 justify-center items-center py-1.5 px-3 font-semibold text-white border border-sky-500 bg-sky-500 text-sm rounded hover:bg-sky-600"
             >
               Save
@@ -378,7 +476,7 @@ const Edit: Component<EditProps> = ({ setState, shift, setShiftFocus }) => {
   );
 };
 const roles = [
-  { value: "", label: "All roles" },
+  { value: "All roles", label: "All roles" },
   { value: Role.MANAGER, label: "Manager" },
   { value: Role.CASHIER, label: "Cashier" },
   { value: Role.GUARD, label: "Guard" },

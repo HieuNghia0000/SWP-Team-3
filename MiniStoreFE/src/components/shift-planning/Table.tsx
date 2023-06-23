@@ -16,6 +16,7 @@ import TableCel from "./TableCel";
 import { useShiftPlanningModals, useSPData } from "~/context/ShiftPlanning";
 import { shiftTimes } from "./utils/shiftTimes";
 import { celIdGenerator } from "./utils/celIdGenerator";
+import { capitalize } from "~/utils/capitalize";
 
 // a cel is a droppable box
 // a shift is a draggable item
@@ -200,7 +201,21 @@ const Table: Component<DnDTableProps> = (props) => {
                         {staff.staffName}
                       </button>
                       <div class="font-normal text-sm text-gray-400">
-                        0 hrs / $0
+                        {/* <span
+                          class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-semibold rounded-full"
+                          classList={{
+                            "bg-blue-200 text-blue-700":
+                              staff.role === Role.CASHIER,
+                            "bg-yellow-200 text-yellow-700":
+                              staff.role === Role.GUARD,
+                            "bg-red-200 text-red-700":
+                              staff.role === Role.MANAGER,
+                            "bg-gray-200 text-gray-700":
+                              staff.role === Role.ADMIN,
+                          }}
+                        > */}
+                        {capitalize(staff.role)}
+                        {/* </span> */}
                       </div>
                     </div>
                     <For each={tableData.dates}>
@@ -221,6 +236,7 @@ const Table: Component<DnDTableProps> = (props) => {
                 {/* @ts-ignore */}
                 {(draggable) => {
                   let item = () => draggable?.data?.item as WorkSchedule;
+                  let isOrigin = () => draggable?.data?.isOrigin as boolean;
                   let selectedShiftWidth = () => draggable?.data?.width() - 4;
                   // let staff = () => draggable?.data?.staff as Staff;
 
@@ -228,11 +244,17 @@ const Table: Component<DnDTableProps> = (props) => {
                     <button
                       type="button"
                       id={draggable?.id as string}
-                      class="rounded mx-0.5 px-1.5 py-1 relative text-left bg-[#edf2f7] border border-gray-200"
+                      class="rounded mx-0.5 px-1.5 py-1 relative text-left"
                       style={{ width: `${selectedShiftWidth()}px` }}
                       classList={{
-                        "hover:bg-[repeating-linear-gradient(-45deg,white,white_5px,#eaf0f6_5px,#eaf0f6_10px)]":
-                          !item().published,
+                        "bg-white hover:bg-[#edf2f7] text-black border border-gray-200":
+                          item().published && isOrigin(),
+                        "bg-blue-100 hover:bg-blue-200 text-blue-500 border border-blue-100":
+                          item().published && !isOrigin(),
+                        "bg-[repeating-linear-gradient(-45deg,white,white_5px,#eff4f8_5px,#eff4f8_10px)] hover:bg-[repeating-linear-gradient(-45deg,white,white_5px,#eaf0f6_5px,#eaf0f6_10px)] border border-gray-200":
+                          !item().published && isOrigin(),
+                        "bg-[repeating-linear-gradient(-45deg,#e7f7ff,#e7f7ff_5px,#ceefff_5px,#ceefff_10px)] hover:bg-[repeating-linear-gradient(-45deg,#e7f7ff,#e7f7ff_5px,#bfeaff_5px,#bfeaff_10px)] border border-blue-100":
+                          !item().published && !isOrigin(),
                         "animate-pulse": fetchedData.loading,
                       }}
                     >
