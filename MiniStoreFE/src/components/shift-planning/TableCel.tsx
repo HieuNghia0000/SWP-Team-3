@@ -24,6 +24,10 @@ const TableCel: Component<{
 
   const onAddNewShift = () => {
     setShowNewShiftModal(true);
+    setNewShiftModalData({
+      staff: props.staff,
+      date: props.date,
+    });
   };
 
   return (

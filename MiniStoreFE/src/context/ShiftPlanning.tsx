@@ -18,8 +18,8 @@ type SPModalContext = {
   setStaffModalData: Setter<Staff | undefined>;
   showStaffModal: Accessor<boolean>;
   setShowStaffModal: Setter<boolean>;
-  newShiftModalData: Accessor<WorkSchedule | undefined>;
-  setNewShiftModalData: Setter<WorkSchedule | undefined>;
+  newShiftModalData: Accessor<{ staff: Staff; date: string } | undefined>;
+  setNewShiftModalData: Setter<{ staff: Staff; date: string } | undefined>;
   showNewShiftModal: Accessor<boolean>;
   setShowNewShiftModal: Setter<boolean>;
   shiftTemplateModalData: Accessor<Shift | undefined>;

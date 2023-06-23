@@ -22,9 +22,9 @@ import ShiftTemplateModal from "~/components/shift-planning/ShiftTemplateModal";
 import StaffDetailsModal from "~/components/shift-planning/StaffDetailsModal";
 import Table from "~/components/shift-planning/Table";
 import ToolBar from "~/components/shift-planning/ToolBar";
+import { transformData } from "~/components/shift-planning/utils/dataTransformer";
 
 export type ParamType = {
-  rendition: "grid" | "list";
   picked_date: string;
 };
 export interface FetcherData {
@@ -42,63 +42,6 @@ export interface DataTable extends FetcherData {
   changedShifts: { [key: WorkSchedule["scheduleId"]]: boolean };
 }
 
-export const celIdGenerator = (staff: Staff, date: string) =>
-  `${staff.username}-${date}`;
-
-export function shiftTimes(startTime: string, endTime: string) {
-  const format = "h:mma"; // Time format: 12-hour clock with minutes
-
-  const start = moment(startTime, "HH:mm:ss");
-  const end = moment(endTime, "HH:mm:ss");
-
-  const formattedStart = start.format(format).replace(":00", "");
-  const formattedEnd = end.format(format).replace(":00", "");
-
-  return `${formattedStart} - ${formattedEnd}`;
-}
-
-// TODO: add another transform function to transform data fetched from add new shift endpoint
-// without losing the current data
-function transformData(data: FetcherData): DataTable {
-  const transformedData: DataTable = {
-    originShifts: {},
-    shifts: {},
-    cels: {},
-    dates: data.dates,
-    staffs: data.staffs,
-    changedShifts: {},
-    isChanged: false,
-    isErrored: false,
-    preparingData: false,
-  };
-
-  if (data.staffs.length === 0) return transformedData;
-
-  for (let staff of data.staffs) {
-    for (let shift of staff.workSchedule) {
-      transformedData.shifts[shift.scheduleId] = { ...shift };
-      transformedData.originShifts[shift.scheduleId] = { ...shift };
-      transformedData.changedShifts[shift.scheduleId] = false;
-    }
-
-    for (let date of data.dates) {
-      const celId = celIdGenerator(staff, date);
-      const matchingShifts = staff.workSchedule.filter((s) =>
-        moment(s.date).isSame(date, "day")
-      );
-
-      if (!transformedData.cels.hasOwnProperty(celId)) {
-        transformedData.cels[celId] = [];
-      }
-
-      for (let shift of matchingShifts) {
-        transformedData.cels[celId].push(shift.scheduleId);
-      }
-    }
-  }
-
-  return transformedData;
-}
 const fetcher: ResourceFetcher<boolean | string, FetcherData> = async (
   source
 ) => {
@@ -154,8 +97,10 @@ export default function ShiftPlanning() {
 
   const [showNewShiftModal, setShowNewShiftModal] =
     createSignal<boolean>(false);
-  const [newShiftModalData, setNewShiftModalData] =
-    createSignal<WorkSchedule>();
+  const [newShiftModalData, setNewShiftModalData] = createSignal<{
+    staff: Staff;
+    date: string;
+  }>();
 
   const [showShiftTemplateModal, setShowShiftTemplateModal] =
     createSignal<boolean>(false);
@@ -232,18 +177,16 @@ export default function ShiftPlanning() {
           {/* Tool bar */}
           <ToolBar datePicked={datePicked} setDatePicked={setDatePicked} />
 
-          <Show when={searchParams.rendition === undefined}>
-            {/* Shift Planning Table */}
-            <Show
-              when={!tableData.preparingData}
-              fallback={
-                <div class="w-full min-w-[1024px] min-h-[300px] grid place-items-center">
-                  <Spinner />
-                </div>
-              }
-            >
-              <Table />
-            </Show>
+          {/* Shift Planning Table */}
+          <Show
+            when={!tableData.preparingData}
+            fallback={
+              <div class="w-full min-w-[1024px] min-h-[300px] grid place-items-center">
+                <Spinner />
+              </div>
+            }
+          >
+            <Table />
           </Show>
         </main>
 

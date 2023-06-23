@@ -1,8 +1,8 @@
 import { createSortable } from "@thisbeyond/solid-dnd";
 import { Component, batch, createEffect } from "solid-js";
 import { useShiftPlanningModals, useSPData } from "~/context/ShiftPlanning";
-import { shiftTimes } from "~/routes/shift-planning";
 import { WorkSchedule, Role, Staff } from "~/types";
+import { shiftTimes } from "./utils/shiftTimes";
 
 const Sortable: Component<{
   item: WorkSchedule;

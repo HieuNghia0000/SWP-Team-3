@@ -20,8 +20,9 @@ import { yupSchema } from "solid-form-handler/yup";
 import * as yup from "yup";
 import { TextInput } from "../form/TextInput";
 import moment from "moment";
-import { shiftTimes } from "~/routes/shift-planning";
 import Spinner from "../Spinner";
+import { shiftTimes } from "./utils/shiftTimes";
+import { timeOptions } from "./utils/timeOptions";
 
 const fetcher: ResourceFetcher<
   boolean,
@@ -192,7 +193,7 @@ const Create: Component<TemplateProps> = ({ setState }) => {
                 id="startTime"
                 name="startTime"
                 value={""}
-                options={generateTimeArray()}
+                options={timeOptions()}
                 // formHandler={formHandler}
               />
             </div>
@@ -204,7 +205,7 @@ const Create: Component<TemplateProps> = ({ setState }) => {
                 id="endTime"
                 name="endTime"
                 value={""}
-                options={generateTimeArray()}
+                options={timeOptions()}
                 // formHandler={formHandler}
               />
             </div>
@@ -294,7 +295,7 @@ const Edit: Component<EditProps> = ({ setState, shift, setShiftFocus }) => {
                 id="startTime"
                 name="startTime"
                 value={shift()?.startTime}
-                options={generateTimeArray()}
+                options={timeOptions()}
                 // formHandler={formHandler}
               />
             </div>
@@ -306,7 +307,7 @@ const Edit: Component<EditProps> = ({ setState, shift, setShiftFocus }) => {
                 id="endTime"
                 name="endTime"
                 value={shift()?.endTime}
-                options={generateTimeArray()}
+                options={timeOptions()}
                 // formHandler={formHandler}
               />
             </div>
@@ -382,18 +383,3 @@ const roles = [
   { value: Role.CASHIER, label: "Cashier" },
   { value: Role.GUARD, label: "Guard" },
 ];
-
-function generateTimeArray() {
-  const timeArray = [];
-
-  for (let hour = 0; hour < 24; hour++) {
-    for (let minute = 0; minute < 60; minute += 30) {
-      const time = moment({ hour, minute }).format("HH:mm:ss");
-      const label = moment({ hour, minute }).format("h:mma");
-
-      timeArray.push({ value: time, label: label });
-    }
-  }
-
-  return timeArray;
-}

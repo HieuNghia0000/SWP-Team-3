@@ -11,10 +11,11 @@ import {
 } from "@thisbeyond/solid-dnd";
 import moment from "moment";
 import { Component, For, Show, batch } from "solid-js";
-import { celIdGenerator, shiftTimes } from "~/routes/shift-planning";
 import { Role, WorkSchedule } from "~/types";
 import TableCel from "./TableCel";
 import { useShiftPlanningModals, useSPData } from "~/context/ShiftPlanning";
+import { shiftTimes } from "./utils/shiftTimes";
+import { celIdGenerator } from "./utils/celIdGenerator";
 
 // a cel is a droppable box
 // a shift is a draggable item
