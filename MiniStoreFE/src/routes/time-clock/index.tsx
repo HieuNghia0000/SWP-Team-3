@@ -2,11 +2,10 @@ import Breadcrumbs from "~/components/Breadcrumbs";
 import { useSearchParams, createRouteData } from "solid-start";
 import { DataResponse, TimeClock } from "~/types";
 import { AiOutlineSearch } from "solid-icons/ai";
-import { Accessor, createSignal, For } from "solid-js";
+import {Accessor, createEffect, createSignal, For} from "solid-js";
 import { A, useRouteData } from "@solidjs/router";
 import routes from "~/utils/routes";
 import Pagination from "~/components/Pagination";
-import ToolBar from "~/components/shift-planning/ToolBar";
 
 const mockData = [
   {
@@ -110,9 +109,7 @@ export default function TimeClocks() {
         </div>
 
         {/* Date picked */}
-        <div class="mt-4">
-          <ToolBar datePicked={datePicked} setDatePicked={setDatePicked} />
-        </div>
+        <DateRangePicker/>
 
         {/* Table */}
         <div class="flex flex-col border border-gray-200 rounded-lg overflow-x-auto shadow-sm">
@@ -203,5 +200,104 @@ export default function TimeClocks() {
         />
       </div>
     </main>
+  );
+}
+
+function DateRangePicker() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const currentDate = new Date();
+  const [selectedDay, setSelectedDay] = createSignal(
+      searchParams.day ? parseInt(searchParams.day) : currentDate.getDate()
+  );
+  const [selectedMonth, setSelectedMonth] = createSignal(
+      searchParams.month ? parseInt(searchParams.month) : currentDate.getMonth() + 1
+  );
+  const [selectedYear, setSelectedYear] = createSignal(
+      searchParams.year ? parseInt(searchParams.year) : currentDate.getFullYear()
+  );
+
+  const daysInMonth = new Date(selectedYear(), selectedMonth(), 0).getDate();
+  const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+
+  const years = Array.from(
+      { length: currentDate.getFullYear() - 1900 + 1 },
+      (_, i) => currentDate.getFullYear() - i
+  );
+
+  const handleDayChange = (e: Event) => {
+    const day = parseInt((e.target as HTMLSelectElement).value);
+    setSelectedDay(day);
+    setSearchParams({ ...searchParams, day: day.toString() });
+  };
+
+  const handleMonthChange = (e: Event) => {
+    const month = parseInt((e.target as HTMLSelectElement).value);
+    setSelectedMonth(month);
+    setSearchParams({ ...searchParams, month: month.toString() });
+  };
+
+  const handleYearChange = (e: Event) => {
+    const year = parseInt((e.target as HTMLSelectElement).value);
+    setSelectedYear(year);
+    setSearchParams({ ...searchParams, year: year.toString() });
+  };
+
+  createEffect(() => {
+    if (!searchParams.day) {
+      setSelectedDay(currentDate.getDate());
+    }
+    if (!searchParams.month) {
+      setSelectedMonth(currentDate.getMonth() + 1);
+    }
+    if (!searchParams.year) {
+      setSelectedYear(currentDate.getFullYear());
+    }
+  });
+
+  return (
+      <div class="flex justify-center items-center mt-4 mb-4">
+        <div class="mr-4">
+          <label class="block mb-1 text-sm font-medium text-gray-500">
+            Day
+          </label>
+          <select
+              class="w-24 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              value={selectedDay()}
+              onChange={handleDayChange}
+          >
+            {days.map((day) => (
+                <option value={day}>{day}</option>
+            ))}
+          </select>
+        </div>
+        <div class="mr-4">
+          <label class="block mb-1 text-sm font-medium text-gray-500">
+            Month
+          </label>
+          <select
+              class="w-24 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              value={selectedMonth()}
+              onChange={handleMonthChange}
+          >
+            {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
+                <option value={month}>{month}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label class="block mb-1 text-sm font-medium text-gray-500">
+            Year
+          </label>
+          <select
+              class="w-32 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              value={selectedYear()}
+              onChange={handleYearChange}
+          >
+            {years.map((year) => (
+                <option value={year}>{year}</option>
+            ))}
+          </select>
+        </div>
+      </div>
   );
 }
