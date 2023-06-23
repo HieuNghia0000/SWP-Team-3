@@ -9,7 +9,6 @@ import {
   Show,
 } from "solid-js";
 import { DataResponse, Shift, Staff, WorkSchedule } from "~/types";
-import moment from "moment";
 import { getWeekDateStings } from "~/utils/getWeekDates";
 import getEndPoint from "~/utils/getEndPoint";
 import toast from "solid-toast";
@@ -90,7 +89,9 @@ export default function ShiftPlanning() {
   });
 
   const [showShiftModal, setShowShiftModal] = createSignal<boolean>(false);
-  const [shiftModalData, setShiftModalData] = createSignal<WorkSchedule>();
+  const [shiftModalData, setShiftModalData] = createSignal<
+    WorkSchedule & { isOrigin: boolean }
+  >();
 
   const [showStaffModal, setShowStaffModal] = createSignal<boolean>(false);
   const [staffModalData, setStaffModalData] = createSignal<Staff>();
@@ -138,12 +139,29 @@ export default function ShiftPlanning() {
     )
   );
 
+  const resetTableData = () => {
+    mutate({
+      dates: [],
+      staffs: [],
+    });
+    setTableData({
+      cels: {},
+      shifts: {},
+      dates: [],
+      staffs: [],
+      changedShifts: {},
+      preparingData: true,
+      isErrored: false,
+    });
+  };
+
   return (
     <PageDataContext.Provider
       value={{
         tableData,
         setTableData,
         fetchedData: data,
+        resetTableData,
       }}
     >
       <ModalContext.Provider

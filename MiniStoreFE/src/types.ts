@@ -31,7 +31,7 @@ export interface Staff {
 export interface WorkSchedule {
   scheduleId: number;
   staffId: number;
-  shiftID: number;
+  shiftId: number;
   date: string;
   checkInTime?: string;
   checkOutTime?: string;

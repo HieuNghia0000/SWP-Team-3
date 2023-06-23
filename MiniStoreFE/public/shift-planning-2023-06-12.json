@@ -16,6 +16,7 @@
         {
           "staffId": 1,
           "scheduleId": 1,
+          "shiftId": 1,
           "shift": {
             "shiftId": 1,
             "shiftName": "Ca Sáng",
@@ -47,6 +48,7 @@
         {
           "staffId": 2,
           "scheduleId": 2,
+          "shiftId": 2,
           "shift": {
             "shiftId": 2,
             "shiftName": "Ca Chiều",
@@ -63,6 +65,7 @@
         {
           "staffId": 2,
           "scheduleId": 3,
+          "shiftId": 3,
           "shift": {
             "shiftId": 3,
             "shiftName": "Ca Khuya",
@@ -94,11 +97,12 @@
         {
           "staffId": 3,
           "scheduleId": 4,
+          "shiftId": 4,
           "shift": {
-            "shiftId": 3,
-            "shiftName": "Morning Shift",
-            "startTime": "08:00:00",
-            "endTime": "12:00:00",
+            "shiftId": 4,
+            "shiftName": "Afternoon Shift",
+            "startTime": "12:00:00",
+            "endTime": "16:00:00",
             "salaryCoefficient": 0.8,
             "role": "GUARD"
           },
@@ -110,6 +114,7 @@
         {
           "staffId": 3,
           "scheduleId": 5,
+          "shiftId": 4,
           "shift": {
             "shiftId": 4,
             "shiftName": "Afternoon Shift",

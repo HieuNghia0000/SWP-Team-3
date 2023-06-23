@@ -9,6 +9,7 @@
   "devDependencies": {
     "@types/big.js": "^6.1.6",
     "@types/js-cookie": "^3.0.3",
+    "@types/lodash": "^4.14.195",
     "@types/node": "^18.11.18",
     "autoprefixer": "^10.4.14",
     "esbuild": "^0.14.54",
@@ -27,6 +28,7 @@
     "big.js": "^6.2.1",
     "flatpickr": "^4.6.13",
     "js-cookie": "^3.0.5",
+    "lodash": "^4.17.21",
     "moment": "^2.29.4",
     "solid-dismiss": "^1.7.121",
     "solid-form-handler": "^1.2.0",

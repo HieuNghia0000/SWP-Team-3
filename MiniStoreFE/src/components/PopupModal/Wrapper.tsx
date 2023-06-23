@@ -1,11 +1,17 @@
 import { CgClose } from "solid-icons/cg";
-import { Component, JSX, Show } from "solid-js";
+import { Accessor, Component, For, JSX, Show } from "solid-js";
 
 type Props = {
   open: () => boolean;
   close: () => void;
   title: string;
   children: JSX.Element;
+  headerTabs?: {
+    name: string | JSX.Element;
+    stateName: string;
+    onClick: () => void;
+  }[];
+  headerTabSelected?: Accessor<string>;
 };
 
 const Wrapper: Component<Props> = (props) => {
@@ -20,11 +26,34 @@ const Wrapper: Component<Props> = (props) => {
       >
         <div class="zoom-in col-span-1 bg-white shadow-md w-[600px] min-w-fit min-h-[100px] rounded-md mx-auto my-8 flex flex-col">
           {/* Header */}
-          <div class="py-3.5 px-5 rounded-t-md flex justify-between items-center flex-wrap font-semibold border-b border-gray-300 text-gray-600 bg-gray-50">
-            {props.title}
-            <button onClick={props.close} class="text-xl hover:text-indigo-700">
-              <CgClose />
-            </button>
+          <div class="py-3.5 px-5 rounded-t-md border-b border-gray-300 text-gray-600 bg-gray-50">
+            <div class="flex justify-between items-center flex-wrap font-semibold">
+              {props.title}
+              <button
+                onClick={props.close}
+                class="text-xl hover:text-indigo-700"
+              >
+                <CgClose />
+              </button>
+            </div>
+            <Show when={props.headerTabs && props.headerTabSelected?.()}>
+              <div class="flex mt-1 -mb-[15px] text-sm">
+                <For each={props.headerTabs}>
+                  {(tab) => (
+                    <button
+                      class="text-gray-600 hover:text-[#00a8ff] p-0 h-8 mr-4 transition-colors flex justify-center items-center"
+                      onClick={tab.onClick}
+                      classList={{
+                        "font-semibold border-b-[3px] border-[#00a8ff] text-[#00a8ff]":
+                          tab.stateName === props.headerTabSelected?.(),
+                      }}
+                    >
+                      {tab.name}
+                    </button>
+                  )}
+                </For>
+              </div>
+            </Show>
           </div>
 
           {/* Body */}

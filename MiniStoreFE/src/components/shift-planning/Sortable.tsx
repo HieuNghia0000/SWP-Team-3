@@ -40,7 +40,13 @@ const Sortable: Component<{
       onClick={() => {
         if (sortable.isActiveDraggable) return;
         batch(() => {
-          setShiftModalData({ ...item, staffId: staff.staffId, staff, date });
+          setShiftModalData({
+            ...item,
+            staffId: staff.staffId,
+            staff,
+            date,
+            isOrigin,
+          });
           setShowShiftModal(true);
         });
       }}

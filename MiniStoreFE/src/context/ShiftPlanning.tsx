@@ -10,8 +10,8 @@ import { DataTable, FetcherData } from "~/routes/shift-planning";
 import { WorkSchedule, Staff, Shift } from "~/types";
 
 type SPModalContext = {
-  shiftModalData: Accessor<WorkSchedule | undefined>;
-  setShiftModalData: Setter<WorkSchedule | undefined>;
+  shiftModalData: Accessor<(WorkSchedule & { isOrigin: boolean }) | undefined>;
+  setShiftModalData: Setter<(WorkSchedule & { isOrigin: boolean }) | undefined>;
   showShiftModal: Accessor<boolean>;
   setShowShiftModal: Setter<boolean>;
   staffModalData: Accessor<Staff | undefined>;
@@ -31,6 +31,7 @@ type SPDataContext = {
   tableData: DataTable;
   setTableData: SetStoreFunction<DataTable>;
   fetchedData: InitializedResource<FetcherData>;
+  resetTableData: () => void;
 };
 
 export const ModalContext = createContext<SPModalContext>();

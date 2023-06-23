@@ -32,7 +32,7 @@ type ToolBarProps = {
 const ToolBar: Component<ToolBarProps> = ({ datePicked, setDatePicked }) => {
   const [searchParams, setSearchParams] = useSearchParams<ParamType>();
   const [dateStr, setDateStr] = createSignal<string>("");
-  const { tableData } = useSPData();
+  const { tableData, resetTableData } = useSPData();
   const { setShowShiftTemplateModal } = useShiftPlanningModals();
 
   let dateRef: HTMLInputElement | undefined = undefined;
@@ -58,7 +58,9 @@ const ToolBar: Component<ToolBarProps> = ({ datePicked, setDatePicked }) => {
   });
 
   onCleanup(() => {
+    // console.log("clean up");
     fp?.destroy();
+    resetTableData();
   });
 
   const updateDateStr = (

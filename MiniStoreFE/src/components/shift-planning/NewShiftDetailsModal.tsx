@@ -8,7 +8,7 @@ import {
   createSignal,
 } from "solid-js";
 import PopupModal from "../PopupModal";
-import { DataResponse, Role, Shift, Staff, WorkSchedule } from "~/types";
+import { DataResponse, Role, Shift, Staff } from "~/types";
 import { Select } from "../form/Select";
 import { useFormHandler } from "solid-form-handler";
 import { yupSchema } from "solid-form-handler/yup";
@@ -272,7 +272,7 @@ const NewShiftDetailsModal: Component<{
             onClick={[submit, true]}
             class="py-1.5 px-3 font-semibold text-gray-600 border border-gray-300 text-sm rounded hover:text-black"
           >
-            Save & Publish
+            Create & Publish
           </button>
           <button
             type="button"

@@ -16,6 +16,7 @@
         {
           "staffId": 1,
           "scheduleId": 2,
+          "shiftId": 2,
           "shift": {
             "shiftId": 2,
             "shiftName": "Ca Chiều",
@@ -32,6 +33,7 @@
         {
           "staffId": 1,
           "scheduleId": 3,
+          "shiftId": 2,
           "shift": {
             "shiftId": 2,
             "shiftName": "Ca Khuya",
@@ -77,6 +79,7 @@
         {
           "staffId": 3,
           "scheduleId": 6,
+          "shiftId": 4,
           "shift": {
             "shiftId": 4,
             "shiftName": "Afternoon Shift",
