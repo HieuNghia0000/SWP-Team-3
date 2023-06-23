@@ -7,16 +7,16 @@ import {
   createSignal,
 } from "solid-js";
 import PopupModal from "../../PopupModal";
-import { WorkSchedule } from "~/types";
 import Details from "./Details";
 import Edit from "./Edit";
 import Errors from "./Errors";
 import Copy from "./Copy";
+import { WorkScheduleCard } from "~/context/ShiftPlanning";
 
 export type Tabs = "details" | "edit" | "errors" | "copy";
 const ShiftDetailsModal: Component<{
   showModal: Accessor<boolean>;
-  modalData: Accessor<(WorkSchedule & { isOrigin: boolean }) | undefined>;
+  modalData: Accessor<WorkScheduleCard | undefined>;
   setShowModal: Setter<boolean>;
 }> = ({ showModal, modalData, setShowModal }) => {
   const [state, setState] = createSignal<Tabs>("details");

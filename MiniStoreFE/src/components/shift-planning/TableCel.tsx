@@ -45,6 +45,7 @@ const TableCel: Component<{
               width={() => divRef?.offsetWidth}
               staff={props.staff}
               date={props.date}
+              items={props.items}
             />
           )}
         </For>

@@ -12,7 +12,11 @@ import { DataResponse, Shift, Staff, WorkSchedule } from "~/types";
 import { getWeekDateStings } from "~/utils/getWeekDates";
 import getEndPoint from "~/utils/getEndPoint";
 import toast from "solid-toast";
-import { ModalContext, PageDataContext } from "~/context/ShiftPlanning";
+import {
+  ModalContext,
+  PageDataContext,
+  WorkScheduleCard,
+} from "~/context/ShiftPlanning";
 import { useSearchParams } from "solid-start";
 import Spinner from "~/components/Spinner";
 import NewShiftDetailsModal from "~/components/shift-planning/NewShiftDetailsModal";
@@ -31,6 +35,11 @@ export interface FetcherData {
   staffs: Staff[];
 }
 
+export type Rules = {
+  name: string;
+  description: string;
+  passed: boolean;
+};
 export interface DataTable extends FetcherData {
   originShifts: { [key: WorkSchedule["scheduleId"]]: WorkSchedule };
   shifts: { [key: WorkSchedule["scheduleId"]]: WorkSchedule };
@@ -39,6 +48,7 @@ export interface DataTable extends FetcherData {
   preparingData: boolean;
   isChanged: boolean;
   changedShifts: { [key: WorkSchedule["scheduleId"]]: boolean };
+  shiftsRules: { [key: WorkSchedule["scheduleId"]]: Rules[] };
 }
 
 const fetcher: ResourceFetcher<boolean | string, FetcherData> = async (
@@ -86,12 +96,11 @@ export default function ShiftPlanning() {
     },
     preparingData: true,
     isErrored: false,
+    shiftsRules: {},
   });
 
   const [showShiftModal, setShowShiftModal] = createSignal<boolean>(false);
-  const [shiftModalData, setShiftModalData] = createSignal<
-    WorkSchedule & { isOrigin: boolean }
-  >();
+  const [shiftModalData, setShiftModalData] = createSignal<WorkScheduleCard>();
 
   const [showStaffModal, setShowStaffModal] = createSignal<boolean>(false);
   const [staffModalData, setStaffModalData] = createSignal<Staff>();
@@ -152,6 +161,9 @@ export default function ShiftPlanning() {
       changedShifts: {},
       preparingData: true,
       isErrored: false,
+      shiftsRules: {},
+      isChanged: false,
+      originShifts: {},
     });
   };
 

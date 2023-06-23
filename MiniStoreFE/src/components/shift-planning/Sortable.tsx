@@ -1,15 +1,18 @@
 import { createSortable } from "@thisbeyond/solid-dnd";
-import { Component, batch, createEffect } from "solid-js";
+import { Component, batch, createEffect, on, onMount } from "solid-js";
 import { useShiftPlanningModals, useSPData } from "~/context/ShiftPlanning";
 import { WorkSchedule, Role, Staff } from "~/types";
 import { shiftTimes } from "./utils/shiftTimes";
+import { findOverlappingShifts } from "./utils/findOverlappingShifts";
+import { celIdGenerator } from "./utils/celIdGenerator";
 
 const Sortable: Component<{
   item: WorkSchedule;
+  items: WorkSchedule[];
   width: () => number | undefined;
   staff: Staff;
   date: string;
-}> = ({ item, width, staff, date }) => {
+}> = ({ item, items, width, staff, date }) => {
   const { setShiftModalData, setShowShiftModal } = useShiftPlanningModals();
   const { fetchedData, tableData, setTableData } = useSPData();
 
@@ -23,7 +26,57 @@ const Sortable: Component<{
     isOrigin,
   });
 
-  createEffect(() => {
+  function getShiftsByBoxId(droppableBoxId: string) {
+    if (!tableData.cels.hasOwnProperty(droppableBoxId)) {
+      return []; // Key does not exist in transformed data
+    }
+
+    const shiftIds = tableData.cels[droppableBoxId];
+
+    const shifts: WorkSchedule[] = [];
+    for (let shiftId of shiftIds) {
+      const shift = tableData.shifts[shiftId];
+      if (shift) {
+        shifts.push(shift);
+      }
+    }
+
+    return shifts;
+  }
+
+  const overlappingShifts = findOverlappingShifts(
+    getShiftsByBoxId(celIdGenerator(staff, date))
+  );
+
+  const rules = [
+    {
+      name: "Match role",
+      description:
+        "Does this shift's required role matches with the staff's role?",
+      passed: item.shift.role === staff.role,
+    },
+    {
+      name: "Overlapping shifts",
+      description: "Does this shift overlap with an existing shift?",
+      passed: !overlappingShifts.includes(item.scheduleId),
+    },
+    {
+      name: "Overlap leave request",
+      description: "Does this shift overlap with a time off request?",
+      passed: true,
+    },
+  ];
+
+  createEffect(
+    on(
+      () => items.length,
+      () => {
+        console.log(item);
+      }
+    )
+  );
+
+  onMount(() => {
     batch(() => {
       if (!isOrigin) {
         setTableData("changedShifts", item.scheduleId, true);
@@ -31,11 +84,12 @@ const Sortable: Component<{
         setTableData("changedShifts", item.scheduleId, false);
       }
       // Modify shift data when drag and drop is done
-      setTableData("shifts", item.shiftId, () => ({
+      setTableData("shifts", item.scheduleId, () => ({
         staffId: staff.staffId,
         date: date,
         staff: staff,
       }));
+      setTableData("shiftsRules", item.scheduleId, () => [...rules]);
     });
   });
 
@@ -47,6 +101,7 @@ const Sortable: Component<{
       // id={item.id.toString()}
       onClick={() => {
         if (sortable.isActiveDraggable) return;
+
         batch(() => {
           setShiftModalData({
             ...item,
@@ -54,6 +109,7 @@ const Sortable: Component<{
             staff,
             date,
             isOrigin,
+            rules,
           });
           setShowShiftModal(true);
         });

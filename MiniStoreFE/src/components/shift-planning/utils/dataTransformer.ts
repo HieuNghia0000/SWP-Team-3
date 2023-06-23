@@ -14,6 +14,7 @@ export function transformData(data: FetcherData): DataTable {
     changedShifts: {},
     isChanged: false,
     isErrored: false,
+    shiftsRules: {},
     preparingData: false,
   };
 

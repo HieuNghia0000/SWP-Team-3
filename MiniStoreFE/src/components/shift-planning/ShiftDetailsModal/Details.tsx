@@ -1,12 +1,13 @@
 import { FaSolidPencil } from "solid-icons/fa";
 import { Accessor, Setter, Component } from "solid-js";
 import PopupModal from "~/components/PopupModal";
-import { WorkSchedule, Role } from "~/types";
+import { Role } from "~/types";
 import { Tabs } from ".";
 import moment from "moment";
+import { WorkScheduleCard } from "~/context/ShiftPlanning";
 
 interface DetailsProps {
-  shift: Accessor<(WorkSchedule & { isOrigin: boolean }) | undefined>;
+  shift: Accessor<WorkScheduleCard | undefined>;
   setState: Setter<Tabs>;
 }
 const Details: Component<DetailsProps> = ({ shift, setState }) => {

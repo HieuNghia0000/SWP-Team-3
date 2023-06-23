@@ -15,8 +15,8 @@ import {
 import PopupModal from "~/components/PopupModal";
 import Spinner from "~/components/Spinner";
 import { TextInput } from "~/components/form/TextInput";
-import { useSPData } from "~/context/ShiftPlanning";
-import { Role, Shift, DataResponse, WorkSchedule } from "~/types";
+import { WorkScheduleCard, useSPData } from "~/context/ShiftPlanning";
+import { Role, Shift, DataResponse } from "~/types";
 import { Tabs } from ".";
 import {
   readableToTimeStr,
@@ -84,7 +84,7 @@ const fetcher: ResourceFetcher<
 interface EditProps {
   setModalState: Setter<Tabs>;
   modalState: Accessor<Tabs>;
-  modalData: Accessor<(WorkSchedule & { isOrigin: boolean }) | undefined>;
+  modalData: Accessor<WorkScheduleCard | undefined>;
 }
 const Edit: Component<EditProps> = ({
   setModalState,

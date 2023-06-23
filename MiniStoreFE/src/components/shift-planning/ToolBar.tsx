@@ -2,9 +2,7 @@ import {
   Accessor,
   Component,
   Setter,
-  createEffect,
   createSignal,
-  on,
   onCleanup,
   onMount,
 } from "solid-js";

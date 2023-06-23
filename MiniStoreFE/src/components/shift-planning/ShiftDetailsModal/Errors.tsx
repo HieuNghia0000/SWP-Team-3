@@ -1,16 +1,19 @@
 import { BsCheckCircle, BsExclamationCircle } from "solid-icons/bs";
 import { FaSolidPencil } from "solid-icons/fa";
-import { Accessor, Setter, Component } from "solid-js";
+import { Accessor, Setter, Component, For, Show } from "solid-js";
 import PopupModal from "~/components/PopupModal";
-import { WorkSchedule, Role } from "~/types";
+import { Role } from "~/types";
 import { Tabs } from ".";
 import { shiftTimes } from "../utils/shiftTimes";
+import { WorkScheduleCard, useSPData } from "~/context/ShiftPlanning";
 
 interface ErrorsProps {
-  shift: Accessor<(WorkSchedule & { isOrigin: boolean }) | undefined>;
+  shift: Accessor<WorkScheduleCard | undefined>;
   setModalState: Setter<Tabs>;
 }
 const Errors: Component<ErrorsProps> = ({ shift, setModalState }) => {
+  const { tableData } = useSPData();
+
   return (
     <>
       <PopupModal.Body>
@@ -71,28 +74,29 @@ const Errors: Component<ErrorsProps> = ({ shift, setModalState }) => {
 
           {/* Body */}
           <div>
-            <div class="flex border-t border-gray-200">
-              <div class="text-[#637286] p-2 flex-1">
-                Does this shift overlap with an existing shift?
-              </div>
-              <div class="text-[#00bc1d] font-semibold p-2 w-[120px] text-center border-l border-dashed border-gray-200 flex justify-center items-center gap-1">
-                <span>
-                  <BsCheckCircle />
-                </span>
-                <span>Passed</span>
-              </div>
-            </div>
-            <div class="flex border-t border-gray-200">
-              <div class="text-[#637286] p-2 flex-1">
-                Does this shift overlap with a time off request?
-              </div>
-              <div class="text-[#F6993F] font-semibold p-2 w-[120px] text-center border-l border-dashed border-gray-200 flex justify-center items-center gap-1">
-                <span>
-                  <BsExclamationCircle />
-                </span>
-                <span>Flagged</span>
-              </div>
-            </div>
+            <For each={tableData.shiftsRules[shift()!.scheduleId] || []}>
+              {(rule) => (
+                <div class="flex border-t border-gray-200">
+                  <div class="text-[#637286] p-2 flex-1">
+                    {rule.description}
+                  </div>
+                  <div
+                    class="font-semibold p-2 w-[120px] text-center border-l border-dashed border-gray-200 flex justify-center items-center gap-1"
+                    classList={{
+                      "text-[#00bc1d]": rule.passed,
+                      "text-[#F6993F]": !rule.passed,
+                    }}
+                  >
+                    <Show when={!rule.passed} fallback={<BsCheckCircle />}>
+                      <span>
+                        <BsExclamationCircle />
+                      </span>
+                    </Show>
+                    <span>{rule.passed ? "Passed" : "Flagged"}</span>
+                  </div>
+                </div>
+              )}
+            </For>
           </div>
         </div>
       </PopupModal.Body>

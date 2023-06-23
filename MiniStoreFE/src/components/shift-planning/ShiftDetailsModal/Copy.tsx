@@ -6,8 +6,8 @@ import { Accessor, Setter, Component, createSignal, Show } from "solid-js";
 import PopupModal from "~/components/PopupModal";
 import { Checkboxes } from "~/components/form/Checkboxes";
 import { TextInput } from "~/components/form/TextInput";
-import { useSPData } from "~/context/ShiftPlanning";
-import { WorkSchedule, Role } from "~/types";
+import { WorkScheduleCard, useSPData } from "~/context/ShiftPlanning";
+import { Role } from "~/types";
 import { Tabs } from ".";
 import { shiftTimes } from "../utils/shiftTimes";
 import * as yup from "yup";
@@ -22,7 +22,7 @@ const copySchema: yup.Schema<CopyScheduleForm> = yup.object({
   untilDate: yup.string(),
 });
 interface CopyProps {
-  shift: Accessor<(WorkSchedule & { isOrigin: boolean }) | undefined>;
+  shift: Accessor<WorkScheduleCard | undefined>;
   setModalState: Setter<Tabs>;
 }
 const Copy: Component<CopyProps> = ({ shift, setModalState }) => {
