@@ -134,10 +134,6 @@ const Table: Component<DnDTableProps> = (props) => {
           draggable.id as number,
           ...items.slice(index),
         ]);
-        setTableData("shifts", draggable.id as number, () => {
-          const item = draggable.data.item as WorkSchedule;
-          return { staffId: item.staffId, date: item.date };
-        });
       });
     }
   };

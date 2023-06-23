@@ -38,9 +38,10 @@ const ToolBar: Component<ToolBarProps> = ({ datePicked, setDatePicked }) => {
   let dateRef: HTMLInputElement | undefined = undefined;
   let fp: flatpickr.Instance | undefined = undefined;
 
-  createEffect(() => {
-    // console.log(tableData.changedShifts);
-  });
+  // createEffect(() => {
+  // console.log(tableData.changedShifts);
+  // console.log(tableData.shifts);
+  // });
 
   onMount(() => {
     const p = moment(searchParams.picked_date);

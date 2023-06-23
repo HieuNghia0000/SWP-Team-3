@@ -24,11 +24,19 @@ const Sortable: Component<{
   });
 
   createEffect(() => {
-    if (!isOrigin) {
-      setTableData("changedShifts", item.scheduleId, true);
-    } else {
-      setTableData("changedShifts", item.scheduleId, false);
-    }
+    batch(() => {
+      if (!isOrigin) {
+        setTableData("changedShifts", item.scheduleId, true);
+      } else {
+        setTableData("changedShifts", item.scheduleId, false);
+      }
+      // Modify shift data when drag and drop is done
+      setTableData("shifts", item.shiftId, () => ({
+        staffId: staff.staffId,
+        date: date,
+        staff: staff,
+      }));
+    });
   });
 
   return (

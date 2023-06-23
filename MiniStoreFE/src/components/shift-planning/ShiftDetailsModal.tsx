@@ -618,13 +618,13 @@ const Copy: Component<CopyProps> = ({ shift, setState }) => {
   // Get work days of the week based on the selected shift and the staff member
   // Ex: ["Monday", "Tuesday", "Wednesday"]
   const getWorkDays = (shiftId: number, staffId: number) => {
-    const staffWorkDates = tableData.staffs.map((staff) => {
-      if (staff.staffId !== staffId) return [];
-      return staff.workSchedule.map((shift) =>
-        shift.shiftId === shiftId ? shift.date : ""
-      );
+    const staffWorkDates = Object.keys(tableData.shifts).map((scheduleId) => {
+      const wSchedule = tableData.shifts[Number.parseInt(scheduleId)];
+      if (wSchedule.staffId === staffId && wSchedule.shiftId === shiftId)
+        return wSchedule.date;
+      else return "";
     });
-    const dates = compact(flattenDeep(staffWorkDates));
+    const dates = compact(staffWorkDates);
     return dates.map((date) => moment(date).format("dddd"));
   };
 
