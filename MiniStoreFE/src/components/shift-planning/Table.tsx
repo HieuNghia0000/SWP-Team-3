@@ -11,7 +11,7 @@ import {
 } from "@thisbeyond/solid-dnd";
 import moment from "moment";
 import { Component, For, Show, batch } from "solid-js";
-import { Role, WorkSchedule } from "~/types";
+import { Role, Shift } from "~/types";
 import TableCel from "./TableCel";
 import { useShiftPlanningModals, useSPData } from "~/context/ShiftPlanning";
 import { shiftTimes } from "./utils/shiftTimes";
@@ -34,7 +34,7 @@ const Table: Component<DnDTableProps> = (props) => {
 
     const shiftIds = tableData.cels[droppableBoxId];
 
-    const shifts: WorkSchedule[] = [];
+    const shifts: Shift[] = [];
     for (let shiftId of shiftIds) {
       const shift = tableData.shifts[shiftId];
       if (shift) {
@@ -231,7 +231,7 @@ const Table: Component<DnDTableProps> = (props) => {
               <DragOverlay>
                 {/* @ts-ignore */}
                 {(draggable) => {
-                  let item = () => draggable?.data?.item as WorkSchedule;
+                  let item = () => draggable?.data?.item as Shift;
                   let isOrigin = () => draggable?.data?.isOrigin as boolean;
                   let selectedShiftWidth = () => draggable?.data?.width() - 4;
                   // let staff = () => draggable?.data?.staff as Staff;
@@ -257,20 +257,24 @@ const Table: Component<DnDTableProps> = (props) => {
                       <i
                         class="absolute top-1 left-1 bottom-1 w-1.5 rounded"
                         classList={{
-                          "bg-blue-700": item().shift.role === Role.CASHIER,
-                          "bg-yellow-700": item().shift.role === Role.GUARD,
-                          "bg-red-700": item().shift.role === Role.MANAGER,
-                          "bg-gray-700": item().shift.role === Role.ADMIN,
+                          "bg-blue-700":
+                            item().shiftTemplate.role === Role.CASHIER,
+                          "bg-yellow-700":
+                            item().shiftTemplate.role === Role.GUARD,
+                          "bg-red-700":
+                            item().shiftTemplate.role === Role.MANAGER,
+                          "bg-gray-700":
+                            item().shiftTemplate.role === Role.ADMIN,
                         }}
                       ></i>
                       <p class="ml-3 font-semibold text-sm">
                         {shiftTimes(
-                          item().shift.startTime,
-                          item().shift.endTime
+                          item().shiftTemplate.startTime,
+                          item().shiftTemplate.endTime
                         )}
                       </p>
                       <p class="ml-3 font-normal text-xs text-gray-600">
-                        {item().shift.shiftName}
+                        {item().shiftTemplate.name}
                       </p>
                     </button>
                   );

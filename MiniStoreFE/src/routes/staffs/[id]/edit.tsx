@@ -6,14 +6,21 @@ import * as yup from "yup";
 import Breadcrumbs from "~/components/Breadcrumbs";
 import { Select } from "~/components/form/Select";
 import { TextInput } from "~/components/form/TextInput";
-import { Role, Staff, Status } from "~/types";
+import { Role, Staff, StaffStatus } from "~/types";
 import routes from "~/utils/routes";
+
+const role = [
+  { value: Role.ADMIN, label: "Admin" },
+  { value: Role.MANAGER, label: "Manager" },
+  { value: Role.CASHIER, label: "Cashier" },
+  { value: Role.GUARD, label: "Guard" },
+];
 
 const schema: yup.Schema = yup.object({
   name: yup.string().required("Vui lòng nhập họ tên"),
   phone: yup.string().required("Vui lòng nhập số điện thoại"),
   role: yup.string().required("Vui lòng chọn role"),
-  baseSalary: yup.string().required("Vui lòng nhập lương cơ bản"),
+  salary: yup.string().required("Vui lòng nhập lương cơ bản"),
 });
 
 export function routeData({ params }: RouteDataArgs) {
@@ -30,8 +37,8 @@ export function routeData({ params }: RouteDataArgs) {
         phoneNumber: "0123456789",
         role: Role.ADMIN,
         workDays: "TUE, THU, SAT, SUN",
-        status: Status.ACTIVATED,
-        baseSalary: 80000,
+        status: StaffStatus.ACTIVATED,
+        salary: { hourlyWage: 80000 },
         image: "",
       } as Staff;
     },
@@ -178,10 +185,10 @@ export default function StaffEdit() {
               />
 
               <TextInput
-                id="baseSalary"
-                name="baseSalary"
+                id="salary"
+                name="salary"
                 label="Base salary"
-                value={data()?.baseSalary}
+                value={data()?.salary.hourlyWage}
                 type="number"
                 step={1000}
                 placeholder="Enter staff base salary"
@@ -202,11 +209,13 @@ export default function StaffEdit() {
                 <span
                   class="inline-block whitespace-nowrap px-2 py-0.5 text-sm text-center font-bold text-white rounded-full"
                   classList={{
-                    "bg-green-500": data()?.status === Status.ACTIVATED,
-                    "bg-red-500": data()?.status === Status.DISABLED,
+                    "bg-green-500": data()?.status === StaffStatus.ACTIVATED,
+                    "bg-red-500": data()?.status === StaffStatus.DISABLED,
                   }}
                 >
-                  {data()?.status === Status.ACTIVATED ? "Active" : "Disabled"}
+                  {data()?.status === StaffStatus.ACTIVATED
+                    ? "Active"
+                    : "Disabled"}
                 </span>
               </div>
 
@@ -232,10 +241,3 @@ export default function StaffEdit() {
     </main>
   );
 }
-
-const role = [
-  { value: Role.ADMIN, label: "Admin" },
-  { value: Role.MANAGER, label: "Manager" },
-  { value: Role.CASHIER, label: "Cashier" },
-  { value: Role.GUARD, label: "Guard" },
-];

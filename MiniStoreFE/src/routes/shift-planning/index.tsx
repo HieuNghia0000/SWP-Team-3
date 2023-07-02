@@ -8,14 +8,14 @@ import {
   ResourceFetcher,
   Show,
 } from "solid-js";
-import { DataResponse, Shift, Staff, WorkSchedule } from "~/types";
+import { DataResponse, ShiftTemplate, Staff } from "~/types";
 import { getWeekDateStings } from "~/utils/getWeekDates";
 import getEndPoint from "~/utils/getEndPoint";
 import toast from "solid-toast";
 import {
   ModalContext,
   PageDataContext,
-  WorkScheduleCard,
+  ShiftCard,
 } from "~/context/ShiftPlanning";
 import { useSearchParams } from "solid-start";
 import Spinner from "~/components/Spinner";
@@ -26,30 +26,11 @@ import StaffDetailsModal from "~/components/shift-planning/StaffDetailsModal";
 import Table from "~/components/shift-planning/Table";
 import ToolBar from "~/components/shift-planning/ToolBar";
 import { transformData } from "~/components/shift-planning/utils/dataTransformer";
-
-export type ParamType = {
-  picked_date: string;
-};
-export interface FetcherData {
-  dates: string[];
-  staffs: Staff[];
-}
-
-export type Rules = {
-  name: string;
-  description: string;
-  passed: boolean;
-};
-export interface DataTable extends FetcherData {
-  originShifts: { [key: WorkSchedule["scheduleId"]]: WorkSchedule };
-  shifts: { [key: WorkSchedule["scheduleId"]]: WorkSchedule };
-  cels: { [key: string]: WorkSchedule["scheduleId"][] };
-  isErrored: boolean;
-  preparingData: boolean;
-  isChanged: boolean;
-  changedShifts: { [key: WorkSchedule["scheduleId"]]: boolean };
-  shiftsRules: { [key: WorkSchedule["scheduleId"]]: Rules[] };
-}
+import {
+  DataTable,
+  FetcherData,
+  ParamType,
+} from "~/components/shift-planning/utils/types";
 
 const fetcher: ResourceFetcher<boolean | string, FetcherData> = async (
   source
@@ -100,7 +81,7 @@ export default function ShiftPlanning() {
   });
 
   const [showShiftModal, setShowShiftModal] = createSignal<boolean>(false);
-  const [shiftModalData, setShiftModalData] = createSignal<WorkScheduleCard>();
+  const [shiftModalData, setShiftModalData] = createSignal<ShiftCard>();
 
   const [showStaffModal, setShowStaffModal] = createSignal<boolean>(false);
   const [staffModalData, setStaffModalData] = createSignal<Staff>();
@@ -115,7 +96,7 @@ export default function ShiftPlanning() {
   const [showShiftTemplateModal, setShowShiftTemplateModal] =
     createSignal<boolean>(false);
   const [shiftTemplateModalData, setShiftTemplateModalData] =
-    createSignal<Shift>();
+    createSignal<ShiftTemplate>();
 
   createEffect(
     on(

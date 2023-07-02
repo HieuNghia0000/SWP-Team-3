@@ -6,17 +6,21 @@ import {
   InitializedResource,
 } from "solid-js";
 import { SetStoreFunction } from "solid-js/store";
-import { DataTable, FetcherData, Rules } from "~/routes/shift-planning";
-import { WorkSchedule, Staff, Shift } from "~/types";
+import {
+  DataTable,
+  FetcherData,
+  Rules,
+} from "~/components/shift-planning/utils/types";
+import { Shift, Staff, ShiftTemplate } from "~/types";
 
-export interface WorkScheduleCard extends WorkSchedule {
+export interface ShiftCard extends Shift {
   isOrigin: boolean;
   rules: Rules[];
 }
 
 type SPModalContext = {
-  shiftModalData: Accessor<WorkScheduleCard | undefined>;
-  setShiftModalData: Setter<WorkScheduleCard | undefined>;
+  shiftModalData: Accessor<ShiftCard | undefined>;
+  setShiftModalData: Setter<ShiftCard | undefined>;
   showShiftModal: Accessor<boolean>;
   setShowShiftModal: Setter<boolean>;
   staffModalData: Accessor<Staff | undefined>;
@@ -27,8 +31,8 @@ type SPModalContext = {
   setNewShiftModalData: Setter<{ staff: Staff; date: string } | undefined>;
   showNewShiftModal: Accessor<boolean>;
   setShowNewShiftModal: Setter<boolean>;
-  shiftTemplateModalData: Accessor<Shift | undefined>;
-  setShiftTemplateModalData: Setter<Shift | undefined>;
+  shiftTemplateModalData: Accessor<ShiftTemplate | undefined>;
+  setShiftTemplateModalData: Setter<ShiftTemplate | undefined>;
   showShiftTemplateModal: Accessor<boolean>;
   setShowShiftTemplateModal: Setter<boolean>;
 };

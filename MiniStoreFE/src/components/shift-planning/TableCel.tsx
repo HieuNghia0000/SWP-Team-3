@@ -4,13 +4,13 @@ import {
   SortableProvider,
 } from "@thisbeyond/solid-dnd";
 import { Component, For } from "solid-js";
-import { Staff, WorkSchedule } from "~/types";
+import { Staff, Shift } from "~/types";
 import Sortable from "./Sortable";
 import { useShiftPlanningModals } from "~/context/ShiftPlanning";
 
 const TableCel: Component<{
   id: string;
-  items: WorkSchedule[];
+  items: Shift[];
   staff: Staff;
   date: string;
 }> = (props) => {
@@ -37,7 +37,7 @@ const TableCel: Component<{
       ref={divRef}
       class="flex flex-col border-r border-b border-gray-200 flex-1 overflow-hidden bg-[#f8fafc] pt-0.5 gap-y-0.5"
     >
-      <SortableProvider ids={props.items.map((item) => item.scheduleId)}>
+      <SortableProvider ids={props.items.map((item) => item.shiftId)}>
         <For each={props.items}>
           {(item) => (
             <Sortable

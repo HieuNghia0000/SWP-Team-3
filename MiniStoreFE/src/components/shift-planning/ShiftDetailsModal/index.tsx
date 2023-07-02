@@ -11,12 +11,13 @@ import Details from "./Details";
 import Edit from "./Edit";
 import Errors from "./Errors";
 import Copy from "./Copy";
-import { WorkScheduleCard } from "~/context/ShiftPlanning";
+import { ShiftCard } from "~/context/ShiftPlanning";
 
 export type Tabs = "details" | "edit" | "errors" | "copy";
+
 const ShiftDetailsModal: Component<{
   showModal: Accessor<boolean>;
-  modalData: Accessor<WorkScheduleCard | undefined>;
+  modalData: Accessor<ShiftCard | undefined>;
   setShowModal: Setter<boolean>;
 }> = ({ showModal, modalData, setShowModal }) => {
   const [state, setState] = createSignal<Tabs>("details");
@@ -72,7 +73,7 @@ const ShiftDetailsModal: Component<{
           <Errors shift={modalData} setModalState={setState} />
         </Match>
         <Match when={state() === "copy"}>
-          <Copy shift={modalData} setModalState={setState} />
+          <Copy shiftCard={modalData} setModalState={setState} />
         </Match>
       </Switch>
     </PopupModal.Wrapper>

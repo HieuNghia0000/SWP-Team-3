@@ -6,45 +6,64 @@
       "role": "ADMIN",
       "username": "hieuvo",
       "phoneNumber": "0123456789",
-      "baseSalary": "10000000",
+      "salary": {
+        "salaryId": 1,
+        "hourlyWage": "10000000",
+        "effectiveDate": "2023-06-15",
+        "terminationDate": ""
+      },
       "status": 0,
       "image": "",
       "email": "hieuvo@gmail.com",
       "workDays": "WED, SAT",
-      "leaveBlance": 14,
-      "workSchedule": [
+      "leaveBalance": 14,
+      "shifts": [
         {
-          "staffId": 1,
-          "scheduleId": 2,
           "shiftId": 2,
-          "shift": {
-            "shiftId": 2,
-            "shiftName": "Ca Chiều",
+          "staffId": 1,
+          "shiftTemplateId": 2,
+          "shiftTemplate": {
+            "shiftTemplateId": 2,
+            "name": "Ca Chiều",
             "startTime": "16:00:00",
             "endTime": "24:00:00",
             "salaryCoefficient": 1.0,
             "role": "MANAGER"
           },
           "date": "2023-06-23",
-          "checkInTime": null,
-          "checkOutTime": null,
+          "timesheet": {
+            "timesheetId": 2,
+            "shiftId": 2,
+            "checkInTime": "16:00:00",
+            "checkOutTime": "24:00:00",
+            "status": 1,
+            "noteTitle": null,
+            "noteContent": null
+          },
           "published": false
         },
         {
+          "shiftId": 3,
           "staffId": 1,
-          "scheduleId": 3,
-          "shiftId": 2,
-          "shift": {
-            "shiftId": 2,
-            "shiftName": "Ca Khuya",
+          "shiftTemplateId": 2,
+          "shiftTemplate": {
+            "shiftTemplateId": 2,
+            "name": "Ca Khuya",
             "startTime": "24:00:00",
             "endTime": "08:00:00",
             "salaryCoefficient": 1.0,
             "role": "MANAGER"
           },
           "date": "2023-06-19",
-          "checkInTime": null,
-          "checkOutTime": null,
+          "timesheet": {
+            "timesheetId": 3,
+            "shiftId": 3,
+            "checkInTime": "24:00:00",
+            "checkOutTime": "08:00:00",
+            "status": 2,
+            "noteTitle": null,
+            "noteContent": null
+          },
           "published": true
         }
       ]
@@ -55,13 +74,18 @@
       "role": "MANAGER",
       "username": "khoa",
       "phoneNumber": "0123456789",
-      "baseSalary": "10000000",
+      "salary": {
+        "salaryId": 1,
+        "hourlyWage": "10000000",
+        "effectiveDate": "2023-06-15",
+        "terminationDate": ""
+      },
       "status": 0,
       "image": "",
       "email": "khoa@gmail.com",
       "workDays": "WED, SAT",
-      "leaveBlance": 14,
-      "workSchedule": []
+      "leaveBalance": 14,
+      "shifts": []
     },
     {
       "staffId": 3,
@@ -69,28 +93,40 @@
       "role": "GUARD",
       "username": "johnsmith",
       "phoneNumber": "0123456789",
-      "baseSalary": "8000000",
+      "salary": {
+        "salaryId": 2,
+        "hourlyWage": "8000000",
+        "effectiveDate": "2023-06-15",
+        "terminationDate": ""
+      },
       "status": 0,
       "image": "",
       "email": "johnsmith@gmail.com",
       "workDays": "MON, TUE, WED, THU, FRI",
-      "leaveBlance": 14,
-      "workSchedule": [
+      "leaveBalance": 14,
+      "shifts": [
         {
+          "shiftId": 6,
           "staffId": 3,
-          "scheduleId": 6,
-          "shiftId": 4,
-          "shift": {
-            "shiftId": 4,
-            "shiftName": "Afternoon Shift",
+          "shiftTemplateId": 4,
+          "shiftTemplate": {
+            "shiftTemplateId": 4,
+            "name": "Afternoon Shift",
             "startTime": "12:00:00",
             "endTime": "16:00:00",
             "salaryCoefficient": 0.8,
             "role": "GUARD"
           },
           "date": "2023-06-20",
-          "checkInTime": null,
-          "checkOutTime": null,
+          "timesheet": {
+            "timesheetId": 4,
+            "shiftId": 6,
+            "checkInTime": "12:00:00",
+            "checkOutTime": "16:00:00",
+            "status": 0,
+            "noteTitle": null,
+            "noteContent": null
+          },
           "published": true
         }
       ]

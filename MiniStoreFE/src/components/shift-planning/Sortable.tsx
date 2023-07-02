@@ -1,14 +1,14 @@
 import { createSortable } from "@thisbeyond/solid-dnd";
 import { Component, batch, createEffect, on, onMount } from "solid-js";
 import { useShiftPlanningModals, useSPData } from "~/context/ShiftPlanning";
-import { WorkSchedule, Role, Staff } from "~/types";
+import { Shift, Role, Staff } from "~/types";
 import { shiftTimes } from "./utils/shiftTimes";
 import { findOverlappingShifts } from "./utils/findOverlappingShifts";
 import { celIdGenerator } from "./utils/celIdGenerator";
 
 const Sortable: Component<{
-  item: WorkSchedule;
-  items: WorkSchedule[];
+  item: Shift;
+  items: Shift[];
   width: () => number | undefined;
   staff: Staff;
   date: string;
@@ -17,10 +17,10 @@ const Sortable: Component<{
   const { fetchedData, tableData, setTableData } = useSPData();
 
   const isOrigin =
-    tableData.originShifts[item.scheduleId].staffId === staff.staffId &&
-    tableData.originShifts[item.scheduleId].date === date;
+    tableData.originShifts[item.shiftId].staffId === staff.staffId &&
+    tableData.originShifts[item.shiftId].date === date;
 
-  const sortable = createSortable(item.scheduleId, {
+  const sortable = createSortable(item.shiftId, {
     width: width,
     item: { ...item, date, staffId: staff.staffId },
     isOrigin,
@@ -33,7 +33,7 @@ const Sortable: Component<{
 
     const shiftIds = tableData.cels[droppableBoxId];
 
-    const shifts: WorkSchedule[] = [];
+    const shifts: Shift[] = [];
     for (let shiftId of shiftIds) {
       const shift = tableData.shifts[shiftId];
       if (shift) {
@@ -53,12 +53,12 @@ const Sortable: Component<{
       name: "Match role",
       description:
         "Does this shift's required role matches with the staff's role?",
-      passed: item.shift.role === staff.role,
+      passed: item.shiftTemplate.role === staff.role,
     },
     {
       name: "Overlapping shifts",
       description: "Does this shift overlap with an existing shift?",
-      passed: !overlappingShifts.includes(item.scheduleId),
+      passed: !overlappingShifts.includes(item.shiftId),
     },
     {
       name: "Overlap leave request",
@@ -79,17 +79,17 @@ const Sortable: Component<{
   onMount(() => {
     batch(() => {
       if (!isOrigin) {
-        setTableData("changedShifts", item.scheduleId, true);
+        setTableData("changedShifts", item.shiftId, true);
       } else {
-        setTableData("changedShifts", item.scheduleId, false);
+        setTableData("changedShifts", item.shiftId, false);
       }
       // Modify shift data when drag and drop is done
-      setTableData("shifts", item.scheduleId, () => ({
+      setTableData("shifts", item.shiftId, () => ({
         staffId: staff.staffId,
         date: date,
         staff: staff,
       }));
-      setTableData("shiftsRules", item.scheduleId, () => [...rules]);
+      setTableData("shiftsRules", item.shiftId, () => [...rules]);
     });
   });
 
@@ -131,17 +131,17 @@ const Sortable: Component<{
       <i
         class="absolute top-1 left-1 bottom-1 w-1.5 rounded"
         classList={{
-          "bg-blue-500": item.shift.role === Role.CASHIER,
-          "bg-yellow-500": item.shift.role === Role.GUARD,
-          "bg-red-500": item.shift.role === Role.MANAGER,
-          "bg-gray-500": item.shift.role === Role.ADMIN,
+          "bg-blue-500": item.shiftTemplate.role === Role.CASHIER,
+          "bg-yellow-500": item.shiftTemplate.role === Role.GUARD,
+          "bg-red-500": item.shiftTemplate.role === Role.MANAGER,
+          "bg-gray-500": item.shiftTemplate.role === Role.ADMIN,
         }}
       ></i>
       <p class="ml-3 font-semibold text-sm">
-        {shiftTimes(item.shift.startTime, item.shift.endTime)}
+        {shiftTimes(item.shiftTemplate.startTime, item.shiftTemplate.endTime)}
       </p>
       <p class="ml-3 font-normal text-xs text-gray-600">
-        {item.shift.shiftName}
+        {item.shiftTemplate.name}
       </p>
     </button>
   );

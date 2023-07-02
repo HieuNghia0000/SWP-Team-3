@@ -8,7 +8,7 @@ import {
   createSignal,
 } from "solid-js";
 import PopupModal from "../PopupModal";
-import { DataResponse, Role, Shift, Staff } from "~/types";
+import { DataResponse, Role, ShiftTemplate, Staff } from "~/types";
 import { Select } from "../form/Select";
 import { useFormHandler } from "solid-form-handler";
 import { yupSchema } from "solid-form-handler/yup";
@@ -68,14 +68,14 @@ const schema: yup.Schema<NewScheduleForm> = yup.object({
 
 const fetcher: ResourceFetcher<
   boolean,
-  Shift[],
+  ShiftTemplate[],
   { state: "list" | "edit" | "create" }
 > = async () => {
   // const response = await fetch(
   //   `${getEndPoint()}/shift-planning?from_date=${from}&to_date=${to}`
   // );
   const response = await fetch(`http://localhost:3000/shifts.json`);
-  const data: DataResponse<Shift[]> = await response.json();
+  const data: DataResponse<ShiftTemplate[]> = await response.json();
 
   return data.content;
 };
@@ -119,11 +119,10 @@ const NewShiftDetailsModal: Component<{
 
   const shiftOptions = () => {
     return shiftTemplates()?.map((shift) => ({
-      value: shift.shiftId,
-      label: `${shift.shiftName} (${shiftTimes(
-        shift.startTime,
-        shift.endTime
-      )}) [${!shift.role ? "All roles" : capitalize(shift.role) + " only"}]`,
+      value: shift.shiftTemplateId,
+      label: `${shift.name} (${shiftTimes(shift.startTime, shift.endTime)}) [${
+        !shift.role ? "All roles" : capitalize(shift.role) + " only"
+      }]`,
     }));
   };
 
@@ -131,7 +130,7 @@ const NewShiftDetailsModal: Component<{
     const target = event.target as HTMLSelectElement;
     setChosenTemplate(Number.parseInt(target.value));
     const template = shiftTemplates()?.find(
-      (shift) => shift.shiftId === chosenTemplate()
+      (shift) => shift.shiftTemplateId === chosenTemplate()
     );
     const coefficient = template?.salaryCoefficient || 0;
     const role = template?.role || "All roles";

@@ -1,10 +1,10 @@
 import { sortBy, union } from "lodash";
 import moment from "moment";
-import { WorkSchedule } from "~/types";
+import { Shift } from "~/types";
 
 // Find overlapping shifts
-// Returns an array of scheduleIds of overlapping shifts
-export function findOverlappingShifts(shifts: WorkSchedule[]) {
+// Returns an array of shiftIds of overlapping shifts
+export function findOverlappingShifts(shifts: Shift[]) {
   const sortedShifts = sortBy(shifts, "shift.startTime");
   const overlappingShifts: number[] = [];
 
@@ -12,9 +12,15 @@ export function findOverlappingShifts(shifts: WorkSchedule[]) {
     const currentShift = sortedShifts[i];
     const nextShift = sortedShifts[i + 1];
 
-    const currentShiftStart = moment(currentShift.shift.startTime, "h:mm:ss");
-    const currentShiftEnd = moment(currentShift.shift.endTime, "h:mm:ss");
-    const nextShiftStart = moment(nextShift.shift.startTime, "h:mm:ss");
+    const currentShiftStart = moment(
+      currentShift.shiftTemplate.startTime,
+      "h:mm:ss"
+    );
+    const currentShiftEnd = moment(
+      currentShift.shiftTemplate.endTime,
+      "h:mm:ss"
+    );
+    const nextShiftStart = moment(nextShift.shiftTemplate.startTime, "h:mm:ss");
 
     // console.log(
     //   currentShiftStart.format(),
@@ -29,7 +35,7 @@ export function findOverlappingShifts(shifts: WorkSchedule[]) {
         "[]"
       )
     ) {
-      overlappingShifts.push(currentShift.scheduleId, nextShift.scheduleId);
+      overlappingShifts.push(currentShift.shiftId, nextShift.shiftId);
     }
   }
 

@@ -6,7 +6,7 @@ import { Accessor, Setter, Component, createSignal, Show } from "solid-js";
 import PopupModal from "~/components/PopupModal";
 import { Checkboxes } from "~/components/form/Checkboxes";
 import { TextInput } from "~/components/form/TextInput";
-import { WorkScheduleCard, useSPData } from "~/context/ShiftPlanning";
+import { ShiftCard, useSPData } from "~/context/ShiftPlanning";
 import { Role } from "~/types";
 import { Tabs } from ".";
 import { shiftTimes } from "../utils/shiftTimes";
@@ -22,10 +22,10 @@ const copySchema: yup.Schema<CopyScheduleForm> = yup.object({
   untilDate: yup.string(),
 });
 interface CopyProps {
-  shift: Accessor<WorkScheduleCard | undefined>;
+  shiftCard: Accessor<ShiftCard | undefined>;
   setModalState: Setter<Tabs>;
 }
-const Copy: Component<CopyProps> = ({ shift, setModalState }) => {
+const Copy: Component<CopyProps> = ({ shiftCard, setModalState }) => {
   const { tableData } = useSPData();
   const [enableMultiWeeks, setEnableMultiWeeks] = createSignal<boolean>(false);
   const formHandler = useFormHandler(yupSchema(copySchema));
@@ -34,17 +34,19 @@ const Copy: Component<CopyProps> = ({ shift, setModalState }) => {
   // Get work days of the week based on the selected shift and the staff member
   // Ex: ["Monday", "Tuesday", "Wednesday"]
   const getWorkDays = (shiftId: number, staffId: number) => {
-    const staffWorkDates = Object.keys(tableData.shifts).map((scheduleId) => {
-      const wSchedule = tableData.shifts[Number.parseInt(scheduleId)];
-      if (wSchedule.staffId === staffId && wSchedule.shiftId === shiftId)
-        return wSchedule.date;
+    const staffWorkDates = Object.keys(tableData.shifts).map((id) => {
+      const s = tableData.shifts[Number.parseInt(id)];
+      if (s.staffId === staffId && s.shiftTemplateId === shiftId) return s.date;
       else return "";
     });
     const dates = compact(staffWorkDates);
     return dates.map((date) => moment(date).format("dddd"));
   };
 
-  const workDays = getWorkDays(shift()?.shiftId || 0, shift()?.staffId || 0);
+  const workDays = getWorkDays(
+    shiftCard()?.shiftTemplateId || 0,
+    shiftCard()?.staffId || 0
+  );
 
   function formatDaysArray(daysArray: string[]) {
     if (daysArray.length === 1) {
@@ -68,7 +70,7 @@ const Copy: Component<CopyProps> = ({ shift, setModalState }) => {
         "Data sent with success: " +
           JSON.stringify({
             ...formData(),
-            scheduleId: shift()?.scheduleId,
+            shiftId: shiftCard()?.shiftId,
             published: publish,
           })
       );
@@ -98,32 +100,32 @@ const Copy: Component<CopyProps> = ({ shift, setModalState }) => {
             class="rounded mx-0.5 p-2 relative text-left select-none"
             classList={{
               "bg-[#edf2f7] text-black":
-                shift()?.published && shift()?.isOrigin,
+                shiftCard()?.published && shiftCard()?.isOrigin,
               "bg-blue-100 text-blue-500 border border-blue-100":
-                shift()?.published && !shift()?.isOrigin,
+                shiftCard()?.published && !shiftCard()?.isOrigin,
               "bg-[repeating-linear-gradient(-45deg,white,white_5px,#eaf0f6_5px,#eaf0f6_10px)] border border-gray-200":
-                !shift()?.published && shift()?.isOrigin,
+                !shiftCard()?.published && shiftCard()?.isOrigin,
               "bg-[repeating-linear-gradient(-45deg,#e7f7ff,#e7f7ff_5px,#ceefff_5px,#ceefff_10px)] border border-blue-100":
-                !shift()?.published && !shift()?.isOrigin,
+                !shiftCard()?.published && !shiftCard()?.isOrigin,
             }}
           >
             <i
               class="absolute top-1 left-1.5 bottom-1 w-1.5 rounded"
               classList={{
-                "bg-blue-500": shift()?.shift.role === Role.CASHIER,
-                "bg-yellow-500": shift()?.shift.role === Role.GUARD,
-                "bg-red-500": shift()?.shift.role === Role.MANAGER,
-                "bg-gray-500": shift()?.shift.role === Role.ADMIN,
+                "bg-blue-500": shiftCard()?.shiftTemplate.role === Role.CASHIER,
+                "bg-yellow-500": shiftCard()?.shiftTemplate.role === Role.GUARD,
+                "bg-red-500": shiftCard()?.shiftTemplate.role === Role.MANAGER,
+                "bg-gray-500": shiftCard()?.shiftTemplate.role === Role.ADMIN,
               }}
             ></i>
             <p class="ml-3.5 font-semibold text-base tracking-wider">
               {shiftTimes(
-                shift()?.shift.startTime || "",
-                shift()?.shift.endTime || ""
+                shiftCard()?.shiftTemplate.startTime || "",
+                shiftCard()?.shiftTemplate.endTime || ""
               )}
             </p>
             <p class="ml-3.5 font-normal text-sm tracking-wider">
-              {shift()?.shift.shiftName}
+              {shiftCard()?.shiftTemplate.name}
             </p>
           </div>
         </div>
@@ -215,7 +217,7 @@ const Copy: Component<CopyProps> = ({ shift, setModalState }) => {
               id="untilDate"
               name="untilDate"
               class="text-sm"
-              value={shift()?.date || ""}
+              value={shiftCard()?.date || ""}
               type="date"
               formHandler={formHandler}
             />
@@ -246,14 +248,14 @@ const Copy: Component<CopyProps> = ({ shift, setModalState }) => {
             </button>
             <button
               type="button"
-              onClick={[submit, !shift()?.published]}
+              onClick={[submit, !shiftCard()?.published]}
               class="py-1.5 px-3 font-semibold text-gray-600 border border-gray-300 text-sm rounded hover:text-black"
             >
-              Save & {shift()?.published ? "Unpublish" : "Publish"}
+              Save & {shiftCard()?.published ? "Unpublish" : "Publish"}
             </button>
             <button
               type="button"
-              onClick={[submit, shift()?.published]}
+              onClick={[submit, shiftCard()?.published]}
               class="py-1.5 px-3 font-semibold text-white border border-blue-600 bg-blue-500 text-sm rounded hover:bg-blue-600"
             >
               Save

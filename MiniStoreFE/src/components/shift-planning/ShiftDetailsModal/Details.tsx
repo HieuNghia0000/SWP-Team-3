@@ -4,10 +4,10 @@ import PopupModal from "~/components/PopupModal";
 import { Role } from "~/types";
 import { Tabs } from ".";
 import moment from "moment";
-import { WorkScheduleCard } from "~/context/ShiftPlanning";
+import { ShiftCard } from "~/context/ShiftPlanning";
 
 interface DetailsProps {
-  shift: Accessor<WorkScheduleCard | undefined>;
+  shift: Accessor<ShiftCard | undefined>;
   setState: Setter<Tabs>;
 }
 const Details: Component<DetailsProps> = ({ shift, setState }) => {
@@ -15,7 +15,7 @@ const Details: Component<DetailsProps> = ({ shift, setState }) => {
     <>
       <PopupModal.Body>
         <div class="text-xl font-semibold text-center text-gray-800">
-          {shift()?.shift.shiftName}
+          {shift()?.shiftTemplate.name}
         </div>
         <div
           class="text-sm mb-2.5 font-semibold text-center italic text-gray-500"
@@ -33,7 +33,7 @@ const Details: Component<DetailsProps> = ({ shift, setState }) => {
               <span class="font-semibold text-gray-500">
                 Salary Coefficient:
               </span>
-              <span>{shift()?.shift.salaryCoefficient}</span>
+              <span>{shift()?.shiftTemplate.salaryCoefficient}</span>
             </div>
           </div>
           <div class="flex border-b border-gray-300 border-dotted">
@@ -43,16 +43,16 @@ const Details: Component<DetailsProps> = ({ shift, setState }) => {
                 class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-semibold rounded-full"
                 classList={{
                   "bg-blue-200 text-blue-700":
-                    shift()?.shift.role === Role.CASHIER,
+                    shift()?.shiftTemplate.role === Role.CASHIER,
                   "bg-yellow-200 text-yellow-700":
-                    shift()?.shift.role === Role.GUARD,
+                    shift()?.shiftTemplate.role === Role.GUARD,
                   "bg-red-200 text-red-700":
-                    shift()?.shift.role === Role.MANAGER,
+                    shift()?.shiftTemplate.role === Role.MANAGER,
                   "bg-gray-200 text-gray-700":
-                    shift()?.shift.role === Role.ADMIN,
+                    shift()?.shiftTemplate.role === Role.ADMIN,
                 }}
               >
-                {shift()?.shift.role}
+                {shift()?.shiftTemplate.role}
               </span>
             </div>
           </div>
@@ -64,13 +64,17 @@ const Details: Component<DetailsProps> = ({ shift, setState }) => {
             <div class="flex-1 py-2.5 overflow-hidden space-x-1">
               <span class="font-semibold text-gray-500">Start Time:</span>
               <span>
-                {moment(shift()?.shift.startTime, "h:mm:ss").format("h:mma")}
+                {moment(shift()?.shiftTemplate.startTime, "h:mm:ss").format(
+                  "h:mma"
+                )}
               </span>
             </div>
             <div class="flex-1 py-2.5 overflow-hidden space-x-1">
               <span class="font-semibold text-gray-500">End Time:</span>
               <span>
-                {moment(shift()?.shift.endTime, "h:mm:ss").format("h:mma")}
+                {moment(shift()?.shiftTemplate.endTime, "h:mm:ss").format(
+                  "h:mma"
+                )}
               </span>
             </div>
           </div>

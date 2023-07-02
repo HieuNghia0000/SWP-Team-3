@@ -15,8 +15,8 @@ import {
 import PopupModal from "~/components/PopupModal";
 import Spinner from "~/components/Spinner";
 import { TextInput } from "~/components/form/TextInput";
-import { WorkScheduleCard, useSPData } from "~/context/ShiftPlanning";
-import { Role, Shift, DataResponse } from "~/types";
+import { ShiftCard, useSPData } from "~/context/ShiftPlanning";
+import { Role, ShiftTemplate, DataResponse } from "~/types";
 import { Tabs } from ".";
 import {
   readableToTimeStr,
@@ -70,21 +70,21 @@ const schema: yup.Schema<EditScheduleForm> = yup.object({
 });
 const fetcher: ResourceFetcher<
   boolean,
-  Shift[],
+  ShiftTemplate[],
   { state: Tabs }
 > = async () => {
   // const response = await fetch(
   //   `${getEndPoint()}/shift-planning?from_date=${from}&to_date=${to}`
   // );
   const response = await fetch(`http://localhost:3000/shifts.json`);
-  const data: DataResponse<Shift[]> = await response.json();
+  const data: DataResponse<ShiftTemplate[]> = await response.json();
 
   return data.content;
 };
 interface EditProps {
   setModalState: Setter<Tabs>;
   modalState: Accessor<Tabs>;
-  modalData: Accessor<WorkScheduleCard | undefined>;
+  modalData: Accessor<ShiftCard | undefined>;
 }
 const Edit: Component<EditProps> = ({
   setModalState,
@@ -115,7 +115,7 @@ const Edit: Component<EditProps> = ({
             ...formData(),
             startTime: readableToTimeStr(formData().startTime),
             endTime: readableToTimeStr(formData().endTime),
-            scheduleId: modalData()?.scheduleId,
+            shiftId: modalData()?.shiftId,
             role: formData().role === "All roles" ? "" : formData().role,
             published: publish,
           })
@@ -127,11 +127,10 @@ const Edit: Component<EditProps> = ({
 
   const shiftOptions = () => {
     return shiftTemplates()?.map((shift) => ({
-      value: shift.shiftId,
-      label: `${shift.shiftName} (${shiftTimes(
-        shift.startTime,
-        shift.endTime
-      )}) [${!shift.role ? "All roles" : capitalize(shift.role) + " only"}]`,
+      value: shift.shiftTemplateId,
+      label: `${shift.name} (${shiftTimes(shift.startTime, shift.endTime)}) [${
+        !shift.role ? "All roles" : capitalize(shift.role) + " only"
+      }]`,
     }));
   };
 
@@ -139,7 +138,7 @@ const Edit: Component<EditProps> = ({
     const target = event.target as HTMLSelectElement;
     setChosenTemplate(Number.parseInt(target.value));
     const template = shiftTemplates()?.find(
-      (shift) => shift.shiftId === chosenTemplate()
+      (shift) => shift.shiftTemplateId === chosenTemplate()
     );
     const coefficient = template?.salaryCoefficient || 0;
     const role = template?.role || "All roles";
@@ -184,7 +183,7 @@ const Edit: Component<EditProps> = ({
                 <Select
                   id="shiftId"
                   name="shiftId"
-                  value={modalData()?.shift.shiftId || 0}
+                  value={modalData()?.shiftTemplate.shiftTemplateId || 0}
                   placeholder="Select a shift template"
                   options={shiftOptions()}
                   onChange={onChangeTemplate}
@@ -218,7 +217,7 @@ const Edit: Component<EditProps> = ({
                   name="coefficient"
                   type="number"
                   disabled
-                  value={modalData()?.shift.salaryCoefficient || 0}
+                  value={modalData()?.shiftTemplate.salaryCoefficient || 0}
                   step={0.1}
                   formHandler={formHandler}
                 />
@@ -232,7 +231,7 @@ const Edit: Component<EditProps> = ({
                 <TextInput
                   id="role"
                   name="role"
-                  value={modalData()?.shift.role || "All roles"}
+                  value={modalData()?.shiftTemplate.role || "All roles"}
                   disabled
                   formHandler={formHandler}
                 />
@@ -258,7 +257,7 @@ const Edit: Component<EditProps> = ({
                 <TextInput
                   id="startTime"
                   name="startTime"
-                  value={timeToReadable(modalData()?.shift?.startTime!)}
+                  value={timeToReadable(modalData()?.shiftTemplate?.startTime!)}
                   disabled
                   placeholder="e.g 5am"
                   formHandler={formHandler}
@@ -271,7 +270,7 @@ const Edit: Component<EditProps> = ({
                 <TextInput
                   id="endTime"
                   name="endTime"
-                  value={timeToReadable(modalData()?.shift?.endTime!)}
+                  value={timeToReadable(modalData()?.shiftTemplate?.endTime!)}
                   placeholder="e.g 5pm"
                   disabled
                   formHandler={formHandler}

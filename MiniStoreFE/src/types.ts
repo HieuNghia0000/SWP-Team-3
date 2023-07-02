@@ -1,74 +1,90 @@
+interface Timestamp {
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export enum Role {
   ADMIN = "ADMIN",
   MANAGER = "MANAGER",
   CASHIER = "CASHIER",
   GUARD = "GUARD",
 }
-export enum Status {
+export enum StaffStatus {
   ACTIVATED,
   DISABLED,
 }
+export enum TimesheetStatus {
+  PENDING,
+  APPROVED,
+  REJECTED,
+}
 
-export interface Staff {
+export interface Staff extends Timestamp {
   staffId: number;
   staffName: string;
   role: Role;
   username: string;
+  password?: string;
   phoneNumber?: string;
-  baseSalary?: number;
-  status: Status;
+  status: StaffStatus;
   image?: string;
   email?: string;
   workDays?: string;
-  leaveBlance?: number;
-  createdAt?: string;
-  updatedAt?: string;
+  leaveBalance: number;
 
   // relationship
-  workSchedule: WorkSchedule[];
+  salary: Salary;
+  shifts: Shift[];
 }
 
-export interface WorkSchedule {
-  scheduleId: number;
-  staffId: number;
+export interface Salary {
+  salaryId: number;
+  hourlyWage: number;
+  effectiveDate: string;
+  terminationDate: string;
+}
+
+export interface Shift extends Timestamp {
   shiftId: number;
+  shiftTemplateId: number;
+  staffId: number;
   date: string;
-  checkInTime?: string;
-  checkOutTime?: string;
   published: boolean;
-  createdAt?: string;
-  updatedAt?: string;
 
   // relationship
-  shift: Shift;
+  shiftTemplate: ShiftTemplate;
   staff?: Staff;
 }
 
-export interface Shift {
-  shiftId: number;
-  shiftName: string;
+export interface ShiftTemplate extends Timestamp {
+  shiftTemplateId: number;
   startTime: string;
   endTime: string;
+  name: string;
   salaryCoefficient: number;
   role: Role;
-  createdAt?: string;
-  updatedAt?: string;
 }
 
-export type Order = {
+export interface Timesheet {
+  timesheetId: number;
+  shiftId: number;
+  checkInTime: string;
+  checkOutTime: string;
+  status: TimesheetStatus;
+  noteTitle?: string;
+  noteContent?: string;
+}
+
+export interface Order extends Timestamp {
   orderId: number;
   orderDate: string;
   totalPrice: number;
-  voucherCode?: string;
-  created_at?: string;
-  updated_at?: string;
 
   // relationship
   items: OrderItem[];
-  voucher?: Voucher;
-};
+}
 
-export type OrderItem = {
+export interface OrderItem {
   orderItemId: number;
   orderId: number;
   quantity: number;
@@ -77,9 +93,9 @@ export type OrderItem = {
   // relationship
   product: Product;
   order?: Order;
-};
+}
 
-export type Product = {
+export interface Product {
   productId: number;
   barcode: string;
   name: string;
@@ -90,9 +106,9 @@ export type Product = {
 
   // relationship
   category?: Category;
-};
+}
 
-export type Category = {
+export interface Category {
   categoryId: number;
   name: string;
   description: string;
@@ -100,27 +116,16 @@ export type Category = {
   // add on
   sales?: number;
   stock?: number;
-};
+}
 
-export type Voucher = {
-  voucherCode: string;
-  discountValue: number;
-  discountType: "PERCENTAGE" | "AMOUNT";
-  maxDiscount: number;
-  validFrom: string;
-  validTo: string;
-  usedCount: number;
-};
-
-export type TimeClock = {
+export interface TimeClock {
   staffId: number;
   staffName: string;
   checkIn: string;
   checkOut: string;
   totalTime: string;
   role?: Role;
-  location?: string;
-};
+}
 
 export interface DataResponse<T> extends Response {
   content: T;

@@ -16,11 +16,11 @@ import {
   FaSolidRepeat,
 } from "solid-icons/fa";
 import { FiCalendar, FiSave } from "solid-icons/fi";
-import { ParamType } from "~/routes/shift-planning";
 import moment from "moment";
 import flatpickr from "flatpickr";
 import { getWeekFirstAndLastDates } from "~/utils/getWeekDates";
 import { useSPData, useShiftPlanningModals } from "~/context/ShiftPlanning";
+import { ParamType } from "./utils/types";
 
 type ToolBarProps = {
   datePicked: Accessor<string | undefined>;

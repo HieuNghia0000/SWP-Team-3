@@ -5,10 +5,10 @@ import PopupModal from "~/components/PopupModal";
 import { Role } from "~/types";
 import { Tabs } from ".";
 import { shiftTimes } from "../utils/shiftTimes";
-import { WorkScheduleCard, useSPData } from "~/context/ShiftPlanning";
+import { ShiftCard, useSPData } from "~/context/ShiftPlanning";
 
 interface ErrorsProps {
-  shift: Accessor<WorkScheduleCard | undefined>;
+  shift: Accessor<ShiftCard | undefined>;
   setModalState: Setter<Tabs>;
 }
 const Errors: Component<ErrorsProps> = ({ shift, setModalState }) => {
@@ -34,20 +34,20 @@ const Errors: Component<ErrorsProps> = ({ shift, setModalState }) => {
             <i
               class="absolute top-1 left-1.5 bottom-1 w-1.5 rounded"
               classList={{
-                "bg-blue-500": shift()?.shift.role === Role.CASHIER,
-                "bg-yellow-500": shift()?.shift.role === Role.GUARD,
-                "bg-red-500": shift()?.shift.role === Role.MANAGER,
-                "bg-gray-500": shift()?.shift.role === Role.ADMIN,
+                "bg-blue-500": shift()?.shiftTemplate.role === Role.CASHIER,
+                "bg-yellow-500": shift()?.shiftTemplate.role === Role.GUARD,
+                "bg-red-500": shift()?.shiftTemplate.role === Role.MANAGER,
+                "bg-gray-500": shift()?.shiftTemplate.role === Role.ADMIN,
               }}
             ></i>
             <p class="ml-3.5 font-semibold text-base tracking-wider">
               {shiftTimes(
-                shift()?.shift.startTime || "",
-                shift()?.shift.endTime || ""
+                shift()?.shiftTemplate.startTime || "",
+                shift()?.shiftTemplate.endTime || ""
               )}
             </p>
             <p class="ml-3.5 font-normal text-sm tracking-wider">
-              {shift()?.shift.shiftName}
+              {shift()?.shiftTemplate.name}
             </p>
           </div>
         </div>
@@ -74,7 +74,7 @@ const Errors: Component<ErrorsProps> = ({ shift, setModalState }) => {
 
           {/* Body */}
           <div>
-            <For each={tableData.shiftsRules[shift()!.scheduleId] || []}>
+            <For each={tableData.shiftsRules[shift()!.shiftId] || []}>
               {(rule) => (
                 <div class="flex border-t border-gray-200">
                   <div class="text-[#637286] p-2 flex-1">
