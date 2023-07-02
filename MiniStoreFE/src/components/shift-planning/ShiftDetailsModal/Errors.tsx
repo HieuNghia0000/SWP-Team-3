@@ -8,10 +8,10 @@ import { shiftTimes } from "../utils/shiftTimes";
 import { ShiftCard, useSPData } from "~/context/ShiftPlanning";
 
 interface ErrorsProps {
-  shift: Accessor<ShiftCard | undefined>;
+  shiftCard: Accessor<ShiftCard | undefined>;
   setModalState: Setter<Tabs>;
 }
-const Errors: Component<ErrorsProps> = ({ shift, setModalState }) => {
+const Errors: Component<ErrorsProps> = ({ shiftCard, setModalState }) => {
   const { tableData } = useSPData();
 
   return (
@@ -22,32 +22,32 @@ const Errors: Component<ErrorsProps> = ({ shift, setModalState }) => {
             class="rounded mx-0.5 p-2 relative text-left select-none"
             classList={{
               "bg-[#edf2f7] text-black":
-                shift()?.published && shift()?.isOrigin,
+                shiftCard()?.published && shiftCard()?.isOrigin,
               "bg-blue-100 text-blue-500 border border-blue-100":
-                shift()?.published && !shift()?.isOrigin,
+                shiftCard()?.published && !shiftCard()?.isOrigin,
               "bg-[repeating-linear-gradient(-45deg,white,white_5px,#eaf0f6_5px,#eaf0f6_10px)] border border-gray-200":
-                !shift()?.published && shift()?.isOrigin,
+                !shiftCard()?.published && shiftCard()?.isOrigin,
               "bg-[repeating-linear-gradient(-45deg,#e7f7ff,#e7f7ff_5px,#ceefff_5px,#ceefff_10px)] border border-blue-100":
-                !shift()?.published && !shift()?.isOrigin,
+                !shiftCard()?.published && !shiftCard()?.isOrigin,
             }}
           >
             <i
               class="absolute top-1 left-1.5 bottom-1 w-1.5 rounded"
               classList={{
-                "bg-blue-500": shift()?.shiftTemplate.role === Role.CASHIER,
-                "bg-yellow-500": shift()?.shiftTemplate.role === Role.GUARD,
-                "bg-red-500": shift()?.shiftTemplate.role === Role.MANAGER,
-                "bg-gray-500": shift()?.shiftTemplate.role === Role.ADMIN,
+                "bg-blue-500": shiftCard()?.shiftTemplate.role === Role.CASHIER,
+                "bg-yellow-500": shiftCard()?.shiftTemplate.role === Role.GUARD,
+                "bg-red-500": shiftCard()?.shiftTemplate.role === Role.MANAGER,
+                "bg-gray-500": shiftCard()?.shiftTemplate.role === Role.ADMIN,
               }}
             ></i>
             <p class="ml-3.5 font-semibold text-base tracking-wider">
               {shiftTimes(
-                shift()?.shiftTemplate.startTime || "",
-                shift()?.shiftTemplate.endTime || ""
+                shiftCard()?.shiftTemplate.startTime || "",
+                shiftCard()?.shiftTemplate.endTime || ""
               )}
             </p>
             <p class="ml-3.5 font-normal text-sm tracking-wider">
-              {shift()?.shiftTemplate.name}
+              {shiftCard()?.shiftTemplate.name}
             </p>
           </div>
         </div>
@@ -74,7 +74,7 @@ const Errors: Component<ErrorsProps> = ({ shift, setModalState }) => {
 
           {/* Body */}
           <div>
-            <For each={tableData.shiftsRules[shift()!.shiftId] || []}>
+            <For each={tableData.shiftsRules[shiftCard()!.shiftId] || []}>
               {(rule) => (
                 <div class="flex border-t border-gray-200">
                   <div class="text-[#637286] p-2 flex-1">

@@ -11,14 +11,18 @@ import {
 } from "@thisbeyond/solid-dnd";
 import moment from "moment";
 import { Component, For, Show, batch } from "solid-js";
-import { Role, Shift } from "~/types";
-import TableCel from "./TableCel";
+import { Shift } from "~/types";
+import TableCell from "./TableCell";
 import { useShiftPlanningModals, useSPData } from "~/context/ShiftPlanning";
 import { shiftTimes } from "./utils/shiftTimes";
-import { celIdGenerator } from "./utils/celIdGenerator";
+import { cellIdGenerator } from "./utils/cellIdGenerator";
 import { capitalize } from "~/utils/capitalize";
+import ShiftCard from "./ShiftCard";
+import { findOverlappingShifts } from "./utils/findOverlappingShifts";
+import { sortBy } from "lodash";
+import toast from "solid-toast";
 
-// a cel is a droppable box
+// a cell is a droppable box
 // a shift is a draggable item
 
 type DnDTableProps = {};
@@ -27,12 +31,12 @@ const Table: Component<DnDTableProps> = (props) => {
   const { setStaffModalData, setShowStaffModal } = useShiftPlanningModals();
   const { tableData, setTableData, fetchedData } = useSPData();
 
-  function getShiftsByBoxId(droppableBoxId: string) {
-    if (!tableData.cels.hasOwnProperty(droppableBoxId)) {
+  function getShiftsByCellId(cellId: string) {
+    if (!tableData.cells.hasOwnProperty(cellId)) {
       return []; // Key does not exist in transformed data
     }
 
-    const shiftIds = tableData.cels[droppableBoxId];
+    const shiftIds = tableData.cells[cellId];
 
     const shifts: Shift[] = [];
     for (let shiftId of shiftIds) {
@@ -46,17 +50,17 @@ const Table: Component<DnDTableProps> = (props) => {
   }
 
   // Get all droppable box ids
-  const droppableBoxIds = () => Object.keys(tableData.cels);
+  const cellIds = () => Object.keys(tableData.cells);
 
   // Check if the id is a droppable box id
-  const isDroppableBoxId = (id: string) => droppableBoxIds().includes(id);
+  const isCellId = (id: string) => cellIds().includes(id);
 
   // Find the droppable box id of a draggable id
-  const getDroppableBoxId = (draggableId: Id) => {
-    for (let celId in tableData.cels) {
-      const shiftIds = tableData.cels[celId];
-      if (shiftIds.includes(draggableId as number)) {
-        return celId;
+  const getCellId = (shiftCardId: Id) => {
+    for (let cellId in tableData.cells) {
+      const shiftIds = tableData.cells[cellId];
+      if (shiftIds.includes(shiftCardId as number)) {
+        return cellId;
       }
     }
 
@@ -71,13 +75,11 @@ const Table: Component<DnDTableProps> = (props) => {
   ) => {
     const closestContainer = closestCenter(
       draggable,
-      droppables.filter((droppable) =>
-        isDroppableBoxId(droppable.id as string)
-      ),
+      droppables.filter((droppable) => isCellId(droppable.id as string)),
       context
     );
     if (closestContainer) {
-      const containerItemIds = tableData.cels[closestContainer.id];
+      const containerItemIds = tableData.cells[closestContainer.id];
       const closestItem = closestCenter(
         draggable,
         droppables.filter((droppable) =>
@@ -89,7 +91,7 @@ const Table: Component<DnDTableProps> = (props) => {
         return closestContainer;
       }
 
-      if (getDroppableBoxId(draggable.id) !== closestContainer.id) {
+      if (getCellId(draggable.id) !== closestContainer.id) {
         const isLastItem =
           containerItemIds.indexOf(closestItem.id as number) ===
           containerItemIds.length - 1;
@@ -114,34 +116,59 @@ const Table: Component<DnDTableProps> = (props) => {
     onlyWhenChangingContainer = true
   ) => {
     // Get the droppable box id of the draggable
-    const draggableContainerId = getDroppableBoxId(draggable.id);
+    const draggableContainerId = getCellId(draggable.id);
     // Get the droppable box id of the droppable
-    const droppableId = isDroppableBoxId(droppable.id as string)
+    const droppableId = isCellId(droppable.id as string)
       ? (droppable.id as string)
-      : getDroppableBoxId(droppable.id);
+      : getCellId(droppable.id);
 
     if (draggableContainerId != droppableId || !onlyWhenChangingContainer) {
-      const containerItemIds = tableData.cels[droppableId];
-      let index = containerItemIds.indexOf(droppable.id as number);
-      if (index === -1) index = containerItemIds.length;
+      if (isErrored(draggable, droppable)) {
+        toast.error("Cannot move the shift here!", {
+          duration: 2000,
+          style: {
+            color: "#dc2626",
+            background: "#fecaca",
+            border: "1px solid #b91c1c",
+          },
+        });
+        return;
+      }
 
       batch(() => {
-        setTableData("cels", draggableContainerId, (items) =>
+        setTableData("cells", draggableContainerId, (items) =>
           items.filter((item) => item !== draggable.id)
         );
-        setTableData("cels", droppableId, (items) => [
-          ...items.slice(0, index),
-          draggable.id as number,
-          ...items.slice(index),
-        ]);
+        setTableData("cells", droppableId, (items) => {
+          const sortedShifts = sortBy(
+            [...items, draggable.id as number],
+            [(shiftId) => tableData.shifts[shiftId].shiftTemplate.startTime]
+          );
+          return [...sortedShifts];
+        });
       });
     }
   };
 
-  const onDragOver: DragEventHandler = ({ draggable, droppable }) => {
-    if (draggable && droppable) {
-      move(draggable, droppable);
-    }
+  const overlappingShifts = (draggable: Draggable, droppable: Droppable) =>
+    findOverlappingShifts([
+      ...getShiftsByCellId(droppable.id as string),
+      draggable.data.item,
+    ]);
+
+  const isErrored = (draggable: Draggable, droppable: Droppable) => {
+    // If the shift's required role is not the same role as the staff
+    if (draggable.data.item.shiftTemplate.role !== droppable.data.staff.role)
+      return true;
+
+    // If the shift overlaps with another shift
+    if (
+      overlappingShifts(draggable, droppable).includes(
+        draggable.data.item.shiftTemplateId
+      )
+    )
+      return true;
+    return false;
   };
 
   const onDragEnd: DragEventHandler = ({ draggable, droppable }) => {
@@ -177,7 +204,6 @@ const Table: Component<DnDTableProps> = (props) => {
         <div class="relative shadow-sm border border-gray-200 border-t-0">
           <Show when={tableData.staffs.length !== 0}>
             <DragDropProvider
-              // onDragOver={onDragOver}
               onDragEnd={onDragEnd}
               collisionDetector={closestContainerOrItem}
             >
@@ -216,9 +242,11 @@ const Table: Component<DnDTableProps> = (props) => {
                     </div>
                     <For each={tableData.dates}>
                       {(date) => (
-                        <TableCel
-                          id={celIdGenerator(staff, date)}
-                          items={getShiftsByBoxId(celIdGenerator(staff, date))}
+                        <TableCell
+                          id={cellIdGenerator(staff, date)}
+                          items={getShiftsByCellId(
+                            cellIdGenerator(staff, date)
+                          )}
                           staff={staff}
                           date={date}
                         />
@@ -234,49 +262,21 @@ const Table: Component<DnDTableProps> = (props) => {
                   let item = () => draggable?.data?.item as Shift;
                   let isOrigin = () => draggable?.data?.isOrigin as boolean;
                   let selectedShiftWidth = () => draggable?.data?.width() - 4;
-                  // let staff = () => draggable?.data?.staff as Staff;
 
                   return (
-                    <button
-                      type="button"
-                      id={draggable?.id as string}
-                      class="rounded mx-0.5 px-1.5 py-1 relative text-left"
+                    <ShiftCard
+                      isOrigin={isOrigin()}
+                      published={item().published}
+                      loading={fetchedData.loading}
+                      role={item().shiftTemplate.role}
+                      shiftDuration={shiftTimes(
+                        item().shiftTemplate.startTime,
+                        item().shiftTemplate.endTime
+                      )}
+                      shiftName={item().shiftTemplate.name}
                       style={{ width: `${selectedShiftWidth()}px` }}
-                      classList={{
-                        "bg-white hover:bg-[#edf2f7] text-black border border-gray-200":
-                          item().published && isOrigin(),
-                        "bg-blue-100 hover:bg-blue-200 text-blue-500 border border-blue-100":
-                          item().published && !isOrigin(),
-                        "bg-[repeating-linear-gradient(-45deg,white,white_5px,#eff4f8_5px,#eff4f8_10px)] hover:bg-[repeating-linear-gradient(-45deg,white,white_5px,#eaf0f6_5px,#eaf0f6_10px)] border border-gray-200":
-                          !item().published && isOrigin(),
-                        "bg-[repeating-linear-gradient(-45deg,#e7f7ff,#e7f7ff_5px,#ceefff_5px,#ceefff_10px)] hover:bg-[repeating-linear-gradient(-45deg,#e7f7ff,#e7f7ff_5px,#bfeaff_5px,#bfeaff_10px)] border border-blue-100":
-                          !item().published && !isOrigin(),
-                        "animate-pulse": fetchedData.loading,
-                      }}
-                    >
-                      <i
-                        class="absolute top-1 left-1 bottom-1 w-1.5 rounded"
-                        classList={{
-                          "bg-blue-700":
-                            item().shiftTemplate.role === Role.CASHIER,
-                          "bg-yellow-700":
-                            item().shiftTemplate.role === Role.GUARD,
-                          "bg-red-700":
-                            item().shiftTemplate.role === Role.MANAGER,
-                          "bg-gray-700":
-                            item().shiftTemplate.role === Role.ADMIN,
-                        }}
-                      ></i>
-                      <p class="ml-3 font-semibold text-sm">
-                        {shiftTimes(
-                          item().shiftTemplate.startTime,
-                          item().shiftTemplate.endTime
-                        )}
-                      </p>
-                      <p class="ml-3 font-normal text-xs text-gray-600">
-                        {item().shiftTemplate.name}
-                      </p>
-                    </button>
+                      isOverlay={true}
+                    />
                   );
                 }}
               </DragOverlay>

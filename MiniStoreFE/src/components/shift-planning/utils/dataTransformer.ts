@@ -1,5 +1,5 @@
 import moment from "moment";
-import { celIdGenerator } from "./celIdGenerator";
+import { cellIdGenerator } from "./cellIdGenerator";
 import { DataTable, FetcherData } from "./types";
 
 // TODO: add another transform function to transform data fetched from add new shift endpoint
@@ -8,7 +8,7 @@ export function transformData(data: FetcherData): DataTable {
   const transformedData: DataTable = {
     originShifts: {},
     shifts: {},
-    cels: {},
+    cells: {},
     dates: data.dates,
     staffs: data.staffs,
     changedShifts: {},
@@ -28,17 +28,17 @@ export function transformData(data: FetcherData): DataTable {
     }
 
     for (let date of data.dates) {
-      const celId = celIdGenerator(staff, date);
+      const cellId = cellIdGenerator(staff, date);
       const matchingShifts = staff.shifts.filter((s) =>
         moment(s.date).isSame(date, "day")
       );
 
-      if (!transformedData.cels.hasOwnProperty(celId)) {
-        transformedData.cels[celId] = [];
+      if (!transformedData.cells.hasOwnProperty(cellId)) {
+        transformedData.cells[cellId] = [];
       }
 
       for (let shift of matchingShifts) {
-        transformedData.cels[celId].push(shift.shiftId);
+        transformedData.cells[cellId].push(shift.shiftId);
       }
     }
   }

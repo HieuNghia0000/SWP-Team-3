@@ -28,7 +28,7 @@ export default function Root() {
       </Head>
       <Body>
         <SolidNProgress color="#4F46E5" />
-        <Toaster position="top-center" />
+        <Toaster position="top-center" gutter={8} />
         <Suspense
           fallback={
             <div class="h-screen grid place-items-center">Loading...</div>

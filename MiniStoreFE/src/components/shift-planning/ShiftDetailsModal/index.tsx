@@ -60,7 +60,7 @@ const ShiftDetailsModal: Component<{
     >
       <Switch>
         <Match when={state() === "details"}>
-          <Details shift={modalData} setState={setState} />
+          <Details shiftCard={modalData} setState={setState} />
         </Match>
         <Match when={state() === "edit"}>
           <Edit
@@ -70,7 +70,7 @@ const ShiftDetailsModal: Component<{
           />
         </Match>
         <Match when={state() === "errors"}>
-          <Errors shift={modalData} setModalState={setState} />
+          <Errors shiftCard={modalData} setModalState={setState} />
         </Match>
         <Match when={state() === "copy"}>
           <Copy shiftCard={modalData} setModalState={setState} />

@@ -16,7 +16,7 @@ export type Rules = {
 export interface DataTable extends FetcherData {
   originShifts: { [key: Shift["shiftId"]]: Shift };
   shifts: { [key: Shift["shiftId"]]: Shift };
-  cels: { [key: string]: Shift["shiftId"][] };
+  cells: { [key: string]: Shift["shiftId"][] };
   isErrored: boolean;
   preparingData: boolean;
   isChanged: boolean;

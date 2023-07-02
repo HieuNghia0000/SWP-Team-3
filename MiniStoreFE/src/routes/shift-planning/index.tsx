@@ -66,7 +66,7 @@ export default function ShiftPlanning() {
   // Because the data returned from the fetcher is a Signal, which is not good for manage complex state
   // So we need to transform the data to a Store for better state management
   const [tableData, setTableData] = createStore<DataTable>({
-    cels: {},
+    cells: {},
     shifts: {},
     originShifts: {},
     dates: [],
@@ -110,7 +110,7 @@ export default function ShiftPlanning() {
 
         if (data.state === "errored" && datePicked() !== undefined) {
           setTableData({
-            cels: {},
+            cells: {},
             shifts: [],
             dates: getWeekDateStings(datePicked()!),
             staffs: [],
@@ -135,7 +135,7 @@ export default function ShiftPlanning() {
       staffs: [],
     });
     setTableData({
-      cels: {},
+      cells: {},
       shifts: {},
       dates: [],
       staffs: [],

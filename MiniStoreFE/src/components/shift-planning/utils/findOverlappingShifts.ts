@@ -1,11 +1,12 @@
-import { sortBy, union } from "lodash";
+import { sortBy, union, unionBy } from "lodash";
 import moment from "moment";
 import { Shift } from "~/types";
 
 // Find overlapping shifts
-// Returns an array of shiftIds of overlapping shifts
+// Returns an array of shiftTemplateIds of overlapping shifts
 export function findOverlappingShifts(shifts: Shift[]) {
-  const sortedShifts = sortBy(shifts, "shift.startTime");
+  const s = unionBy(shifts, "shiftId");
+  const sortedShifts = sortBy(s, "shiftTemplate.startTime");
   const overlappingShifts: number[] = [];
 
   for (let i = 0; i < sortedShifts.length - 1; i++) {
@@ -32,10 +33,13 @@ export function findOverlappingShifts(shifts: Shift[]) {
         currentShiftStart,
         currentShiftEnd,
         undefined,
-        "[]"
+        "[)"
       )
     ) {
-      overlappingShifts.push(currentShift.shiftId, nextShift.shiftId);
+      overlappingShifts.push(
+        currentShift.shiftTemplateId,
+        nextShift.shiftTemplateId
+      );
     }
   }
 
