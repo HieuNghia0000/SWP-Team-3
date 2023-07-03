@@ -26,6 +26,8 @@ import {
 import { timeOptions } from "../utils/timeOptions";
 import * as yup from "yup";
 import { Select } from "~/components/form/Select";
+import { roles } from "~/utils/roles";
+import isDayInThePast from "../utils/isDayInThePast";
 
 type EditScheduleForm = {
   shiftId: number;
@@ -33,7 +35,7 @@ type EditScheduleForm = {
   startTime: string;
   endTime: string;
   coefficient: number;
-  role: Role | "All roles";
+  role: Role;
   date: Date;
 };
 
@@ -58,7 +60,7 @@ const schema: yup.Schema<EditScheduleForm> = yup.object({
   role: yup
     .string()
     .oneOf(
-      [Role.MANAGER, Role.CASHIER, Role.GUARD, "All roles"],
+      [Role.MANAGER, Role.CASHIER, Role.GUARD, Role.ALL_ROLES],
       "Invalid role"
     )
     .required("Please select a role"),
@@ -85,11 +87,13 @@ interface EditProps {
   setModalState: Setter<Tabs>;
   modalState: Accessor<Tabs>;
   modalData: Accessor<ShiftCard | undefined>;
+  onDelete: () => void;
 }
 const Edit: Component<EditProps> = ({
   setModalState,
   modalData,
   modalState,
+  onDelete,
 }) => {
   const { tableData } = useSPData();
   const [shiftTemplates, { refetch, mutate }] = createResource(
@@ -116,7 +120,6 @@ const Edit: Component<EditProps> = ({
             startTime: readableToTimeStr(formData().startTime),
             endTime: readableToTimeStr(formData().endTime),
             shiftId: modalData()?.shiftId,
-            role: formData().role === "All roles" ? "" : formData().role,
             published: publish,
           })
       );
@@ -129,7 +132,9 @@ const Edit: Component<EditProps> = ({
     return shiftTemplates()?.map((shift) => ({
       value: shift.shiftTemplateId,
       label: `${shift.name} (${shiftTimes(shift.startTime, shift.endTime)}) [${
-        !shift.role ? "All roles" : capitalize(shift.role) + " only"
+        shift.role === Role.ALL_ROLES
+          ? "All roles"
+          : capitalize(shift.role) + " only"
       }]`,
     }));
   };
@@ -141,7 +146,7 @@ const Edit: Component<EditProps> = ({
       (shift) => shift.shiftTemplateId === chosenTemplate()
     );
     const coefficient = template?.salaryCoefficient || 0;
-    const role = template?.role || "All roles";
+    const role = template?.role;
     const startTime = template?.startTime;
     const endTime = template?.endTime;
 
@@ -161,9 +166,7 @@ const Edit: Component<EditProps> = ({
     setChosenTemplate(0);
   };
 
-  const onDelete = async () => {
-    alert("Delete");
-  };
+  const isOldShift = isDayInThePast(modalData()?.date || "");
 
   return (
     <>
@@ -206,6 +209,7 @@ const Edit: Component<EditProps> = ({
                     label: staff.staffName,
                   }))}
                   formHandler={formHandler}
+                  disabled={isOldShift}
                 />
               </div>
               <div class="flex-1 py-2.5 max-w-[140px] flex flex-col gap-1">
@@ -228,12 +232,13 @@ const Edit: Component<EditProps> = ({
                 <label for="role" class="text-gray-700 font-semibold">
                   Required Role
                 </label>
-                <TextInput
+                <Select
                   id="role"
                   name="role"
-                  value={modalData()?.shiftTemplate.role || "All roles"}
-                  disabled
+                  value={modalData()?.shiftTemplate.role}
+                  options={roles}
                   formHandler={formHandler}
+                  disabled
                 />
               </div>
               <div class="flex-1 py-2.5 flex flex-col gap-1">
@@ -246,6 +251,7 @@ const Edit: Component<EditProps> = ({
                   type="date"
                   value={modalData()?.date || ""}
                   formHandler={formHandler}
+                  disabled={isOldShift}
                 />
               </div>
             </div>
@@ -277,6 +283,17 @@ const Edit: Component<EditProps> = ({
                 />
               </div>
             </div>
+            <Show when={isOldShift}>
+              <div class="mb-2 w-[560px]">
+                <label class="mb-1.5 font-semibold text-gray-600 inline-block">
+                  Note
+                </label>
+                <p class="text-gray-400 text-sm tracking-wide">
+                  Since this shift has passed, you can only change the shift
+                  template for this shift.
+                </p>
+              </div>
+            </Show>
           </form>
         </Show>
       </PopupModal.Body>

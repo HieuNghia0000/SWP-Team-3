@@ -8,8 +8,8 @@ export interface FetcherData {
   staffs: Staff[];
 }
 
-export type Rules = {
-  name: string;
+export type Rule = {
+  errorName: string;
   description: string;
   passed: boolean;
 };
@@ -21,5 +21,5 @@ export interface DataTable extends FetcherData {
   preparingData: boolean;
   isChanged: boolean;
   changedShifts: { [key: Shift["shiftId"]]: boolean };
-  shiftsRules: { [key: Shift["shiftId"]]: Rules[] };
+  shiftsRules: { [key: Shift["shiftId"]]: Rule[] };
 }

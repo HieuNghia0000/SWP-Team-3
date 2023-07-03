@@ -19,18 +19,42 @@
       "leaveBalance": 14,
       "shifts": [
         {
-          "shiftId": 1,
+          "shiftId": 2,
           "staffId": 1,
-          "shiftTemplateId": 1,
+          "shiftTemplateId": 2,
           "shiftTemplate": {
-            "shiftTemplateId": 1,
-            "name": "Ca Sáng",
-            "startTime": "08:00:00",
-            "endTime": "16:00:00",
+            "shiftTemplateId": 2,
+            "name": "Ca Chiều",
+            "startTime": "16:00:00",
+            "endTime": "24:00:00",
             "salaryCoefficient": 1.0,
-            "role": "CASHIER"
+            "role": "MANAGER"
           },
-          "date": "2023-06-15",
+          "date": "2023-07-03",
+          "timesheet": {
+            "timesheetId": 5,
+            "shiftId": 2,
+            "checkInTime": "16:00:00",
+            "checkOutTime": "24:00:00",
+            "status": 0,
+            "noteTitle": null,
+            "noteContent": null
+          },
+          "published": false
+        },
+        {
+          "shiftId": 3,
+          "staffId": 1,
+          "shiftTemplateId": 2,
+          "shiftTemplate": {
+            "shiftTemplateId": 2,
+            "name": "Ca Khuya",
+            "startTime": "24:00:00",
+            "endTime": "08:00:00",
+            "salaryCoefficient": 1.0,
+            "role": "MANAGER"
+          },
+          "date": "2023-07-06",
           "timesheet": null,
           "published": true
         }
@@ -53,40 +77,7 @@
       "email": "khoa@gmail.com",
       "workDays": "WED, SAT",
       "leaveBalance": 14,
-      "shifts": [
-        {
-          "shiftId": 2,
-          "staffId": 2,
-          "shiftTemplateId": 2,
-          "shiftTemplate": {
-            "shiftTemplateId": 2,
-            "name": "Ca Chiều",
-            "startTime": "16:00:00",
-            "endTime": "24:00:00",
-            "salaryCoefficient": 1.0,
-            "role": "MANAGER"
-          },
-          "date": "2023-06-17",
-          "timesheet": null,
-          "published": false
-        },
-        {
-          "shiftId": 3,
-          "staffId": 2,
-          "shiftTemplateId": 3,
-          "shiftTemplate": {
-            "shiftTemplateId": 3,
-            "name": "Ca Khuya",
-            "startTime": "24:00:00",
-            "endTime": "08:00:00",
-            "salaryCoefficient": 1.0,
-            "role": "ALL_ROLES"
-          },
-          "date": "2023-06-14",
-          "timesheet": null,
-          "published": true
-        }
-      ]
+      "shifts": []
     },
     {
       "staffId": 3,
@@ -107,7 +98,7 @@
       "leaveBalance": 14,
       "shifts": [
         {
-          "shiftId": 4,
+          "shiftId": 6,
           "staffId": 3,
           "shiftTemplateId": 4,
           "shiftTemplate": {
@@ -116,28 +107,12 @@
             "startTime": "12:00:00",
             "endTime": "16:00:00",
             "salaryCoefficient": 0.8,
-            "role": "GUARD"
+            "role": "ALL_ROLES"
           },
-          "date": "2023-06-18",
-          "timesheet": null,
-          "published": true
-        },
-        {
-          "shiftId": 5,
-          "staffId": 3,
-          "shiftTemplateId": 4,
-          "shiftTemplate": {
-            "shiftTemplateId": 4,
-            "name": "Afternoon Shift",
-            "startTime": "12:00:00",
-            "endTime": "16:00:00",
-            "salaryCoefficient": 0.8,
-            "role": "ADMIN"
-          },
-          "date": "2023-06-12",
+          "date": "2023-07-05",
           "timesheet": {
-            "timesheetId": 1,
-            "shiftId": 5,
+            "timesheetId": 6,
+            "shiftId": 6,
             "checkInTime": "12:00:00",
             "checkOutTime": "16:00:00",
             "status": 1,

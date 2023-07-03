@@ -353,7 +353,7 @@ const StaffDetailsModal: Component<{
             </div>
             <div class="flex-1 py-2.5 overflow-hidden space-x-1">
               <span class="font-semibold text-gray-500">Hourly Wage:</span>
-              <span>$0.00</span>
+              <span>0 ₫</span>
             </div>
           </div>
           <div class="flex border-b border-gray-300 border-dotted">

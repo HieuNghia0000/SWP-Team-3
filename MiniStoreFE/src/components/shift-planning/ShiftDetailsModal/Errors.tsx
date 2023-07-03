@@ -1,19 +1,22 @@
 import { BsCheckCircle, BsExclamationCircle } from "solid-icons/bs";
-import { FaSolidPencil } from "solid-icons/fa";
+import { FaSolidPencil, FaSolidTrash } from "solid-icons/fa";
 import { Accessor, Setter, Component, For, Show } from "solid-js";
 import PopupModal from "~/components/PopupModal";
 import { Role } from "~/types";
 import { Tabs } from ".";
 import { shiftTimes } from "../utils/shiftTimes";
-import { ShiftCard, useSPData } from "~/context/ShiftPlanning";
+import { ShiftCard } from "~/context/ShiftPlanning";
 
 interface ErrorsProps {
   shiftCard: Accessor<ShiftCard | undefined>;
   setModalState: Setter<Tabs>;
+  onDelete: () => void;
 }
-const Errors: Component<ErrorsProps> = ({ shiftCard, setModalState }) => {
-  const { tableData } = useSPData();
-
+const Errors: Component<ErrorsProps> = ({
+  shiftCard,
+  setModalState,
+  onDelete,
+}) => {
   return (
     <>
       <PopupModal.Body>
@@ -37,7 +40,9 @@ const Errors: Component<ErrorsProps> = ({ shiftCard, setModalState }) => {
                 "bg-blue-500": shiftCard()?.shiftTemplate.role === Role.CASHIER,
                 "bg-yellow-500": shiftCard()?.shiftTemplate.role === Role.GUARD,
                 "bg-red-500": shiftCard()?.shiftTemplate.role === Role.MANAGER,
-                "bg-gray-500": shiftCard()?.shiftTemplate.role === Role.ADMIN,
+                "bg-gray-600": shiftCard()?.shiftTemplate.role === Role.ADMIN,
+                "bg-gray-400":
+                  shiftCard()?.shiftTemplate.role === Role.ALL_ROLES,
               }}
             ></i>
             <p class="ml-3.5 font-semibold text-base tracking-wider">
@@ -74,7 +79,7 @@ const Errors: Component<ErrorsProps> = ({ shiftCard, setModalState }) => {
 
           {/* Body */}
           <div>
-            <For each={tableData.shiftsRules[shiftCard()!.shiftId] || []}>
+            <For each={shiftCard()!.rules}>
               {(rule) => (
                 <div class="flex border-t border-gray-200">
                   <div class="text-[#637286] p-2 flex-1">
@@ -101,15 +106,28 @@ const Errors: Component<ErrorsProps> = ({ shiftCard, setModalState }) => {
         </div>
       </PopupModal.Body>
       <PopupModal.Footer>
-        <button
-          onClick={[setModalState, "edit"]}
-          class="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-2"
-        >
-          <span class="">
-            <FaSolidPencil />
-          </span>
-          Edit Shift
-        </button>
+        <div class="w-full flex justify-start items-center gap-3">
+          <button
+            type="button"
+            onClick={onDelete}
+            class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
+          >
+            <span>
+              <FaSolidTrash />
+            </span>
+            <span>Delete</span>
+          </button>
+          <button
+            type="button"
+            onClick={[setModalState, "edit"]}
+            class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
+          >
+            <span class="">
+              <FaSolidPencil />
+            </span>
+            Edit Shift
+          </button>
+        </div>
       </PopupModal.Footer>
     </>
   );

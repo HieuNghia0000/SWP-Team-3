@@ -4,6 +4,7 @@ interface Timestamp {
 }
 
 export enum Role {
+  ALL_ROLES = "ALL_ROLES",
   ADMIN = "ADMIN",
   MANAGER = "MANAGER",
   CASHIER = "CASHIER",

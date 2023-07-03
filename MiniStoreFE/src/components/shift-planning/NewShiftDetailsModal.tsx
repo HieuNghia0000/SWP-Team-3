@@ -23,6 +23,7 @@ import { capitalize } from "~/utils/capitalize";
 import { useSPData } from "~/context/ShiftPlanning";
 import { timeOptions } from "./utils/timeOptions";
 import Spinner from "../Spinner";
+import { roles } from "~/utils/roles";
 
 type NewScheduleForm = {
   shiftId: number;
@@ -30,7 +31,7 @@ type NewScheduleForm = {
   startTime: string;
   endTime: string;
   coefficient: number;
-  role: Role | "All roles";
+  role: Role;
   date: Date;
 };
 
@@ -55,7 +56,7 @@ const schema: yup.Schema<NewScheduleForm> = yup.object({
   role: yup
     .string()
     .oneOf(
-      [Role.MANAGER, Role.CASHIER, Role.GUARD, "All roles"],
+      [Role.MANAGER, Role.CASHIER, Role.GUARD, Role.ALL_ROLES],
       "Invalid role"
     )
     .required("Please select a role"),
@@ -104,7 +105,6 @@ const NewShiftDetailsModal: Component<{
             ...formData(),
             startTime: readableToTimeStr(formData().startTime),
             endTime: readableToTimeStr(formData().endTime),
-            role: formData().role === "All roles" ? "" : formData().role,
             published: publish,
           })
       );
@@ -121,7 +121,9 @@ const NewShiftDetailsModal: Component<{
     return shiftTemplates()?.map((shift) => ({
       value: shift.shiftTemplateId,
       label: `${shift.name} (${shiftTimes(shift.startTime, shift.endTime)}) [${
-        !shift.role ? "All roles" : capitalize(shift.role) + " only"
+        shift.role === Role.ALL_ROLES
+          ? "All roles"
+          : capitalize(shift.role) + " only"
       }]`,
     }));
   };
@@ -133,7 +135,7 @@ const NewShiftDetailsModal: Component<{
       (shift) => shift.shiftTemplateId === chosenTemplate()
     );
     const coefficient = template?.salaryCoefficient || 0;
-    const role = template?.role || "All roles";
+    const role = template?.role;
     const startTime = template?.startTime;
     const endTime = template?.endTime;
 
@@ -212,12 +214,13 @@ const NewShiftDetailsModal: Component<{
                 <label for="role" class="text-gray-700 font-semibold">
                   Required Role
                 </label>
-                <TextInput
+                <Select
                   id="role"
                   name="role"
-                  value="All roles"
-                  disabled
+                  value={Role.ALL_ROLES}
+                  options={roles}
                   formHandler={formHandler}
+                  disabled
                 />
               </div>
               <div class="flex-1 py-2.5 flex flex-col gap-1 overflow-hidden">

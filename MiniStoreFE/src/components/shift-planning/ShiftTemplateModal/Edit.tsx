@@ -9,7 +9,7 @@ import { ShiftTemplate } from "~/types";
 import { readableToTimeStr } from "../utils/shiftTimes";
 import { timeOptions } from "../utils/timeOptions";
 import { TemplateProps } from "./types";
-import { roles } from "~/utils/roles";
+import { roles2 } from "~/utils/roles";
 import { schema } from "./formSchema";
 
 interface EditProps extends TemplateProps {
@@ -35,7 +35,6 @@ const Edit: Component<EditProps> = ({
             ...formData(),
             startTime: readableToTimeStr(formData().startTime),
             endTime: readableToTimeStr(formData().endTime),
-            role: formData().role === "All roles" ? "" : formData().role,
             shiftId: shiftTemplateFocus()?.shiftTemplateId,
           })
       );
@@ -104,8 +103,8 @@ const Edit: Component<EditProps> = ({
               <Select
                 id="role"
                 name="role"
-                value={shiftTemplateFocus()?.role || "All roles"}
-                options={roles}
+                value={shiftTemplateFocus()?.role}
+                options={roles2}
                 formHandler={formHandler}
               />
             </div>

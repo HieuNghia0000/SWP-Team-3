@@ -116,7 +116,7 @@ export default function ShiftPlanning() {
             staffs: [],
           });
 
-          toast.error("Error!", {
+          toast.error("Error! Unable to get the data", {
             duration: 2000,
             style: {
               color: "#dc2626",

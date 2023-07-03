@@ -4,6 +4,8 @@ import { Role, Staff, StaffStatus } from "~/types";
 import PopupModal from "../PopupModal";
 import { Accessor, Component, Setter } from "solid-js";
 import routes from "~/utils/routes";
+import { roles } from "~/utils/roles";
+import formatNumberWithCommas from "~/utils/formatNumberWithCommas";
 
 const StaffDetailsModal: Component<{
   showModal: Accessor<boolean>;
@@ -34,7 +36,12 @@ const StaffDetailsModal: Component<{
             </div>
             <div class="flex-1 py-2.5 overflow-hidden space-x-1">
               <span class="font-semibold text-gray-500">Hourly Wage:</span>
-              <span>{modalData()?.salary.hourlyWage}</span>
+              <span>
+                {formatNumberWithCommas(
+                  `${modalData()?.salary.hourlyWage || 0}`
+                )}{" "}
+                ₫
+              </span>
             </div>
           </div>
           <div class="flex">
@@ -48,10 +55,12 @@ const StaffDetailsModal: Component<{
                   "bg-yellow-200 text-yellow-700":
                     modalData()?.role === Role.GUARD,
                   "bg-red-200 text-red-700": modalData()?.role === Role.MANAGER,
-                  "bg-gray-200 text-gray-700": modalData()?.role === Role.ADMIN,
+                  "bg-gray-200 text-gray-700":
+                    modalData()?.role === Role.ADMIN ||
+                    modalData()?.role === Role.ALL_ROLES,
                 }}
               >
-                {modalData()?.role}
+                {roles.find((r) => r.value === modalData()?.role)?.label}
               </span>
             </div>
             <div class="flex-1 py-2.5 overflow-hidden space-x-1">
@@ -63,7 +72,9 @@ const StaffDetailsModal: Component<{
                   "bg-red-500": modalData()?.status === StaffStatus.DISABLED,
                 }}
               >
-                {true ? "Activated" : "Disabled"}
+                {modalData()?.status === StaffStatus.ACTIVATED
+                  ? "Activated"
+                  : "Disabled"}
               </span>
             </div>
           </div>

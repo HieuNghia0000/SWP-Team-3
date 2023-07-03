@@ -1,7 +1,7 @@
 import { compact } from "lodash";
 import { useFormHandler } from "solid-form-handler";
 import { yupSchema } from "solid-form-handler/yup";
-import { FaSolidTrash } from "solid-icons/fa";
+import { FaSolidPencil, FaSolidTrash } from "solid-icons/fa";
 import { Accessor, Setter, Component, createSignal, Show } from "solid-js";
 import PopupModal from "~/components/PopupModal";
 import { Checkboxes } from "~/components/form/Checkboxes";
@@ -24,8 +24,9 @@ const copySchema: yup.Schema<CopyScheduleForm> = yup.object({
 interface CopyProps {
   shiftCard: Accessor<ShiftCard | undefined>;
   setModalState: Setter<Tabs>;
+  onDelete: () => void;
 }
-const Copy: Component<CopyProps> = ({ shiftCard, setModalState }) => {
+const Copy: Component<CopyProps> = ({ shiftCard, setModalState, onDelete }) => {
   const { tableData } = useSPData();
   const [enableMultiWeeks, setEnableMultiWeeks] = createSignal<boolean>(false);
   const formHandler = useFormHandler(yupSchema(copySchema));
@@ -79,10 +80,6 @@ const Copy: Component<CopyProps> = ({ shiftCard, setModalState }) => {
     }
   };
 
-  const onDelete = async () => {
-    alert("Delete");
-  };
-
   const reset = () => {
     formHandler.resetForm();
   };
@@ -115,7 +112,9 @@ const Copy: Component<CopyProps> = ({ shiftCard, setModalState }) => {
                 "bg-blue-500": shiftCard()?.shiftTemplate.role === Role.CASHIER,
                 "bg-yellow-500": shiftCard()?.shiftTemplate.role === Role.GUARD,
                 "bg-red-500": shiftCard()?.shiftTemplate.role === Role.MANAGER,
-                "bg-gray-500": shiftCard()?.shiftTemplate.role === Role.ADMIN,
+                "bg-gray-600": shiftCard()?.shiftTemplate.role === Role.ADMIN,
+                "bg-gray-400":
+                  shiftCard()?.shiftTemplate.role === Role.ALL_ROLES,
               }}
             ></i>
             <p class="ml-3.5 font-semibold text-base tracking-wider">
@@ -226,16 +225,26 @@ const Copy: Component<CopyProps> = ({ shiftCard, setModalState }) => {
       </PopupModal.Body>
       <PopupModal.Footer>
         <div class="w-full flex justify-between items-center gap-2">
-          <div class="flex gap-2 justify-center items-center">
+          <div class="flex gap-3 justify-center items-center">
             <button
               type="button"
               onClick={onDelete}
-              class="flex gap-2 justify-center items-center px-3 text-gray-500 text-sm hover:text-gray-700"
+              class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
             >
               <span>
                 <FaSolidTrash />
               </span>
               <span>Delete</span>
+            </button>
+            <button
+              type="button"
+              onClick={[setModalState, "edit"]}
+              class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
+            >
+              <span class="">
+                <FaSolidPencil />
+              </span>
+              Edit Shift
             </button>
           </div>
           <div class="flex gap-2 justify-center items-center">

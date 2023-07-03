@@ -9,13 +9,13 @@ import { SetStoreFunction } from "solid-js/store";
 import {
   DataTable,
   FetcherData,
-  Rules,
+  Rule,
 } from "~/components/shift-planning/utils/types";
 import { Shift, Staff, ShiftTemplate } from "~/types";
 
 export interface ShiftCard extends Shift {
   isOrigin: boolean;
-  rules: Rules[];
+  rules: Rule[];
 }
 
 type SPModalContext = {

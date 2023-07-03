@@ -2,7 +2,7 @@ import { capitalize } from "lodash";
 import { ImPlus } from "solid-icons/im";
 import { Setter, Component, For, batch } from "solid-js";
 import PopupModal from "~/components/PopupModal";
-import { ShiftTemplate } from "~/types";
+import { Role, ShiftTemplate } from "~/types";
 import { shiftTimes } from "../utils/shiftTimes";
 import { TemplateProps } from "./types";
 
@@ -40,7 +40,7 @@ const List: Component<ListProps> = ({
                   </div>
                   <div class="text-gray-500 tracking-wide">
                     {shiftTemplate.name} -{" "}
-                    {!shiftTemplate.role
+                    {shiftTemplate.role === Role.ALL_ROLES
                       ? "All roles"
                       : capitalize(shiftTemplate.role)}
                   </div>

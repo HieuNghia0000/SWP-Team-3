@@ -2,7 +2,9 @@ import {
   Accessor,
   Component,
   Setter,
+  createEffect,
   createSignal,
+  on,
   onCleanup,
   onMount,
 } from "solid-js";
@@ -36,10 +38,15 @@ const ToolBar: Component<ToolBarProps> = ({ datePicked, setDatePicked }) => {
   let dateRef: HTMLInputElement | undefined = undefined;
   let fp: flatpickr.Instance | undefined = undefined;
 
-  // createEffect(() => {
-  // console.log(tableData.changedShifts);
-  // console.log(tableData.shifts);
-  // });
+  createEffect(
+    on(
+      () => searchParams.picked_date,
+      () => {
+        if (searchParams.picked_date === undefined)
+          fp?.setDate(moment().toDate(), true);
+      }
+    )
+  );
 
   onMount(() => {
     const p = moment(searchParams.picked_date);

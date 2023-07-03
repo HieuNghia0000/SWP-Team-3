@@ -4,59 +4,43 @@ import { useShiftPlanningModals, useSPData } from "~/context/ShiftPlanning";
 import { Shift, Staff } from "~/types";
 import { shiftTimes } from "./utils/shiftTimes";
 import ShiftCard from "./ShiftCard";
+import { getShiftRules } from "./utils/shiftRules";
 
 const DraggableCard: Component<{
-  item: Shift;
+  shift: Shift;
   width: () => number | undefined;
   staff: Staff;
   date: string;
-}> = ({ item, width, staff, date }) => {
+}> = ({ shift, width, staff, date }) => {
   const { setShiftModalData, setShowShiftModal } = useShiftPlanningModals();
   const { fetchedData, tableData, setTableData } = useSPData();
 
   const isOrigin =
-    tableData.originShifts[item.shiftId].staffId === staff.staffId &&
-    tableData.originShifts[item.shiftId].date === date;
+    tableData.originShifts[shift.shiftId].staffId === staff.staffId &&
+    tableData.originShifts[shift.shiftId].date === date;
 
-  const draggable = createDraggable(item.shiftId, {
-    width: width,
-    item: { ...item, date, staffId: staff.staffId },
+  const draggable = createDraggable(shift.shiftId, {
+    width,
+    item: { ...shift, date, staffId: staff.staffId },
     isOrigin,
   });
 
-  const rules = [
-    {
-      name: "Match role",
-      description:
-        "Does this shift's required role matches with the staff's role?",
-      passed: item.shiftTemplate.role === staff.role,
-    },
-    {
-      name: "Overlapping shifts",
-      description: "Does this shift overlap with an existing shift?",
-      passed: true,
-    },
-    {
-      name: "Overlap leave request",
-      description: "Does this shift overlap with a time off request?",
-      passed: true,
-    },
-  ];
+  const rules = getShiftRules(shift, { staff, date }, tableData);
 
   onMount(() => {
     batch(() => {
       if (!isOrigin) {
-        setTableData("changedShifts", item.shiftId, true);
+        setTableData("changedShifts", shift.shiftId, true);
       } else {
-        setTableData("changedShifts", item.shiftId, false);
+        setTableData("changedShifts", shift.shiftId, false);
       }
       // Modify shift data when drag and drop is done
-      setTableData("shifts", item.shiftId, () => ({
+      setTableData("shifts", shift.shiftId, () => ({
         staffId: staff.staffId,
         date: date,
         staff: staff,
       }));
-      setTableData("shiftsRules", item.shiftId, () => [...rules]);
+      setTableData("shiftsRules", shift.shiftId, () => rules);
     });
   });
 
@@ -68,7 +52,7 @@ const DraggableCard: Component<{
 
         batch(() => {
           setShiftModalData({
-            ...item,
+            ...shift,
             staffId: staff.staffId,
             staff,
             date,
@@ -80,14 +64,15 @@ const DraggableCard: Component<{
       }}
       isActiveDraggable={draggable.isActiveDraggable}
       isOrigin={isOrigin}
-      published={item.published}
+      published={shift.published}
       loading={fetchedData.loading}
-      role={item.shiftTemplate.role}
+      role={shift.shiftTemplate.role}
       shiftDuration={shiftTimes(
-        item.shiftTemplate.startTime,
-        item.shiftTemplate.endTime
+        shift.shiftTemplate.startTime,
+        shift.shiftTemplate.endTime
       )}
-      shiftName={item.shiftTemplate.name}
+      shiftName={shift.shiftTemplate.name}
+      isErrored={rules.find((rule) => !rule.passed) !== undefined}
     />
   );
 };

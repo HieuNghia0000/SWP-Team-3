@@ -18,9 +18,10 @@ import { shiftTimes } from "./utils/shiftTimes";
 import { cellIdGenerator } from "./utils/cellIdGenerator";
 import { capitalize } from "~/utils/capitalize";
 import ShiftCard from "./ShiftCard";
-import { findOverlappingShifts } from "./utils/findOverlappingShifts";
 import { sortBy } from "lodash";
 import toast from "solid-toast";
+import { getShiftMoveErrors } from "./utils/shiftRules";
+import getShiftsByCellId from "./utils/getShiftsByCellId";
 
 // a cell is a droppable box
 // a shift is a draggable item
@@ -30,24 +31,6 @@ type DnDTableProps = {};
 const Table: Component<DnDTableProps> = (props) => {
   const { setStaffModalData, setShowStaffModal } = useShiftPlanningModals();
   const { tableData, setTableData, fetchedData } = useSPData();
-
-  function getShiftsByCellId(cellId: string) {
-    if (!tableData.cells.hasOwnProperty(cellId)) {
-      return []; // Key does not exist in transformed data
-    }
-
-    const shiftIds = tableData.cells[cellId];
-
-    const shifts: Shift[] = [];
-    for (let shiftId of shiftIds) {
-      const shift = tableData.shifts[shiftId];
-      if (shift) {
-        shifts.push(shift);
-      }
-    }
-
-    return shifts;
-  }
 
   // Get all droppable box ids
   const cellIds = () => Object.keys(tableData.cells);
@@ -123,15 +106,18 @@ const Table: Component<DnDTableProps> = (props) => {
       : getCellId(droppable.id);
 
     if (draggableContainerId != droppableId || !onlyWhenChangingContainer) {
-      if (isErrored(draggable, droppable)) {
-        toast.error("Cannot move the shift here!", {
-          duration: 2000,
-          style: {
-            color: "#dc2626",
-            background: "#fecaca",
-            border: "1px solid #b91c1c",
-          },
-        });
+      const errors = getShiftMoveErrors(draggable, droppable, tableData);
+      if (errors.length > 0) {
+        for (let error of errors) {
+          toast.error(error.errorName, {
+            duration: 2000,
+            style: {
+              color: "#dc2626",
+              background: "#fecaca",
+              border: "1px solid #b91c1c",
+            },
+          });
+        }
         return;
       }
 
@@ -148,27 +134,6 @@ const Table: Component<DnDTableProps> = (props) => {
         });
       });
     }
-  };
-
-  const overlappingShifts = (draggable: Draggable, droppable: Droppable) =>
-    findOverlappingShifts([
-      ...getShiftsByCellId(droppable.id as string),
-      draggable.data.item,
-    ]);
-
-  const isErrored = (draggable: Draggable, droppable: Droppable) => {
-    // If the shift's required role is not the same role as the staff
-    if (draggable.data.item.shiftTemplate.role !== droppable.data.staff.role)
-      return true;
-
-    // If the shift overlaps with another shift
-    if (
-      overlappingShifts(draggable, droppable).includes(
-        draggable.data.item.shiftTemplateId
-      )
-    )
-      return true;
-    return false;
   };
 
   const onDragEnd: DragEventHandler = ({ draggable, droppable }) => {
@@ -193,7 +158,7 @@ const Table: Component<DnDTableProps> = (props) => {
                   {moment(date).format("ddd, MMM D")}
                 </div>
                 <div class="font-normal text-sm text-gray-400">
-                  19.5 hrs / $0
+                  19.5 hrs / 0₫
                 </div>
               </div>
             )}
@@ -223,21 +188,7 @@ const Table: Component<DnDTableProps> = (props) => {
                         {staff.staffName}
                       </button>
                       <div class="font-normal text-sm text-gray-400">
-                        {/* <span
-                          class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-semibold rounded-full"
-                          classList={{
-                            "bg-blue-200 text-blue-700":
-                              staff.role === Role.CASHIER,
-                            "bg-yellow-200 text-yellow-700":
-                              staff.role === Role.GUARD,
-                            "bg-red-200 text-red-700":
-                              staff.role === Role.MANAGER,
-                            "bg-gray-200 text-gray-700":
-                              staff.role === Role.ADMIN,
-                          }}
-                        > */}
                         {capitalize(staff.role)}
-                        {/* </span> */}
                       </div>
                     </div>
                     <For each={tableData.dates}>
@@ -245,7 +196,8 @@ const Table: Component<DnDTableProps> = (props) => {
                         <TableCell
                           id={cellIdGenerator(staff, date)}
                           items={getShiftsByCellId(
-                            cellIdGenerator(staff, date)
+                            cellIdGenerator(staff, date),
+                            tableData
                           )}
                           staff={staff}
                           date={date}
@@ -262,6 +214,10 @@ const Table: Component<DnDTableProps> = (props) => {
                   let item = () => draggable?.data?.item as Shift;
                   let isOrigin = () => draggable?.data?.isOrigin as boolean;
                   let selectedShiftWidth = () => draggable?.data?.width() - 4;
+                  let isErrored = () =>
+                    tableData.shiftsRules[
+                      (draggable?.data.item as Shift).shiftId
+                    ].find((rule) => !rule.passed) !== undefined;
 
                   return (
                     <ShiftCard
@@ -276,6 +232,7 @@ const Table: Component<DnDTableProps> = (props) => {
                       shiftName={item().shiftTemplate.name}
                       style={{ width: `${selectedShiftWidth()}px` }}
                       isOverlay={true}
+                      isErrored={isErrored()}
                     />
                   );
                 }}

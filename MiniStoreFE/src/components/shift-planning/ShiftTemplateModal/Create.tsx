@@ -7,7 +7,7 @@ import { readableToTimeStr } from "../utils/shiftTimes";
 import { timeOptions } from "../utils/timeOptions";
 import { TemplateProps } from "./types";
 import { Select } from "~/components/form/Select";
-import { roles } from "~/utils/roles";
+import { roles2 } from "~/utils/roles";
 import { schema } from "./formSchema";
 
 const Create: Component<TemplateProps> = ({ setState }) => {
@@ -24,7 +24,6 @@ const Create: Component<TemplateProps> = ({ setState }) => {
             ...formData(),
             startTime: readableToTimeStr(formData().startTime),
             endTime: readableToTimeStr(formData().endTime),
-            role: formData().role === "All roles" ? "" : formData().role,
           })
       );
     } catch (error) {
@@ -89,8 +88,8 @@ const Create: Component<TemplateProps> = ({ setState }) => {
               <Select
                 id="role"
                 name="role"
-                value={"All roles"}
-                options={roles}
+                value={roles2[0].value}
+                options={roles2}
                 formHandler={formHandler}
               />
             </div>

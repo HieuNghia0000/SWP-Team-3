@@ -6,7 +6,7 @@ type ShiftTemplateForm = {
   name: string;
   startTime: string;
   endTime: string;
-  role: Role | "All roles";
+  role: Role;
   salaryCoefficient: number;
 };
 
@@ -25,12 +25,12 @@ export const schema: yup.Schema<ShiftTemplateForm> = yup.object({
   role: yup
     .string()
     .oneOf(
-      [Role.MANAGER, Role.CASHIER, Role.GUARD, "All roles"],
+      [Role.MANAGER, Role.CASHIER, Role.GUARD, Role.ALL_ROLES],
       "Invalid role"
     )
     .required("Please select a role"),
   salaryCoefficient: yup
     .number()
-    .min(1, "Coefficient can not below 1")
+    .min(0, "Coefficient can not below 0")
     .required("Please select a coefficient"),
 });

@@ -1,16 +1,22 @@
-import { FaSolidPencil } from "solid-icons/fa";
+import { FaSolidPencil, FaSolidTrash } from "solid-icons/fa";
 import { Accessor, Setter, Component } from "solid-js";
 import PopupModal from "~/components/PopupModal";
 import { Role } from "~/types";
 import { Tabs } from ".";
 import moment from "moment";
 import { ShiftCard } from "~/context/ShiftPlanning";
+import { roles } from "~/utils/roles";
 
 interface DetailsProps {
   shiftCard: Accessor<ShiftCard | undefined>;
   setState: Setter<Tabs>;
+  onDelete: () => void;
 }
-const Details: Component<DetailsProps> = ({ shiftCard, setState }) => {
+const Details: Component<DetailsProps> = ({
+  shiftCard,
+  setState,
+  onDelete,
+}) => {
   return (
     <>
       <PopupModal.Body>
@@ -50,9 +56,14 @@ const Details: Component<DetailsProps> = ({ shiftCard, setState }) => {
                     shiftCard()?.shiftTemplate.role === Role.MANAGER,
                   "bg-gray-200 text-gray-700":
                     shiftCard()?.shiftTemplate.role === Role.ADMIN,
+                  "bg-gray-200 text-gray-800":
+                    shiftCard()?.shiftTemplate.role === Role.ALL_ROLES,
                 }}
               >
-                {shiftCard()?.shiftTemplate.role}
+                {
+                  roles.find((r) => r.value === shiftCard()?.shiftTemplate.role)
+                    ?.label
+                }
               </span>
             </div>
           </div>
@@ -95,15 +106,28 @@ const Details: Component<DetailsProps> = ({ shiftCard, setState }) => {
         </div>
       </PopupModal.Body>
       <PopupModal.Footer>
-        <button
-          onClick={[setState, "edit"]}
-          class="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-2"
-        >
-          <span class="">
-            <FaSolidPencil />
-          </span>
-          Edit Shift
-        </button>
+        <div class="w-full flex justify-start items-center gap-3">
+          <button
+            type="button"
+            onClick={onDelete}
+            class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
+          >
+            <span>
+              <FaSolidTrash />
+            </span>
+            <span>Delete</span>
+          </button>
+          <button
+            type="button"
+            onClick={[setState, "edit"]}
+            class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
+          >
+            <span class="">
+              <FaSolidPencil />
+            </span>
+            Edit Shift
+          </button>
+        </div>
       </PopupModal.Footer>
     </>
   );

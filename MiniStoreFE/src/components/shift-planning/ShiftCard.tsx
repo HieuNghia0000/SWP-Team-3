@@ -1,4 +1,5 @@
-import { Component, splitProps } from "solid-js";
+import { FaSolidInfo } from "solid-icons/fa";
+import { Component, Show, splitProps } from "solid-js";
 import { Role } from "~/types";
 
 interface ShiftCardProps {
@@ -13,6 +14,7 @@ interface ShiftCardProps {
   onClick?: () => void;
   draggable?: any;
   style?: any;
+  isErrored?: boolean;
 }
 
 const ShiftCard: Component<ShiftCardProps> = (props) => {
@@ -26,6 +28,7 @@ const ShiftCard: Component<ShiftCardProps> = (props) => {
     "loading",
     "isOverlay",
     "draggable",
+    "isErrored",
   ]);
 
   const fs = () => {};
@@ -58,11 +61,17 @@ const ShiftCard: Component<ShiftCardProps> = (props) => {
           "bg-blue-500": local.role === Role.CASHIER,
           "bg-yellow-500": local.role === Role.GUARD,
           "bg-red-500": local.role === Role.MANAGER,
-          "bg-gray-500": local.role === Role.ADMIN,
+          "bg-gray-600": local.role === Role.ADMIN,
+          "bg-gray-400": local.role === Role.ALL_ROLES,
         }}
       ></i>
       <p class="ml-3 font-semibold text-sm">{local.shiftDuration}</p>
       <p class="ml-3 font-normal text-xs text-gray-600">{local.shiftName}</p>
+      <Show when={local.isErrored}>
+        <div class="absolute top-1 right-1 h-3 w-3 inline-flex text-[10px] leading-[14px] justify-center items-center font-semibold ml-1 rounded-full text-white bg-red-600">
+          <FaSolidInfo />
+        </div>
+      </Show>
     </button>
   );
 };
