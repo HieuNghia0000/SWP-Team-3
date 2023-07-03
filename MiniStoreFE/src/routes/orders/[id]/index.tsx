@@ -34,7 +34,7 @@ export default function Invoice() {
                         <p class="text-gray-500 mb-1 font-semibold">Date</p>
                     </div>
                     <div>
-                        <p class="font-semibold">#123456</p>
+                        <p class="font-semibold">#302011</p>
                         <p class="font-semibold">2023-01-01</p>
                     </div>
                 </div>
@@ -44,23 +44,40 @@ export default function Invoice() {
                     <table class="min-w-full table-fixed border-separate border-spacing-0.5 border-white">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="text-left py-2" scope="col">Product</th>
-                                <th class="text-left py-2" scope="col">SKU</th>
-                                <th class="text-left py-2" scope="col">QTY</th>
-                                <th class="text-left py-2" scope="col">Price</th>
-                                <th class="text-left py-2" scope="col">Total</th>
+                                <th class="text-left px-4 py-2" scope="col">Product</th>
+                                <th class="text-left px-4 py-2" scope="col">SKU</th>
+                                <th class="text-left px-4 py-2" scope="col">QTY</th>
+                                <th class="text-left px-4 py-2" scope="col">Price</th>
+                                <th class="text-right px-4 py-2" scope="col">Total</th>
                             </tr>
                         </thead>
+
                         {/*Table row*/}
                         <tbody>
                             <tr>
-                                <td class="py-2">Product 1</td>
-                                <td class="py-2">SKU-001</td>
-                                <td class="py-2">2</td>
-                                <td class="py-2">$10.00</td>
-                                <td class="py-2">$20.00</td>
+                                <td class="px-4 py-2">Product 1</td>
+                                <td class="px-4 py-2">302011</td>
+                                <td class="px-4 py-2">2</td>
+                                <td class="px-4 py-2">$10.00</td>
+                                <td class="px-4 py-2 text-right">$20.00</td>
                             </tr>
                         </tbody>
+
+                        {/*Total price*/}
+                        <tfoot>
+                            <tr>
+                                <td colspan="4" class="text-right px-4 py-2">Subtotal</td>
+                                <td class="px-4 py-2 text-right">$40.00</td>
+                            </tr>
+                            <tr>
+                                <td colspan="4" class="text-right px-4 py-2">Vouchers</td>
+                                <td class="px-4 py-2 text-right">-$5.00</td>
+                            </tr>
+                            <tr>
+                                <td colspan="4" class="text-right px-4 py-2">Grand Total</td>
+                                <td class="px-4 py-2 text-right">$35.00</td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
 
