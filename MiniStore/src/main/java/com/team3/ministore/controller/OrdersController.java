@@ -122,7 +122,7 @@ public class OrdersController {
         List<Orders> filteredOrders = new ArrayList<>();
 
         for (Orders orders : ordersList) {
-            int orderAmount = orders.getTotalPrice();
+            int orderAmount = orders.getGrandTotal();
 
             if (orderAmount >= fromAmount && orderAmount <= toAmount) {
                 filteredOrders.add(orders);

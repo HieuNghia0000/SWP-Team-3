@@ -3,8 +3,7 @@ package com.team3.ministore.model;
 import lombok.*;
 
 import javax.persistence.*;
-import java.sql.Time;
-import java.util.List;
+import java.util.Date;
 
 @Entity
 @Data
@@ -16,24 +15,13 @@ public class Shifts {
     @Column(name = "shift_id")
     private int shiftId;
 
-    @OneToMany(mappedBy = "shifts")
-    private List<WorkSchedules> workSchedules;
+    @ManyToOne
+    @JoinColumn(name = "staff_id", referencedColumnName = "staff_id")
+    private Staff staff;
 
-    @Column(name = "start_time")
-    private Time startTime;
+    @Column(name = "date")
+    private Date date;
 
-    @Column(name = "end_time")
-    private Time endTime;
-
-    @Column(name = "shift_name", length = 50)
-    private int shiftName;
-
-    @Column(name = "day_of_week")
-    private int dayOfWeek;
-
-    @Column(name = "salary_coefficient")
-    private float salaryCoefficient;
-
-    @Column(name = "role", length = 50)
-    private String role;
+    @Column(name = "published")
+    private Boolean published;
 }

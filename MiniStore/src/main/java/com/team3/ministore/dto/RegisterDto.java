@@ -35,9 +35,6 @@ public class RegisterDto {
     private String phoneNumber;
 
     @Nullable
-    private Float baseSalary;
-
-    @Nullable
     private StaffStatus status;
 
     @Nullable

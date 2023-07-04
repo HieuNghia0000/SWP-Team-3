@@ -24,9 +24,6 @@ public class Staff extends BaseEntity {
     @OneToMany(mappedBy = "staff")
     private List<LeaveRequest> leaveRequests;
 
-    @OneToMany(mappedBy = "staff")
-    private List<WorkSchedules> workSchedules;
-
     @Column(name = "staff_name", length = 100)
     private String staffName;
 
@@ -50,9 +47,6 @@ public class Staff extends BaseEntity {
 
     @Column(name = "phone_number", length = 20)
     private String phoneNumber;
-
-    @Column(name = "base_salary")
-    private Float baseSalary;
 
     @Column(name = "status")
     @Enumerated(EnumType.ORDINAL)

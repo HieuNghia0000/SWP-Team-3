@@ -7,7 +7,7 @@ import java.util.Date;
 
 @Entity
 @Data
-@Table(name = "leaverequest")
+@Table(name = "leaverequests")
 public class LeaveRequest {
 
     @Id

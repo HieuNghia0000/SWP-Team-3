@@ -4,28 +4,20 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.sql.Time;
-import java.util.Date;
 
 @Entity
 @Data
-@Table(name = "workschedules")
-public class WorkSchedules {
+@Table(name = "timesheets")
+public class TimeSheets {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "schedule_id")
-    private int scheduleId;
+    @Column(name = "timesheet_id")
+    private int timeSheetId;
 
-    @ManyToOne
-    @JoinColumn(name = "staff_id", referencedColumnName = "staff_id")
-    private Staff staff;
-
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "shift_id", referencedColumnName = "shift_id")
     private Shifts shifts;
-
-    @Column(name = "date")
-    private Date date;
 
     @Column(name = "check_in_time")
     private Time checkInTime;
@@ -33,6 +25,12 @@ public class WorkSchedules {
     @Column(name = "check_out_time")
     private Time checkOutTime;
 
-    @Column(name = "published")
-    private boolean published;
+    @Column(name = "status")
+    private int status;
+
+    @Column(name = "note_title", length = 100)
+    private String noteTitle;
+
+    @Column(name = "note_content", length = 100)
+    private String noteContent;
 }

@@ -52,7 +52,6 @@ public class StaffServiceImpl implements StaffService {
                 staffDto.getUsername(),
                 staffDto.getPassword(),
                 staffDto.getPhoneNumber(),
-                staffDto.getBaseSalary(),
                 staffDto.getStatus(),
                 staffDto.getImage(),
                 staffDto.getEmail(),
@@ -72,7 +71,6 @@ public class StaffServiceImpl implements StaffService {
                 staff.getUsername(),
                 staff.getPassword(),
                 staff.getPhoneNumber(),
-                staff.getBaseSalary(),
                 staff.getStatus(),
                 staff.getImage(),
                 staff.getEmail(),
@@ -114,7 +112,6 @@ public class StaffServiceImpl implements StaffService {
         result.setEmail(foundStaff.getEmail());
         result.setPhoneNumber(foundStaff.getPhoneNumber());
         result.setStatus(foundStaff.getStatus());
-        result.setBaseSalary(foundStaff.getBaseSalary());
         result.setWorkDays(foundStaff.getWorkDays());
         result.setImage(foundStaff.getImage());
         result.setLeaveBalance(foundStaff.getLeaveBalance());
@@ -122,13 +119,12 @@ public class StaffServiceImpl implements StaffService {
         return result;
     }
 
-    private Staff saveStaff(Staff staff, String staffName, Role role, String username, String password, String phoneNumber, Float baseSalary, StaffStatus status, String image, String email, String workDays, Integer leaveBalance) {
+    private Staff saveStaff(Staff staff, String staffName, Role role, String username, String password, String phoneNumber, StaffStatus status, String image, String email, String workDays, Integer leaveBalance) {
         staff.setStaffName(staffName);
         staff.setRole(role);
         staff.setUsername(username);
         staff.setPassword(encoder.encode(password));
         staff.setPhoneNumber(phoneNumber);
-        staff.setBaseSalary(baseSalary);
         staff.setStatus(status);
         staff.setImage(image);
         staff.setEmail(email);

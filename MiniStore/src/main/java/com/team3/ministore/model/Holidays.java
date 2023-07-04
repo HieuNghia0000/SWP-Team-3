@@ -7,13 +7,13 @@ import java.util.Date;
 
 @Entity
 @Data
-@Table(name = "holidaycoef")
-public class HolidayCoef {
+@Table(name = "holidays")
+public class Holidays {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "holiday_coef_id")
-    private int holidayCoefId;
+    @Column(name = "holiday_id")
+    private int holidayId;
 
     @Column(name = "name", length = 100)
     private String name;

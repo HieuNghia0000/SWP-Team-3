@@ -33,12 +33,9 @@ public class ShiftsServiceImpl implements ShiftsService {
     public Shifts updateShifts(Integer id, Shifts shifts) {
         Shifts existingShifts = getShiftsById(id);
 
-        existingShifts.setDayOfWeek(shifts.getDayOfWeek());
-        existingShifts.setStartTime(shifts.getStartTime());
-        existingShifts.setEndTime(shifts.getEndTime());
-        existingShifts.setSalaryCoefficient(shifts.getSalaryCoefficient());
-        existingShifts.setShiftName(shifts.getShiftName());
-        existingShifts.setRole(shifts.getRole());
+        existingShifts.setStaff(shifts.getStaff());
+        existingShifts.setDate(shifts.getDate());
+        existingShifts.setPublished(shifts.getPublished());
 
         return shiftsRepository.save(existingShifts);
     }

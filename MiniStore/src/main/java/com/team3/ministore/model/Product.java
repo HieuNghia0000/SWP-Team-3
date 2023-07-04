@@ -32,8 +32,8 @@ public class Product {
     private String description;
 
     @Column(name = "price")
-    private float price;
+    private Float price;
 
-    @Column(name = "quantity")
-    private int quantity;
+    @Column(name = "inventory")
+    private int inventory;
 }
