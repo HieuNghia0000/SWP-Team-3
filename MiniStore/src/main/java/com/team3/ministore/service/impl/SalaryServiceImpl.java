@@ -1,6 +1,8 @@
 package com.team3.ministore.service.impl;
 
+import com.team3.ministore.dto.SalaryDto;
 import com.team3.ministore.model.Salary;
+import com.team3.ministore.model.Staff;
 import com.team3.ministore.repository.SalaryRepository;
 import com.team3.ministore.service.SalaryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +22,17 @@ public class SalaryServiceImpl implements SalaryService {
     }
 
     @Override
-    public Salary createSalary(Salary salary) {
+    public SalaryDto getSalaryByStaffId(Integer staffId) {
+        return salaryRepository.findSalaryInformationByStaffId(staffId);
+    }
+
+    @Override
+    public Salary createSalary(SalaryDto dto, Staff staff) {
+        Salary salary = new Salary();
+        salary.setHourlyWage(dto.getHourlyWage());
+        salary.setEffectiveDate(dto.getEffectiveDate());
+        salary.setTerminationDate(dto.getTerminationDate());
+        salary.setStaff(staff);
         return salaryRepository.save(salary);
     }
 

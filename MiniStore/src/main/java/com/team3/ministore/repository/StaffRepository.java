@@ -1,6 +1,5 @@
 package com.team3.ministore.repository;
 
-import com.team3.ministore.dto.CurrentStaffDto;
 import com.team3.ministore.model.Staff;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,4 +24,5 @@ public interface StaffRepository extends JpaRepository<Staff, Integer> {
 
     @Query("SELECT s FROM Staff s WHERE s.email = :email")
     Staff getStaffByEmail(@Param("email") String email);
+
 }

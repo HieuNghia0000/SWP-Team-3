@@ -2,7 +2,12 @@ package com.team3.ministore.controller;
 
 import com.team3.ministore.common.responsehandler.ResponseHandler;
 import com.team3.ministore.dto.RegisterDto;
+import com.team3.ministore.dto.SalaryDto;
+import com.team3.ministore.dto.StaffDto;
+import com.team3.ministore.dto.UpdateStaffDto;
+import com.team3.ministore.model.Salary;
 import com.team3.ministore.model.Staff;
+import com.team3.ministore.service.SalaryService;
 import com.team3.ministore.service.StaffService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,29 +29,57 @@ public class StaffController {
     @Autowired
     private StaffService staffService;
 
+    @Autowired
+    private SalaryService salaryService;
+
 
     //Create new staff
     @PostMapping("/add")
-    public Object register(@Valid @RequestBody RegisterDto dto, BindingResult errors) {
-        if (errors.hasErrors())
-            return ResponseHandler.getResponse(errors, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<Object> register(@Valid @RequestBody RegisterDto dto, BindingResult errors) {
+        if (errors.hasErrors()) return ResponseHandler.getResponse(errors, HttpStatus.BAD_REQUEST);
 
         Staff staff = staffService.createStaff(dto);
-        return ResponseHandler.getResponse(staff, HttpStatus.CREATED);
+        SalaryDto salaryDto = new SalaryDto(
+                dto.getHourlyWage(),
+                dto.getEffectiveDate(),
+                dto.getTerminationDate(),
+                staff.getStaffId()
+        );
+        Salary salary = salaryService.createSalary(salaryDto, staff);
+        salaryDto.setSalaryId(salary.getSalaryId());
+
+        return ResponseHandler.getResponse(new StaffDto(staff, salaryDto), HttpStatus.CREATED);
     }
 
     //Read a staff by ID
-    @GetMapping("/search/{id}")
-    public ResponseEntity<Staff> getStaffById(@PathVariable("id") Integer id) {
-        Staff staff = staffService.getStaffById(id);
-        return new ResponseEntity<>(staff, HttpStatus.OK);
+    @GetMapping("/{id}")
+    public ResponseEntity<Object> getStaffById(@PathVariable("id") Integer id) {
+        Optional<Staff> staff = staffService.getStaffById(id);
+
+        return staff.map(value ->
+                        ResponseHandler.getResponse(new StaffDto(
+                                        value,
+                                        salaryService.getSalaryByStaffId(value.getStaffId())),
+                                HttpStatus.OK)
+                )
+                .orElseGet(() -> ResponseHandler.getResponse(new Exception("Invalid staff id"),
+                        HttpStatus.BAD_REQUEST));
     }
 
     //Update an existing staff
     @PutMapping("/{id}/edit")
-    public ResponseEntity<Staff> updateStaff(@PathVariable("id") Integer id, @RequestBody Staff staff) {
-        Staff updatedStaff = staffService.updateStaff(id, staff);
-        return new ResponseEntity<>(updatedStaff, HttpStatus.OK);
+    public ResponseEntity<Object> updateStaff(@PathVariable("id") Integer id,
+                                              @Valid @RequestBody UpdateStaffDto staff) {
+        Optional<Staff> updatedStaff = staffService.updateStaff(id, staff);
+
+        return updatedStaff.map(value ->
+                        ResponseHandler.getResponse(new StaffDto(
+                                        value,
+                                        salaryService.getSalaryByStaffId(value.getStaffId())),
+                                HttpStatus.OK)
+                )
+                .orElseGet(() -> ResponseHandler.getResponse(new Exception("Invalid staff id"),
+                        HttpStatus.BAD_REQUEST));
     }
 
     //Delete a staff
@@ -57,9 +90,7 @@ public class StaffController {
     }
 
     @GetMapping("")
-    public ResponseEntity<Page<Staff>> getStaffs(@RequestParam("search") Optional<String> searchParam,
-                                               @RequestParam("curPage") Optional<Integer> curPageParam,
-                                               @RequestParam("perPage") Optional<Integer> perPageParam) {
+    public ResponseEntity<Page<Staff>> getStaffs(@RequestParam("search") Optional<String> searchParam, @RequestParam("curPage") Optional<Integer> curPageParam, @RequestParam("perPage") Optional<Integer> perPageParam) {
         Page<Staff> staffPage;
         List<Staff> staffList = null;
 
@@ -76,8 +107,7 @@ public class StaffController {
             if (staffPage.getSize() == 0) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
-        }
-        else {
+        } else {
             int curPage = 1;
             int perPage = 10;
 

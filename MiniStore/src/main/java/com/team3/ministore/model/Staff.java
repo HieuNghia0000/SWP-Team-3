@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.team3.ministore.common.entity.BaseEntity;
 import com.team3.ministore.utils.Role;
 import com.team3.ministore.utils.StaffStatus;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -12,24 +13,20 @@ import java.util.List;
 
 @Entity
 @Data
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @Table(name = "staffs")
 public class Staff extends BaseEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "staff_id")
     private int staffId;
-
-    @OneToMany(mappedBy = "staff")
-    private List<LeaveRequest> leaveRequests;
 
     @Column(name = "staff_name", length = 100)
     private String staffName;
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(name = "role", length = 50)
+    @Column(name = "role")
     private Role role;
 
     @NotNull
@@ -60,4 +57,7 @@ public class Staff extends BaseEntity {
 
     @Column(name = "leave_balance")
     private Integer leaveBalance;
+
+    @OneToMany(mappedBy = "staff")
+    private List<LeaveRequest> leaveRequests;
 }

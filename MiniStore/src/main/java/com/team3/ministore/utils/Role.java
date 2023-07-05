@@ -4,6 +4,6 @@ public enum Role {
     ADMIN,
     MANAGER,
     CASHIER,
-    GUARD;
-
+    GUARD,
+    ALL_ROLES;
 }

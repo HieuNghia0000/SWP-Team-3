@@ -1,30 +1,34 @@
 package com.team3.ministore.model;
 
+import com.team3.ministore.common.entity.BaseEntity;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.util.Date;
 
 @Entity
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Table(name = "salaries")
-public class Salary {
+public class Salary extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "salary_id")
     private int salaryId;
 
-    @ManyToOne
-    @JoinColumn(name = "staff_id", referencedColumnName = "staff_id")
-    private Staff staff;
-
     @Column(name = "hourly_wage")
-    private Float hourlyWage;
+    private String hourlyWage;
 
     @Column(name = "effective_date")
     private Date effectiveDate;
 
     @Column(name = "termination_date")
     private Date terminationDate;
+
+    @ManyToOne
+    @JoinColumn(name = "staff_id")
+    private Staff staff;
+
 }

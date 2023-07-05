@@ -13,18 +13,15 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Data
-public class RegisterDto {
-    @ExistUsername
-    @NotBlank(message = "Username must not be blank")
-    private String username;
-
-    @NotBlank(message = "Password must not be blank")
-    private String password;
-
+public class UpdateStaffDto {
     @ExistEmail
     @Email
     @NotBlank(message = "Email must not be blank")
     private String email;
+
+    @ExistUsername
+    @NotBlank(message = "Username must not be blank")
+    private String username;
 
     @NotBlank(message = "Staff name must not be blank")
     private String staffName;
@@ -32,27 +29,16 @@ public class RegisterDto {
     @NotNull(message = "Role must not be blank")
     private Role role;
 
-    @Nullable
     private String phoneNumber;
 
-    @Nullable
+    @NotNull(message = "Status must not be blank")
     private StaffStatus status;
 
-    @Nullable
     private String image;
 
-    @Nullable
     private String workDays;
 
-    @Nullable
+    @NotNull(message = "leaveBalance must not be blank")
     private Integer leaveBalance;
 
-    @NotNull(message = "Hourly wage must not be null")
-    private String hourlyWage;
-
-    @NotNull(message = "EffectiveDate name must not be null")
-    private Date effectiveDate;
-
-    @NotNull(message = "TerminationDate name must not be null")
-    private Date terminationDate;
 }
