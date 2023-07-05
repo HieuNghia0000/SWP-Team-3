@@ -40,6 +40,7 @@ export interface Staff extends Timestamp {
 
 export interface Salary {
   salaryId: number;
+  staffId: number;
   hourlyWage: number;
   effectiveDate: string;
   terminationDate: string;
@@ -57,15 +58,6 @@ export interface Shift extends Timestamp {
   staff?: Staff;
 }
 
-export interface ShiftTemplate extends Timestamp {
-  shiftTemplateId: number;
-  startTime: string;
-  endTime: string;
-  name: string;
-  salaryCoefficient: number;
-  role: Role;
-}
-
 export interface Timesheet {
   timesheetId: number;
   shiftId: number;
@@ -75,6 +67,34 @@ export interface Timesheet {
   noteTitle?: string;
   noteContent?: string;
 }
+
+export interface ShiftTemplate extends Timestamp {
+  shiftTemplateId: number;
+  startTime: string;
+  endTime: string;
+  name: string;
+  salaryCoefficient: number;
+  role: Role;
+}
+
+export interface ScheduleTemplate extends Timestamp {
+  scheduleTemplateId: number;
+  name: string;
+  description: string;
+  numOfShifts: number;
+
+  // relationship
+  shiftInfos?: ShiftMetaInfo[];
+}
+
+export interface ShiftScheduleTemplate {
+  shiftTemplateId: number;
+  scheduleTemplateId: number;
+  date: string;
+  staffName: string;
+}
+
+export interface ShiftMetaInfo extends ShiftTemplate, ShiftScheduleTemplate {}
 
 export interface Order extends Timestamp {
   orderId: number;

@@ -9,6 +9,7 @@ export type RadiosProps = FieldProps & {
   value?: string | number;
   triggers?: string[];
   class?: string;
+  classList?: Record<string, boolean>;
 };
 
 export const Radios: Component<RadiosProps> = (props) => {
@@ -17,9 +18,11 @@ export const Radios: Component<RadiosProps> = (props) => {
       {...props}
       mode="radio-group"
       render={(field) => (
-        <div>
+        <div classList={props.classList}>
           <Show when={props.label}>
-            <label>{props.label}</label>
+            <label class="inline-block mb-1.5 text-gray-600 font-semibold">
+              {props.label}
+            </label>
           </Show>
           <div class={props.class}>
             <For each={props.options}>
@@ -32,14 +35,14 @@ export const Radios: Component<RadiosProps> = (props) => {
                     value={option.value}
                     class=""
                     classList={{
-                      "appearance-none w-4 h-4 border-2 border-red-500 rounded-full":
+                      "appearance-none w-4 h-4 border-2 border-red-400 rounded-full":
                         field.helpers.error,
                     }}
                     type="radio"
                   />
                   <Show when={option.label}>
                     <label
-                      classList={{ "text-orange-600": field.helpers.error }}
+                      classList={{ "text-red-400": field.helpers.error }}
                       for={`${field.props.id}-${i()}`}
                     >
                       {option.label}
@@ -50,7 +53,7 @@ export const Radios: Component<RadiosProps> = (props) => {
             </For>
           </div>
           <Show when={field.helpers.error}>
-            <p class="text-sm text-red-500">{field.helpers.errorMessage}</p>
+            <p class="text-sm text-red-400">{field.helpers.errorMessage}</p>
           </Show>
         </div>
       )}

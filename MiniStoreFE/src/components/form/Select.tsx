@@ -24,7 +24,6 @@ export const Select: Component<SelectProps> = (props) => {
     "options",
     "label",
     "classList",
-    "class",
     "formHandler",
   ]);
   const [options, setOptions] = createSignal<SelectableOption[]>([]);
@@ -44,18 +43,22 @@ export const Select: Component<SelectProps> = (props) => {
       {...props}
       mode="input"
       render={(field) => (
-        <div class={local.class} classList={local.classList}>
+        <div classList={local.classList}>
           <Show when={local.label}>
-            <label for={field.props.id} class="inline-block mb-2 text-gray-600">
+            <label
+              for={field.props.id}
+              class="inline-block mb-1.5 text-gray-600 font-semibold"
+            >
               {local.label}
             </label>
           </Show>
           <select
             {...rest}
             {...field.props}
-            class="w-full border outline-none focus:border-indigo-500 focus:shadow px-4 py-2 rounded truncate disabled:bg-[#FAFAFA] disabled:border-gray-300 disabled:appearance-none"
             classList={{
-              "ring-1 ring-red-400 focus:outline-none": field.helpers.error,
+              "w-full border outline-none text-gray-600 focus:border-indigo-500 focus:shadow px-4 py-2 rounded truncate disabled:bg-[#FAFAFA] disabled:border-gray-300 disabled:appearance-none":
+                true,
+              "border-red-400": field.helpers.error,
             }}
           >
             <For each={options()}>

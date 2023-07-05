@@ -31,6 +31,7 @@ import {
   FetcherData,
   ParamType,
 } from "~/components/shift-planning/utils/types";
+import ScheduleTemplateModal from "~/components/shift-planning/ScheduleTemplateModal";
 
 const fetcher: ResourceFetcher<boolean | string, FetcherData> = async (
   source
@@ -55,7 +56,9 @@ const fetcher: ResourceFetcher<boolean | string, FetcherData> = async (
 
 export default function ShiftPlanning() {
   const [searchParams, setSearchParams] = useSearchParams<ParamType>();
-  const [datePicked, setDatePicked] = createSignal<string>();
+  const [datePicked, setDatePicked] = createSignal<string | undefined>();
+
+  // Be careful with this. You should always check for error before reading the data
   const [data, { refetch, mutate }] = createResource(datePicked, fetcher, {
     initialValue: {
       dates: [],
@@ -76,7 +79,6 @@ export default function ShiftPlanning() {
       return Object.values(this.changedShifts).some((v) => v);
     },
     preparingData: true,
-    isErrored: false,
     shiftsRules: {},
   });
 
@@ -98,6 +100,9 @@ export default function ShiftPlanning() {
   const [shiftTemplateModalData, setShiftTemplateModalData] =
     createSignal<ShiftTemplate>();
 
+  const [scheduleTemplateModalState, setScheduleTemplateModalState] =
+    createSignal<"list" | "copy" | "create" | "apply">();
+
   createEffect(
     on(
       () => data.state,
@@ -116,7 +121,7 @@ export default function ShiftPlanning() {
             staffs: [],
           });
 
-          toast.error("Error! Unable to get the data", {
+          toast.error("Error! Data not available", {
             duration: 2000,
             style: {
               color: "#dc2626",
@@ -141,11 +146,15 @@ export default function ShiftPlanning() {
       staffs: [],
       changedShifts: {},
       preparingData: true,
-      isErrored: false,
       shiftsRules: {},
       isChanged: false,
       originShifts: {},
     });
+  };
+
+  const saveChanges = async () => {
+    alert("save changes");
+    refetch();
   };
 
   return (
@@ -153,8 +162,9 @@ export default function ShiftPlanning() {
       value={{
         tableData,
         setTableData,
-        fetchedData: data,
+        routeData: data,
         resetTableData,
+        saveChanges,
       }}
     >
       <ModalContext.Provider
@@ -179,6 +189,9 @@ export default function ShiftPlanning() {
           setShowShiftTemplateModal,
           shiftTemplateModalData,
           setShiftTemplateModalData,
+          // schedule template
+          scheduleTemplateModalState,
+          setScheduleTemplateModalState,
         }}
       >
         <main>
@@ -221,6 +234,10 @@ export default function ShiftPlanning() {
           showModal={showShiftTemplateModal}
           modalData={shiftTemplateModalData}
           setShowModal={setShowShiftTemplateModal}
+        />
+        <ScheduleTemplateModal
+          modalState={scheduleTemplateModalState}
+          setModalState={setScheduleTemplateModalState}
         />
       </ModalContext.Provider>
     </PageDataContext.Provider>

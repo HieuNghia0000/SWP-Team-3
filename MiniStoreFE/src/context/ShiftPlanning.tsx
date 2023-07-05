@@ -17,6 +17,12 @@ export interface ShiftCard extends Shift {
   isOrigin: boolean;
   rules: Rule[];
 }
+export type ScheduleTemplateModalState =
+  | "list"
+  | "copy"
+  | "create"
+  | "apply"
+  | undefined;
 
 type SPModalContext = {
   shiftModalData: Accessor<ShiftCard | undefined>;
@@ -31,16 +37,21 @@ type SPModalContext = {
   setNewShiftModalData: Setter<{ staff: Staff; date: string } | undefined>;
   showNewShiftModal: Accessor<boolean>;
   setShowNewShiftModal: Setter<boolean>;
+  // Shift Template
   shiftTemplateModalData: Accessor<ShiftTemplate | undefined>;
   setShiftTemplateModalData: Setter<ShiftTemplate | undefined>;
   showShiftTemplateModal: Accessor<boolean>;
   setShowShiftTemplateModal: Setter<boolean>;
+  // Schedule Template
+  scheduleTemplateModalState: Accessor<ScheduleTemplateModalState>;
+  setScheduleTemplateModalState: Setter<ScheduleTemplateModalState>;
 };
 type SPDataContext = {
   tableData: DataTable;
   setTableData: SetStoreFunction<DataTable>;
-  fetchedData: InitializedResource<FetcherData>;
+  routeData: InitializedResource<FetcherData>;
   resetTableData: () => void;
+  saveChanges: () => void;
 };
 
 export const ModalContext = createContext<SPModalContext>();

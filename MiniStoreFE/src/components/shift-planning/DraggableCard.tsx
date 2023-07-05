@@ -13,11 +13,13 @@ const DraggableCard: Component<{
   date: string;
 }> = ({ shift, width, staff, date }) => {
   const { setShiftModalData, setShowShiftModal } = useShiftPlanningModals();
-  const { fetchedData, tableData, setTableData } = useSPData();
+  const { routeData, tableData, setTableData } = useSPData();
 
   const isOrigin =
     tableData.originShifts[shift.shiftId].staffId === staff.staffId &&
-    tableData.originShifts[shift.shiftId].date === date;
+    tableData.originShifts[shift.shiftId].date === date &&
+    tableData.originShifts[shift.shiftId].published ===
+      tableData.shifts[shift.shiftId].published;
 
   const draggable = createDraggable(shift.shiftId, {
     width,
@@ -65,7 +67,7 @@ const DraggableCard: Component<{
       isActiveDraggable={draggable.isActiveDraggable}
       isOrigin={isOrigin}
       published={shift.published}
-      loading={fetchedData.loading}
+      loading={routeData.loading}
       role={shift.shiftTemplate.role}
       shiftDuration={shiftTimes(
         shift.shiftTemplate.startTime,

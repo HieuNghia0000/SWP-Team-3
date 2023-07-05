@@ -8,11 +8,11 @@ import { TextInput } from "~/components/form/TextInput";
 import { ShiftTemplate } from "~/types";
 import { readableToTimeStr } from "../utils/shiftTimes";
 import { timeOptions } from "../utils/timeOptions";
-import { TemplateProps } from "./types";
+import { ShiftTemplateProps } from "./types";
 import { roles2 } from "~/utils/roles";
 import { schema } from "./formSchema";
 
-interface EditProps extends TemplateProps {
+interface EditProps extends ShiftTemplateProps {
   shiftTemplateFocus: Accessor<ShiftTemplate | undefined>;
   setShiftTemplateFocus: Setter<ShiftTemplate | undefined>;
 }
@@ -29,15 +29,21 @@ const Edit: Component<EditProps> = ({
     event.preventDefault();
     try {
       await formHandler.validateForm();
-      alert(
-        "Data sent with success: " +
-          JSON.stringify({
-            ...formData(),
-            startTime: readableToTimeStr(formData().startTime),
-            endTime: readableToTimeStr(formData().endTime),
-            shiftId: shiftTemplateFocus()?.shiftTemplateId,
-          })
-      );
+      if (
+        confirm(
+          "Are you sure you want to save? This will effect all the associated shifts."
+        )
+      ) {
+        alert(
+          "Data sent with success: " +
+            JSON.stringify({
+              ...formData(),
+              startTime: readableToTimeStr(formData().startTime),
+              endTime: readableToTimeStr(formData().endTime),
+              shiftId: shiftTemplateFocus()?.shiftTemplateId,
+            })
+        );
+      }
     } catch (error) {
       console.error(error);
     }

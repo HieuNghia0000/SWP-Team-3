@@ -5,12 +5,12 @@ import PopupModal from "~/components/PopupModal";
 import { TextInput } from "~/components/form/TextInput";
 import { readableToTimeStr } from "../utils/shiftTimes";
 import { timeOptions } from "../utils/timeOptions";
-import { TemplateProps } from "./types";
+import { ShiftTemplateProps } from "./types";
 import { Select } from "~/components/form/Select";
 import { roles2 } from "~/utils/roles";
 import { schema } from "./formSchema";
 
-const Create: Component<TemplateProps> = ({ setState }) => {
+const Create: Component<ShiftTemplateProps> = ({ setState }) => {
   const formHandler = useFormHandler(yupSchema(schema));
   const { formData, setFieldValue } = formHandler;
 

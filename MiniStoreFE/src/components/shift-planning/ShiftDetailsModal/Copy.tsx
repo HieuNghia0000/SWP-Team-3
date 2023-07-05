@@ -9,7 +9,7 @@ import { TextInput } from "~/components/form/TextInput";
 import { ShiftCard, useSPData } from "~/context/ShiftPlanning";
 import { Role } from "~/types";
 import { Tabs } from ".";
-import { shiftTimes } from "../utils/shiftTimes";
+import { shiftDetailsTime } from "../utils/shiftTimes";
 import * as yup from "yup";
 import moment from "moment";
 
@@ -117,13 +117,14 @@ const Copy: Component<CopyProps> = ({ shiftCard, setModalState, onDelete }) => {
                   shiftCard()?.shiftTemplate.role === Role.ALL_ROLES,
               }}
             ></i>
-            <p class="ml-3.5 font-semibold text-base tracking-wider">
-              {shiftTimes(
+            <p class="ml-3.5 font-semibold text-sm tracking-wider">
+              {shiftDetailsTime(
+                shiftCard()?.date || "",
                 shiftCard()?.shiftTemplate.startTime || "",
                 shiftCard()?.shiftTemplate.endTime || ""
               )}
             </p>
-            <p class="ml-3.5 font-normal text-sm tracking-wider">
+            <p class="ml-3.5 font-normal text-xs tracking-wider">
               {shiftCard()?.shiftTemplate.name}
             </p>
           </div>
@@ -257,14 +258,14 @@ const Copy: Component<CopyProps> = ({ shiftCard, setModalState, onDelete }) => {
             </button>
             <button
               type="button"
-              onClick={[submit, !shiftCard()?.published]}
+              onClick={[submit, true]}
               class="py-1.5 px-3 font-semibold text-gray-600 border border-gray-300 text-sm rounded hover:text-black"
             >
-              Save & {shiftCard()?.published ? "Unpublish" : "Publish"}
+              Save & Publish
             </button>
             <button
               type="button"
-              onClick={[submit, shiftCard()?.published]}
+              onClick={[submit, false]}
               class="py-1.5 px-3 font-semibold text-white border border-blue-600 bg-blue-500 text-sm rounded hover:bg-blue-600"
             >
               Save

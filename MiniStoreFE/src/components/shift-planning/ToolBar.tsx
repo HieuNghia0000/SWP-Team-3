@@ -14,7 +14,6 @@ import { IoCopySharp } from "solid-icons/io";
 import {
   FaSolidAngleLeft,
   FaSolidAngleRight,
-  FaSolidCheck,
   FaSolidRepeat,
 } from "solid-icons/fa";
 import { FiCalendar, FiSave } from "solid-icons/fi";
@@ -32,8 +31,9 @@ type ToolBarProps = {
 const ToolBar: Component<ToolBarProps> = ({ datePicked, setDatePicked }) => {
   const [searchParams, setSearchParams] = useSearchParams<ParamType>();
   const [dateStr, setDateStr] = createSignal<string>("");
-  const { tableData, resetTableData } = useSPData();
-  const { setShowShiftTemplateModal } = useShiftPlanningModals();
+  const { tableData, resetTableData, saveChanges } = useSPData();
+  const { setShowShiftTemplateModal, setScheduleTemplateModalState } =
+    useShiftPlanningModals();
 
   let dateRef: HTMLInputElement | undefined = undefined;
   let fp: flatpickr.Instance | undefined = undefined;
@@ -146,45 +146,42 @@ const ToolBar: Component<ToolBarProps> = ({ datePicked, setDatePicked }) => {
         <button
           type="button"
           disabled={!tableData.isChanged}
-          class="flex flex-row items-center gap-1 border border-gray-300 rounded-lg py-2 px-3.5 font-medium text-sm text-gray-500 cursor-default"
-          classList={{
-            "text-indigo-600 border-indigo-600 hover:bg-indigo-50 cursor-pointer":
-              tableData.isChanged,
-          }}
+          onClick={saveChanges}
+          class="flex flex-row items-center gap-1 border border-indigo-400 text-sm font-semibold text-white bg-indigo-600 py-2 px-3.5 rounded-lg hover:bg-indigo-700 disabled:bg-indigo-400"
         >
           <span class="text-base">
             <FiSave />
           </span>
           Save
         </button>
-        <button
-          type="button"
-          class="flex flex-row items-center gap-1 text-sm font-semibold text-white bg-indigo-600 py-2 px-3.5 rounded-lg hover:bg-indigo-700"
+        <DropDownBtn
+          text="Copy"
+          icon={<IoCopySharp />}
+          classList={{
+            "w-fit flex flex-col items-stretch": true,
+          }}
         >
-          <span class="text-base">
-            <FaSolidCheck />
-          </span>
-          Publish
-        </button>
-        <DropDownBtn text="Copy" icon={<IoCopySharp />}>
-          <A
-            href="/"
-            class="py-1.5 px-2.5 text-sm text-gray-600 hover:bg-gray-100 whitespace-nowrap block"
+          <button
+            type="button"
+            onClick={[setScheduleTemplateModalState, "copy"]}
+            class="py-1.5 px-2.5 text-sm text-start text-gray-600 hover:bg-gray-100 whitespace-nowrap block"
           >
             Copy Previous Week
-          </A>
-          <A
-            href="/"
-            class="py-1.5 px-2.5 text-sm text-gray-600 hover:bg-gray-100 whitespace-nowrap block"
+          </button>
+          <button
+            type="button"
+            onClick={[setScheduleTemplateModalState, "create"]}
+            class="py-1.5 px-2.5 text-sm text-start text-gray-600 hover:bg-gray-100 whitespace-nowrap block"
           >
             Create Week Template
-          </A>
-          <A
-            href="/"
-            class="py-1.5 px-2.5 text-sm text-gray-600 hover:bg-gray-100 whitespace-nowrap block"
+          </button>
+          <button
+            type="button"
+            onClick={[setScheduleTemplateModalState, "list"]}
+            class="py-1.5 px-2.5 text-sm text-start text-gray-600 hover:bg-gray-100 whitespace-nowrap block"
           >
             Apply Week Template
-          </A>
+          </button>
         </DropDownBtn>
       </div>
     </div>

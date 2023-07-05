@@ -1,7 +1,7 @@
 import { Setter, Resource } from "solid-js";
 import { ShiftTemplate } from "~/types";
 
-export interface TemplateProps {
+export interface ShiftTemplateProps {
   setState: Setter<"list" | "edit" | "create">;
   shiftTemplates: Resource<ShiftTemplate[]>;
 }

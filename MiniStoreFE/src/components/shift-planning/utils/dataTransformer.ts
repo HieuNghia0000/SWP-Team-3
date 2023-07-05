@@ -4,7 +4,10 @@ import { DataTable, FetcherData } from "./types";
 
 // TODO: add another transform function to transform data fetched from add new shift endpoint
 // without losing the current data
-export function transformData(data: FetcherData): DataTable {
+export function transformData(
+  data: FetcherData,
+  simple: boolean = false
+): DataTable {
   const transformedData: DataTable = {
     originShifts: {},
     shifts: {},
@@ -13,7 +16,6 @@ export function transformData(data: FetcherData): DataTable {
     staffs: data.staffs,
     changedShifts: {},
     isChanged: false,
-    isErrored: false,
     shiftsRules: {},
     preparingData: false,
   };
@@ -23,6 +25,7 @@ export function transformData(data: FetcherData): DataTable {
   for (let staff of data.staffs) {
     for (let shift of staff.shifts) {
       transformedData.shifts[shift.shiftId] = { ...shift };
+      if (simple) continue;
       transformedData.originShifts[shift.shiftId] = { ...shift };
       transformedData.changedShifts[shift.shiftId] = false;
     }

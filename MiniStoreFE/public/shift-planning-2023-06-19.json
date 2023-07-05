@@ -8,6 +8,7 @@
       "phoneNumber": "0123456789",
       "salary": {
         "salaryId": 1,
+        "staffId": 1,
         "hourlyWage": "10000000",
         "effectiveDate": "2023-06-15",
         "terminationDate": ""
@@ -76,6 +77,7 @@
       "phoneNumber": "0123456789",
       "salary": {
         "salaryId": 1,
+        "staffId": 2,
         "hourlyWage": "10000000",
         "effectiveDate": "2023-06-15",
         "terminationDate": ""
@@ -95,6 +97,7 @@
       "phoneNumber": "0123456789",
       "salary": {
         "salaryId": 2,
+        "staffId": 3,
         "hourlyWage": "8000000",
         "effectiveDate": "2023-06-15",
         "terminationDate": ""

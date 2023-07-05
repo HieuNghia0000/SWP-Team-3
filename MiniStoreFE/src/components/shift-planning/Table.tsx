@@ -30,7 +30,7 @@ type DnDTableProps = {};
 
 const Table: Component<DnDTableProps> = (props) => {
   const { setStaffModalData, setShowStaffModal } = useShiftPlanningModals();
-  const { tableData, setTableData, fetchedData } = useSPData();
+  const { tableData, setTableData, routeData } = useSPData();
 
   // Get all droppable box ids
   const cellIds = () => Object.keys(tableData.cells);
@@ -152,7 +152,7 @@ const Table: Component<DnDTableProps> = (props) => {
             {(date) => (
               <div
                 class="px-3 py-2 flex flex-col justify-center border border-gray-200 flex-1 items-center overflow-hidden bg-white"
-                classList={{ "animate-pulse": fetchedData.loading }}
+                classList={{ "animate-pulse": routeData.loading }}
               >
                 <div class="font-semibold text-sm text-gray-600">
                   {moment(date).format("ddd, MMM D")}
@@ -223,7 +223,7 @@ const Table: Component<DnDTableProps> = (props) => {
                     <ShiftCard
                       isOrigin={isOrigin()}
                       published={item().published}
-                      loading={fetchedData.loading}
+                      loading={routeData.loading}
                       role={item().shiftTemplate.role}
                       shiftDuration={shiftTimes(
                         item().shiftTemplate.startTime,

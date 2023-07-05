@@ -78,7 +78,7 @@ const fetcher: ResourceFetcher<
   // const response = await fetch(
   //   `${getEndPoint()}/shift-planning?from_date=${from}&to_date=${to}`
   // );
-  const response = await fetch(`http://localhost:3000/shifts.json`);
+  const response = await fetch(`http://localhost:3000/shift-templates.json`);
   const data: DataResponse<ShiftTemplate[]> = await response.json();
 
   return data.content;
@@ -104,6 +104,7 @@ const Edit: Component<EditProps> = ({
   const formHandler = useFormHandler(yupSchema(schema));
   const { formData, setFieldValue } = formHandler;
 
+  // Reset the form data to the default values
   onCleanup(() => {
     formHandler.resetForm();
     setChosenTemplate(0);
@@ -156,14 +157,8 @@ const Edit: Component<EditProps> = ({
     setFieldValue("endTime", timeToReadable(endTime!));
   };
 
-  const reset = () => {
-    formHandler.resetForm();
-  };
-
   const onCancel = () => {
-    reset();
     setModalState("details");
-    setChosenTemplate(0);
   };
 
   const isOldShift = isDayInThePast(modalData()?.date || "");

@@ -4,7 +4,7 @@ import { Accessor, Setter, Component, For, Show } from "solid-js";
 import PopupModal from "~/components/PopupModal";
 import { Role } from "~/types";
 import { Tabs } from ".";
-import { shiftTimes } from "../utils/shiftTimes";
+import { shiftDetailsTime } from "../utils/shiftTimes";
 import { ShiftCard } from "~/context/ShiftPlanning";
 
 interface ErrorsProps {
@@ -45,13 +45,14 @@ const Errors: Component<ErrorsProps> = ({
                   shiftCard()?.shiftTemplate.role === Role.ALL_ROLES,
               }}
             ></i>
-            <p class="ml-3.5 font-semibold text-base tracking-wider">
-              {shiftTimes(
+            <p class="ml-3.5 font-semibold text-sm tracking-wider">
+              {shiftDetailsTime(
+                shiftCard()?.date || "",
                 shiftCard()?.shiftTemplate.startTime || "",
                 shiftCard()?.shiftTemplate.endTime || ""
               )}
             </p>
-            <p class="ml-3.5 font-normal text-sm tracking-wider">
+            <p class="ml-3.5 font-normal text-xs tracking-wider">
               {shiftCard()?.shiftTemplate.name}
             </p>
           </div>

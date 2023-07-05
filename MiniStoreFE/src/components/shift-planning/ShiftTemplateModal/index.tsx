@@ -24,7 +24,7 @@ const fetcher: ResourceFetcher<
   // const response = await fetch(
   //   `${getEndPoint()}/shift-planning?from_date=${from}&to_date=${to}`
   // );
-  const response = await fetch(`http://localhost:3000/shifts.json`);
+  const response = await fetch(`http://localhost:3000/shift-templates.json`);
   const data: DataResponse<ShiftTemplate[]> = await response.json();
 
   return data.content;

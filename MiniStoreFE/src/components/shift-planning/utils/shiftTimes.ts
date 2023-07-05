@@ -41,3 +41,20 @@ export function readableToTimeStr(time: string) {
 
   return formattedTime;
 }
+
+export function shiftDetailsTime(
+  date: string,
+  startTime: string,
+  endTime: string
+) {
+  const format = "h:mma"; // Time format: 12-hour clock with minutes
+
+  const start = moment(startTime, "HH:mm:ss");
+  const end = moment(endTime, "HH:mm:ss");
+  const d = moment(date, "YYYY-MM-DD").format("ddd, MMM D");
+
+  const formattedStart = start.format(format).replace(":00", "");
+  const formattedEnd = end.format(format).replace(":00", "");
+
+  return `${d}, ${formattedStart} - ${formattedEnd}`;
+}

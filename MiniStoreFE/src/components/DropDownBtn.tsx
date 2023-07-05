@@ -6,6 +6,7 @@ const DropDownBtn: Component<{
   text: string;
   icon?: JSX.Element;
   children: JSX.Element;
+  classList?: { [key: string]: boolean };
 }> = (props) => {
   const [open, setOpen] = createSignal(false);
   let btnEl;
@@ -26,7 +27,12 @@ const DropDownBtn: Component<{
         </span>
       </button>
       <Dismiss menuButton={btnEl} open={open} setOpen={setOpen}>
-        <div class="origin-top-right absolute right-0 top-11 z-40 min-w-[200px] rounded-lg shadow-lg border border-gray-200 bg-white shadow-xs">
+        <div
+          class="origin-top-right absolute right-0 top-11 z-40 rounded-lg shadow-lg border border-gray-200 bg-white shadow-xs"
+          classList={
+            props.classList ? props.classList : { "min-w-[200px]": true }
+          }
+        >
           {props.children}
         </div>
       </Dismiss>
