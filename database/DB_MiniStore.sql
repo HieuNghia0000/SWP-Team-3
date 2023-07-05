@@ -135,7 +135,7 @@ CREATE TABLE Salaries
 (
 	salary_id INT AUTO_INCREMENT NOT NULL,
     staff_id INT NOT NULL,
-    hourly_wage FLOAT,
+    hourly_wage NVARCHAR(10),
     effective_date DATE,
     termination_date DATE,
     PRIMARY KEY (salary_id),
