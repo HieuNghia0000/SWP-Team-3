@@ -7,24 +7,20 @@ import javax.persistence.*;
 @Entity
 @Data
 @Table(name = "shiftcoverrequests")
-public class ShiftCoverRequests {
+public class ShiftCoverRequest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "shift_cover_request_id")
     private int shiftCoverRequestId;
 
-    @OneToOne
-    @JoinColumn(name = "shift_id", referencedColumnName = "shift_id")
-    private Shift shift;
-
-    @ManyToOne
-    @JoinColumn(name = "staff_id" ,referencedColumnName = "staff_id")
-    private Staff staff;
-
     @Column(name = "note", length = 400)
     private String note;
 
     @Column(name = "status")
     private int status;
+
+    @ManyToOne
+    @JoinColumn(name = "staff_id")
+    private Staff staff;
 }

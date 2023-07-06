@@ -13,7 +13,7 @@
         "effectiveDate": "2023-06-15",
         "terminationDate": ""
       },
-      "status": 0,
+      "status": "ACTIVE",
       "image": "",
       "email": "hieuvo@gmail.com",
       "workDays": "WED, SAT",
@@ -49,7 +49,7 @@
         "effectiveDate": "2023-06-15",
         "terminationDate": ""
       },
-      "status": 0,
+      "status": "ACTIVE",
       "image": "",
       "email": "khoa@gmail.com",
       "workDays": "WED, SAT",
@@ -100,7 +100,7 @@
         "effectiveDate": "2023-06-15",
         "terminationDate": ""
       },
-      "status": 0,
+      "status": "ACTIVE",
       "image": "",
       "email": "johnsmith@gmail.com",
       "workDays": "MON, TUE, WED, THU, FRI",

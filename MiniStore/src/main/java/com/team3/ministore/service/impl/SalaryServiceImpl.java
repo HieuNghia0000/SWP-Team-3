@@ -27,6 +27,11 @@ public class SalaryServiceImpl implements SalaryService {
     }
 
     @Override
+    public List<SalaryDto> getSalaryOfAllStaffs() {
+        return salaryRepository.findSalaryOfAllStaffs();
+    }
+
+    @Override
     public Salary createSalary(SalaryDto dto, Staff staff) {
         Salary salary = new Salary();
         salary.setHourlyWage(dto.getHourlyWage());

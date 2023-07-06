@@ -9,7 +9,7 @@ import lombok.Data;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Data
 public class RegisterDto {
@@ -35,10 +35,10 @@ public class RegisterDto {
     private String hourlyWage;
 
     @NotNull(message = "EffectiveDate name must not be null")
-    private Date effectiveDate;
+    private LocalDate effectiveDate;
 
     @NotNull(message = "TerminationDate name must not be null")
-    private Date terminationDate;
+    private LocalDate terminationDate;
 
     private String phoneNumber;
 

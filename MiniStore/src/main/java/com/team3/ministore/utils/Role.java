@@ -5,5 +5,5 @@ public enum Role {
     MANAGER,
     CASHIER,
     GUARD,
-    ALL_ROLES;
+    ALL_ROLES
 }

@@ -11,19 +11,17 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequestMapping("/shift-templates")
 public class ShiftTemplateController {
-    
+
     @Autowired
     private ShiftTemplateService shiftTemplateService;
 
-    @GetMapping("")
-    public ResponseEntity<List<ShiftTemplate>> getAllShiftTemplates() {
-        List<ShiftTemplate> shiftTemplateList = shiftTemplateService.getAllShiftTemplates();
-        return new ResponseEntity<>(shiftTemplateList, HttpStatus.OK);
+    @GetMapping()
+    public ResponseEntity<Object> getAllShiftTemplates() {
+        return ResponseHandler.getResponse(shiftTemplateService.getAllShiftTemplates(), HttpStatus.OK);
     }
 
     @PostMapping("/add")

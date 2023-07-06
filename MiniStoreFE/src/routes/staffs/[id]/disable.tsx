@@ -18,7 +18,7 @@ export function routeData({ params }: RouteDataArgs) {
         staffName: "Nguyen Van A",
         username: "nguyenvana",
         image: "",
-        status: 0,
+        status: StaffStatus.ACTIVATED,
       } as Staff;
     },
     { key: () => ["staffs", params.id] }

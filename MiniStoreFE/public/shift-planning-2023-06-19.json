@@ -13,7 +13,7 @@
         "effectiveDate": "2023-06-15",
         "terminationDate": ""
       },
-      "status": 0,
+      "status": "ACTIVE",
       "image": "",
       "email": "hieuvo@gmail.com",
       "workDays": "WED, SAT",
@@ -36,7 +36,7 @@
             "shiftId": 2,
             "checkInTime": "16:00:00",
             "checkOutTime": "24:00:00",
-            "status": 1,
+            "status": "APPROVED",
             "noteTitle": null,
             "noteContent": null
           },
@@ -59,7 +59,7 @@
             "shiftId": 3,
             "checkInTime": "24:00:00",
             "checkOutTime": "08:00:00",
-            "status": 2,
+            "status": "REJECTED",
             "noteTitle": null,
             "noteContent": null
           },
@@ -80,7 +80,7 @@
         "effectiveDate": "2023-06-15",
         "terminationDate": ""
       },
-      "status": 0,
+      "status": "ACTIVE",
       "image": "",
       "email": "khoa@gmail.com",
       "workDays": "WED, SAT",
@@ -100,7 +100,7 @@
         "effectiveDate": "2023-06-15",
         "terminationDate": ""
       },
-      "status": 0,
+      "status": "ACTIVE",
       "image": "",
       "email": "johnsmith@gmail.com",
       "workDays": "MON, TUE, WED, THU, FRI",
@@ -123,7 +123,7 @@
             "shiftId": 6,
             "checkInTime": "12:00:00",
             "checkOutTime": "16:00:00",
-            "status": 0,
+            "status": "PENDING",
             "noteTitle": null,
             "noteContent": null
           },

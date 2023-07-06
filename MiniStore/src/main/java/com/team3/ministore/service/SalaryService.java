@@ -11,6 +11,8 @@ public interface SalaryService {
 
     SalaryDto getSalaryByStaffId(Integer staffId);
 
+    List<SalaryDto> getSalaryOfAllStaffs();
+
     Salary createSalary(SalaryDto salary, Staff staff);
 
     Salary getSalaryById(Integer id);

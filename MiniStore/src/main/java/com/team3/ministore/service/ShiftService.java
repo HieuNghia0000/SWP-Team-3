@@ -1,19 +1,25 @@
 package com.team3.ministore.service;
 
 import com.team3.ministore.dto.CreateShiftDto;
+import com.team3.ministore.dto.ShiftDto;
 import com.team3.ministore.model.Shift;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 public interface ShiftService {
     List<Shift> getAllShifts();
 
-    Optional<Shift> createShift(CreateShiftDto shift);
+    List<Shift> getAllShiftsByStaffId(int staffId, LocalDate from, LocalDate to);
 
-    Shift getShiftsById(Integer id);
+    Optional<ShiftDto> createShift(CreateShiftDto shift);
 
-    Shift updateShifts(Integer id, Shift shift);
+    Optional<Shift> getShiftById(Integer id);
 
-    void deleteShifts(Integer id);
+    Optional<Shift> updateShift(Integer id, Shift shift);
+
+    void deleteShift(Integer id);
+
+    List<Shift> getAllShifts(LocalDate fromDate, LocalDate toDate);
 }

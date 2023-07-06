@@ -4,7 +4,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Data
@@ -14,7 +14,7 @@ public class ShiftScheduleTemplate {
     private Pk pk;
 
     @Column(name = "date")
-    private Date date;
+    private LocalDate date;
 
     @Column(name = "staff_name", length = 100)
     private String staffName;

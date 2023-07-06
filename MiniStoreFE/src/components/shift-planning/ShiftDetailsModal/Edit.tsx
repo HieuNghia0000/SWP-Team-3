@@ -197,7 +197,7 @@ const Edit: Component<EditProps> = ({
                 <Select
                   id="staffId"
                   name="staffId"
-                  value={modalData()?.staff?.staffId || 0}
+                  value={modalData()?.staffId || 0}
                   placeholder="Select a staff member"
                   options={tableData.staffs.map((staff) => ({
                     value: staff.staffId,

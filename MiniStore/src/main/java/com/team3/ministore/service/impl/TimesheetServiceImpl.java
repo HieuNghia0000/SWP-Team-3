@@ -1,12 +1,16 @@
 package com.team3.ministore.service.impl;
 
+import com.team3.ministore.dto.TimesheetDto;
 import com.team3.ministore.model.Timesheet;
 import com.team3.ministore.repository.TimesheetRepository;
 import com.team3.ministore.service.TimesheetService;
+import com.team3.ministore.utils.TimesheetStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Time;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TimesheetServiceImpl implements TimesheetService {
@@ -20,31 +24,52 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
-    public Timesheet createTimeSheets(Timesheet timesheet) {
+    public Timesheet createTimesheet(TimesheetDto dto) {
+        Timesheet timesheet = new Timesheet();
+
+        return saveTimesheet(
+                timesheet,
+                dto.getCheckInTime(),
+                dto.getCheckOutTime(),
+                dto.getStatus(),
+                dto.getNoteTitle(),
+                dto.getNoteContent()
+        );
+    }
+
+    @Override
+    public Optional<Timesheet> getTimesheetById(Integer id) {
+        return timesheetRepository.findById(id);
+    }
+
+    @Override
+    public Optional<Timesheet> updateTimesheet(Integer id, TimesheetDto timesheet) {
+        Optional<Timesheet> existingTimesheet = getTimesheetById(id);
+
+        return existingTimesheet.map(value -> saveTimesheet(
+                value,
+                timesheet.getCheckInTime(),
+                timesheet.getCheckOutTime(),
+                timesheet.getStatus(),
+                timesheet.getNoteTitle(),
+                timesheet.getNoteContent()
+        ));
+    }
+
+    @Override
+    public void deleteTimesheet(Integer id) {
+        timesheetRepository.deleteById(id);
+    }
+
+    private Timesheet saveTimesheet(Timesheet timesheet, Time checkInTime, Time checkOutTime, TimesheetStatus status,
+                                    String noteTitle, String noteContent) {
+        timesheet.setCheckInTime(checkInTime);
+        timesheet.setCheckOutTime(checkOutTime);
+        timesheet.setStatus(status == null ? TimesheetStatus.PENDING : status);
+        timesheet.setNoteTitle(noteTitle == null ? "" : noteTitle);
+        timesheet.setNoteContent(noteContent == null ? "" : noteContent);
+
         return timesheetRepository.save(timesheet);
     }
 
-    @Override
-    public Timesheet getTimeSheetsById(Integer id) {
-        return timesheetRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid Time Sheet ID: " + id));
-    }
-
-    @Override
-    public Timesheet updateTimeSheets(Integer id, Timesheet timesheet) {
-        Timesheet existingTimesheet = getTimeSheetsById(id);
-
-        existingTimesheet.setShift(timesheet.getShift());
-        existingTimesheet.setCheckInTime(timesheet.getCheckInTime());
-        existingTimesheet.setCheckOutTime(timesheet.getCheckOutTime());
-        existingTimesheet.setStatus(timesheet.getStatus());
-        existingTimesheet.setNoteTitle(timesheet.getNoteTitle());
-        existingTimesheet.setNoteContent(timesheet.getNoteContent());
-
-        return timesheetRepository.save(existingTimesheet);
-    }
-
-    @Override
-    public void deleteTimeSheets(Integer id) {
-        timesheetRepository.deleteById(id);
-    }
 }

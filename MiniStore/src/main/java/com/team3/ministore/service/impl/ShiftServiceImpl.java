@@ -1,16 +1,18 @@
 package com.team3.ministore.service.impl;
 
 import com.team3.ministore.dto.CreateShiftDto;
+import com.team3.ministore.dto.ShiftDto;
 import com.team3.ministore.model.Shift;
 import com.team3.ministore.model.ShiftTemplate;
 import com.team3.ministore.model.Staff;
 import com.team3.ministore.repository.ShiftTemplateRepository;
-import com.team3.ministore.repository.ShiftsRepository;
+import com.team3.ministore.repository.ShiftRepository;
 import com.team3.ministore.repository.StaffRepository;
 import com.team3.ministore.service.ShiftService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,7 +20,7 @@ import java.util.Optional;
 public class ShiftServiceImpl implements ShiftService {
 
     @Autowired
-    private ShiftsRepository shiftsRepository;
+    private ShiftRepository shiftRepository;
 
     @Autowired
     private StaffRepository staffRepository;
@@ -28,11 +30,16 @@ public class ShiftServiceImpl implements ShiftService {
 
     @Override
     public List<Shift> getAllShifts() {
-        return shiftsRepository.findAll();
+        return shiftRepository.findAll();
     }
 
     @Override
-    public Optional<Shift> createShift(CreateShiftDto dto) {
+    public List<Shift> getAllShiftsByStaffId(int staffId, LocalDate from, LocalDate to) {
+        return shiftRepository.findAllByStaff_StaffIdAndDateBetween(staffId, from, to);
+    }
+
+    @Override
+    public Optional<ShiftDto> createShift(CreateShiftDto dto) {
         Shift shift = new Shift();
 
         Optional<ShiftTemplate> sTemplate = shiftTemplateRepository.findById(dto.getShiftTemplateId());
@@ -46,27 +53,27 @@ public class ShiftServiceImpl implements ShiftService {
         shift.setDate(dto.getDate());
         shift.setPublished(dto.isPublished());
 
-        return Optional.of(shiftsRepository.save(shift));
+        return Optional.of(new ShiftDto(shiftRepository.save(shift)));
     }
 
     @Override
-    public Shift getShiftsById(Integer id) {
-        return shiftsRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid Shifts ID: " + id));
+    public Optional<Shift> getShiftById(Integer id) {
+        return shiftRepository.findById(id);
     }
 
     @Override
-    public Shift updateShifts(Integer id, Shift shift) {
-        Shift existingShift = getShiftsById(id);
-
-        existingShift.setStaff(shift.getStaff());
-        existingShift.setDate(shift.getDate());
-        existingShift.setPublished(shift.getPublished());
-
-        return shiftsRepository.save(existingShift);
+    public Optional<Shift> updateShift(Integer id, Shift shift) {
+        Optional<Shift> existingShift = getShiftById(id);
+        return existingShift.map(value -> shiftRepository.save(shift));
     }
 
     @Override
-    public void deleteShifts(Integer id) {
-        shiftsRepository.deleteById(id);
+    public void deleteShift(Integer id) {
+        shiftRepository.deleteById(id);
+    }
+
+    @Override
+    public List<Shift> getAllShifts(LocalDate fromDate, LocalDate toDate) {
+        return shiftRepository.findAllByDateBetween(fromDate, toDate);
     }
 }

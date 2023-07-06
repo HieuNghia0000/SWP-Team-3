@@ -1,17 +1,19 @@
 package com.team3.ministore.service;
 
+import com.team3.ministore.dto.TimesheetDto;
 import com.team3.ministore.model.Timesheet;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface TimesheetService {
     List<Timesheet> getAllTimeSheets();
 
-    Timesheet createTimeSheets(Timesheet timesheet);
+    Timesheet createTimesheet(TimesheetDto timesheet);
 
-    Timesheet getTimeSheetsById(Integer id);
+    Optional<Timesheet> getTimesheetById(Integer id);
 
-    Timesheet updateTimeSheets(Integer id, Timesheet timesheet);
+    Optional<Timesheet> updateTimesheet(Integer id, TimesheetDto timesheet);
 
-    void deleteTimeSheets(Integer id);
+    void deleteTimesheet(Integer id);
 }

@@ -3,6 +3,7 @@ package com.team3.ministore.model;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -16,7 +17,7 @@ public class Shift {
     private int shiftId;
 
     @Column(name = "date")
-    private Date date;
+    private LocalDate date;
 
     @Column(name = "published")
     private Boolean published;
@@ -28,5 +29,13 @@ public class Shift {
     @ManyToOne
     @JoinColumn(name = "shift_template_id")
     private ShiftTemplate shiftTemplate;
+
+    @OneToOne
+    @JoinColumn(name = "timesheet_id")
+    private Timesheet timesheet;
+
+    @OneToOne
+    @JoinColumn(name = "shift_cover_request_id")
+    private ShiftCoverRequest shiftCoverRequest;
 
 }

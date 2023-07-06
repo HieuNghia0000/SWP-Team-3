@@ -3,7 +3,7 @@ package com.team3.ministore.dto;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Data
 public class CreateShiftDto {
@@ -14,7 +14,7 @@ public class CreateShiftDto {
     private int shiftTemplateId;
 
     @NotNull(message = "Date must not be null")
-    private Date date;
+    private LocalDate date;
 
     @NotNull(message = "Published must not be null")
     private boolean published;

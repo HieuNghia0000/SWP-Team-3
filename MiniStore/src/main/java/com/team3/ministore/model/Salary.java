@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Data
@@ -22,10 +22,10 @@ public class Salary extends BaseEntity {
     private String hourlyWage;
 
     @Column(name = "effective_date")
-    private Date effectiveDate;
+    private LocalDate effectiveDate;
 
     @Column(name = "termination_date")
-    private Date terminationDate;
+    private LocalDate terminationDate;
 
     @ManyToOne
     @JoinColumn(name = "staff_id")

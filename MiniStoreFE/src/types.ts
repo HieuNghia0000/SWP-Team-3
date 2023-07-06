@@ -11,15 +11,19 @@ export enum Role {
   GUARD = "GUARD",
 }
 export enum StaffStatus {
-  ACTIVATED,
-  DISABLED,
+  ACTIVATED = "ACTIVATED",
+  DISABLED = "DISABLED",
 }
 export enum TimesheetStatus {
-  PENDING,
-  APPROVED,
-  REJECTED,
+  PENDING = "PENDING",
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED",
 }
-
+export enum ShiftCoverRequestStatus {
+  PENDING = "PENDING",
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED",
+}
 export interface Staff extends Timestamp {
   staffId: number;
   staffName: string;
@@ -55,16 +59,27 @@ export interface Shift extends Timestamp {
   // relationship
   shiftTemplate: ShiftTemplate;
   staff?: Staff;
+  timesheet?: Timesheet;
+  shiftCoverRequest?: ShiftCoverRequest;
 }
 
 export interface Timesheet {
   timesheetId: number;
-  shiftId: number;
   checkInTime: string;
   checkOutTime: string;
   status: TimesheetStatus;
   noteTitle?: string;
   noteContent?: string;
+}
+
+export interface ShiftCoverRequest extends Timestamp {
+  shiftCoverRequestId: number;
+  staffId: number;
+  note: string;
+  status: ShiftCoverRequestStatus;
+
+  // relationship
+  staff?: Staff;
 }
 
 export interface ShiftTemplate extends Timestamp {

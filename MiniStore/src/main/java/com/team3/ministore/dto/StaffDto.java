@@ -26,6 +26,7 @@ public class StaffDto {
     private Integer leaveBalance;
     private SalaryDto salary;
     private List<LeaveRequest> leaveRequests;
+    private List<ShiftDto> shifts;
 
     public StaffDto(Staff staff, SalaryDto salary) {
         this.staffId = staff.getStaffId();
@@ -42,7 +43,7 @@ public class StaffDto {
         this.salary = salary;
     }
 
-    public StaffDto(Staff staff) {
+    public StaffDto(Staff staff, SalaryDto salary, List<ShiftDto> shifts) {
         this.staffId = staff.getStaffId();
         this.username = staff.getUsername();
         this.staffName = staff.getStaffName();
@@ -54,6 +55,8 @@ public class StaffDto {
         this.workDays = staff.getWorkDays();
         this.leaveBalance = staff.getLeaveBalance();
         this.leaveRequests = staff.getLeaveRequests();
+        this.salary = salary;
+        this.shifts = shifts;
     }
 
 }

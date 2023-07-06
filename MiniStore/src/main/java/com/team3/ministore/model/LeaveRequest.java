@@ -5,7 +5,7 @@ import com.team3.ministore.utils.LeaveType;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Data
@@ -22,10 +22,10 @@ public class LeaveRequest {
     private LeaveType leaveType;
 
     @Column(name = "start_date")
-    private Date startDate;
+    private LocalDate startDate;
 
     @Column(name = "end_date")
-    private Date endDate;
+    private LocalDate endDate;
 
     @Column(name = "status")
     @Enumerated(EnumType.ORDINAL)

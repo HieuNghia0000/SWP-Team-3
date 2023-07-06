@@ -31,7 +31,7 @@ public class SalaryController {
     }
 
     @GetMapping("/staff/{id}")
-    public ResponseEntity<SalaryDto> getStaffSalaryHistory(@PathVariable("id") Integer id) {
+    public ResponseEntity<SalaryDto> getStaffSalary(@PathVariable("id") Integer id) {
        SalaryDto salaryList = salaryService.getSalaryByStaffId(id);
         return new ResponseEntity<>(salaryList, HttpStatus.OK);
     }

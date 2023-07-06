@@ -41,7 +41,7 @@ const fetcher: ResourceFetcher<boolean | string, FetcherData> = async (
   const to = dates[dates.length - 1];
 
   // const response = await fetch(
-  //   `${getEndPoint()}/shift-planning?from_date=${from}&to_date=${to}`
+  //   `${getEndPoint()}/shift-planning?from=${from}&to=${to}`
   // );
   const response = await fetch(
     `http://localhost:3000/shift-planning-${source}.json`
