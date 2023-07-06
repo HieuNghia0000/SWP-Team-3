@@ -3,24 +3,22 @@ CREATE DATABASE IF NOT EXISTS MiniStore;
 USE MiniStore;
 
 -- Create Tables
-CREATE TABLE Staffs
-(
-	staff_id INT AUTO_INCREMENT NOT NULL,
-	staff_name NVARCHAR(100) NOT NULL,
-	role NVARCHAR(50),
-	username NVARCHAR(100) NOT NULL,
-	password NVARCHAR(100) NOT NULL,
-	phone_number NVARCHAR(20),
-	status INT,
-	image NVARCHAR(200),
-	email NVARCHAR(200),
-	work_days NVARCHAR(200),
+CREATE TABLE Staffs (
+    staff_id INT AUTO_INCREMENT NOT NULL,
+    staff_name NVARCHAR(100) NOT NULL,
+    role NVARCHAR(50),
+    username NVARCHAR(100) NOT NULL,
+    password NVARCHAR(100) NOT NULL,
+    phone_number NVARCHAR(20),
+    status INT,
+    image NVARCHAR(200),
+    email NVARCHAR(200),
+    work_days NVARCHAR(200),
     leave_balance INT,
-	PRIMARY KEY (staff_id)
+    PRIMARY KEY (staff_id)
 );
 
-CREATE TABLE ShiftTemplates
-(
+CREATE TABLE ShiftTemplates (
 	shift_template_id INT AUTO_INCREMENT NOT NULL,
     start_time TIME,
     end_time TIME,
@@ -30,8 +28,7 @@ CREATE TABLE ShiftTemplates
     PRIMARY KEY (shift_template_id)
 );
 
-CREATE TABLE ScheduleTemplates
-(
+CREATE TABLE ScheduleTemplates (
 	schedule_template_id INT NOT NULL,
     name NVARCHAR(100) NOT NULL,
     description NVARCHAR(400),
@@ -39,16 +36,38 @@ CREATE TABLE ScheduleTemplates
     PRIMARY KEY (schedule_template_id)
 );
 
-CREATE TABLE Shifts
-(
+CREATE TABLE Timesheets (
+	timesheet_id INT AUTO_INCREMENT NOT NULL,
+    check_in_time TIME,
+    check_out_time TIME,
+    status INT,
+    note_title NVARCHAR(100),
+    note_content NVARCHAR(400),
+    PRIMARY KEY (timesheet_id)
+);
+
+CREATE TABLE ShiftCoverRequests (
+	shift_cover_request_id INT AUTO_INCREMENT NOT NULL,
+    staff_id INT,
+    note NVARCHAR(400),
+    status INT,
+    PRIMARY KEY (shift_cover_request_id),
+    FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id)
+);
+
+CREATE TABLE Shifts (
 	shift_id INT AUTO_INCREMENT NOT NULL,
 	shift_template_id INT NOT NULL,
     staff_id INT NOT NULL,
+    timesheet_id INT,
+    shift_cover_request_id INT,
     date DATE,
     published TINYINT(1),
 	PRIMARY KEY (shift_id),
     FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id),
-    FOREIGN KEY (shift_template_id) REFERENCES ShiftTemplates(shift_template_id)
+    FOREIGN KEY (shift_template_id) REFERENCES ShiftTemplates(shift_template_id),
+    FOREIGN KEY (timesheet_id) REFERENCES Timesheets(timesheet_id),
+    FOREIGN KEY (shift_cover_request_id) REFERENCES ShiftCoverRequests(shift_cover_request_id)
 );
 
 CREATE TABLE ShiftScheduleTemplates (
@@ -61,41 +80,14 @@ CREATE TABLE ShiftScheduleTemplates (
     FOREIGN KEY (schedule_template_id) REFERENCES ScheduleTemplates(schedule_template_id)
 );
 
-CREATE TABLE TimeSheets
-(
-	timesheet_id INT AUTO_INCREMENT NOT NULL,
-    shift_id INT NOT NULL,
-    check_in_time TIME,
-    check_out_time TIME,
-    status INT,
-    note_title NVARCHAR(100),
-    note_content NVARCHAR(400),
-    PRIMARY KEY (timesheet_id),
-    FOREIGN KEY (shift_id) REFERENCES Shifts(shift_id)
-);
-
-CREATE TABLE ShiftCoverRequests
-(
-	shift_cover_request_id INT AUTO_INCREMENT NOT NULL,
-    shift_id INT NOT NULL,
-    staff_id INT,
-    note NVARCHAR(400),
-    status INT,
-    PRIMARY KEY (shift_cover_request_id),
-    FOREIGN KEY (shift_id) REFERENCES Shifts(shift_id),
-    FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id)
-);
-
-CREATE TABLE Categories
-(
+CREATE TABLE Categories (
 	category_id INT AUTO_INCREMENT NOT NULL,
 	name NVARCHAR(100),
     description NVARCHAR(300),
 	PRIMARY KEY (category_id)
 );
 
-CREATE TABLE Products
-(
+CREATE TABLE Products (
 	product_id INT AUTO_INCREMENT NOT NULL,
 	category_id INT,
 	barcode NVARCHAR(20),
@@ -107,8 +99,7 @@ CREATE TABLE Products
 	FOREIGN KEY (category_id) REFERENCES Categories(category_id)
 );
 
-CREATE TABLE LeaveRequests
-(
+CREATE TABLE LeaveRequests (
 	leave_request_id INT AUTO_INCREMENT NOT NULL,
 	staff_id INT NOT NULL,
     leave_type NVARCHAR(20),
@@ -121,8 +112,7 @@ CREATE TABLE LeaveRequests
 	FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id)
 );
 
-CREATE TABLE Holidays
-(
+CREATE TABLE Holidays (
 	holiday_id INT AUTO_INCREMENT NOT NULL,
 	name NVARCHAR(100) NOT NULL,
     start_date DATE,
@@ -131,8 +121,7 @@ CREATE TABLE Holidays
 	PRIMARY KEY (holiday_id)
 );
 
-CREATE TABLE Salaries
-(
+CREATE TABLE Salaries (
 	salary_id INT AUTO_INCREMENT NOT NULL,
     staff_id INT NOT NULL,
     hourly_wage NVARCHAR(10),
@@ -142,16 +131,14 @@ CREATE TABLE Salaries
     FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id)
 );
 
-CREATE TABLE Orders
-(
+CREATE TABLE Orders (
 	order_id INT AUTO_INCREMENT NOT NULL,
 	order_date DATETIME NOT NULL,
 	grand_total FLOAT,
 	PRIMARY KEY (order_id)
 );
 
-CREATE TABLE OrderItems
-(
+CREATE TABLE OrderItems (
 	order_item_id INT AUTO_INCREMENT NOT NULL,
 	order_id INT NOT NULL,
 	product_id INT NOT NULL,
