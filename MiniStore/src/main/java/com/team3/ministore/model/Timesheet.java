@@ -8,7 +8,7 @@ import java.sql.Time;
 @Entity
 @Data
 @Table(name = "timesheets")
-public class TimeSheets {
+public class Timesheet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,7 +17,7 @@ public class TimeSheets {
 
     @OneToOne
     @JoinColumn(name = "shift_id", referencedColumnName = "shift_id")
-    private Shifts shifts;
+    private Shift shift;
 
     @Column(name = "check_in_time")
     private Time checkInTime;

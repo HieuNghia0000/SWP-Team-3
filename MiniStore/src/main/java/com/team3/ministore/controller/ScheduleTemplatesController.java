@@ -1,6 +1,6 @@
 package com.team3.ministore.controller;
 
-import com.team3.ministore.model.ScheduleTemplates;
+import com.team3.ministore.model.ScheduleTemplate;
 import com.team3.ministore.service.ScheduleTemplatesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,21 +17,21 @@ public class ScheduleTemplatesController {
     private ScheduleTemplatesService scheduleTemplatesService;
 
     @GetMapping("")
-    public ResponseEntity<List<ScheduleTemplates>> getAllScheduleTemplates() {
-        List<ScheduleTemplates> scheduleTemplatesList = scheduleTemplatesService.getAllScheduleTemplates();
-        return new ResponseEntity<>(scheduleTemplatesList, HttpStatus.OK);
+    public ResponseEntity<List<ScheduleTemplate>> getAllScheduleTemplates() {
+        List<ScheduleTemplate> scheduleTemplateList = scheduleTemplatesService.getAllScheduleTemplates();
+        return new ResponseEntity<>(scheduleTemplateList, HttpStatus.OK);
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ScheduleTemplates> createScheduleTemplates(@RequestBody ScheduleTemplates scheduleTemplates) {
-        ScheduleTemplates createdScheduleTemplates = scheduleTemplatesService.createScheduleTemplates(scheduleTemplates);
-        return new ResponseEntity<>(createdScheduleTemplates, HttpStatus.CREATED);
+    public ResponseEntity<ScheduleTemplate> createScheduleTemplates(@RequestBody ScheduleTemplate scheduleTemplate) {
+        ScheduleTemplate createdScheduleTemplate = scheduleTemplatesService.createScheduleTemplates(scheduleTemplate);
+        return new ResponseEntity<>(createdScheduleTemplate, HttpStatus.CREATED);
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<ScheduleTemplates> updateScheduleTemplates(@PathVariable("id") Integer id, @RequestBody ScheduleTemplates scheduleTemplates) {
-        ScheduleTemplates updatedScheduleTemplates = scheduleTemplatesService.updateScheduleTemplates(id, scheduleTemplates);
-        return new ResponseEntity<>(updatedScheduleTemplates, HttpStatus.OK);
+    public ResponseEntity<ScheduleTemplate> updateScheduleTemplates(@PathVariable("id") Integer id, @RequestBody ScheduleTemplate scheduleTemplate) {
+        ScheduleTemplate updatedScheduleTemplate = scheduleTemplatesService.updateScheduleTemplates(id, scheduleTemplate);
+        return new ResponseEntity<>(updatedScheduleTemplate, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")

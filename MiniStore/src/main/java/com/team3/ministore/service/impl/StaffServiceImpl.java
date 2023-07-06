@@ -1,6 +1,5 @@
 package com.team3.ministore.service.impl;
 
-import com.team3.ministore.dto.StaffDto;
 import com.team3.ministore.dto.RegisterDto;
 import com.team3.ministore.dto.UpdateStaffDto;
 import com.team3.ministore.model.Staff;
@@ -92,44 +91,26 @@ public class StaffServiceImpl implements StaffService {
     }
 
     @Override
-    public Staff getStaffByEmail(String email) {
-        return staffRepository.getStaffByEmail(email);
+    public Optional<Staff> getStaffByEmail(String email) {
+        return staffRepository.findByEmail(email);
     }
 
     @Override
-    public Staff getStaffByUsername(String username) {
+    public Optional<Staff> getStaffByUsername(String username) {
         return staffRepository.findByUsername(username);
     }
 
-    @Override
-    public StaffDto getCurrentStaffByUsername(String username) {
-        StaffDto result = new StaffDto();
-        Staff foundStaff = staffRepository.findByUsername(username);
-
-        result.setStaffId(foundStaff.getStaffId());
-        result.setUsername(foundStaff.getUsername());
-        result.setStaffName(foundStaff.getStaffName());
-        result.setRole(foundStaff.getRole());
-        result.setEmail(foundStaff.getEmail());
-        result.setPhoneNumber(foundStaff.getPhoneNumber());
-        result.setStatus(foundStaff.getStatus());
-        result.setWorkDays(foundStaff.getWorkDays());
-        result.setImage(foundStaff.getImage());
-        result.setLeaveBalance(foundStaff.getLeaveBalance());
-
-        return result;
-    }
 
     private Staff saveStaff(Staff staff, String staffName, Role role, String username,String phoneNumber, StaffStatus status, String image, String email, String workDays, Integer leaveBalance) {
         staff.setStaffName(staffName);
         staff.setRole(role);
         staff.setUsername(username);
-        staff.setPhoneNumber(phoneNumber);
-        staff.setStatus(status);
-        staff.setImage(image);
         staff.setEmail(email);
-        staff.setWorkDays(workDays);
-        staff.setLeaveBalance(leaveBalance);
+        staff.setPhoneNumber(phoneNumber == null ? "" : phoneNumber);
+        staff.setStatus(status == null ? StaffStatus.ACTIVE : status);
+        staff.setImage(image == null ? "" : image);
+        staff.setWorkDays(workDays == null ? "" : workDays);
+        staff.setLeaveBalance(leaveBalance == null ? 0 : leaveBalance);
 
         return staffRepository.save(staff);
     }

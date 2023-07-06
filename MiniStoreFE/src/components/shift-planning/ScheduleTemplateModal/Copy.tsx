@@ -49,6 +49,8 @@ const fetcher: ResourceFetcher<
   );
   const data: DataResponse<Staff[]> = await response.json();
 
+  // TODO: We don't need to transform data here, we can just use the data as is and iterate over it in the template
+  // return data.content;
   return transformData({ dates, staffs: data.content }, true);
 };
 

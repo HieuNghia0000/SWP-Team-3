@@ -1,6 +1,6 @@
 package com.team3.ministore.service.impl;
 
-import com.team3.ministore.model.ShiftScheduleTemplates;
+import com.team3.ministore.model.ShiftScheduleTemplate;
 import com.team3.ministore.repository.ShiftScheduleTemplatesRepository;
 import com.team3.ministore.service.ShiftScheduleTemplatesService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,28 +15,28 @@ public class ShiftScheduleTemplatesServiceImpl implements ShiftScheduleTemplates
     private ShiftScheduleTemplatesRepository shiftScheduleTemplatesRepository;
 
     @Override
-    public List<ShiftScheduleTemplates> getAllShiftScheduleTemplates() {
+    public List<ShiftScheduleTemplate> getAllShiftScheduleTemplates() {
         return shiftScheduleTemplatesRepository.findAll();
     }
 
     @Override
-    public ShiftScheduleTemplates createShiftScheduleTemplates(ShiftScheduleTemplates shiftScheduleTemplates) {
-        return shiftScheduleTemplatesRepository.save(shiftScheduleTemplates);
+    public ShiftScheduleTemplate createShiftScheduleTemplates(ShiftScheduleTemplate shiftScheduleTemplate) {
+        return shiftScheduleTemplatesRepository.save(shiftScheduleTemplate);
     }
 
     @Override
-    public ShiftScheduleTemplates getShiftScheduleTemplatesById(Integer id) {
+    public ShiftScheduleTemplate getShiftScheduleTemplatesById(Integer id) {
         return shiftScheduleTemplatesRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid ShiftScheduleTemplate ID: " + id));
     }
 
     @Override
-    public ShiftScheduleTemplates updateShiftScheduleTemplates(Integer id, ShiftScheduleTemplates shiftScheduleTemplates) {
-        ShiftScheduleTemplates existingShiftScheduleTemplates = getShiftScheduleTemplatesById(id);
+    public ShiftScheduleTemplate updateShiftScheduleTemplates(Integer id, ShiftScheduleTemplate shiftScheduleTemplate) {
+        ShiftScheduleTemplate existingShiftScheduleTemplate = getShiftScheduleTemplatesById(id);
 
-        existingShiftScheduleTemplates.setDate(shiftScheduleTemplates.getDate());
-        existingShiftScheduleTemplates.setStaffName(shiftScheduleTemplates.getStaffName());
+        existingShiftScheduleTemplate.setDate(shiftScheduleTemplate.getDate());
+        existingShiftScheduleTemplate.setStaffName(shiftScheduleTemplate.getStaffName());
 
-        return shiftScheduleTemplatesRepository.save(existingShiftScheduleTemplates);
+        return shiftScheduleTemplatesRepository.save(existingShiftScheduleTemplate);
     }
 
     @Override

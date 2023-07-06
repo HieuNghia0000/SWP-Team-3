@@ -50,7 +50,7 @@ export const getShiftRules = (
         tableData
       ),
       shift,
-    ]).includes(shift.shiftTemplateId)
+    ]).includes(shift.shiftTemplate.shiftTemplateId)
   )
     result[1].passed = true;
 

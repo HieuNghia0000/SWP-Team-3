@@ -24,7 +24,7 @@ public class ExistEmailValidator implements ConstraintValidator<ExistEmail, Stri
 	
 	@Override
 	public boolean isValid(String email, ConstraintValidatorContext context) {
-		if(staffService.getStaffByEmail(email) == null)
+		if(staffService.getStaffByEmail(email).isEmpty())
 			return true;
 
 		ValidatorUtils.addError(context, message);

@@ -1,6 +1,6 @@
 package com.team3.ministore.controller;
 
-import com.team3.ministore.model.ShiftScheduleTemplates;
+import com.team3.ministore.model.ShiftScheduleTemplate;
 import com.team3.ministore.service.ShiftScheduleTemplatesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,21 +17,21 @@ public class ShiftScheduleTemplatesController {
     private ShiftScheduleTemplatesService shiftScheduleTemplatesService;
 
     @GetMapping("")
-    public ResponseEntity<List<ShiftScheduleTemplates>> getAllShiftScheduleTemplates() {
-        List<ShiftScheduleTemplates> shiftScheduleTemplatesList = shiftScheduleTemplatesService.getAllShiftScheduleTemplates();
-        return new ResponseEntity<>(shiftScheduleTemplatesList, HttpStatus.OK);
+    public ResponseEntity<List<ShiftScheduleTemplate>> getAllShiftScheduleTemplates() {
+        List<ShiftScheduleTemplate> shiftScheduleTemplateList = shiftScheduleTemplatesService.getAllShiftScheduleTemplates();
+        return new ResponseEntity<>(shiftScheduleTemplateList, HttpStatus.OK);
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ShiftScheduleTemplates> createShiftScheduleTemplates(@RequestBody ShiftScheduleTemplates shiftScheduleTemplates) {
-        ShiftScheduleTemplates createdShiftScheduleTemplates = shiftScheduleTemplatesService.createShiftScheduleTemplates(shiftScheduleTemplates);
-        return new ResponseEntity<>(createdShiftScheduleTemplates, HttpStatus.CREATED);
+    public ResponseEntity<ShiftScheduleTemplate> createShiftScheduleTemplates(@RequestBody ShiftScheduleTemplate shiftScheduleTemplate) {
+        ShiftScheduleTemplate createdShiftScheduleTemplate = shiftScheduleTemplatesService.createShiftScheduleTemplates(shiftScheduleTemplate);
+        return new ResponseEntity<>(createdShiftScheduleTemplate, HttpStatus.CREATED);
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<ShiftScheduleTemplates> updateShiftScheduleTemplates(@PathVariable("id") Integer id, @RequestBody ShiftScheduleTemplates shiftScheduleTemplates) {
-        ShiftScheduleTemplates updatedShiftScheduleTemplates = shiftScheduleTemplatesService.updateShiftScheduleTemplates(id, shiftScheduleTemplates);
-        return new ResponseEntity<>(updatedShiftScheduleTemplates, HttpStatus.OK);
+    public ResponseEntity<ShiftScheduleTemplate> updateShiftScheduleTemplates(@PathVariable("id") Integer id, @RequestBody ShiftScheduleTemplate shiftScheduleTemplate) {
+        ShiftScheduleTemplate updatedShiftScheduleTemplate = shiftScheduleTemplatesService.updateShiftScheduleTemplates(id, shiftScheduleTemplate);
+        return new ResponseEntity<>(updatedShiftScheduleTemplate, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")

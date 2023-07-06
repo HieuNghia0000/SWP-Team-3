@@ -69,7 +69,9 @@ public class StaffController {
     //Update an existing staff
     @PutMapping("/{id}/edit")
     public ResponseEntity<Object> updateStaff(@PathVariable("id") Integer id,
-                                              @Valid @RequestBody UpdateStaffDto staff) {
+                                              @Valid @RequestBody UpdateStaffDto staff, BindingResult errors) {
+        if (errors.hasErrors()) return ResponseHandler.getResponse(errors, HttpStatus.BAD_REQUEST);
+
         Optional<Staff> updatedStaff = staffService.updateStaff(id, staff);
 
         return updatedStaff.map(value ->

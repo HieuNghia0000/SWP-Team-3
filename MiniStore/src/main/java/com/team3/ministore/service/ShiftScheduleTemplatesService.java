@@ -1,17 +1,17 @@
 package com.team3.ministore.service;
 
-import com.team3.ministore.model.ShiftScheduleTemplates;
+import com.team3.ministore.model.ShiftScheduleTemplate;
 
 import java.util.List;
 
 public interface ShiftScheduleTemplatesService {
-    List<ShiftScheduleTemplates> getAllShiftScheduleTemplates();
+    List<ShiftScheduleTemplate> getAllShiftScheduleTemplates();
 
-    ShiftScheduleTemplates createShiftScheduleTemplates(ShiftScheduleTemplates shiftScheduleTemplates);
+    ShiftScheduleTemplate createShiftScheduleTemplates(ShiftScheduleTemplate shiftScheduleTemplate);
 
-    ShiftScheduleTemplates getShiftScheduleTemplatesById(Integer id);
+    ShiftScheduleTemplate getShiftScheduleTemplatesById(Integer id);
 
-    ShiftScheduleTemplates updateShiftScheduleTemplates(Integer id, ShiftScheduleTemplates shiftScheduleTemplates);
+    ShiftScheduleTemplate updateShiftScheduleTemplates(Integer id, ShiftScheduleTemplate shiftScheduleTemplate);
 
     void deleteShiftScheduleTemplates(Integer id);
 }

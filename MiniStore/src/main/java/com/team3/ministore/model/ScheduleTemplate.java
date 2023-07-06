@@ -7,7 +7,7 @@ import javax.persistence.*;
 @Entity
 @Data
 @Table(name = "scheduletemplates")
-public class ScheduleTemplates {
+public class ScheduleTemplate {
 
     @Id
     @Column(name = "schedule_template_id")

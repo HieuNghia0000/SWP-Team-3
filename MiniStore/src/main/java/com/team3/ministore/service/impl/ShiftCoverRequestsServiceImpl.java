@@ -33,7 +33,7 @@ public class ShiftCoverRequestsServiceImpl implements ShiftCoverRequestsService 
     public ShiftCoverRequests updateShiftCoverRequests(Integer id, ShiftCoverRequests shiftCoverRequests) {
         ShiftCoverRequests existingShiftCoverRequests = getShiftCoverRequestsById(id);
 
-        existingShiftCoverRequests.setShifts(shiftCoverRequests.getShifts());
+        existingShiftCoverRequests.setShift(shiftCoverRequests.getShift());
         existingShiftCoverRequests.setStaff(shiftCoverRequests.getStaff());
         existingShiftCoverRequests.setNote(shiftCoverRequests.getNote());
         existingShiftCoverRequests.setStatus(shiftCoverRequests.getStatus());

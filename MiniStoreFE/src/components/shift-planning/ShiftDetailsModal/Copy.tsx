@@ -37,7 +37,8 @@ const Copy: Component<CopyProps> = ({ shiftCard, setModalState, onDelete }) => {
   const getWorkDays = (shiftId: number, staffId: number) => {
     const staffWorkDates = Object.keys(tableData.shifts).map((id) => {
       const s = tableData.shifts[Number.parseInt(id)];
-      if (s.staffId === staffId && s.shiftTemplateId === shiftId) return s.date;
+      if (s.staffId === staffId && s.shiftTemplate.shiftTemplateId === shiftId)
+        return s.date;
       else return "";
     });
     const dates = compact(staffWorkDates);
@@ -45,7 +46,7 @@ const Copy: Component<CopyProps> = ({ shiftCard, setModalState, onDelete }) => {
   };
 
   const workDays = getWorkDays(
-    shiftCard()?.shiftTemplateId || 0,
+    shiftCard()?.shiftTemplate.shiftTemplateId || 0,
     shiftCard()?.staffId || 0
   );
 

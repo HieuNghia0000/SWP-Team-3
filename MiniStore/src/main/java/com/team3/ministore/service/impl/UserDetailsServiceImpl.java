@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -19,15 +20,15 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     private StaffRepository staffRepository;
 
-    public StaffDetails loadUserByUsername(String username)throws UsernameNotFoundException{
-        Staff staff = staffRepository.findByUsername(username);
-        if (staff == null) throw new UsernameNotFoundException("Không tìm thấy tài khoản!");
+    public StaffDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<Staff> staff = staffRepository.findByUsername(username);
+        if (staff.isEmpty()) throw new UsernameNotFoundException("User not found");
 
-        Set<GrantedAuthority> authorities=new HashSet<GrantedAuthority>();
-        String roleName = staff.getRole().name();
+        Set<GrantedAuthority> authorities = new HashSet<>();
+        String roleName = staff.get().getRole().name();
         authorities.add(new SimpleGrantedAuthority(roleName));
 
-        return new StaffDetails(username, staff.getPassword(), authorities);
+        return new StaffDetails(username, staff.get().getPassword(), authorities);
     }
 
 }

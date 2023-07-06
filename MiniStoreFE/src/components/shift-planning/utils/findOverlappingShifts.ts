@@ -37,8 +37,8 @@ export function findOverlappingShifts(shifts: Shift[]) {
       )
     ) {
       overlappingShifts.push(
-        currentShift.shiftTemplateId,
-        nextShift.shiftTemplateId
+        currentShift.shiftTemplate.shiftTemplateId,
+        nextShift.shiftTemplate.shiftTemplateId
       );
     }
   }

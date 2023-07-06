@@ -48,7 +48,6 @@ export interface Salary {
 
 export interface Shift extends Timestamp {
   shiftId: number;
-  shiftTemplateId: number;
   staffId: number;
   date: string;
   published: boolean;

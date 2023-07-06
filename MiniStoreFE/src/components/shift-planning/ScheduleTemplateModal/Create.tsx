@@ -44,7 +44,8 @@ const Create: Component = ({}) => {
             ...formData(),
             numOfShifts: shiftIds.length,
             shiftInfos: shiftIds.map((id) => ({
-              shiftTemplateId: tableData.shifts[id].shiftTemplateId,
+              shiftTemplateId:
+                tableData.shifts[id].shiftTemplate.shiftTemplateId,
               date: tableData.shifts[id].date,
               staffName: tableData.shifts[id].staff?.staffName,
             })),

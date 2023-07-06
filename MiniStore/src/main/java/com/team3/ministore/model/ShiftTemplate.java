@@ -1,14 +1,16 @@
 package com.team3.ministore.model;
 
+import com.team3.ministore.utils.Role;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.sql.Time;
 
 @Entity
 @Data
 @Table(name = "shifttemplates")
-public class ShiftTemplates {
+public class ShiftTemplate {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,12 +23,16 @@ public class ShiftTemplates {
     @Column(name = "end_time")
     private Time endTime;
 
+    @NotNull
     @Column(name = "name", length = 50)
     private String name;
 
     @Column(name = "salary_coefficient")
     private Float salaryCoefficient;
 
-    @Column(name = "role", length = 50)
-    private String role;
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    private Role role;
+
 }

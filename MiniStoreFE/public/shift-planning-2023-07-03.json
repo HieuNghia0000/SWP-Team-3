@@ -22,7 +22,6 @@
         {
           "shiftId": 2,
           "staffId": 1,
-          "shiftTemplateId": 2,
           "shiftTemplate": {
             "shiftTemplateId": 2,
             "name": "Ca Chiều",
@@ -46,7 +45,6 @@
         {
           "shiftId": 3,
           "staffId": 1,
-          "shiftTemplateId": 2,
           "shiftTemplate": {
             "shiftTemplateId": 2,
             "name": "Ca Khuya",
@@ -103,7 +101,6 @@
         {
           "shiftId": 6,
           "staffId": 3,
-          "shiftTemplateId": 4,
           "shiftTemplate": {
             "shiftTemplateId": 4,
             "name": "Afternoon Shift",

@@ -1,6 +1,5 @@
 package com.team3.ministore.service;
 
-import com.team3.ministore.dto.StaffDto;
 import com.team3.ministore.dto.RegisterDto;
 import com.team3.ministore.dto.UpdateStaffDto;
 import com.team3.ministore.model.Staff;
@@ -24,10 +23,8 @@ public interface StaffService {
 
     Page<Staff> findAllPagingStaff(int pageIndex, int pageSize);
 
-    Staff getStaffByEmail(String email);
+    Optional<Staff> getStaffByEmail(String email);
 
-    Staff getStaffByUsername(String username);
-
-    StaffDto getCurrentStaffByUsername(String username);
+    Optional<Staff> getStaffByUsername(String username);
 
 }

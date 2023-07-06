@@ -26,7 +26,7 @@ import Spinner from "../Spinner";
 import { roles } from "~/utils/roles";
 
 type NewScheduleForm = {
-  shiftId: number;
+  shiftTemplateId: number;
   staffId: number;
   startTime: string;
   endTime: string;
@@ -37,7 +37,7 @@ type NewScheduleForm = {
 
 const validTimeOptions = timeOptions().map((item) => item.label);
 const schema: yup.Schema<NewScheduleForm> = yup.object({
-  shiftId: yup
+  shiftTemplateId: yup
     .number()
     .min(1, "Please select a shift template")
     .required("Please select a shift template"),
@@ -102,9 +102,9 @@ const NewShiftDetailsModal: Component<{
       alert(
         "Data sent with success: " +
           JSON.stringify({
-            ...formData(),
-            startTime: readableToTimeStr(formData().startTime),
-            endTime: readableToTimeStr(formData().endTime),
+            staffId: formData().staffId,
+            shiftTemplateId: formData().shiftTemplateId,
+            date: formData().date,
             published: publish,
           })
       );
@@ -117,7 +117,7 @@ const NewShiftDetailsModal: Component<{
     formHandler.resetForm();
   };
 
-  const shiftOptions = () => {
+  const shiftTemplateOptions = () => {
     return shiftTemplates()?.map((shift) => ({
       value: shift.shiftTemplateId,
       label: `${shift.name} (${shiftTimes(shift.startTime, shift.endTime)}) [${
@@ -163,15 +163,18 @@ const NewShiftDetailsModal: Component<{
           <form class="text-sm" onSubmit={[submit, false]}>
             <div class="flex">
               <div class="flex-1 py-2.5 flex flex-col gap-1">
-                <label for="shiftId" class="text-gray-700 font-semibold">
+                <label
+                  for="shiftTemplateId"
+                  class="text-gray-700 font-semibold"
+                >
                   Shift Template
                 </label>
                 <Select
-                  id="shiftId"
-                  name="shiftId"
+                  id="shiftTemplateId"
+                  name="shiftTemplateId"
                   value={0}
                   placeholder="Select a shift template"
-                  options={shiftOptions()}
+                  options={shiftTemplateOptions()}
                   onChange={onChangeTemplate}
                   formHandler={formHandler}
                 />

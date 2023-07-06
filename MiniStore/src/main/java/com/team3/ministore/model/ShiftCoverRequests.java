@@ -16,7 +16,7 @@ public class ShiftCoverRequests {
 
     @OneToOne
     @JoinColumn(name = "shift_id", referencedColumnName = "shift_id")
-    private Shifts shifts;
+    private Shift shift;
 
     @ManyToOne
     @JoinColumn(name = "staff_id" ,referencedColumnName = "staff_id")
