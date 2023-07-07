@@ -18,24 +18,6 @@ CREATE TABLE Staffs (
     PRIMARY KEY (staff_id)
 );
 
-CREATE TABLE ShiftTemplates (
-	shift_template_id INT AUTO_INCREMENT NOT NULL,
-    start_time TIME,
-    end_time TIME,
-    name NVARCHAR(50),
-    salary_coefficient FLOAT,
-    role NVARCHAR(50),
-    PRIMARY KEY (shift_template_id)
-);
-
-CREATE TABLE ScheduleTemplates (
-	schedule_template_id INT NOT NULL,
-    name NVARCHAR(100) NOT NULL,
-    description NVARCHAR(400),
-    num_of_shifts INT,
-    PRIMARY KEY (schedule_template_id)
-);
-
 CREATE TABLE Timesheets (
 	timesheet_id INT AUTO_INCREMENT NOT NULL,
     check_in_time TIME,
@@ -57,27 +39,84 @@ CREATE TABLE ShiftCoverRequests (
 
 CREATE TABLE Shifts (
 	shift_id INT AUTO_INCREMENT NOT NULL,
-	shift_template_id INT NOT NULL,
     staff_id INT NOT NULL,
     timesheet_id INT,
     shift_cover_request_id INT,
     date DATE,
     published TINYINT(1),
+	start_time TIME,
+    end_time TIME,
+    name NVARCHAR(50),
+    salary_coefficient FLOAT,
+    role NVARCHAR(50),
 	PRIMARY KEY (shift_id),
     FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id),
-    FOREIGN KEY (shift_template_id) REFERENCES ShiftTemplates(shift_template_id),
     FOREIGN KEY (timesheet_id) REFERENCES Timesheets(timesheet_id),
     FOREIGN KEY (shift_cover_request_id) REFERENCES ShiftCoverRequests(shift_cover_request_id)
 );
 
-CREATE TABLE ShiftScheduleTemplates (
-    shift_template_id INT NOT NULL,
+CREATE TABLE ShiftTemplates (
+	shift_template_id INT AUTO_INCREMENT NOT NULL,
+    start_time TIME,
+    end_time TIME,
+    name NVARCHAR(50),
+    salary_coefficient FLOAT,
+    role NVARCHAR(50),
+    PRIMARY KEY (shift_template_id)
+);
+
+CREATE TABLE ScheduleTemplates (
+	schedule_template_id INT AUTO_INCREMENT NOT NULL,
+    name NVARCHAR(100) NOT NULL,
+    description NVARCHAR(400),
+    num_of_shifts INT,
+    PRIMARY KEY (schedule_template_id)
+);
+
+CREATE TABLE ScheduleShiftTemplates (
+    schedule_shift_template_id INT AUTO_INCREMENT NOT NULL,
     schedule_template_id INT NOT NULL,
+    staff_id INT NOT NULL,
     date DATE,
-    staff_name NVARCHAR(100) NOT NULL,
-    PRIMARY KEY (shift_template_id, schedule_template_id),
-    FOREIGN KEY (shift_template_id) REFERENCES ShiftTemplates(shift_template_id),
+	start_time TIME,
+    end_time TIME,
+	salary_coefficient FLOAT,
+    role NVARCHAR(50),
+    PRIMARY KEY (schedule_shift_template_id),
+    FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id),
     FOREIGN KEY (schedule_template_id) REFERENCES ScheduleTemplates(schedule_template_id)
+);
+
+CREATE TABLE LeaveRequests (
+	leave_request_id INT AUTO_INCREMENT NOT NULL,
+	staff_id INT NOT NULL,
+    leave_type NVARCHAR(20),
+	start_date DATE,
+	end_date DATE,
+	status INT,
+	reason NVARCHAR(500),
+    admin_reply NVARCHAR(500),
+	PRIMARY KEY (leave_request_id),
+	FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id)
+);
+
+CREATE TABLE Salaries (
+	salary_id INT AUTO_INCREMENT NOT NULL,
+    staff_id INT NOT NULL,
+    hourly_wage NVARCHAR(10),
+    effective_date DATE,
+    termination_date DATE,
+    PRIMARY KEY (salary_id),
+    FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id)
+);
+
+CREATE TABLE Holidays (
+	holiday_id INT AUTO_INCREMENT NOT NULL,
+	name NVARCHAR(100) NOT NULL,
+    start_date DATE,
+    end_date DATE,
+	coefficient FLOAT,
+	PRIMARY KEY (holiday_id)
 );
 
 CREATE TABLE Categories (
@@ -97,38 +136,6 @@ CREATE TABLE Products (
 	inventory INT,
 	PRIMARY KEY (product_id),
 	FOREIGN KEY (category_id) REFERENCES Categories(category_id)
-);
-
-CREATE TABLE LeaveRequests (
-	leave_request_id INT AUTO_INCREMENT NOT NULL,
-	staff_id INT NOT NULL,
-    leave_type NVARCHAR(20),
-	start_date DATE,
-	end_date DATE,
-	status INT,
-	reason NVARCHAR(500),
-    admin_reply NVARCHAR(500),
-	PRIMARY KEY (leave_request_id),
-	FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id)
-);
-
-CREATE TABLE Holidays (
-	holiday_id INT AUTO_INCREMENT NOT NULL,
-	name NVARCHAR(100) NOT NULL,
-    start_date DATE,
-    end_date DATE,
-	coefficient FLOAT,
-	PRIMARY KEY (holiday_id)
-);
-
-CREATE TABLE Salaries (
-	salary_id INT AUTO_INCREMENT NOT NULL,
-    staff_id INT NOT NULL,
-    hourly_wage NVARCHAR(10),
-    effective_date DATE,
-    termination_date DATE,
-    PRIMARY KEY (salary_id),
-    FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id)
 );
 
 CREATE TABLE Orders (
