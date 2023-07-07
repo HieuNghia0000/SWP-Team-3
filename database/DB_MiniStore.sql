@@ -34,25 +34,7 @@ CREATE TABLE ShiftCoverRequests (
     note NVARCHAR(400),
     status INT,
     PRIMARY KEY (shift_cover_request_id),
-    FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id)
-);
-
-CREATE TABLE Shifts (
-	shift_id INT AUTO_INCREMENT NOT NULL,
-    staff_id INT NOT NULL,
-    timesheet_id INT,
-    shift_cover_request_id INT,
-    date DATE,
-    published TINYINT(1),
-	start_time TIME,
-    end_time TIME,
-    name NVARCHAR(50),
-    salary_coefficient FLOAT,
-    role NVARCHAR(50),
-	PRIMARY KEY (shift_id),
-    FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id),
-    FOREIGN KEY (timesheet_id) REFERENCES Timesheets(timesheet_id),
-    FOREIGN KEY (shift_cover_request_id) REFERENCES ShiftCoverRequests(shift_cover_request_id)
+    FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id) ON DELETE SET NULL
 );
 
 CREATE TABLE ShiftTemplates (
@@ -63,6 +45,26 @@ CREATE TABLE ShiftTemplates (
     salary_coefficient FLOAT,
     role NVARCHAR(50),
     PRIMARY KEY (shift_template_id)
+);
+
+CREATE TABLE Shifts (
+	shift_id INT AUTO_INCREMENT NOT NULL,
+    staff_id INT NOT NULL,
+    timesheet_id INT,
+    shift_cover_request_id INT,
+    shift_template_id INT,
+    date DATE,
+    published TINYINT(1),
+	start_time TIME,
+    end_time TIME,
+    name NVARCHAR(50),
+    salary_coefficient FLOAT,
+    role NVARCHAR(50),
+	PRIMARY KEY (shift_id),
+    FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id) ON DELETE cascade,
+    FOREIGN KEY (timesheet_id) REFERENCES Timesheets(timesheet_id) ON DELETE SET NULL,
+    FOREIGN KEY (shift_cover_request_id) REFERENCES ShiftCoverRequests(shift_cover_request_id) ON DELETE SET NULL,
+    FOREIGN KEY (shift_template_id) REFERENCES ShiftTemplates(shift_template_id) ON DELETE SET NULL
 );
 
 CREATE TABLE ScheduleTemplates (
@@ -83,8 +85,8 @@ CREATE TABLE ScheduleShiftTemplates (
 	salary_coefficient FLOAT,
     role NVARCHAR(50),
     PRIMARY KEY (schedule_shift_template_id),
-    FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id),
-    FOREIGN KEY (schedule_template_id) REFERENCES ScheduleTemplates(schedule_template_id)
+    FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id) ON DELETE cascade,
+    FOREIGN KEY (schedule_template_id) REFERENCES ScheduleTemplates(schedule_template_id) ON DELETE cascade
 );
 
 CREATE TABLE LeaveRequests (
@@ -97,7 +99,7 @@ CREATE TABLE LeaveRequests (
 	reason NVARCHAR(500),
     admin_reply NVARCHAR(500),
 	PRIMARY KEY (leave_request_id),
-	FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id)
+	FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id) ON DELETE cascade
 );
 
 CREATE TABLE Salaries (
@@ -107,7 +109,7 @@ CREATE TABLE Salaries (
     effective_date DATE,
     termination_date DATE,
     PRIMARY KEY (salary_id),
-    FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id)
+    FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id) ON DELETE cascade
 );
 
 CREATE TABLE Holidays (
@@ -135,7 +137,7 @@ CREATE TABLE Products (
 	price FLOAT,
 	inventory INT,
 	PRIMARY KEY (product_id),
-	FOREIGN KEY (category_id) REFERENCES Categories(category_id)
+	FOREIGN KEY (category_id) REFERENCES Categories(category_id) ON DELETE SET NULL
 );
 
 CREATE TABLE Orders (
@@ -151,6 +153,6 @@ CREATE TABLE OrderItems (
 	product_id INT NOT NULL,
 	quantity INT,
 	PRIMARY KEY (order_item_id),
-	FOREIGN KEY (order_id) REFERENCES Orders(order_id),
-	FOREIGN KEY (product_id) REFERENCES Products(product_id)
+	FOREIGN KEY (order_id) REFERENCES Orders(order_id) ON DELETE cascade,
+	FOREIGN KEY (product_id) REFERENCES Products(product_id) ON DELETE cascade
 );
