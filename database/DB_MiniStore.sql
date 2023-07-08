@@ -52,7 +52,6 @@ CREATE TABLE Shifts (
     staff_id INT NOT NULL,
     timesheet_id INT,
     shift_cover_request_id INT,
-    shift_template_id INT,
     date DATE,
     published TINYINT(1),
 	start_time TIME,
@@ -63,8 +62,7 @@ CREATE TABLE Shifts (
 	PRIMARY KEY (shift_id),
     FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id) ON DELETE cascade,
     FOREIGN KEY (timesheet_id) REFERENCES Timesheets(timesheet_id) ON DELETE SET NULL,
-    FOREIGN KEY (shift_cover_request_id) REFERENCES ShiftCoverRequests(shift_cover_request_id) ON DELETE SET NULL,
-    FOREIGN KEY (shift_template_id) REFERENCES ShiftTemplates(shift_template_id) ON DELETE SET NULL
+    FOREIGN KEY (shift_cover_request_id) REFERENCES ShiftCoverRequests(shift_cover_request_id) ON DELETE SET NULL
 );
 
 CREATE TABLE ScheduleTemplates (
