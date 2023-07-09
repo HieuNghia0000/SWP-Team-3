@@ -1,15 +1,15 @@
 import { useFormHandler } from "solid-form-handler";
 import { yupSchema } from "solid-form-handler/yup";
 import { FaSolidTrash } from "solid-icons/fa";
-import { Accessor, Setter, Component, batch } from "solid-js";
+import { Accessor, batch, Component, createSignal, Setter } from "solid-js";
 import PopupModal from "~/components/PopupModal";
 import { Select } from "~/components/form/Select";
 import { TextInput } from "~/components/form/TextInput";
 import { ShiftTemplate } from "~/types";
 import { readableToTimeStr } from "../utils/shiftTimes";
-import { timeOptions } from "../utils/timeOptions";
+import { timeOptions, transformTimeString } from "../utils/timeOptions";
 import { ShiftTemplateProps } from "./types";
-import { roles2 } from "~/utils/roles";
+import { roles } from "~/utils/roles";
 import { schema } from "./formSchema";
 
 interface EditProps extends ShiftTemplateProps {
@@ -18,15 +18,18 @@ interface EditProps extends ShiftTemplateProps {
 }
 
 const Edit: Component<EditProps> = ({
-  setState,
-  shiftTemplateFocus,
-  setShiftTemplateFocus: setShiftFocus,
-}) => {
+                                      setState,
+                                      shiftTemplateFocus,
+                                      setShiftTemplateFocus: setShiftFocus,
+                                    }) => {
+  const [editing, setEditing] = createSignal(false);
   const formHandler = useFormHandler(yupSchema(schema));
-  const { formData, setFieldValue } = formHandler;
+  const {formData, setFieldValue} = formHandler;
 
   const submit = async (event: Event) => {
     event.preventDefault();
+    if (editing()) return;
+
     try {
       await formHandler.validateForm();
       if (
@@ -36,21 +39,19 @@ const Edit: Component<EditProps> = ({
       ) {
         alert(
           "Data sent with success: " +
-            JSON.stringify({
-              ...formData(),
-              startTime: readableToTimeStr(formData().startTime),
-              endTime: readableToTimeStr(formData().endTime),
-              shiftId: shiftTemplateFocus()?.shiftTemplateId,
-            })
+          JSON.stringify({
+            ...formData(),
+            startTime: readableToTimeStr(formData().startTime),
+            endTime: readableToTimeStr(formData().endTime),
+            shiftId: shiftTemplateFocus()?.shiftTemplateId,
+          })
         );
+        setEditing(true);
+        // const response = await axios.post<DataResponse<ShiftTemplate>>(
       }
     } catch (error) {
       console.error(error);
     }
-  };
-
-  const reset = () => {
-    formHandler.resetForm();
   };
 
   const onDelete = async () => {
@@ -83,6 +84,8 @@ const Edit: Component<EditProps> = ({
               <Select
                 id="startTime"
                 name="startTime"
+                onChange={() => setFieldValue("endTime", 0, { validate: false })}
+                placeholder="Select Start Time"
                 value={shiftTemplateFocus()?.startTime}
                 options={timeOptions()}
                 formHandler={formHandler}
@@ -96,7 +99,9 @@ const Edit: Component<EditProps> = ({
                 id="endTime"
                 name="endTime"
                 value={shiftTemplateFocus()?.endTime}
-                options={timeOptions()}
+                placeholder="Select End Time"
+                options={timeOptions(transformTimeString(formData().startTime))}
+                disabled={formData().startTime == "0"}
                 formHandler={formHandler}
               />
             </div>
@@ -110,7 +115,7 @@ const Edit: Component<EditProps> = ({
                 id="role"
                 name="role"
                 value={shiftTemplateFocus()?.role}
-                options={roles2}
+                options={roles}
                 formHandler={formHandler}
               />
             </div>
@@ -141,18 +146,18 @@ const Edit: Component<EditProps> = ({
             class="flex gap-2 justify-center items-center px-3 text-gray-500 text-sm hover:text-gray-700"
           >
             <span>
-              <FaSolidTrash />
+              <FaSolidTrash/>
             </span>
             <span>Delete</span>
           </button>
           <div class="flex gap-2 justify-center items-center">
             <button
               type="button"
-              onClick={() => {
+              onClick={async () => {
+                await formHandler.resetForm();
                 batch(() => {
                   setState("list");
                   setShiftFocus(undefined);
-                  reset();
                 });
               }}
               class="flex gap-2 justify-center items-center px-3 text-gray-500 text-sm hover:text-gray-700"
@@ -162,6 +167,7 @@ const Edit: Component<EditProps> = ({
             <button
               type="button"
               onClick={submit}
+              disabled={editing()}
               class="flex gap-2 justify-center items-center py-1.5 px-3 font-semibold text-white border border-sky-500 bg-sky-500 text-sm rounded hover:bg-sky-600"
             >
               Save

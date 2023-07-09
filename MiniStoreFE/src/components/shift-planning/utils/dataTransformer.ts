@@ -17,7 +17,6 @@ export function transformData(
     changedShifts: {},
     isChanged: false,
     shiftsRules: {},
-    preparingData: false,
   };
 
   if (data.staffs.length === 0) return transformedData;

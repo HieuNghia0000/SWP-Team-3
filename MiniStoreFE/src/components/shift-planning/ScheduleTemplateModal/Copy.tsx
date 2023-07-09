@@ -49,7 +49,7 @@ const fetcher: ResourceFetcher<
   );
   const data: DataResponse<Staff[]> = await response.json();
 
-  // TODO: We don't need to transform data here, we can just use the data as is and iterate over it in the template
+  // TODO: We don't need to transform data here, we have APIs for schedule template.
   // return data.content;
   return transformData({ dates, staffs: data.content }, true);
 };
@@ -148,23 +148,22 @@ const Copy: Component<CopyProps> = ({ modalState }) => {
                   class="absolute top-1.5 left-1.5 bottom-1.5 w-1.5 rounded"
                   classList={{
                     "bg-blue-500":
-                      data()!.shifts[shift].shiftTemplate.role === Role.CASHIER,
+                      data()!.shifts[shift].role === Role.CASHIER,
                     "bg-yellow-500":
-                      data()!.shifts[shift].shiftTemplate.role === Role.GUARD,
+                      data()!.shifts[shift].role === Role.GUARD,
                     "bg-red-500":
-                      data()!.shifts[shift].shiftTemplate.role === Role.MANAGER,
+                      data()!.shifts[shift].role === Role.MANAGER,
                     "bg-gray-600":
-                      data()!.shifts[shift].shiftTemplate.role === Role.ADMIN,
+                      data()!.shifts[shift].role === Role.ADMIN,
                     "bg-gray-400":
-                      data()!.shifts[shift].shiftTemplate.role ===
-                      Role.ALL_ROLES,
+                      data()!.shifts[shift].role === Role.ALL_ROLES,
                   }}
                 ></i>
                 <p class="ml-3.5 font-semibold text-sm tracking-wider">
                   {shiftDetailsTime(
                     data()!.shifts[shift].date || "",
-                    data()!.shifts[shift].shiftTemplate.startTime || "",
-                    data()!.shifts[shift].shiftTemplate.endTime || ""
+                    data()!.shifts[shift].startTime || "",
+                    data()!.shifts[shift].endTime || ""
                   )}
                 </p>
                 <p class="ml-3.5 font-normal text-xs text-[13px] tracking-wider">
@@ -174,7 +173,7 @@ const Copy: Component<CopyProps> = ({ modalState }) => {
                   {
                     roles.find(
                       (r) =>
-                        r.value === data()!.shifts[shift].shiftTemplate.role
+                        r.value === data()!.shifts[shift].role
                     )?.label
                   }
                 </p>

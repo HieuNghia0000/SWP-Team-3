@@ -23,9 +23,7 @@ export function timeToReadable(time: string) {
 
   if (!t.isValid()) return "";
 
-  const formattedTime = t.format(format);
-
-  return formattedTime;
+  return t.format(format);
 }
 
 // Format readable time to 24-hour clock
@@ -37,9 +35,7 @@ export function readableToTimeStr(time: string) {
 
   if (!t.isValid()) return "";
 
-  const formattedTime = t.format(format);
-
-  return formattedTime;
+  return t.format(format);
 }
 
 export function shiftDetailsTime(

@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -41,6 +42,7 @@ public class StaffDto {
         this.leaveBalance = staff.getLeaveBalance();
         this.leaveRequests = staff.getLeaveRequests();
         this.salary = salary;
+        this.shifts = new ArrayList<>();
     }
 
     public StaffDto(Staff staff, SalaryDto salary, List<ShiftDto> shifts) {

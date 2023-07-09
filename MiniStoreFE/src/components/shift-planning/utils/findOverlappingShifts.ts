@@ -6,7 +6,7 @@ import { Shift } from "~/types";
 // Returns an array of shiftTemplateIds of overlapping shifts
 export function findOverlappingShifts(shifts: Shift[]) {
   const s = unionBy(shifts, "shiftId");
-  const sortedShifts = sortBy(s, "shiftTemplate.startTime");
+  const sortedShifts = sortBy(s, "startTime");
   const overlappingShifts: number[] = [];
 
   for (let i = 0; i < sortedShifts.length - 1; i++) {
@@ -14,20 +14,20 @@ export function findOverlappingShifts(shifts: Shift[]) {
     const nextShift = sortedShifts[i + 1];
 
     const currentShiftStart = moment(
-      currentShift.shiftTemplate.startTime,
+      currentShift.startTime,
       "h:mm:ss"
     );
     const currentShiftEnd = moment(
-      currentShift.shiftTemplate.endTime,
+      currentShift.endTime,
       "h:mm:ss"
     );
-    const nextShiftStart = moment(nextShift.shiftTemplate.startTime, "h:mm:ss");
 
-    // console.log(
-    //   currentShiftStart.format(),
-    //   currentShiftEnd.format(),
-    //   nextShiftStart.format()
-    // );
+    if (currentShiftEnd.isSameOrBefore(currentShiftStart)) {
+      currentShiftEnd.add(1, "day");
+    }
+
+    const nextShiftStart = moment(nextShift.startTime, "h:mm:ss");
+
     if (
       nextShiftStart.isBetween(
         currentShiftStart,
@@ -37,8 +37,8 @@ export function findOverlappingShifts(shifts: Shift[]) {
       )
     ) {
       overlappingShifts.push(
-        currentShift.shiftTemplate.shiftTemplateId,
-        nextShift.shiftTemplate.shiftTemplateId
+        currentShift.shiftId,
+        nextShift.shiftId
       );
     }
   }

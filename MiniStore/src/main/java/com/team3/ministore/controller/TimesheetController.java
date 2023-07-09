@@ -1,6 +1,7 @@
 package com.team3.ministore.controller;
 
 import com.team3.ministore.common.responsehandler.ResponseHandler;
+import com.team3.ministore.dto.ShiftDto;
 import com.team3.ministore.dto.TimesheetDto;
 import com.team3.ministore.model.Shift;
 import com.team3.ministore.model.Timesheet;
@@ -36,13 +37,9 @@ public class TimesheetController {
         Timesheet timesheet = timesheetService.createTimesheet(dto);
         shift.get().setTimesheet(timesheet);
 
-        Optional<Shift> updatedShift = shiftService.updateShift(shift.get().getShiftId(), shift.get());
+        ShiftDto updatedShift = shiftService.updateShift(shift.get());
 
-        return updatedShift.map(
-                value -> ResponseHandler.getResponse(value.getTimesheet(), HttpStatus.CREATED)
-        ).orElseGet(
-                () -> ResponseHandler.getResponse(new Exception("Cannot update shift"), HttpStatus.INTERNAL_SERVER_ERROR)
-        );
+        return  ResponseHandler.getResponse(updatedShift.getTimesheet(), HttpStatus.CREATED);
     }
 
     @GetMapping()

@@ -11,6 +11,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/shift-templates")
@@ -33,14 +34,16 @@ public class ShiftTemplateController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<ShiftTemplate> updateShiftTemplates(@PathVariable("id") Integer id, @RequestBody ShiftTemplate shiftTemplate) {
-        ShiftTemplate updatedShiftTemplate = shiftTemplateService.updateShiftTemplates(id, shiftTemplate);
-        return new ResponseEntity<>(updatedShiftTemplate, HttpStatus.OK);
+    public ResponseEntity<Object> updateShiftTemplate(@PathVariable("id") Integer id,
+                                                      @RequestBody ShiftTemplate shiftTemplate) {
+        Optional<ShiftTemplate> updatedShiftTemplate = shiftTemplateService.updateShiftTemplates(id, shiftTemplate);
+        return updatedShiftTemplate.map(value -> ResponseHandler.getResponse(value, HttpStatus.OK))
+                .orElseGet(() -> ResponseHandler.getResponse(new Exception("Shift template not found"), HttpStatus.NOT_FOUND));
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteShiftTemplates(@PathVariable("id") Integer id) {
+    public ResponseEntity<Object> deleteShiftTemplates(@PathVariable("id") Integer id) {
         shiftTemplateService.deleteShiftTemplates(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return ResponseHandler.getResponse(HttpStatus.OK);
     }
 }

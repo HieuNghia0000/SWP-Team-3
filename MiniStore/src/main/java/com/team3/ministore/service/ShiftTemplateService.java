@@ -4,15 +4,16 @@ import com.team3.ministore.dto.CreateShiftTemplateDto;
 import com.team3.ministore.model.ShiftTemplate;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ShiftTemplateService {
     List<ShiftTemplate> getAllShiftTemplates();
 
     ShiftTemplate createShiftTemplate(CreateShiftTemplateDto dto);
 
-    ShiftTemplate getShiftTemplatesById(Integer id);
+    Optional<ShiftTemplate> getShiftTemplatesById(Integer id);
 
-    ShiftTemplate updateShiftTemplates(Integer id, ShiftTemplate shiftTemplate);
+    Optional<ShiftTemplate> updateShiftTemplates(Integer id, ShiftTemplate shiftTemplate);
 
     void deleteShiftTemplates(Integer id);
 }

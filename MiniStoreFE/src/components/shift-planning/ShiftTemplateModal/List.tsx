@@ -1,19 +1,20 @@
-import { capitalize } from "lodash";
-import { ImPlus } from "solid-icons/im";
-import { Setter, Component, For, batch } from "solid-js";
+import {capitalize} from "lodash";
+import {ImPlus} from "solid-icons/im";
+import {Setter, Component, For, batch} from "solid-js";
 import PopupModal from "~/components/PopupModal";
-import { Role, ShiftTemplate } from "~/types";
-import { shiftTimes } from "../utils/shiftTimes";
-import { ShiftTemplateProps } from "./types";
+import {Role, ShiftTemplate} from "~/types";
+import {shiftTimes} from "../utils/shiftTimes";
+import {ShiftTemplateProps} from "./types";
 
 interface ListProps extends ShiftTemplateProps {
   setShiftTemplateFocus: Setter<ShiftTemplate | undefined>;
 }
+
 const List: Component<ListProps> = ({
-  setState,
-  shiftTemplates,
-  setShiftTemplateFocus,
-}) => {
+                                      setState,
+                                      shiftTemplates,
+                                      setShiftTemplateFocus,
+                                    }) => {
   return (
     <>
       <PopupModal.Body>
@@ -23,9 +24,9 @@ const List: Component<ListProps> = ({
             your schedule quickly. You can select these when creating shifts
             instead of having to type out the start and end time.
           </div>
-          <div class="">
+          <div>
             <For each={shiftTemplates()}>
-              {(shiftTemplate, idx) => (
+              {(shiftTemplate) => (
                 <div
                   onClick={() => {
                     batch(() => {
@@ -58,7 +59,7 @@ const List: Component<ListProps> = ({
             class="flex gap-2 justify-center items-center py-1.5 px-3 font-semibold text-white border border-[#00bc1d] bg-[#00bc1d] text-sm rounded hover:bg-green-600"
           >
             <span class="text-xs">
-              <ImPlus />
+              <ImPlus/>
             </span>
             New Shift Template
           </button>

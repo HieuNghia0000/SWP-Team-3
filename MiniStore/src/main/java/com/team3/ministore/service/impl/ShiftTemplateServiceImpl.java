@@ -1,9 +1,7 @@
 package com.team3.ministore.service.impl;
 
 import com.team3.ministore.dto.CreateShiftTemplateDto;
-import com.team3.ministore.model.Shift;
 import com.team3.ministore.model.ShiftTemplate;
-import com.team3.ministore.model.Staff;
 import com.team3.ministore.repository.ShiftTemplateRepository;
 import com.team3.ministore.service.ShiftTemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,21 +35,22 @@ public class ShiftTemplateServiceImpl implements ShiftTemplateService {
     }
 
     @Override
-    public ShiftTemplate getShiftTemplatesById(Integer id) {
-        return shiftTemplateRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid Shift Template ID: " + id));
+    public Optional<ShiftTemplate> getShiftTemplatesById(Integer id) {
+        return shiftTemplateRepository.findById(id);
     }
 
     @Override
-    public ShiftTemplate updateShiftTemplates(Integer id, ShiftTemplate shiftTemplate) {
-        ShiftTemplate existingShiftTemplate = getShiftTemplatesById(id);
+    public Optional<ShiftTemplate> updateShiftTemplates(Integer id, ShiftTemplate shiftTemplate) {
+        Optional<ShiftTemplate> existingShiftTemplate = getShiftTemplatesById(id);
 
-        existingShiftTemplate.setStartTime(shiftTemplate.getStartTime());
-        existingShiftTemplate.setEndTime(shiftTemplate.getEndTime());
-        existingShiftTemplate.setName(shiftTemplate.getName());
-        existingShiftTemplate.setSalaryCoefficient(shiftTemplate.getSalaryCoefficient());
-        existingShiftTemplate.setRole(shiftTemplate.getRole());
-
-        return shiftTemplateRepository.save(existingShiftTemplate);
+        return existingShiftTemplate.map(value -> {
+            value.setStartTime(shiftTemplate.getStartTime());
+            value.setEndTime(shiftTemplate.getEndTime());
+            value.setName(shiftTemplate.getName());
+            value.setSalaryCoefficient(shiftTemplate.getSalaryCoefficient());
+            value.setRole(shiftTemplate.getRole());
+            return shiftTemplateRepository.save(value);
+        });
     }
 
     @Override

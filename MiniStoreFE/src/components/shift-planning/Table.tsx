@@ -22,6 +22,7 @@ import { sortBy } from "lodash";
 import toast from "solid-toast";
 import { getShiftMoveErrors } from "./utils/shiftRules";
 import getShiftsByCellId from "./utils/getShiftsByCellId";
+import { toastError } from "~/utils/toast";
 
 // a cell is a droppable box
 // a shift is a draggable item
@@ -30,7 +31,7 @@ type DnDTableProps = {};
 
 const Table: Component<DnDTableProps> = (props) => {
   const { setStaffModalData, setShowStaffModal } = useShiftPlanningModals();
-  const { tableData, setTableData, routeData } = useSPData();
+  const { tableData, setTableData, isRouteDataLoading } = useSPData();
 
   // Get all droppable box ids
   const cellIds = () => Object.keys(tableData.cells);
@@ -109,14 +110,7 @@ const Table: Component<DnDTableProps> = (props) => {
       const errors = getShiftMoveErrors(draggable, droppable, tableData);
       if (errors.length > 0) {
         for (let error of errors) {
-          toast.error(error.errorName, {
-            duration: 2000,
-            style: {
-              color: "#dc2626",
-              background: "#fecaca",
-              border: "1px solid #b91c1c",
-            },
-          });
+          toastError(error.errorName);
         }
         return;
       }
@@ -128,7 +122,7 @@ const Table: Component<DnDTableProps> = (props) => {
         setTableData("cells", droppableId, (items) => {
           const sortedShifts = sortBy(
             [...items, draggable.id as number],
-            [(shiftId) => tableData.shifts[shiftId].shiftTemplate.startTime]
+            [(shiftId) => tableData.shifts[shiftId].startTime]
           );
           return [...sortedShifts];
         });
@@ -152,7 +146,7 @@ const Table: Component<DnDTableProps> = (props) => {
             {(date) => (
               <div
                 class="px-3 py-2 flex flex-col justify-center border border-gray-200 flex-1 items-center overflow-hidden bg-white"
-                classList={{ "animate-pulse": routeData.loading }}
+                classList={{ "animate-pulse": isRouteDataLoading() }}
               >
                 <div class="font-semibold text-sm text-gray-600">
                   {moment(date).format("ddd, MMM D")}
@@ -223,13 +217,13 @@ const Table: Component<DnDTableProps> = (props) => {
                     <ShiftCard
                       isOrigin={isOrigin()}
                       published={item().published}
-                      loading={routeData.loading}
-                      role={item().shiftTemplate.role}
+                      loading={isRouteDataLoading}
+                      role={item().role}
                       shiftDuration={shiftTimes(
-                        item().shiftTemplate.startTime,
-                        item().shiftTemplate.endTime
+                        item().startTime,
+                        item().endTime
                       )}
-                      shiftName={item().shiftTemplate.name}
+                      shiftName={item().name}
                       style={{ width: `${selectedShiftWidth()}px` }}
                       isOverlay={true}
                       isErrored={isErrored()}

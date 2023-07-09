@@ -1,42 +1,60 @@
 import { useFormHandler } from "solid-form-handler";
 import { yupSchema } from "solid-form-handler/yup";
-import { Component } from "solid-js";
+import { Component, createSignal } from "solid-js";
 import PopupModal from "~/components/PopupModal";
 import { TextInput } from "~/components/form/TextInput";
 import { readableToTimeStr } from "../utils/shiftTimes";
-import { timeOptions } from "../utils/timeOptions";
+import { timeOptions, transformTimeString } from "../utils/timeOptions";
 import { ShiftTemplateProps } from "./types";
 import { Select } from "~/components/form/Select";
 import { roles2 } from "~/utils/roles";
 import { schema } from "./formSchema";
+import getEndPoint from "~/utils/getEndPoint";
+import axios from "axios";
+import handleFetchError from "~/utils/handleFetchError";
+import { DataResponse, ShiftTemplate } from "~/types";
 
-const Create: Component<ShiftTemplateProps> = ({ setState }) => {
+const Create: Component<ShiftTemplateProps> = ({setState, refreshShiftTemplates}) => {
+  const [creating, setCreating] = createSignal(false);
   const formHandler = useFormHandler(yupSchema(schema));
-  const { formData, setFieldValue } = formHandler;
+  const {formData, setFieldValue} = formHandler;
 
   const submit = async (event: Event) => {
     event.preventDefault();
+    if (creating()) return;
+
     try {
-      await formHandler.validateForm();
-      alert(
-        "Data sent with success: " +
-          JSON.stringify({
-            ...formData(),
-            startTime: readableToTimeStr(formData().startTime),
-            endTime: readableToTimeStr(formData().endTime),
-          })
-      );
-    } catch (error) {
-      console.error(error);
+      const f = await formHandler.validateForm({throwException: false});
+      if (f.isFormInvalid) return;
+
+      setCreating(true);
+
+      const response = await axios.post<DataResponse<ShiftTemplate>>(
+        `${getEndPoint()}/shift-templates/add`,
+        {
+          ...formData(),
+          startTime: readableToTimeStr(formData().startTime),
+          endTime: readableToTimeStr(formData().endTime),
+        }
+      )
+      console.log(response.data);
+      refreshShiftTemplates();
+      setState("list");
+    } catch (error: any) {
+      handleFetchError(error);
+    } finally {
+      setCreating(false);
     }
   };
 
-  const reset = () => {
-    formHandler.resetForm();
+  const reset = async () => {
+    await formHandler.resetForm();
   };
 
   return (
-    <>
+    <div classList={{
+      "cursor-progress": creating(),
+    }}>
       <PopupModal.Body>
         <form onSubmit={submit} class="text-sm max-w-[560px] mx-auto">
           <div class="flex">
@@ -61,6 +79,7 @@ const Create: Component<ShiftTemplateProps> = ({ setState }) => {
                 id="startTime"
                 name="startTime"
                 value={0}
+                onChange={() => setFieldValue("endTime", 0, { validate: false })}
                 placeholder="Select Start Time"
                 options={timeOptions()}
                 formHandler={formHandler}
@@ -75,8 +94,9 @@ const Create: Component<ShiftTemplateProps> = ({ setState }) => {
                 name="endTime"
                 value={0}
                 placeholder="Select End Time"
-                options={timeOptions()}
+                options={timeOptions(transformTimeString(formData().startTime))}
                 formHandler={formHandler}
+                disabled={formData().startTime == "0"}
               />
             </div>
           </div>
@@ -127,13 +147,14 @@ const Create: Component<ShiftTemplateProps> = ({ setState }) => {
           <button
             type="button"
             onClick={submit}
+            disabled={creating()}
             class="flex gap-2 justify-center items-center py-1.5 px-3 font-semibold text-white border border-sky-500 bg-sky-500 text-sm rounded hover:bg-sky-600"
           >
             Create
           </button>
         </div>
       </PopupModal.Footer>
-    </>
+    </div>
   );
 };
 

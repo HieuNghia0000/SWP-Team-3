@@ -57,11 +57,9 @@ public class StaffController {
         Optional<Staff> staff = staffService.getStaffById(id);
 
         return staff.map(value ->
-                        ResponseHandler.getResponse(new StaffDto(
-                                        value,
+                        ResponseHandler.getResponse(new StaffDto(value,
                                         salaryService.getSalaryByStaffId(value.getStaffId())),
-                                HttpStatus.OK)
-                )
+                                HttpStatus.OK))
                 .orElseGet(() -> ResponseHandler.getResponse(new Exception("Invalid staff id"),
                         HttpStatus.BAD_REQUEST));
     }
@@ -75,11 +73,9 @@ public class StaffController {
         Optional<Staff> updatedStaff = staffService.updateStaff(id, staff);
 
         return updatedStaff.map(value ->
-                        ResponseHandler.getResponse(new StaffDto(
-                                        value,
+                        ResponseHandler.getResponse(new StaffDto(value,
                                         salaryService.getSalaryByStaffId(value.getStaffId())),
-                                HttpStatus.OK)
-                )
+                                HttpStatus.OK))
                 .orElseGet(() -> ResponseHandler.getResponse(new Exception("Invalid staff id"),
                         HttpStatus.BAD_REQUEST));
     }

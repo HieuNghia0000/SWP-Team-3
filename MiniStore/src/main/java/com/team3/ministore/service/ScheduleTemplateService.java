@@ -4,7 +4,7 @@ import com.team3.ministore.model.ScheduleTemplate;
 
 import java.util.List;
 
-public interface ScheduleTemplatesService {
+public interface ScheduleTemplateService {
     List<ScheduleTemplate> getAllScheduleTemplates();
 
     ScheduleTemplate createScheduleTemplates(ScheduleTemplate scheduleTemplate);

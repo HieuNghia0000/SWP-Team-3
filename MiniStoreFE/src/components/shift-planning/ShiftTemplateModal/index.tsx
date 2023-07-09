@@ -1,13 +1,13 @@
 import {
   Accessor,
+  batch,
   Component,
+  createResource,
+  createSignal,
   Match,
   ResourceFetcher,
   Setter,
   Switch,
-  batch,
-  createResource,
-  createSignal,
 } from "solid-js";
 import PopupModal from "../../PopupModal";
 import { DataResponse, ShiftTemplate } from "~/types";
@@ -15,32 +15,38 @@ import Spinner from "../../Spinner";
 import Edit from "./Edit";
 import List from "./List";
 import Create from "./Create";
+import getEndPoint from "~/utils/getEndPoint";
+import axios from "axios";
+import handleFetchError from "~/utils/handleFetchError";
 
 const fetcher: ResourceFetcher<
   boolean,
   ShiftTemplate[],
   { state: "list" | "edit" | "create" }
 > = async () => {
-  // const response = await fetch(
-  //   `${getEndPoint()}/shift-planning?from_date=${from}&to_date=${to}`
-  // );
-  const response = await fetch(`http://localhost:3000/shift-templates.json`);
-  const data: DataResponse<ShiftTemplate[]> = await response.json();
-
-  return data.content;
+  try {
+    const response = await axios.get<DataResponse<ShiftTemplate[]>>(
+      `${getEndPoint()}/shift-templates`
+    );
+    return response.data.content;
+  } catch (e: any) {
+    throw new Error(handleFetchError(e));
+  }
 };
 
 const ShiftTemplateModal: Component<{
   showModal: Accessor<boolean>;
   modalData: Accessor<ShiftTemplate | undefined>;
   setShowModal: Setter<boolean>;
-}> = ({ showModal, modalData, setShowModal }) => {
+}> = ({showModal, modalData, setShowModal}) => {
   const [state, setState] = createSignal<"list" | "edit" | "create">("list");
   const [shiftTemplateFocus, setShiftTemplateFocus] =
     createSignal<ShiftTemplate>();
-  const [shiftTemplates, { refetch, mutate }] = createResource(
+  const [shiftTemplates, {refetch, mutate}] = createResource(
     showModal,
-    fetcher
+    fetcher, {
+      initialValue: [],
+    }
   );
 
   return (
@@ -49,8 +55,8 @@ const ShiftTemplateModal: Component<{
         state() === "list"
           ? "Shift Templates"
           : state() === "edit"
-          ? "Edit Shift Template"
-          : "New Shift Template"
+            ? "Edit Shift Template"
+            : "New Shift Template"
       }
       close={() => {
         batch(() => {
@@ -64,7 +70,12 @@ const ShiftTemplateModal: Component<{
       <Switch fallback={<div class="text-center">Something went wrong.</div>}>
         <Match when={shiftTemplates.loading}>
           <div class="w-full min-h-[300px] grid place-items-center">
-            <Spinner />
+            <Spinner/>
+          </div>
+        </Match>
+        <Match when={shiftTemplates.error}>
+          <div class="w-full min-h-[300px] grid place-items-center">
+            Something went wrong.
           </div>
         </Match>
         <Match when={state() === "list"}>
@@ -72,16 +83,18 @@ const ShiftTemplateModal: Component<{
             setState={setState}
             shiftTemplates={shiftTemplates}
             setShiftTemplateFocus={setShiftTemplateFocus}
+            refreshShiftTemplates={refetch}
           />
         </Match>
         <Match when={state() === "create"}>
-          <Create setState={setState} shiftTemplates={shiftTemplates} />
+          <Create setState={setState} shiftTemplates={shiftTemplates} refreshShiftTemplates={refetch}/>
         </Match>
         <Match when={state() === "edit"}>
           <Edit
             setState={setState}
             shiftTemplates={shiftTemplates}
             shiftTemplateFocus={shiftTemplateFocus}
+            refreshShiftTemplates={refetch}
             setShiftTemplateFocus={setShiftTemplateFocus}
           />
         </Match>

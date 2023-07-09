@@ -37,8 +37,8 @@ export const getShiftRules = (
 
   // If the shift's required role is the same role as the staff
   if (
-    shift.shiftTemplate.role === Role.ALL_ROLES ||
-    shift.shiftTemplate.role === currentCell.staff.role
+    shift.role === Role.ALL_ROLES ||
+    shift.role === currentCell.staff.role
   )
     result[0].passed = true;
 
@@ -50,7 +50,7 @@ export const getShiftRules = (
         tableData
       ),
       shift,
-    ]).includes(shift.shiftTemplate.shiftTemplateId)
+    ]).includes(shift.shiftId)
   )
     result[1].passed = true;
 
@@ -86,8 +86,8 @@ export const getShiftMoveErrors = (
 
   // If the shift's required role is not the same role as the staff
   if (
-    draggable.data.item.shiftTemplate.role !== Role.ALL_ROLES &&
-    draggable.data.item.shiftTemplate.role !== droppable.data.staff.role
+    draggable.data.item.role !== Role.ALL_ROLES &&
+    draggable.data.item.role !== droppable.data.staff.role
   )
     errors.push(rules[0]);
 
@@ -96,7 +96,7 @@ export const getShiftMoveErrors = (
     findOverlappingShifts([
       ...getShiftsByCellId(droppable.id as string, tableData),
       draggable.data.item,
-    ]).includes(draggable.data.item.shiftTemplateId)
+    ]).includes(draggable.data.item.shiftId)
   )
     errors.push(rules[1]);
 

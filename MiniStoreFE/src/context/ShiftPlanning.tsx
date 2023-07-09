@@ -3,12 +3,10 @@ import {
   Setter,
   createContext,
   useContext,
-  InitializedResource,
 } from "solid-js";
 import { SetStoreFunction } from "solid-js/store";
 import {
   DataTable,
-  FetcherData,
   Rule,
 } from "~/components/shift-planning/utils/types";
 import { Shift, Staff, ShiftTemplate } from "~/types";
@@ -49,7 +47,7 @@ type SPModalContext = {
 type SPDataContext = {
   tableData: DataTable;
   setTableData: SetStoreFunction<DataTable>;
-  routeData: InitializedResource<FetcherData>;
+  isRouteDataLoading: () => boolean;
   resetTableData: () => void;
   saveChanges: () => void;
 };

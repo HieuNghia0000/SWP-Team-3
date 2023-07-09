@@ -34,10 +34,10 @@ const Copy: Component<CopyProps> = ({ shiftCard, setModalState, onDelete }) => {
 
   // Get work days of the week based on the selected shift and the staff member
   // Ex: ["Monday", "Tuesday", "Wednesday"]
-  const getWorkDays = (shiftId: number, staffId: number) => {
+  const getWorkDays = (staffId: number) => {
     const staffWorkDates = Object.keys(tableData.shifts).map((id) => {
       const s = tableData.shifts[Number.parseInt(id)];
-      if (s.staffId === staffId && s.shiftTemplate.shiftTemplateId === shiftId)
+      if (s.staffId === staffId)
         return s.date;
       else return "";
     });
@@ -46,7 +46,6 @@ const Copy: Component<CopyProps> = ({ shiftCard, setModalState, onDelete }) => {
   };
 
   const workDays = getWorkDays(
-    shiftCard()?.shiftTemplate.shiftTemplateId || 0,
     shiftCard()?.staffId || 0
   );
 
@@ -110,23 +109,22 @@ const Copy: Component<CopyProps> = ({ shiftCard, setModalState, onDelete }) => {
             <i
               class="absolute top-1 left-1.5 bottom-1 w-1.5 rounded"
               classList={{
-                "bg-blue-500": shiftCard()?.shiftTemplate.role === Role.CASHIER,
-                "bg-yellow-500": shiftCard()?.shiftTemplate.role === Role.GUARD,
-                "bg-red-500": shiftCard()?.shiftTemplate.role === Role.MANAGER,
-                "bg-gray-600": shiftCard()?.shiftTemplate.role === Role.ADMIN,
-                "bg-gray-400":
-                  shiftCard()?.shiftTemplate.role === Role.ALL_ROLES,
+                "bg-blue-500": shiftCard()?.role === Role.CASHIER,
+                "bg-yellow-500": shiftCard()?.role === Role.GUARD,
+                "bg-red-500": shiftCard()?.role === Role.MANAGER,
+                "bg-gray-600": shiftCard()?.role === Role.ADMIN,
+                "bg-gray-400": shiftCard()?.role === Role.ALL_ROLES,
               }}
             ></i>
             <p class="ml-3.5 font-semibold text-sm tracking-wider">
               {shiftDetailsTime(
                 shiftCard()?.date || "",
-                shiftCard()?.shiftTemplate.startTime || "",
-                shiftCard()?.shiftTemplate.endTime || ""
+                shiftCard()?.startTime || "",
+                shiftCard()?.endTime || ""
               )}
             </p>
             <p class="ml-3.5 font-normal text-xs tracking-wider">
-              {shiftCard()?.shiftTemplate.name}
+              {shiftCard()?.name}
             </p>
           </div>
         </div>

@@ -1,6 +1,6 @@
-import { FaSolidInfo } from "solid-icons/fa";
-import { Component, Show, splitProps } from "solid-js";
-import { Role } from "~/types";
+import {FaSolidInfo} from "solid-icons/fa";
+import {Component, Show, splitProps} from "solid-js";
+import {Role} from "~/types";
 
 interface ShiftCardProps {
   isActiveDraggable?: boolean;
@@ -9,7 +9,7 @@ interface ShiftCardProps {
   role: Role;
   shiftDuration: string;
   shiftName: string;
-  loading: boolean;
+  loading: () => boolean;
   isOverlay?: boolean;
   onClick?: () => void;
   draggable?: any;
@@ -31,7 +31,8 @@ const ShiftCard: Component<ShiftCardProps> = (props) => {
     "isErrored",
   ]);
 
-  const fs = () => {};
+  const fs = () => {
+  };
   const draggable = local.draggable || fs; // DO NOT REMOVE THIS LINE
 
   return (
@@ -51,7 +52,7 @@ const ShiftCard: Component<ShiftCardProps> = (props) => {
           !local.published && local.isOrigin,
         "bg-[repeating-linear-gradient(-45deg,#e7f7ff,#e7f7ff_5px,#ceefff_5px,#ceefff_10px)] hover:bg-[repeating-linear-gradient(-45deg,#e7f7ff,#e7f7ff_5px,#bfeaff_5px,#bfeaff_10px)] border border-blue-100":
           !local.published && !local.isOrigin,
-        "animate-pulse": local.loading,
+        "animate-pulse": local.loading(),
         "z-40": local.isOverlay,
       }}
     >
@@ -68,8 +69,9 @@ const ShiftCard: Component<ShiftCardProps> = (props) => {
       <p class="ml-3 font-semibold text-sm">{local.shiftDuration}</p>
       <p class="ml-3 font-normal text-xs text-gray-600">{local.shiftName}</p>
       <Show when={local.isErrored}>
-        <div class="absolute top-1 right-1 h-3 w-3 inline-flex text-[10px] leading-[14px] justify-center items-center font-semibold ml-1 rounded-full text-white bg-red-600">
-          <FaSolidInfo />
+        <div
+          class="absolute top-1 right-1 h-3 w-3 inline-flex text-[10px] leading-[14px] justify-center items-center font-semibold ml-1 rounded-full text-white bg-red-600">
+          <FaSolidInfo/>
         </div>
       </Show>
     </button>

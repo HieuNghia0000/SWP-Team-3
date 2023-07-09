@@ -4,7 +4,10 @@ import com.team3.ministore.common.responsehandler.ResponseHandler;
 import com.team3.ministore.dto.CreateShiftDto;
 import com.team3.ministore.dto.ShiftDto;
 import com.team3.ministore.model.Shift;
+import com.team3.ministore.model.Staff;
 import com.team3.ministore.service.ShiftService;
+import com.team3.ministore.service.ShiftTemplateService;
+import com.team3.ministore.service.StaffService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,13 +24,19 @@ public class ShiftController {
     @Autowired
     private ShiftService shiftService;
 
+    @Autowired
+    private StaffService staffService;
+
+    @Autowired
+    private ShiftTemplateService shiftTemplateService;
+
     @PostMapping("/add")
     public ResponseEntity<Object> createShift(@Valid @RequestBody CreateShiftDto shift, BindingResult errors) {
         if (errors.hasErrors()) return ResponseHandler.getResponse(errors, HttpStatus.BAD_REQUEST);
 
         Optional<ShiftDto> createdShift = shiftService.createShift(shift);
         return createdShift.map(value -> ResponseHandler.getResponse(value, HttpStatus.OK))
-                .orElseGet(() -> ResponseHandler.getResponse(new Exception("Invalid staff id or shift template id"),
+                .orElseGet(() -> ResponseHandler.getResponse(new Exception("Invalid staff id"),
                         HttpStatus.BAD_REQUEST));
     }
 
@@ -43,15 +52,33 @@ public class ShiftController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateShifts(@PathVariable("id") Integer id, @RequestBody Shift shift) {
-        Optional<Shift> updatedShift = shiftService.updateShift(id, shift);
-        return new ResponseEntity<>(updatedShift, HttpStatus.OK);
+    public ResponseEntity<Object> updateShift(@Valid @PathVariable("id") Integer id, @RequestBody CreateShiftDto dto,
+                                              BindingResult errors) {
+        if (errors.hasErrors()) return ResponseHandler.getResponse(errors, HttpStatus.BAD_REQUEST);
+
+        Optional<Shift> shift = shiftService.getShiftById(id);
+        Optional<Staff> foundStaff = staffService.getStaffById(dto.getStaffId());
+
+        return foundStaff.map(staff -> shift.map(value -> {
+                    value.setStartTime(dto.getStartTime());
+                    value.setEndTime(dto.getEndTime());
+                    value.setDate(dto.getDate());
+                    value.setRole(dto.getRole());
+                    value.setSalaryCoefficient(dto.getSalaryCoefficient());
+                    value.setPublished(dto.isPublished());
+                    value.setName(dto.getName());
+                    value.setStaff(staff);
+
+                    return ResponseHandler.getResponse(shiftService.updateShift(shift.get()), HttpStatus.OK);
+                }).orElseGet(() -> ResponseHandler.getResponse(new Exception("Shift not found"), HttpStatus.NOT_FOUND)))
+                .orElseGet(() -> ResponseHandler.getResponse(new Exception("Staff not found"), HttpStatus.NOT_FOUND));
+
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteShifts(@PathVariable("id") Integer id) {
+    public ResponseEntity<Object> deleteShifts(@PathVariable("id") Integer id) {
         shiftService.deleteShift(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return ResponseHandler.getResponse(HttpStatus.OK);
     }
 }
 

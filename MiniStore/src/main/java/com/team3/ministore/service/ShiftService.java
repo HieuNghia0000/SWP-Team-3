@@ -17,7 +17,7 @@ public interface ShiftService {
 
     Optional<Shift> getShiftById(Integer id);
 
-    Optional<Shift> updateShift(Integer id, Shift shift);
+    ShiftDto updateShift(Shift shift);
 
     void deleteShift(Integer id);
 

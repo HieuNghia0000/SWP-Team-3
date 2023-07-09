@@ -21,7 +21,7 @@ const Details: Component<DetailsProps> = ({
     <>
       <PopupModal.Body>
         <div class="text-xl font-semibold text-center text-gray-800">
-          {shiftCard()?.shiftTemplate.name}
+          {shiftCard()?.name}
         </div>
         <div
           class="text-sm mb-2.5 font-semibold text-center italic text-gray-500"
@@ -39,7 +39,7 @@ const Details: Component<DetailsProps> = ({
               <span class="font-semibold text-gray-500">
                 Salary Coefficient:
               </span>
-              <span>{shiftCard()?.shiftTemplate.salaryCoefficient}</span>
+              <span>{shiftCard()?.salaryCoefficient}</span>
             </div>
           </div>
           <div class="flex border-b border-gray-300 border-dotted">
@@ -49,19 +49,19 @@ const Details: Component<DetailsProps> = ({
                 class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-semibold rounded-full"
                 classList={{
                   "bg-blue-200 text-blue-700":
-                    shiftCard()?.shiftTemplate.role === Role.CASHIER,
+                    shiftCard()?.role === Role.CASHIER,
                   "bg-yellow-200 text-yellow-700":
-                    shiftCard()?.shiftTemplate.role === Role.GUARD,
+                    shiftCard()?.role === Role.GUARD,
                   "bg-red-200 text-red-700":
-                    shiftCard()?.shiftTemplate.role === Role.MANAGER,
+                    shiftCard()?.role === Role.MANAGER,
                   "bg-gray-200 text-gray-700":
-                    shiftCard()?.shiftTemplate.role === Role.ADMIN,
+                    shiftCard()?.role === Role.ADMIN,
                   "bg-gray-200 text-gray-800":
-                    shiftCard()?.shiftTemplate.role === Role.ALL_ROLES,
+                    shiftCard()?.role === Role.ALL_ROLES,
                 }}
               >
                 {
-                  roles.find((r) => r.value === shiftCard()?.shiftTemplate.role)
+                  roles.find((r) => r.value === shiftCard()?.role)
                     ?.label
                 }
               </span>
@@ -75,7 +75,7 @@ const Details: Component<DetailsProps> = ({
             <div class="flex-1 py-2.5 overflow-hidden space-x-1">
               <span class="font-semibold text-gray-500">Start Time:</span>
               <span>
-                {moment(shiftCard()?.shiftTemplate.startTime, "h:mm:ss").format(
+                {moment(shiftCard()?.startTime, "h:mm:ss").format(
                   "h:mma"
                 )}
               </span>
@@ -83,7 +83,7 @@ const Details: Component<DetailsProps> = ({
             <div class="flex-1 py-2.5 overflow-hidden space-x-1">
               <span class="font-semibold text-gray-500">End Time:</span>
               <span>
-                {moment(shiftCard()?.shiftTemplate.endTime, "h:mm:ss").format(
+                {moment(shiftCard()?.endTime, "h:mm:ss").format(
                   "h:mma"
                 )}
               </span>

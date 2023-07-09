@@ -44,10 +44,12 @@ const Create: Component = ({}) => {
             ...formData(),
             numOfShifts: shiftIds.length,
             shiftInfos: shiftIds.map((id) => ({
-              shiftTemplateId:
-                tableData.shifts[id].shiftTemplate.shiftTemplateId,
+              staffId: tableData.shifts[id].staffId,
               date: tableData.shifts[id].date,
-              staffName: tableData.shifts[id].staff?.staffName,
+              startTime: tableData.shifts[id].startTime,
+              endTime: tableData.shifts[id].endTime,
+              role: tableData.shifts[id].role,
+              salaryCoefficient: tableData.shifts[id].salaryCoefficient
             })),
           })
       );
@@ -103,23 +105,22 @@ const Create: Component = ({}) => {
                 class="absolute top-1.5 left-1.5 bottom-1.5 w-1.5 rounded"
                 classList={{
                   "bg-blue-500":
-                    tableData.shifts[shift].shiftTemplate.role === Role.CASHIER,
+                    tableData.shifts[shift].role === Role.CASHIER,
                   "bg-yellow-500":
-                    tableData.shifts[shift].shiftTemplate.role === Role.GUARD,
+                    tableData.shifts[shift].role === Role.GUARD,
                   "bg-red-500":
-                    tableData.shifts[shift].shiftTemplate.role === Role.MANAGER,
+                    tableData.shifts[shift].role === Role.MANAGER,
                   "bg-gray-600":
-                    tableData.shifts[shift].shiftTemplate.role === Role.ADMIN,
+                    tableData.shifts[shift].role === Role.ADMIN,
                   "bg-gray-400":
-                    tableData.shifts[shift].shiftTemplate.role ===
-                    Role.ALL_ROLES,
+                    tableData.shifts[shift].role === Role.ALL_ROLES,
                 }}
               ></i>
               <p class="ml-3.5 font-semibold text-sm tracking-wider">
                 {shiftDetailsTime(
                   tableData.shifts[shift].date || "",
-                  tableData.shifts[shift].shiftTemplate.startTime || "",
-                  tableData.shifts[shift].shiftTemplate.endTime || ""
+                  tableData.shifts[shift].startTime || "",
+                  tableData.shifts[shift].endTime || ""
                 )}
               </p>
               <p class="ml-3.5 font-normal text-xs text-[13px] tracking-wider">
@@ -129,7 +130,7 @@ const Create: Component = ({}) => {
                 {
                   roles.find(
                     (r) =>
-                      r.value === tableData.shifts[shift].shiftTemplate.role
+                      r.value === tableData.shifts[shift].role
                   )?.label
                 }
               </p>
