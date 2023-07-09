@@ -7,7 +7,7 @@ import getEndPoint from "~/utils/getEndPoint";
 import { ModalContext, PageDataContext, ShiftCard } from "~/context/ShiftPlanning";
 import { useSearchParams } from "solid-start";
 import Spinner from "~/components/Spinner";
-import NewShiftDetailsModal from "~/components/shift-planning/NewShiftDetailsModal";
+import NewShiftModal from "~/components/shift-planning/NewShiftModal";
 import ShiftDetailsModal from "~/components/shift-planning/ShiftDetailsModal";
 import ShiftTemplateModal from "~/components/shift-planning/ShiftTemplateModal";
 import StaffDetailsModal from "~/components/shift-planning/StaffDetailsModal";
@@ -203,7 +203,7 @@ export default function ShiftPlanning() {
           modalData={staffModalData}
           setShowModal={setShowStaffModal}
         />
-        <NewShiftDetailsModal
+        <NewShiftModal
           showModal={showNewShiftModal}
           modalData={newShiftModalData}
           setShowModal={setShowNewShiftModal}

@@ -80,7 +80,7 @@ const fetcher: ResourceFetcher<
   }
 };
 
-const NewShiftDetailsModal: Component<{
+const NewShiftModal: Component<{
   showModal: Accessor<boolean>;
   modalData: Accessor<{ staff: Staff; date: string } | undefined>;
   setShowModal: Setter<boolean>;
@@ -368,4 +368,4 @@ const NewShiftDetailsModal: Component<{
   );
 };
 
-export default NewShiftDetailsModal;
+export default NewShiftModal;
