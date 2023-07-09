@@ -1,131 +1,152 @@
 import Breadcrumbs from "~/components/Breadcrumbs";
 import routes from "~/utils/routes";
-import {TbDownload} from "solid-icons/tb";;
-import {OcPaperairplane2, OcPencil3} from "solid-icons/oc";
-import {BsPrinter} from "solid-icons/bs";
+import {FaRegularCalendarCheck, FaRegularUser} from "solid-icons/fa";
+import {OcMail2} from "solid-icons/oc";
+import {CgSmartphone} from "solid-icons/cg";
 
-export default function Invoice() {
-  return (
-    <main class="min-w-fit">
-      <h1 class="mb-2 text-2xl font-medium">Invoice</h1>
-      <Breadcrumbs
-        linkList={[
-          { name: "Orders", link: routes.orders },
-          { name: "Invoice" },
-        ]}
-      />
+export default function OrderDetails() {
+    return (
+        <main class="min-w-fit">
+            <h1 class="mb-2 text-2xl font-medium">Order Details</h1>
+            <Breadcrumbs linkList={[
+                {name: "Orders", link: routes.orders},
+                {name: "Order Details"}
+            ]}/>
 
-        <div class="flex">
-            {/*Invoice section*/}
-            <div class="w-9/12 p-10 bg-white rounded-lg shadow-lg">
-                <div class="flex items-center justify-between mb-10">
-                    <div class="flex">
-                        <img src="/Logo.png" alt="MiniStore Logo" class="mr-3"/>
-                        <h2 class="text-2xl font-bold">MiniStore</h2>
-                    </div>
-                    <div>
-                        <h2 class="text-2xl font-bold">Invoice</h2>
+
+            <div class="flex justify-between">
+                {/*Order*/}
+                <div class="bg-white rounded-lg w-5/12 shadow-lg p-4 border border-gray-300">
+                    <h2 class="text-xl font-medium mb-4">Order #302011</h2>
+                    <div class="flex justify-between">
+                        <div class="flex items-center">
+                            <div class="border border-gray-100 bg-gray-100 p-1 rounded-full">
+                                <div class="border border-gray-200 bg-gray-200 p-1.5 rounded-full text-gray-500">
+                                    <span class="text-lg">
+                                        <FaRegularCalendarCheck />
+                                    </span>
+                                </div>
+                            </div>
+                            <p class="ml-2 text-gray-500 font-semibold">Added</p>
+                        </div>
+                        <div>
+                            <p class="font-semibold">12 Dec 2022</p>
+                        </div>
                     </div>
                 </div>
-                <div class="border-t border-gray-200"></div>
-                <div class="flex items-center justify-between mt-10">
+
+                {/*Cashier*/}
+                <div class="bg-white rounded-lg w-5/12 shadow-lg p-4 border border-gray-300">
                     <div>
-                        <p class="text-gray-500 mb-1 font-semibold">Invoice ID</p>
-                        <p class="text-gray-500 mb-1 font-semibold">Date</p>
+                        <h2 class="text-xl font-medium mb-4">Cashier</h2>
+                        <div class="flex justify-between">
+                            <div class="flex items-center">
+                                <div class="border border-gray-100 bg-gray-100 p-1 rounded-full">
+                                    <div class="border border-gray-200 bg-gray-200 p-1.5 rounded-full text-gray-500">
+                                        <span class="text-lg">
+                                            <FaRegularUser />
+                                        </span>
+                                    </div>
+                                </div>
+                                <p class="ml-2 text-gray-500 font-semibold">Cashier</p>
+                            </div>
+                            <div>
+                                <p class="font-semibold">Josh Adam</p>
+                            </div>
+                        </div>
+                        <div class="flex justify-between mt-2">
+                            <div class="flex items-center">
+                                <div class="border border-gray-100 bg-gray-100 p-1 rounded-full">
+                                    <div class="border border-gray-200 bg-gray-200 p-1.5 rounded-full text-gray-500">
+                                        <span class="text-lg">
+                                            <OcMail2 />
+                                        </span>
+                                    </div>
+                                </div>
+                                <p class="ml-2 text-gray-500 font-semibold">Email</p>
+                            </div>
+                            <div>
+                                <p class="font-semibold">josh_adam@mail.com</p>
+                            </div>
+                        </div>
+                        <div class="flex justify-between mt-2">
+                            <div class="flex items-center">
+                                <div class="border border-gray-100 bg-gray-100 p-1 rounded-full">
+                                    <div class="border border-gray-200 bg-gray-200 p-1.5 rounded-full text-gray-500">
+                                        <span class="text-xl">
+                                            <CgSmartphone />
+                                        </span>
+                                    </div>
+                                </div>
+                                <p class="ml-2 text-gray-500 font-semibold">Phone</p>
+                            </div>
+                            <div>
+                                <p class="font-semibold">909 427 2910</p>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <p class="font-semibold">#302011</p>
-                        <p class="font-semibold">2023-01-01</p>
+                </div>
+            </div>
+
+            {/*Order List*/}
+            <div class="w-full bg-white rounded-lg shadow-lg mt-4 p-4 border border-gray-300">
+                <div class="flex items-center">
+                    <h2 class="text-xl font-medium mr-2">Order List</h2>
+                    <div class="rounded-lg bg-green-100 pl-4 pr-4">
+                        <p class="text-green-700 font-semibold">
+                            2 Products
+                        </p>
                     </div>
                 </div>
 
                 {/*Table*/}
-                <div class="flex flex-col border border-gray-200 rounded-lg overflow-x-auto shadow-sm mt-8">
+                <div class="flex flex-col overflow-x-auto mt-8">
                     <table class="min-w-full table-fixed border-separate border-spacing-0.5 border-white">
-                        <thead class="bg-gray-50">
+
+                        {/*Table head*/}
+                        <thead>
                             <tr>
-                                <th class="text-left px-4 py-2" scope="col">Product</th>
-                                <th class="text-left px-4 py-2" scope="col">SKU</th>
-                                <th class="text-left px-4 py-2" scope="col">QTY</th>
-                                <th class="text-left px-4 py-2" scope="col">Price</th>
-                                <th class="text-right px-4 py-2" scope="col">Total</th>
+                                <th class="text-left px-4 py-2 font-medium" scope="col">Product</th>
+                                <th class="text-left px-4 py-2 font-medium" scope="col">Barcode</th>
+                                <th class="text-left px-4 py-2 font-medium" scope="col">QTY</th>
+                                <th class="text-right px-4 py-2 font-medium" scope="col">Price</th>
+                                <th class="text-right px-4 py-2 font-medium" scope="col">Total</th>
                             </tr>
                         </thead>
 
                         {/*Table row*/}
                         <tbody>
                             <tr>
-                                <td class="px-4 py-2">Product 1</td>
-                                <td class="px-4 py-2">302011</td>
-                                <td class="px-4 py-2">2</td>
-                                <td class="px-4 py-2">$10.00</td>
-                                <td class="px-4 py-2 text-right">$20.00</td>
+                                <td class="px-4 py-2 text-gray-500 font-medium">Product 1</td>
+                                <td class="px-4 py-2 text-indigo-500 font-bold">302011</td>
+                                <td class="px-4 py-2 text-gray-500 font-medium">1 pcs</td>
+                                <td class="px-4 py-2 text-right text-gray-500 font-medium">$400.00</td>
+                                <td class="px-4 py-2 text-right text-gray-500 font-medium">$400.00</td>
                             </tr>
                         </tbody>
 
                         {/*Total price*/}
                         <tfoot>
                             <tr>
-                                <td colspan="4" class="text-right px-4 py-2">Subtotal</td>
-                                <td class="px-4 py-2 text-right">$40.00</td>
+                                <td colspan="4" class="text-right px-4 py-2 font-medium">Subtotal</td>
+                                <td class="px-4 py-2 text-right font-medium">$400.00</td>
                             </tr>
                             <tr>
-                                <td colspan="4" class="text-right px-4 py-2">Vouchers</td>
-                                <td class="px-4 py-2 text-right">-$5.00</td>
+                                <td colspan="4" class="text-right px-4 py-2 font-medium">VAT</td>
+                                <td class="px-4 py-2 text-right font-medium">$0</td>
                             </tr>
                             <tr>
-                                <td colspan="4" class="text-right px-4 py-2">Grand Total</td>
-                                <td class="px-4 py-2 text-right">$35.00</td>
+                                <td colspan="4" class="text-right px-4 py-2 font-medium">Shipping Rate</td>
+                                <td class="px-4 py-2 text-right font-medium">$5.00</td>
+                            </tr>
+                            <tr>
+                                <td colspan="4" class="text-right px-4 py-2 font-medium">Grand Total</td>
+                                <td class="px-4 py-2 text-right font-bold">$580.00</td>
                             </tr>
                         </tfoot>
                     </table>
                 </div>
-
-                {/*Footer*/}
-                <div class="flex justify-center mt-8">
-                    <p class="text-gray-500">Should you have inquiries concerning this invoice, please contact <span class="font-bold">Martha</span> on +1 (469) 227 9044</p>
-                </div>
             </div>
-            
-            {/*Invoice button*/}
-            <div class="w-3/12 px-4">
-                <div class="flex flex-col justify-between shadow-lg p-6 rounded-lg bg-white">
-                    <button class="bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold py-2 px-4 rounded-lg mb-4">
-                      <span class="inline-flex items-center">
-                        <span class="mr-1">
-                          <OcPaperairplane2 />
-                        </span>
-                        Send Invoice
-                      </span>
-                    </button>
-
-                    <button class="bg-[#dedefa] hover:bg-[#d6d6ff] active:bg-[#c5c5fc] text-indigo-500 font-bold py-2 px-4 rounded-lg mb-4">
-                        <span class="inline-flex items-center">
-                            <span class="mr-1">
-                              <TbDownload/>
-                            </span>
-                            Download Invoice
-                        </span>
-                    </button>
-                    <button class="bg-[#dedefa] hover:bg-[#d6d6ff] active:bg-[#c5c5fc] text-indigo-500 font-bold py-2 px-4 rounded-lg mb-4">
-                        <span class="inline-flex items-center">
-                            <span class="mr-1">
-                              <BsPrinter />
-                            </span>
-                            Print Invoice
-                        </span>
-                    </button>
-                    <button class="bg-[#dedefa] hover:bg-[#d6d6ff] active:bg-[#c5c5fc] text-indigo-500 font-bold py-2 px-4 rounded-lg">
-                        <span class="inline-flex items-center">
-                            <span class="mr-1">
-                              <OcPencil3 />
-                            </span>
-                            Edit Invoice
-                        </span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </main>
-  );
+        </main>
+    )
 }
