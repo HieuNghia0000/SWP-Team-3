@@ -16,6 +16,7 @@ export type CheckboxesProps = FieldProps & {
   value?: Array<string | number>;
   triggers?: string[];
   class?: string;
+  classList?: Record<string, boolean>;
 };
 
 export const Checkboxes: Component<CheckboxesProps> = (props) => {
@@ -24,9 +25,11 @@ export const Checkboxes: Component<CheckboxesProps> = (props) => {
       {...props}
       mode="checkbox-group"
       render={(field) => (
-        <div>
+        <div classList={props.classList}>
           <Show when={props.label}>
-            <label>{props.label}</label>
+            <label class="inline-block mb-1.5 text-gray-600 font-semibold">
+              {props.label}
+            </label>
           </Show>
           <div class={props.class}>
             <For each={props.options}>
@@ -41,9 +44,8 @@ export const Checkboxes: Component<CheckboxesProps> = (props) => {
                     checked={field.helpers.isChecked(option.value)}
                     value={option.value}
                     disabled={option.disabled}
-                    class=""
                     classList={{
-                      "appearance-none w-4 h-4 border-2 border-red-500 rounded-full":
+                      "appearance-none w-4 h-4 border-2 border-red-400 rounded-full":
                         field.helpers.error,
                       "cursor-default": option.disabled,
                       "cursor-pointer": !option.disabled,
@@ -53,7 +55,7 @@ export const Checkboxes: Component<CheckboxesProps> = (props) => {
                   <Show when={option.label}>
                     <label
                       classList={{
-                        "text-orange-600": field.helpers.error,
+                        "text-red-400": field.helpers.error,
                         "cursor-default": option.disabled,
                         "cursor-pointer": !option.disabled,
                       }}
@@ -67,7 +69,7 @@ export const Checkboxes: Component<CheckboxesProps> = (props) => {
             </For>
           </div>
           <Show when={field.helpers.error}>
-            <p class="text-sm text-red-500">{field.helpers.errorMessage}</p>
+            <p class="text-sm text-red-400">{field.helpers.errorMessage}</p>
           </Show>
         </div>
       )}

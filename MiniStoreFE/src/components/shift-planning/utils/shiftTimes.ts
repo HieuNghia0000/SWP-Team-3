@@ -23,9 +23,7 @@ export function timeToReadable(time: string) {
 
   if (!t.isValid()) return "";
 
-  const formattedTime = t.format(format);
-
-  return formattedTime;
+  return t.format(format);
 }
 
 // Format readable time to 24-hour clock
@@ -37,7 +35,22 @@ export function readableToTimeStr(time: string) {
 
   if (!t.isValid()) return "";
 
-  const formattedTime = t.format(format);
+  return t.format(format);
+}
 
-  return formattedTime;
+export function shiftDetailsTime(
+  date: string,
+  startTime: string,
+  endTime: string
+) {
+  const format = "h:mma"; // Time format: 12-hour clock with minutes
+
+  const start = moment(startTime, "HH:mm:ss");
+  const end = moment(endTime, "HH:mm:ss");
+  const d = moment(date, "YYYY-MM-DD").format("ddd, MMM D");
+
+  const formattedStart = start.format(format).replace(":00", "");
+  const formattedEnd = end.format(format).replace(":00", "");
+
+  return `${d}, ${formattedStart} - ${formattedEnd}`;
 }

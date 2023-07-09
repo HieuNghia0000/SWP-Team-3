@@ -5,11 +5,11 @@ import com.team3.ministore.utils.StaffStatus;
 import com.team3.ministore.validation.annotation.ExistEmail;
 import com.team3.ministore.validation.annotation.ExistUsername;
 import lombok.Data;
-import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 
 @Data
 public class RegisterDto {
@@ -28,24 +28,25 @@ public class RegisterDto {
     @NotBlank(message = "Staff name must not be blank")
     private String staffName;
 
-    @NotNull(message = "Role must not be null")
+    @NotNull(message = "Role must not be blank")
     private Role role;
 
-    @Nullable
+    @NotNull(message = "Hourly wage must not be null")
+    private String hourlyWage;
+
+    @NotNull(message = "EffectiveDate name must not be null")
+    private LocalDate effectiveDate;
+
+    @NotNull(message = "TerminationDate name must not be null")
+    private LocalDate terminationDate;
+
     private String phoneNumber;
 
-    @Nullable
-    private Float baseSalary;
-
-    @Nullable
     private StaffStatus status;
 
-    @Nullable
     private String image;
 
-    @Nullable
     private String workDays;
 
-    @Nullable
     private Integer leaveBalance;
 }

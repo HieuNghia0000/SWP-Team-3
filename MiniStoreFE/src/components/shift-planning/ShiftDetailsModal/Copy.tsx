@@ -1,15 +1,15 @@
 import { compact } from "lodash";
 import { useFormHandler } from "solid-form-handler";
 import { yupSchema } from "solid-form-handler/yup";
-import { FaSolidTrash } from "solid-icons/fa";
+import { FaSolidPencil, FaSolidTrash } from "solid-icons/fa";
 import { Accessor, Setter, Component, createSignal, Show } from "solid-js";
 import PopupModal from "~/components/PopupModal";
 import { Checkboxes } from "~/components/form/Checkboxes";
 import { TextInput } from "~/components/form/TextInput";
-import { WorkScheduleCard, useSPData } from "~/context/ShiftPlanning";
+import { ShiftCard, useSPData } from "~/context/ShiftPlanning";
 import { Role } from "~/types";
 import { Tabs } from ".";
-import { shiftTimes } from "../utils/shiftTimes";
+import { shiftDetailsTime } from "../utils/shiftTimes";
 import * as yup from "yup";
 import moment from "moment";
 
@@ -22,10 +22,11 @@ const copySchema: yup.Schema<CopyScheduleForm> = yup.object({
   untilDate: yup.string(),
 });
 interface CopyProps {
-  shift: Accessor<WorkScheduleCard | undefined>;
+  shiftCard: Accessor<ShiftCard | undefined>;
   setModalState: Setter<Tabs>;
+  onDelete: () => void;
 }
-const Copy: Component<CopyProps> = ({ shift, setModalState }) => {
+const Copy: Component<CopyProps> = ({ shiftCard, setModalState, onDelete }) => {
   const { tableData } = useSPData();
   const [enableMultiWeeks, setEnableMultiWeeks] = createSignal<boolean>(false);
   const formHandler = useFormHandler(yupSchema(copySchema));
@@ -33,18 +34,20 @@ const Copy: Component<CopyProps> = ({ shift, setModalState }) => {
 
   // Get work days of the week based on the selected shift and the staff member
   // Ex: ["Monday", "Tuesday", "Wednesday"]
-  const getWorkDays = (shiftId: number, staffId: number) => {
-    const staffWorkDates = Object.keys(tableData.shifts).map((scheduleId) => {
-      const wSchedule = tableData.shifts[Number.parseInt(scheduleId)];
-      if (wSchedule.staffId === staffId && wSchedule.shiftId === shiftId)
-        return wSchedule.date;
+  const getWorkDays = (staffId: number) => {
+    const staffWorkDates = Object.keys(tableData.shifts).map((id) => {
+      const s = tableData.shifts[Number.parseInt(id)];
+      if (s.staffId === staffId)
+        return s.date;
       else return "";
     });
     const dates = compact(staffWorkDates);
     return dates.map((date) => moment(date).format("dddd"));
   };
 
-  const workDays = getWorkDays(shift()?.shiftId || 0, shift()?.staffId || 0);
+  const workDays = getWorkDays(
+    shiftCard()?.staffId || 0
+  );
 
   function formatDaysArray(daysArray: string[]) {
     if (daysArray.length === 1) {
@@ -68,17 +71,13 @@ const Copy: Component<CopyProps> = ({ shift, setModalState }) => {
         "Data sent with success: " +
           JSON.stringify({
             ...formData(),
-            scheduleId: shift()?.scheduleId,
+            shiftId: shiftCard()?.shiftId,
             published: publish,
           })
       );
     } catch (error) {
       console.error(error);
     }
-  };
-
-  const onDelete = async () => {
-    alert("Delete");
   };
 
   const reset = () => {
@@ -98,32 +97,34 @@ const Copy: Component<CopyProps> = ({ shift, setModalState }) => {
             class="rounded mx-0.5 p-2 relative text-left select-none"
             classList={{
               "bg-[#edf2f7] text-black":
-                shift()?.published && shift()?.isOrigin,
+                shiftCard()?.published && shiftCard()?.isOrigin,
               "bg-blue-100 text-blue-500 border border-blue-100":
-                shift()?.published && !shift()?.isOrigin,
+                shiftCard()?.published && !shiftCard()?.isOrigin,
               "bg-[repeating-linear-gradient(-45deg,white,white_5px,#eaf0f6_5px,#eaf0f6_10px)] border border-gray-200":
-                !shift()?.published && shift()?.isOrigin,
+                !shiftCard()?.published && shiftCard()?.isOrigin,
               "bg-[repeating-linear-gradient(-45deg,#e7f7ff,#e7f7ff_5px,#ceefff_5px,#ceefff_10px)] border border-blue-100":
-                !shift()?.published && !shift()?.isOrigin,
+                !shiftCard()?.published && !shiftCard()?.isOrigin,
             }}
           >
             <i
               class="absolute top-1 left-1.5 bottom-1 w-1.5 rounded"
               classList={{
-                "bg-blue-500": shift()?.shift.role === Role.CASHIER,
-                "bg-yellow-500": shift()?.shift.role === Role.GUARD,
-                "bg-red-500": shift()?.shift.role === Role.MANAGER,
-                "bg-gray-500": shift()?.shift.role === Role.ADMIN,
+                "bg-blue-500": shiftCard()?.role === Role.CASHIER,
+                "bg-yellow-500": shiftCard()?.role === Role.GUARD,
+                "bg-red-500": shiftCard()?.role === Role.MANAGER,
+                "bg-gray-600": shiftCard()?.role === Role.ADMIN,
+                "bg-gray-400": shiftCard()?.role === Role.ALL_ROLES,
               }}
             ></i>
-            <p class="ml-3.5 font-semibold text-base tracking-wider">
-              {shiftTimes(
-                shift()?.shift.startTime || "",
-                shift()?.shift.endTime || ""
+            <p class="ml-3.5 font-semibold text-sm tracking-wider">
+              {shiftDetailsTime(
+                shiftCard()?.date || "",
+                shiftCard()?.startTime || "",
+                shiftCard()?.endTime || ""
               )}
             </p>
-            <p class="ml-3.5 font-normal text-sm tracking-wider">
-              {shift()?.shift.shiftName}
+            <p class="ml-3.5 font-normal text-xs tracking-wider">
+              {shiftCard()?.name}
             </p>
           </div>
         </div>
@@ -215,7 +216,7 @@ const Copy: Component<CopyProps> = ({ shift, setModalState }) => {
               id="untilDate"
               name="untilDate"
               class="text-sm"
-              value={shift()?.date || ""}
+              value={shiftCard()?.date || ""}
               type="date"
               formHandler={formHandler}
             />
@@ -224,16 +225,26 @@ const Copy: Component<CopyProps> = ({ shift, setModalState }) => {
       </PopupModal.Body>
       <PopupModal.Footer>
         <div class="w-full flex justify-between items-center gap-2">
-          <div class="flex gap-2 justify-center items-center">
+          <div class="flex gap-3 justify-center items-center">
             <button
               type="button"
               onClick={onDelete}
-              class="flex gap-2 justify-center items-center px-3 text-gray-500 text-sm hover:text-gray-700"
+              class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
             >
               <span>
                 <FaSolidTrash />
               </span>
               <span>Delete</span>
+            </button>
+            <button
+              type="button"
+              onClick={[setModalState, "edit"]}
+              class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
+            >
+              <span class="">
+                <FaSolidPencil />
+              </span>
+              Edit Shift
             </button>
           </div>
           <div class="flex gap-2 justify-center items-center">
@@ -246,14 +257,14 @@ const Copy: Component<CopyProps> = ({ shift, setModalState }) => {
             </button>
             <button
               type="button"
-              onClick={[submit, !shift()?.published]}
+              onClick={[submit, true]}
               class="py-1.5 px-3 font-semibold text-gray-600 border border-gray-300 text-sm rounded hover:text-black"
             >
-              Save & {shift()?.published ? "Unpublish" : "Publish"}
+              Save & Publish
             </button>
             <button
               type="button"
-              onClick={[submit, shift()?.published]}
+              onClick={[submit, false]}
               class="py-1.5 px-3 font-semibold text-white border border-blue-600 bg-blue-500 text-sm rounded hover:bg-blue-600"
             >
               Save

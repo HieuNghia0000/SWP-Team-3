@@ -1,13 +1,15 @@
 package com.team3.ministore.model;
 
+import com.team3.ministore.utils.LeaveStatus;
+import com.team3.ministore.utils.LeaveType;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Data
-@Table(name = "leaverequest")
+@Table(name = "leaverequests")
 public class LeaveRequest {
 
     @Id
@@ -15,25 +17,28 @@ public class LeaveRequest {
     @Column(name = "leave_request_id")
     private int leaveRequestId;
 
-    @ManyToOne
-    @JoinColumn(name = "staff_id", referencedColumnName = "staff_id")
-    private Staff staff;
-
-    @Column(name = "leave_type", length = 20)
-    private String leaveType;
+    @Column(name = "leave_type")
+    @Enumerated(EnumType.STRING)
+    private LeaveType leaveType;
 
     @Column(name = "start_date")
-    private Date startDate;
+    private LocalDate startDate;
 
     @Column(name = "end_date")
-    private Date endDate;
+    private LocalDate endDate;
 
     @Column(name = "status")
-    private int status;
+    @Enumerated(EnumType.ORDINAL)
+    private LeaveStatus status;
 
     @Column(name = "reason", length = 500)
     private String reason;
 
     @Column(name = "admin_reply", length = 500)
     private String adminReply;
+
+    @ManyToOne
+    @JoinColumn(name = "staff_id", referencedColumnName = "staff_id")
+    private Staff staff;
+
 }

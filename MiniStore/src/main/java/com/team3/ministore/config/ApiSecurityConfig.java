@@ -1,7 +1,6 @@
 package com.team3.ministore.config;
 
 import com.team3.ministore.jwt.JwtAuthorizationFilter;
-import com.team3.ministore.utils.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -60,17 +59,21 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
         http.cors().configurationSource(request -> configuration.applyPermitDefaultValues());
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-        http.addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
+//        http.addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
 
         http.csrf().disable();
 
+//        http.authorizeRequests()
+//                .antMatchers("/auth/login", "/auth/current-staff","/staffs/add").permitAll()
+////                .antMatchers("/staff/add").hasRole(Role.ADMIN.name())
+//                .anyRequest().authenticated()
+//                .and()
+//                .exceptionHandling()
+//                .accessDeniedHandler(((request, response, accessDeniedException) -> response.setStatus(HttpStatus.NOT_FOUND.value())))
+//                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
+
         http.authorizeRequests()
-                .antMatchers("/auth/login", "/auth/current-staff","/staffs/add").permitAll()
-//                .antMatchers("/staff/add").hasRole(Role.ADMIN.name())
-                .anyRequest().authenticated()
-                .and()
-                .exceptionHandling()
-                .accessDeniedHandler(((request, response, accessDeniedException) -> response.setStatus(HttpStatus.NOT_FOUND.value())))
-                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
+                .antMatchers("*").permitAll();
+
     }
 }

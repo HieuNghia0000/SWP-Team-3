@@ -84,20 +84,13 @@ const Navbar: Component<NavbarProps> = (props) => {
           isOpen={isOpen}
         />
 
-        {/* Voucher */}
-        <NavbarLink
-          href={routes.vouchers}
-          icon={<BsTicketPerforated />}
-          text="Vouchers"
-          isOpen={isOpen}
-        />
-
         {/* Time Clock */}
         <NavbarLink
           href={routes.timeClock}
           icon={<TbClock />}
           text="Time Clock"
-          isOpen={isOpen}/>
+          isOpen={isOpen}
+        />
       </ul>
     </section>
   );

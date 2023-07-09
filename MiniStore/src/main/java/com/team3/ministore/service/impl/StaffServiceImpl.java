@@ -1,7 +1,7 @@
 package com.team3.ministore.service.impl;
 
-import com.team3.ministore.dto.CurrentStaffDto;
 import com.team3.ministore.dto.RegisterDto;
+import com.team3.ministore.dto.UpdateStaffDto;
 import com.team3.ministore.model.Staff;
 import com.team3.ministore.repository.StaffRepository;
 import com.team3.ministore.service.StaffService;
@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class StaffServiceImpl implements StaffService {
@@ -27,13 +28,13 @@ public class StaffServiceImpl implements StaffService {
     }
 
     @Override
-    public List<Staff> getAllStaff() {
+    public List<Staff> getAllStaffs() {
         return staffRepository.findAll();
     }
 
     @Override
-    public Staff getStaffById(Integer id) {
-        return staffRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid staff ID: " + id));
+    public Optional<Staff> getStaffById(Integer id) {
+        return staffRepository.findById(id);
     }
 
     @Override
@@ -44,15 +45,14 @@ public class StaffServiceImpl implements StaffService {
     @Override
     public Staff createStaff(RegisterDto staffDto) {
         Staff staff = new Staff();
+        staff.setPassword(encoder.encode(staffDto.getPassword()));
 
-        return saveStaff(
+         return saveStaff(
                 staff,
                 staffDto.getStaffName(),
                 staffDto.getRole(),
                 staffDto.getUsername(),
-                staffDto.getPassword(),
                 staffDto.getPhoneNumber(),
-                staffDto.getBaseSalary(),
                 staffDto.getStatus(),
                 staffDto.getImage(),
                 staffDto.getEmail(),
@@ -62,23 +62,21 @@ public class StaffServiceImpl implements StaffService {
     }
 
     @Override
-    public Staff updateStaff(Integer id, Staff staff) {
-        Staff existingStaff = getStaffById(id);
+    public Optional<Staff> updateStaff(Integer id, UpdateStaffDto staff) {
+        Optional<Staff> existingStaff = getStaffById(id);
 
-        return saveStaff(
-                existingStaff,
+        return existingStaff.map(value -> saveStaff(
+                value,
                 staff.getStaffName(),
                 staff.getRole(),
                 staff.getUsername(),
-                staff.getPassword(),
                 staff.getPhoneNumber(),
-                staff.getBaseSalary(),
                 staff.getStatus(),
                 staff.getImage(),
                 staff.getEmail(),
                 staff.getWorkDays(),
                 staff.getLeaveBalance()
-        );
+        ));
     }
 
     @Override
@@ -93,47 +91,26 @@ public class StaffServiceImpl implements StaffService {
     }
 
     @Override
-    public Staff getStaffByEmail(String email) {
-        return staffRepository.getStaffByEmail(email);
+    public Optional<Staff> getStaffByEmail(String email) {
+        return staffRepository.findByEmail(email);
     }
 
     @Override
-    public Staff getStaffByUsername(String username) {
+    public Optional<Staff> getStaffByUsername(String username) {
         return staffRepository.findByUsername(username);
     }
 
-    @Override
-    public CurrentStaffDto getCurrentStaffByUsername(String username) {
-        CurrentStaffDto result = new CurrentStaffDto();
-        Staff foundStaff = staffRepository.findByUsername(username);
 
-        result.setStaffId(foundStaff.getStaffId());
-        result.setUsername(foundStaff.getUsername());
-        result.setStaffName(foundStaff.getStaffName());
-        result.setRole(foundStaff.getRole());
-        result.setEmail(foundStaff.getEmail());
-        result.setPhoneNumber(foundStaff.getPhoneNumber());
-        result.setStatus(foundStaff.getStatus());
-        result.setBaseSalary(foundStaff.getBaseSalary());
-        result.setWorkDays(foundStaff.getWorkDays());
-        result.setImage(foundStaff.getImage());
-        result.setLeaveBalance(foundStaff.getLeaveBalance());
-
-        return result;
-    }
-
-    private Staff saveStaff(Staff staff, String staffName, Role role, String username, String password, String phoneNumber, Float baseSalary, StaffStatus status, String image, String email, String workDays, Integer leaveBalance) {
+    private Staff saveStaff(Staff staff, String staffName, Role role, String username,String phoneNumber, StaffStatus status, String image, String email, String workDays, Integer leaveBalance) {
         staff.setStaffName(staffName);
         staff.setRole(role);
         staff.setUsername(username);
-        staff.setPassword(encoder.encode(password));
-        staff.setPhoneNumber(phoneNumber);
-        staff.setBaseSalary(baseSalary);
-        staff.setStatus(status);
-        staff.setImage(image);
         staff.setEmail(email);
-        staff.setWorkDays(workDays);
-        staff.setLeaveBalance(leaveBalance);
+        staff.setPhoneNumber(phoneNumber == null ? "" : phoneNumber);
+        staff.setStatus(status == null ? StaffStatus.ACTIVE : status);
+        staff.setImage(image == null ? "" : image);
+        staff.setWorkDays(workDays == null ? "" : workDays);
+        staff.setLeaveBalance(leaveBalance == null ? 0 : leaveBalance);
 
         return staffRepository.save(staff);
     }

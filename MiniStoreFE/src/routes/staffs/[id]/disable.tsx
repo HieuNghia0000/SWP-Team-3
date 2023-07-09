@@ -3,7 +3,7 @@ import { Show } from "solid-js";
 import { RouteDataArgs, useRouteData } from "solid-start";
 import { createServerData$ } from "solid-start/server";
 import Breadcrumbs from "~/components/Breadcrumbs";
-import { Staff, Status } from "~/types";
+import { Staff, StaffStatus } from "~/types";
 import routes from "~/utils/routes";
 
 export function routeData({ params }: RouteDataArgs) {
@@ -18,7 +18,7 @@ export function routeData({ params }: RouteDataArgs) {
         staffName: "Nguyen Van A",
         username: "nguyenvana",
         image: "",
-        status: 0,
+        status: StaffStatus.ACTIVATED,
       } as Staff;
     },
     { key: () => ["staffs", params.id] }
@@ -108,13 +108,13 @@ export default function DisablingStaff() {
               <h4 class="text-lg font-medium">Disable staff</h4>
             </div>
             <p class="text-gray-500 italic">
-              {data()?.status === Status.ACTIVATED
+              {data()?.status === StaffStatus.ACTIVATED
                 ? "This staff is currently enabled. You can disable this staff by clicking the button below."
                 : "This staff is currently disabled. You can enable this staff by clicking the button below."}
             </p>
             <div>
               <Show
-                when={data()?.status === Status.ACTIVATED}
+                when={data()?.status === StaffStatus.ACTIVATED}
                 fallback={
                   <button
                     class="block ml-auto p-2 px-6 py-2 text-center text-white bg-blue-500 border border-blue-500 rounded hover:bg-blue-600 hover:text-white"

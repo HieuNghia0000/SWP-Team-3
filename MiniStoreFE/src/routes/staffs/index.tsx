@@ -8,7 +8,7 @@ import Pagination from "~/components/Pagination";
 import { A } from "@solidjs/router";
 import { Accessor, Component, For, Setter, Show, createSignal } from "solid-js";
 import routes from "~/utils/routes";
-import { Staff, Status } from "~/types";
+import { Staff, StaffStatus } from "~/types";
 import PopupModal from "~/components/PopupModal";
 import { FaSolidLock, FaSolidPencil, FaSolidUnlock } from "solid-icons/fa";
 import { RiSystemAddFill } from "solid-icons/ri";
@@ -21,8 +21,8 @@ const mockData = [
     phoneNumber: "0123456789",
     role: "Manager",
     workDays: "TUE, THU, SAT, SUN",
-    status: 0,
-    baseSalary: 80.0,
+    status: "ACTIVE",
+    salary: { hourlyWage: 80.0 },
     createdAt: "2021-09-01T00:00:00.000Z",
     updatedAt: "2021-09-01T00:00:00.000Z",
   },
@@ -33,8 +33,8 @@ const mockData = [
     phoneNumber: "0123456789",
     role: "Manager",
     workDays: "TUE, THU, SAT, SUN",
-    status: 1,
-    baseSalary: 80.0,
+    status: "DISABLED",
+    salary: { hourlyWage: 80.0 },
     createdAt: "2021-09-01T00:00:00.000Z",
     updatedAt: "2021-09-01T00:00:00.000Z",
   },
@@ -45,8 +45,8 @@ const mockData = [
     phoneNumber: "0123456789",
     role: "Cashier",
     workDays: "TUE, THU, SAT",
-    status: 1,
-    baseSalary: 60.0,
+    status: "DISABLED",
+    salary: { hourlyWage: 60.0 },
     createdAt: "2021-09-01T00:00:00.000Z",
     updatedAt: "2021-09-01T00:00:00.000Z",
   },
@@ -239,11 +239,11 @@ export default function Staffs() {
                       <span
                         class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-bold text-white rounded-full"
                         classList={{
-                          "bg-green-500": item.status === Status.ACTIVATED,
-                          "bg-red-500": item.status === Status.DISABLED,
+                          "bg-green-500": item.status === StaffStatus.ACTIVATED,
+                          "bg-red-500": item.status === StaffStatus.DISABLED,
                         }}
                       >
-                        {item.status === Status.ACTIVATED
+                        {item.status === StaffStatus.ACTIVATED
                           ? "Active"
                           : "Disabled"}
                       </span>
@@ -275,14 +275,14 @@ export default function Staffs() {
                         <div class="relative flex justify-center items-center">
                           <button class="peer text-base text-gray-500 hover:text-indigo-500">
                             <Show
-                              when={item.status === Status.ACTIVATED}
+                              when={item.status === StaffStatus.ACTIVATED}
                               fallback={<FiUnlock />}
                             >
                               <FiLock />
                             </Show>
                           </button>
                           <span class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
-                            {item.status === Status.ACTIVATED
+                            {item.status === StaffStatus.ACTIVATED
                               ? "Disable"
                               : "Enable"}
                           </span>
@@ -353,7 +353,7 @@ const StaffDetailsModal: Component<{
             </div>
             <div class="flex-1 py-2.5 overflow-hidden space-x-1">
               <span class="font-semibold text-gray-500">Hourly Wage:</span>
-              <span>$0.00</span>
+              <span>0 ₫</span>
             </div>
           </div>
           <div class="flex border-b border-gray-300 border-dotted">
@@ -417,13 +417,15 @@ const StaffDetailsModal: Component<{
           <button class="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-2">
             <span class="">
               <Show
-                when={modalData()?.status === Status.ACTIVATED}
+                when={modalData()?.status === StaffStatus.ACTIVATED}
                 fallback={<FaSolidUnlock />}
               >
                 <FaSolidLock />
               </Show>
             </span>
-            {modalData()?.status === Status.ACTIVATED ? "Disable" : "Enable"}
+            {modalData()?.status === StaffStatus.ACTIVATED
+              ? "Disable"
+              : "Enable"}
           </button>
         </div>
       </PopupModal.Footer>

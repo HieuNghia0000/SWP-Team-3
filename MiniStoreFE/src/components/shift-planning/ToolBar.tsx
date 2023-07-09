@@ -2,44 +2,51 @@ import {
   Accessor,
   Component,
   Setter,
+  createEffect,
   createSignal,
+  on,
   onCleanup,
   onMount,
 } from "solid-js";
-import { A, useSearchParams } from "solid-start";
+import {useSearchParams} from "solid-start";
 import DropDownBtn from "../DropDownBtn";
-import { IoCopySharp } from "solid-icons/io";
+import {IoCopySharp} from "solid-icons/io";
 import {
   FaSolidAngleLeft,
   FaSolidAngleRight,
-  FaSolidCheck,
   FaSolidRepeat,
 } from "solid-icons/fa";
-import { FiCalendar, FiSave } from "solid-icons/fi";
-import { ParamType } from "~/routes/shift-planning";
+import {FiCalendar, FiSave} from "solid-icons/fi";
 import moment from "moment";
 import flatpickr from "flatpickr";
-import { getWeekFirstAndLastDates } from "~/utils/getWeekDates";
-import { useSPData, useShiftPlanningModals } from "~/context/ShiftPlanning";
+import {getWeekFirstAndLastDates} from "~/utils/getWeekDates";
+import {useSPData, useShiftPlanningModals} from "~/context/ShiftPlanning";
+import {ParamType} from "./utils/types";
 
 type ToolBarProps = {
   datePicked: Accessor<string | undefined>;
   setDatePicked: Setter<string | undefined>;
 };
 
-const ToolBar: Component<ToolBarProps> = ({ datePicked, setDatePicked }) => {
+const ToolBar: Component<ToolBarProps> = ({datePicked, setDatePicked}) => {
   const [searchParams, setSearchParams] = useSearchParams<ParamType>();
   const [dateStr, setDateStr] = createSignal<string>("");
-  const { tableData, resetTableData } = useSPData();
-  const { setShowShiftTemplateModal } = useShiftPlanningModals();
+  const {tableData, resetTableData, saveChanges} = useSPData();
+  const {setShowShiftTemplateModal, setScheduleTemplateModalState} =
+    useShiftPlanningModals();
 
   let dateRef: HTMLInputElement | undefined = undefined;
   let fp: flatpickr.Instance | undefined = undefined;
 
-  // createEffect(() => {
-  // console.log(tableData.changedShifts);
-  // console.log(tableData.shifts);
-  // });
+  createEffect(
+    on(
+      () => searchParams.picked_date,
+      () => {
+        if (searchParams.picked_date === undefined)
+          fp?.setDate(moment().toDate(), true);
+      }
+    )
+  );
 
   onMount(() => {
     const p = moment(searchParams.picked_date);
@@ -69,14 +76,14 @@ const ToolBar: Component<ToolBarProps> = ({ datePicked, setDatePicked }) => {
   ) => {
     if (selectedDates.length === 0) {
       setDatePicked(undefined);
-      setSearchParams({ picked_date: undefined });
+      setSearchParams({picked_date: undefined});
       setDateStr("");
     }
     if (selectedDates.length === 1) {
       const pickedDate = dateStr;
       const [from, to] = getWeekFirstAndLastDates(pickedDate);
       setDatePicked(pickedDate);
-      setSearchParams({ picked_date: pickedDate });
+      setSearchParams({picked_date: pickedDate});
       const start = instance.formatDate(from.toDate(), "F j");
       const end = instance.formatDate(to.toDate(), "F j, Y");
       setDateStr(`${start} - ${end}`);
@@ -106,7 +113,7 @@ const ToolBar: Component<ToolBarProps> = ({ datePicked, setDatePicked }) => {
           class="flex flex-row items-center gap-1 cursor-pointer border border-gray-300 rounded-lg py-2 px-3.5 font-medium text-sm text-gray-500 hover:text-indigo-600 hover:border-indigo-600"
         >
           <span class="text-base">
-            <FaSolidRepeat />
+            <FaSolidRepeat/>
           </span>
           Shift Templates
         </button>
@@ -117,14 +124,14 @@ const ToolBar: Component<ToolBarProps> = ({ datePicked, setDatePicked }) => {
           onClick={goToPrevWeek}
           class="flex justify-center items-center border border-gray-300 rounded-lg py-2 px-3.5 font-medium text-sm text-gray-500 hover:text-indigo-600 hover:border-indigo-600"
         >
-          <FaSolidAngleLeft size={20} />
+          <FaSolidAngleLeft size={20}/>
         </button>
         <button
           ref={dateRef}
           type="button"
           class="range_flatpicker flex flex-row gap-2 justify-center items-center border border-gray-300 rounded-lg py-2 px-3.5 font-medium text-sm text-gray-500 hover:text-indigo-600 hover:border-indigo-600"
         >
-          <FiCalendar />
+          <FiCalendar/>
           {dateStr() || "Select Dates"}
         </button>
         <button
@@ -132,52 +139,49 @@ const ToolBar: Component<ToolBarProps> = ({ datePicked, setDatePicked }) => {
           onClick={goToNextWeek}
           class="flex justify-center items-center border border-gray-300 rounded-lg py-2 px-3.5 font-medium text-sm text-gray-500 hover:text-indigo-600 hover:border-indigo-600"
         >
-          <FaSolidAngleRight size={20} />
+          <FaSolidAngleRight size={20}/>
         </button>
       </div>
       <div class="flex justify-center items-center gap-4">
         <button
           type="button"
           disabled={!tableData.isChanged}
-          class="flex flex-row items-center gap-1 border border-gray-300 rounded-lg py-2 px-3.5 font-medium text-sm text-gray-500 cursor-default"
-          classList={{
-            "text-indigo-600 border-indigo-600 hover:bg-indigo-50 cursor-pointer":
-              tableData.isChanged,
-          }}
+          onClick={saveChanges}
+          class="flex flex-row items-center gap-1 border border-indigo-400 text-sm font-semibold text-white bg-indigo-600 py-2 px-3.5 rounded-lg hover:bg-indigo-700 disabled:bg-indigo-400"
         >
           <span class="text-base">
-            <FiSave />
+            <FiSave/>
           </span>
           Save
         </button>
-        <button
-          type="button"
-          class="flex flex-row items-center gap-1 text-sm font-semibold text-white bg-indigo-600 py-2 px-3.5 rounded-lg hover:bg-indigo-700"
+        <DropDownBtn
+          text="Copy"
+          icon={<IoCopySharp/>}
+          classList={{
+            "w-fit flex flex-col items-stretch": true,
+          }}
         >
-          <span class="text-base">
-            <FaSolidCheck />
-          </span>
-          Publish
-        </button>
-        <DropDownBtn text="Copy" icon={<IoCopySharp />}>
-          <A
-            href="/"
-            class="py-1.5 px-2.5 text-sm text-gray-600 hover:bg-gray-100 whitespace-nowrap block"
+          <button
+            type="button"
+            onClick={[setScheduleTemplateModalState, "copy"]}
+            class="py-1.5 px-2.5 text-sm text-start text-gray-600 hover:bg-gray-100 whitespace-nowrap block"
           >
             Copy Previous Week
-          </A>
-          <A
-            href="/"
-            class="py-1.5 px-2.5 text-sm text-gray-600 hover:bg-gray-100 whitespace-nowrap block"
+          </button>
+          <button
+            type="button"
+            onClick={[setScheduleTemplateModalState, "create"]}
+            class="py-1.5 px-2.5 text-sm text-start text-gray-600 hover:bg-gray-100 whitespace-nowrap block"
           >
             Create Week Template
-          </A>
-          <A
-            href="/"
-            class="py-1.5 px-2.5 text-sm text-gray-600 hover:bg-gray-100 whitespace-nowrap block"
+          </button>
+          <button
+            type="button"
+            onClick={[setScheduleTemplateModalState, "list"]}
+            class="py-1.5 px-2.5 text-sm text-start text-gray-600 hover:bg-gray-100 whitespace-nowrap block"
           >
             Apply Week Template
-          </A>
+          </button>
         </DropDownBtn>
       </div>
     </div>

@@ -10,25 +10,25 @@ import javax.validation.ConstraintValidatorContext;
 
 public class ExistUsernameValidator implements ConstraintValidator<ExistUsername, String> {
 
-	private String message;
-	private StaffService staffService;
-	
-	public ExistUsernameValidator(StaffService service) {
-		staffService =service;
-	}
+    private String message;
+    private StaffService staffService;
 
-	@Override
-	public void initialize(ExistUsername constraintAnnotation) {
-		message=constraintAnnotation.message();
-	}
-	
-	@Override
-	public boolean isValid(String username, ConstraintValidatorContext context) {
-		if(staffService.getStaffByUsername(username)==null)
-			return true;
-		
-		ValidatorUtils.addError(context, message);
-		return false;
-	}
+    public ExistUsernameValidator(StaffService service) {
+        staffService = service;
+    }
+
+    @Override
+    public void initialize(ExistUsername constraintAnnotation) {
+        message = constraintAnnotation.message();
+    }
+
+    @Override
+    public boolean isValid(String username, ConstraintValidatorContext context) {
+        if (staffService.getStaffByUsername(username).isEmpty())
+            return true;
+
+        ValidatorUtils.addError(context, message);
+        return false;
+    }
 
 }

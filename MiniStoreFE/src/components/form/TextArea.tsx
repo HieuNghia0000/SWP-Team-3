@@ -21,7 +21,12 @@ export const TextArea: Component<TextAreaInputProps> = (props) => {
       render={(field) => (
         <div classList={local.classList}>
           <Show when={local.label}>
-            <label for={field.props.id}>{local.label}</label>
+            <label
+              for={field.props.id}
+              class="inline-block mb-1.5 text-gray-600 font-semibold"
+            >
+              {local.label}
+            </label>
           </Show>
 
           <textarea
@@ -30,14 +35,15 @@ export const TextArea: Component<TextAreaInputProps> = (props) => {
             cols={local.cols}
             rows={local.rows}
             classList={{
-              "ring-1 ring-orange-600 focus:outline-none": field.helpers.error,
-              "border border-gray-300 py-2 px-4 rounded": true,
+              "border-red-400": field.helpers.error,
+              "border py-2 px-4 text-gray-600 rounded min-h-[65px] outline-none focus:border-indigo-500 focus:shadow":
+                true,
               "w-full": !local.cols,
             }}
           />
 
           <Show when={field.helpers.error}>
-            <p class="text-sm text-red-500">{field.helpers.errorMessage}</p>
+            <p class="text-sm text-red-400">{field.helpers.errorMessage}</p>
           </Show>
         </div>
       )}

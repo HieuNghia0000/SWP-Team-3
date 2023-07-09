@@ -1,19 +1,23 @@
 import { BsCheckCircle, BsExclamationCircle } from "solid-icons/bs";
-import { FaSolidPencil } from "solid-icons/fa";
+import { FaSolidPencil, FaSolidTrash } from "solid-icons/fa";
 import { Accessor, Setter, Component, For, Show } from "solid-js";
 import PopupModal from "~/components/PopupModal";
 import { Role } from "~/types";
 import { Tabs } from ".";
-import { shiftTimes } from "../utils/shiftTimes";
-import { WorkScheduleCard, useSPData } from "~/context/ShiftPlanning";
+import { shiftDetailsTime } from "../utils/shiftTimes";
+import { ShiftCard } from "~/context/ShiftPlanning";
 
 interface ErrorsProps {
-  shift: Accessor<WorkScheduleCard | undefined>;
+  shiftCard: Accessor<ShiftCard | undefined>;
   setModalState: Setter<Tabs>;
+  onDelete: () => void;
 }
-const Errors: Component<ErrorsProps> = ({ shift, setModalState }) => {
-  const { tableData } = useSPData();
-
+const Errors: Component<ErrorsProps> = ({
+  shiftCard,
+  setModalState,
+  onDelete,
+}) => {
+  console.log("shiftCard", shiftCard()?.rules);
   return (
     <>
       <PopupModal.Body>
@@ -22,32 +26,35 @@ const Errors: Component<ErrorsProps> = ({ shift, setModalState }) => {
             class="rounded mx-0.5 p-2 relative text-left select-none"
             classList={{
               "bg-[#edf2f7] text-black":
-                shift()?.published && shift()?.isOrigin,
+                shiftCard()?.published && shiftCard()?.isOrigin,
               "bg-blue-100 text-blue-500 border border-blue-100":
-                shift()?.published && !shift()?.isOrigin,
+                shiftCard()?.published && !shiftCard()?.isOrigin,
               "bg-[repeating-linear-gradient(-45deg,white,white_5px,#eaf0f6_5px,#eaf0f6_10px)] border border-gray-200":
-                !shift()?.published && shift()?.isOrigin,
+                !shiftCard()?.published && shiftCard()?.isOrigin,
               "bg-[repeating-linear-gradient(-45deg,#e7f7ff,#e7f7ff_5px,#ceefff_5px,#ceefff_10px)] border border-blue-100":
-                !shift()?.published && !shift()?.isOrigin,
+                !shiftCard()?.published && !shiftCard()?.isOrigin,
             }}
           >
             <i
               class="absolute top-1 left-1.5 bottom-1 w-1.5 rounded"
               classList={{
-                "bg-blue-500": shift()?.shift.role === Role.CASHIER,
-                "bg-yellow-500": shift()?.shift.role === Role.GUARD,
-                "bg-red-500": shift()?.shift.role === Role.MANAGER,
-                "bg-gray-500": shift()?.shift.role === Role.ADMIN,
+                "bg-blue-500": shiftCard()?.role === Role.CASHIER,
+                "bg-yellow-500": shiftCard()?.role === Role.GUARD,
+                "bg-red-500": shiftCard()?.role === Role.MANAGER,
+                "bg-gray-600": shiftCard()?.role === Role.ADMIN,
+                "bg-gray-400":
+                  shiftCard()?.role === Role.ALL_ROLES,
               }}
             ></i>
-            <p class="ml-3.5 font-semibold text-base tracking-wider">
-              {shiftTimes(
-                shift()?.shift.startTime || "",
-                shift()?.shift.endTime || ""
+            <p class="ml-3.5 font-semibold text-sm tracking-wider">
+              {shiftDetailsTime(
+                shiftCard()?.date || "",
+                shiftCard()?.startTime || "",
+                shiftCard()?.endTime || ""
               )}
             </p>
-            <p class="ml-3.5 font-normal text-sm tracking-wider">
-              {shift()?.shift.shiftName}
+            <p class="ml-3.5 font-normal text-xs tracking-wider">
+              {shiftCard()?.name}
             </p>
           </div>
         </div>
@@ -74,7 +81,7 @@ const Errors: Component<ErrorsProps> = ({ shift, setModalState }) => {
 
           {/* Body */}
           <div>
-            <For each={tableData.shiftsRules[shift()!.scheduleId] || []}>
+            <For each={shiftCard()!.rules}>
               {(rule) => (
                 <div class="flex border-t border-gray-200">
                   <div class="text-[#637286] p-2 flex-1">
@@ -101,15 +108,28 @@ const Errors: Component<ErrorsProps> = ({ shift, setModalState }) => {
         </div>
       </PopupModal.Body>
       <PopupModal.Footer>
-        <button
-          onClick={[setModalState, "edit"]}
-          class="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-2"
-        >
-          <span class="">
-            <FaSolidPencil />
-          </span>
-          Edit Shift
-        </button>
+        <div class="w-full flex justify-start items-center gap-3">
+          <button
+            type="button"
+            onClick={onDelete}
+            class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
+          >
+            <span>
+              <FaSolidTrash />
+            </span>
+            <span>Delete</span>
+          </button>
+          <button
+            type="button"
+            onClick={[setModalState, "edit"]}
+            class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
+          >
+            <span class="">
+              <FaSolidPencil />
+            </span>
+            Edit Shift
+          </button>
+        </div>
       </PopupModal.Footer>
     </>
   );

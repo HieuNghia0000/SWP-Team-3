@@ -2,7 +2,10 @@ package com.team3.ministore.controller;
 
 import com.team3.ministore.common.responsehandler.ResponseHandler;
 import com.team3.ministore.dto.LoginDto;
+import com.team3.ministore.dto.StaffDto;
 import com.team3.ministore.jwt.JwtUtils;
+import com.team3.ministore.model.Staff;
+import com.team3.ministore.service.SalaryService;
 import com.team3.ministore.service.StaffService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/auth")
@@ -27,11 +31,14 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
     private final StaffService staffService;
+    private final SalaryService salaryService;
 
-    public AuthController(AuthenticationManager authManager, JwtUtils jwtUtils, StaffService staffService) {
+    public AuthController(AuthenticationManager authManager, JwtUtils jwtUtils, StaffService staffService,
+                          SalaryService salaryService) {
         authenticationManager = authManager;
         this.jwtUtils = jwtUtils;
         this.staffService = staffService;
+        this.salaryService = salaryService;
     }
 
     @PostMapping("/login")
@@ -60,7 +67,12 @@ public class AuthController {
             return ResponseHandler.getResponse("Please sign in first.", HttpStatus.BAD_REQUEST);
         try {
             String username = jwtUtils.getUsernameFromToken(token);
-            return ResponseHandler.getResponse(staffService.getCurrentStaffByUsername(username), HttpStatus.OK);
+            Optional<Staff> foundStaff = staffService.getStaffByUsername(username);
+
+            return foundStaff.map(value -> ResponseHandler.getResponse(
+                    new StaffDto(value, salaryService.getSalaryByStaffId(value.getStaffId())), HttpStatus.OK)
+            ).orElseGet(() -> ResponseHandler.getResponse(new Exception("Invalid staff id"), HttpStatus.BAD_REQUEST));
+
         } catch (SignatureException e) {
             e.printStackTrace();
             return ResponseHandler.getResponse(e, HttpStatus.FORBIDDEN);

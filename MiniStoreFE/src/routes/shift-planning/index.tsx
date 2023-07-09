@@ -1,22 +1,10 @@
 import Breadcrumbs from "~/components/Breadcrumbs";
 import { createStore } from "solid-js/store";
-import {
-  createEffect,
-  createResource,
-  createSignal,
-  on,
-  ResourceFetcher,
-  Show,
-} from "solid-js";
-import { DataResponse, Shift, Staff, WorkSchedule } from "~/types";
+import { createEffect, createResource, createSignal, on, ResourceFetcher, Show } from "solid-js";
+import { DataResponse, ShiftTemplate, Staff } from "~/types";
 import { getWeekDateStings } from "~/utils/getWeekDates";
 import getEndPoint from "~/utils/getEndPoint";
-import toast from "solid-toast";
-import {
-  ModalContext,
-  PageDataContext,
-  WorkScheduleCard,
-} from "~/context/ShiftPlanning";
+import { ModalContext, PageDataContext, ShiftCard } from "~/context/ShiftPlanning";
 import { useSearchParams } from "solid-start";
 import Spinner from "~/components/Spinner";
 import NewShiftDetailsModal from "~/components/shift-planning/NewShiftDetailsModal";
@@ -26,56 +14,38 @@ import StaffDetailsModal from "~/components/shift-planning/StaffDetailsModal";
 import Table from "~/components/shift-planning/Table";
 import ToolBar from "~/components/shift-planning/ToolBar";
 import { transformData } from "~/components/shift-planning/utils/dataTransformer";
-
-export type ParamType = {
-  picked_date: string;
-};
-export interface FetcherData {
-  dates: string[];
-  staffs: Staff[];
-}
-
-export type Rules = {
-  name: string;
-  description: string;
-  passed: boolean;
-};
-export interface DataTable extends FetcherData {
-  originShifts: { [key: WorkSchedule["scheduleId"]]: WorkSchedule };
-  shifts: { [key: WorkSchedule["scheduleId"]]: WorkSchedule };
-  cels: { [key: string]: WorkSchedule["scheduleId"][] };
-  isErrored: boolean;
-  preparingData: boolean;
-  isChanged: boolean;
-  changedShifts: { [key: WorkSchedule["scheduleId"]]: boolean };
-  shiftsRules: { [key: WorkSchedule["scheduleId"]]: Rules[] };
-}
+import { DataTable, FetcherData, ParamType } from "~/components/shift-planning/utils/types";
+import ScheduleTemplateModal from "~/components/shift-planning/ScheduleTemplateModal";
+import axios from "axios";
+import handleFetchError from "~/utils/handleFetchError";
 
 const fetcher: ResourceFetcher<boolean | string, FetcherData> = async (
   source
 ) => {
-  const dates = getWeekDateStings(source as string);
-  const from = dates[0];
-  const to = dates[dates.length - 1];
+  try {
+    const dates = getWeekDateStings(source as string);
+    const from = dates[0];
+    const to = dates[dates.length - 1];
 
-  // const response = await fetch(
-  //   `${getEndPoint()}/shift-planning?from_date=${from}&to_date=${to}`
-  // );
-  const response = await fetch(
-    `http://localhost:3000/shift-planning-${source}.json`
-  );
-  const data: DataResponse<Staff[]> = await response.json();
+    const response = await axios.get<DataResponse<Staff[]>>(
+      `${getEndPoint()}/shift-planning?from=${from}&to=${to}`
+    );
 
-  return {
-    dates,
-    staffs: data.content,
-  };
+    return {
+      dates,
+      staffs: response.data.content,
+    };
+  } catch (e) {
+    throw new Error(handleFetchError(e));
+  }
 };
 
 export default function ShiftPlanning() {
-  const [searchParams, setSearchParams] = useSearchParams<ParamType>();
-  const [datePicked, setDatePicked] = createSignal<string>();
-  const [data, { refetch, mutate }] = createResource(datePicked, fetcher, {
+  const [ searchParams, setSearchParams ] = useSearchParams<ParamType>();
+  const [ datePicked, setDatePicked ] = createSignal<string | undefined>();
+
+  // Be careful with this. You should always check for error before reading the data
+  const [ data, { refetch, mutate } ] = createResource(datePicked, fetcher, {
     initialValue: {
       dates: [],
       staffs: [],
@@ -84,8 +54,8 @@ export default function ShiftPlanning() {
 
   // Because the data returned from the fetcher is a Signal, which is not good for manage complex state
   // So we need to transform the data to a Store for better state management
-  const [tableData, setTableData] = createStore<DataTable>({
-    cels: {},
+  const [ tableData, setTableData ] = createStore<DataTable>({
+    cells: {},
     shifts: {},
     originShifts: {},
     dates: [],
@@ -94,28 +64,29 @@ export default function ShiftPlanning() {
     get isChanged() {
       return Object.values(this.changedShifts).some((v) => v);
     },
-    preparingData: true,
-    isErrored: false,
     shiftsRules: {},
   });
 
-  const [showShiftModal, setShowShiftModal] = createSignal<boolean>(false);
-  const [shiftModalData, setShiftModalData] = createSignal<WorkScheduleCard>();
+  const [ showShiftModal, setShowShiftModal ] = createSignal<boolean>(false);
+  const [ shiftModalData, setShiftModalData ] = createSignal<ShiftCard>();
 
-  const [showStaffModal, setShowStaffModal] = createSignal<boolean>(false);
-  const [staffModalData, setStaffModalData] = createSignal<Staff>();
+  const [ showStaffModal, setShowStaffModal ] = createSignal<boolean>(false);
+  const [ staffModalData, setStaffModalData ] = createSignal<Staff>();
 
-  const [showNewShiftModal, setShowNewShiftModal] =
+  const [ showNewShiftModal, setShowNewShiftModal ] =
     createSignal<boolean>(false);
-  const [newShiftModalData, setNewShiftModalData] = createSignal<{
+  const [ newShiftModalData, setNewShiftModalData ] = createSignal<{
     staff: Staff;
     date: string;
   }>();
 
-  const [showShiftTemplateModal, setShowShiftTemplateModal] =
+  const [ showShiftTemplateModal, setShowShiftTemplateModal ] =
     createSignal<boolean>(false);
-  const [shiftTemplateModalData, setShiftTemplateModalData] =
-    createSignal<Shift>();
+  const [ shiftTemplateModalData, setShiftTemplateModalData ] =
+    createSignal<ShiftTemplate>();
+
+  const [ scheduleTemplateModalState, setScheduleTemplateModalState ] =
+    createSignal<"list" | "copy" | "create" | "apply">();
 
   createEffect(
     on(
@@ -129,19 +100,10 @@ export default function ShiftPlanning() {
 
         if (data.state === "errored" && datePicked() !== undefined) {
           setTableData({
-            cels: {},
+            cells: {},
             shifts: [],
             dates: getWeekDateStings(datePicked()!),
             staffs: [],
-          });
-
-          toast.error("Error!", {
-            duration: 2000,
-            style: {
-              color: "#dc2626",
-              background: "#fecaca",
-              border: "1px solid #b91c1c",
-            },
           });
         }
       }
@@ -154,26 +116,32 @@ export default function ShiftPlanning() {
       staffs: [],
     });
     setTableData({
-      cels: {},
+      cells: {},
       shifts: {},
       dates: [],
       staffs: [],
       changedShifts: {},
-      preparingData: true,
-      isErrored: false,
       shiftsRules: {},
       isChanged: false,
-      originShifts: {},
+      originShifts: {}
     });
   };
+
+  const saveChanges = async () => {
+    alert("save changes");
+    refetch();
+  };
+
+  const isRouteDataLoading = () => data.loading;
 
   return (
     <PageDataContext.Provider
       value={{
         tableData,
         setTableData,
-        fetchedData: data,
+        isRouteDataLoading,
         resetTableData,
+        saveChanges
       }}
     >
       <ModalContext.Provider
@@ -198,25 +166,28 @@ export default function ShiftPlanning() {
           setShowShiftTemplateModal,
           shiftTemplateModalData,
           setShiftTemplateModalData,
+          // schedule template
+          scheduleTemplateModalState,
+          setScheduleTemplateModalState,
         }}
       >
         <main>
           <h1 class="mb-2 text-2xl font-medium">Shift planning</h1>
-          <Breadcrumbs linkList={[{ name: "Shift Planning" }]} />
+          <Breadcrumbs linkList={[ { name: "Shift Planning" } ]}/>
 
           {/* Tool bar */}
-          <ToolBar datePicked={datePicked} setDatePicked={setDatePicked} />
+          <ToolBar datePicked={datePicked} setDatePicked={setDatePicked}/>
 
           {/* Shift Planning Table */}
           <Show
-            when={!tableData.preparingData}
+            when={tableData.dates.length > 0}
             fallback={
               <div class="w-full min-w-[1024px] min-h-[300px] grid place-items-center">
-                <Spinner />
+                <Spinner/>
               </div>
             }
           >
-            <Table />
+            <Table/>
           </Show>
         </main>
 
@@ -225,6 +196,7 @@ export default function ShiftPlanning() {
           showModal={showShiftModal}
           modalData={shiftModalData}
           setShowModal={setShowShiftModal}
+          setShiftModalData={setShiftModalData}
         />
         <StaffDetailsModal
           showModal={showStaffModal}
@@ -240,6 +212,10 @@ export default function ShiftPlanning() {
           showModal={showShiftTemplateModal}
           modalData={shiftTemplateModalData}
           setShowModal={setShowShiftTemplateModal}
+        />
+        <ScheduleTemplateModal
+          modalState={scheduleTemplateModalState}
+          setModalState={setScheduleTemplateModalState}
         />
       </ModalContext.Provider>
     </PageDataContext.Provider>

@@ -29,7 +29,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product getProductById(Integer id) {
-        return productRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid Order ID: " + id));
+        return productRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid Product ID: " + id));
     }
 
     @Override
@@ -41,7 +41,7 @@ public class ProductServiceImpl implements ProductService {
         existingProduct.setDescription(product.getDescription());
         existingProduct.setCategory(product.getCategory());
         existingProduct.setPrice(product.getPrice());
-        existingProduct.setQuantity(product.getQuantity());
+        existingProduct.setInventory(product.getInventory());
 
         return productRepository.save(existingProduct);
     }

@@ -1,48 +1,46 @@
-import { capitalize } from "lodash";
 import { useFormHandler } from "solid-form-handler";
 import { yupSchema } from "solid-form-handler/yup";
 import { FaSolidTrash } from "solid-icons/fa";
-import {
-  ResourceFetcher,
-  Setter,
-  Accessor,
-  Component,
-  createResource,
-  createSignal,
-  onCleanup,
-  Show,
-} from "solid-js";
+import { Accessor, batch, Component, createSignal, onCleanup, Setter, Show, } from "solid-js";
 import PopupModal from "~/components/PopupModal";
-import Spinner from "~/components/Spinner";
 import { TextInput } from "~/components/form/TextInput";
-import { WorkScheduleCard, useSPData } from "~/context/ShiftPlanning";
-import { Role, Shift, DataResponse } from "~/types";
+import { ShiftCard, useSPData } from "~/context/ShiftPlanning";
+import { DataResponse, Role, Shift } from "~/types";
 import { Tabs } from ".";
-import {
-  readableToTimeStr,
-  shiftTimes,
-  timeToReadable,
-} from "../utils/shiftTimes";
-import { timeOptions } from "../utils/timeOptions";
+import { readableToTimeStr, } from "../utils/shiftTimes";
+import { timeOptions, transformTimeString } from "../utils/timeOptions";
 import * as yup from "yup";
 import { Select } from "~/components/form/Select";
+import { roles } from "~/utils/roles";
+import isDayInThePast from "../utils/isDayInThePast";
+import moment from "moment";
+import { getShiftRules } from "~/components/shift-planning/utils/shiftRules";
+import axios from "axios";
+import handleFetchError from "~/utils/handleFetchError";
+import getEndPoint from "~/utils/getEndPoint";
+import { cellIdGenerator } from "~/components/shift-planning/utils/cellIdGenerator";
+import { sortBy } from "lodash";
+import { toastSuccess } from "~/utils/toast";
 
 type EditScheduleForm = {
   shiftId: number;
   staffId: number;
   startTime: string;
   endTime: string;
-  coefficient: number;
-  role: Role | "All roles";
+  salaryCoefficient: number;
+  name: string;
+  role: Role;
   date: Date;
 };
 
-const validTimeOptions = timeOptions().map((item) => item.label);
+const validTimeOptions = timeOptions().map((item) => item.value);
 const schema: yup.Schema<EditScheduleForm> = yup.object({
   shiftId: yup
     .number()
-    .min(1, "Please select a shift template")
-    .required("Please select a shift template"),
+    .required("Invalid shift id"),
+  name: yup
+    .string()
+    .required("Please give this shift a name"),
   staffId: yup
     .number()
     .min(1, "Please select a staff")
@@ -58,269 +56,283 @@ const schema: yup.Schema<EditScheduleForm> = yup.object({
   role: yup
     .string()
     .oneOf(
-      [Role.MANAGER, Role.CASHIER, Role.GUARD, "All roles"],
+      [ Role.MANAGER, Role.CASHIER, Role.GUARD, Role.ALL_ROLES ],
       "Invalid role"
     )
     .required("Please select a role"),
-  coefficient: yup
+  salaryCoefficient: yup
     .number()
     .min(1, "Coefficient can not below 1")
     .required("Please select a coefficient"),
   date: yup.date().required("Please select a date"),
 });
-const fetcher: ResourceFetcher<
-  boolean,
-  Shift[],
-  { state: Tabs }
-> = async () => {
-  // const response = await fetch(
-  //   `${getEndPoint()}/shift-planning?from_date=${from}&to_date=${to}`
-  // );
-  const response = await fetch(`http://localhost:3000/shifts.json`);
-  const data: DataResponse<Shift[]> = await response.json();
 
-  return data.content;
-};
 interface EditProps {
   setModalState: Setter<Tabs>;
+  setShiftModalData: Setter<ShiftCard>;
   modalState: Accessor<Tabs>;
-  modalData: Accessor<WorkScheduleCard | undefined>;
+  modalData: Accessor<ShiftCard | undefined>;
+  onDelete: () => void;
 }
-const Edit: Component<EditProps> = ({
-  setModalState,
-  modalData,
-  modalState,
-}) => {
-  const { tableData } = useSPData();
-  const [shiftTemplates, { refetch, mutate }] = createResource(
-    () => modalState() === "edit",
-    fetcher
-  );
-  const [chosenTemplate, setChosenTemplate] = createSignal<number>(0);
+
+const Edit: Component<EditProps> = ({ setModalState, modalData, onDelete, setShiftModalData }) => {
+  const { tableData, setTableData } = useSPData();
   const formHandler = useFormHandler(yupSchema(schema));
   const { formData, setFieldValue } = formHandler;
+  const [ updating, setUpdating ] = createSignal(false);
+  const isOldShift = isDayInThePast(modalData()?.date || "");
 
+  // Reset the form data to the default values
   onCleanup(() => {
     formHandler.resetForm();
-    setChosenTemplate(0);
   });
 
   const submit = async (publish: boolean, event: Event) => {
     event.preventDefault();
+    if (isOldShift || updating()) return;
+
     try {
-      await formHandler.validateForm();
-      alert(
-        "Data sent with success: " +
-          JSON.stringify({
-            ...formData(),
-            startTime: readableToTimeStr(formData().startTime),
-            endTime: readableToTimeStr(formData().endTime),
-            scheduleId: modalData()?.scheduleId,
-            role: formData().role === "All roles" ? "" : formData().role,
-            published: publish,
-          })
-      );
-    } catch (error) {
-      console.error(error);
+      const f = await formHandler.validateForm({ throwException: false });
+      console.log("submit", formData())
+      if (f.isFormInvalid) return;
+
+      setUpdating(true);
+      const dateStr = moment(formData().date).format("YYYY-MM-DD");
+      const staff = tableData.staffs.find((staff) => staff.staffId === formData().staffId);
+
+      // If the date is in the past, throw an error
+      if (isDayInThePast(dateStr)) throw new Error("Can not create shift in the past");
+
+      // If the staff is not found, throw an error
+      if (!staff) throw new Error("Invalid staff");
+
+      // Check if the shift is valid
+      const notPassedRules = getShiftRules(
+        { ...formData(), published: publish, date: dateStr },
+        {
+          staff,
+          date: dateStr
+        },
+        tableData
+      ).filter((rule) => !rule.passed);
+      if (notPassedRules.length > 0) throw new Error(notPassedRules[0].errorName);
+
+      // Update the shift
+      const { data } = await axios.put<DataResponse<Shift>>(
+        `${getEndPoint()}/shifts/update/${modalData()?.shiftId}`,
+        {
+          ...formData(),
+          startTime: readableToTimeStr(formData().startTime),
+          endTime: readableToTimeStr(formData().endTime),
+        }
+      )
+      console.log(data);
+      if (!data) throw new Error("Invalid response from server");
+
+      // Update the table data. Update the shifts and cells
+      // NOTE: Cells must be updated at last, because we need to set the new shift data first
+      batch(() => {
+        setTableData("shifts", data.content.shiftId, data.content);
+        setTableData("originShifts", data.content.shiftId, data.content);
+        setTableData("cells", cellIdGenerator(staff, dateStr), (shiftIds) => {
+          const sortedShifts = sortBy(shiftIds, [ (shiftId) => tableData.shifts[shiftId].startTime ]);
+          return [ ...sortedShifts ];
+        });
+        setShiftModalData({ ...modalData()!, ...data.content });
+        setModalState("details");
+      });
+
+      toastSuccess("Shift updated successfully");
+
+    } catch (error: any) {
+      handleFetchError(error);
+    } finally {
+      setUpdating(false);
     }
-  };
 
-  const shiftOptions = () => {
-    return shiftTemplates()?.map((shift) => ({
-      value: shift.shiftId,
-      label: `${shift.shiftName} (${shiftTimes(
-        shift.startTime,
-        shift.endTime
-      )}) [${!shift.role ? "All roles" : capitalize(shift.role) + " only"}]`,
-    }));
-  };
-
-  const onChangeTemplate = (event: Event) => {
-    const target = event.target as HTMLSelectElement;
-    setChosenTemplate(Number.parseInt(target.value));
-    const template = shiftTemplates()?.find(
-      (shift) => shift.shiftId === chosenTemplate()
-    );
-    const coefficient = template?.salaryCoefficient || 0;
-    const role = template?.role || "All roles";
-    const startTime = template?.startTime;
-    const endTime = template?.endTime;
-
-    setFieldValue("coefficient", coefficient);
-    setFieldValue("role", role);
-    setFieldValue("startTime", timeToReadable(startTime!));
-    setFieldValue("endTime", timeToReadable(endTime!));
-  };
-
-  const reset = () => {
-    formHandler.resetForm();
   };
 
   const onCancel = () => {
-    reset();
     setModalState("details");
-    setChosenTemplate(0);
-  };
-
-  const onDelete = async () => {
-    alert("Delete");
   };
 
   return (
-    <>
+    <div classList={{
+      "cursor-progress": updating(),
+    }}>
       <PopupModal.Body>
-        <Show when={shiftTemplates.loading}>
-          <div class="w-full min-h-[300px] grid place-items-center">
-            <Spinner />
+        <form class="text-sm" onSubmit={[ submit, false ]}>
+          <Show when={isOldShift}>
+            <div class="mb-2 w-[560px]">
+              <label class="mb-1.5 font-semibold text-gray-600 inline-block">
+                Note
+              </label>
+              <p class="text-gray-400 text-sm tracking-wide">
+                Since this shift has passed, you can not change the information
+                of this shift.
+              </p>
+            </div>
+          </Show>
+          <TextInput
+            id="shiftId"
+            name="shiftId"
+            disabled={isOldShift}
+            hidden={true}
+            value={modalData()?.shiftId || 0}
+            formHandler={formHandler}
+          />
+          <div class="flex gap-2">
+            <div class="flex-1 py-2.5 flex flex-col gap-1">
+              <label for="staffId" class="text-gray-700 font-semibold">
+                Staff Members
+              </label>
+              <Select
+                id="staffId"
+                name="staffId"
+                value={modalData()?.staffId || 0}
+                placeholder="Select a staff member"
+                options={tableData.staffs.map((staff) => ({
+                  value: staff.staffId,
+                  label: staff.staffName,
+                }))}
+                formHandler={formHandler}
+                disabled
+              />
+            </div>
+            <div class="flex-1 py-2.5 max-w-[140px] flex flex-col gap-1">
+              <label for="salaryCoefficient" class="text-gray-700 font-semibold">
+                Salary Coefficient
+              </label>
+              <TextInput
+                id="salaryCoefficient"
+                name="salaryCoefficient"
+                type="number"
+                disabled={isOldShift}
+                value={modalData()?.salaryCoefficient || 0}
+                step={0.1}
+                formHandler={formHandler}
+              />
+            </div>
           </div>
-        </Show>
-        <Show when={!shiftTemplates.loading}>
-          <form class="text-sm" onSubmit={[submit, false]}>
-            <div class="flex">
-              <div class="flex-1 py-2.5 flex flex-col gap-1">
-                <label for="shiftId" class="text-gray-700 font-semibold">
-                  Shift Template
-                </label>
-                <Select
-                  id="shiftId"
-                  name="shiftId"
-                  value={modalData()?.shift.shiftId || 0}
-                  placeholder="Select a shift template"
-                  options={shiftOptions()}
-                  onChange={onChangeTemplate}
-                  formHandler={formHandler}
-                />
-              </div>
+          <div class="flex gap-2">
+            <div class="flex-1 py-2.5 flex flex-col gap-1 overflow-hidden">
+              <label for="name" class="text-gray-700 font-semibold">
+                Shift Name
+              </label>
+              <TextInput
+                id="name"
+                name="name"
+                value={modalData()?.name || ""}
+                formHandler={formHandler}
+                disabled={isOldShift}
+              />
             </div>
-            <div class="flex gap-2">
-              <div class="flex-1 py-2.5 flex flex-col gap-1">
-                <label for="staffId" class="text-gray-700 font-semibold">
-                  Staff Members
-                </label>
-                <Select
-                  id="staffId"
-                  name="staffId"
-                  value={modalData()?.staff?.staffId || 0}
-                  placeholder="Select a staff member"
-                  options={tableData.staffs.map((staff) => ({
-                    value: staff.staffId,
-                    label: staff.staffName,
-                  }))}
-                  formHandler={formHandler}
-                />
-              </div>
-              <div class="flex-1 py-2.5 max-w-[140px] flex flex-col gap-1">
-                <label for="coefficient" class="text-gray-700 font-semibold">
-                  Salary Coefficient
-                </label>
-                <TextInput
-                  id="coefficient"
-                  name="coefficient"
-                  type="number"
-                  disabled
-                  value={modalData()?.shift.salaryCoefficient || 0}
-                  step={0.1}
-                  formHandler={formHandler}
-                />
-              </div>
+            <div class="flex-1 py-2.5 flex flex-col gap-1">
+              <label for="role" class="text-gray-700 font-semibold">
+                Required Role
+              </label>
+              <Select
+                id="role"
+                name="role"
+                value={modalData()?.role}
+                options={roles}
+                formHandler={formHandler}
+                disabled
+              />
             </div>
-            <div class="flex gap-2">
-              <div class="flex-1 py-2.5 flex flex-col gap-1">
-                <label for="role" class="text-gray-700 font-semibold">
-                  Required Role
-                </label>
-                <TextInput
-                  id="role"
-                  name="role"
-                  value={modalData()?.shift.role || "All roles"}
-                  disabled
-                  formHandler={formHandler}
-                />
-              </div>
-              <div class="flex-1 py-2.5 flex flex-col gap-1">
-                <label for="date" class="text-gray-700 font-semibold">
-                  Date
-                </label>
-                <TextInput
-                  id="date"
-                  name="date"
-                  type="date"
-                  value={modalData()?.date || ""}
-                  formHandler={formHandler}
-                />
-              </div>
+          </div>
+          <div class="flex gap-2">
+            <div class="flex-1 py-2.5 flex flex-col gap-1">
+              <label for="date" class="text-gray-700 font-semibold">
+                Date
+              </label>
+              <TextInput
+                id="date"
+                name="date"
+                type="date"
+                value={modalData()?.date || ""}
+                formHandler={formHandler}
+                disabled
+              />
             </div>
-            <div class="flex gap-2">
-              <div class="flex-1 py-2.5 flex flex-col gap-1">
-                <label for="startTime" class="text-gray-700 font-semibold">
-                  Start Time
-                </label>
-                <TextInput
-                  id="startTime"
-                  name="startTime"
-                  value={timeToReadable(modalData()?.shift?.startTime!)}
-                  disabled
-                  placeholder="e.g 5am"
-                  formHandler={formHandler}
-                />
-              </div>
-              <div class="flex-1 py-2.5 flex flex-col gap-1">
-                <label for="endTime" class="text-gray-700 font-semibold">
-                  End Time
-                </label>
-                <TextInput
-                  id="endTime"
-                  name="endTime"
-                  value={timeToReadable(modalData()?.shift?.endTime!)}
-                  placeholder="e.g 5pm"
-                  disabled
-                  formHandler={formHandler}
-                />
-              </div>
+            <div class="flex-1 py-2.5 flex flex-col gap-1">
+              <label for="startTime" class="text-gray-700 font-semibold">
+                Start Time
+              </label>
+              <Select
+                id="startTime"
+                name="startTime"
+                value={modalData()?.startTime! || 0}
+                onChange={() => setFieldValue("endTime", 0, { validate: false })}
+                placeholder="Select Start Time"
+                options={timeOptions()}
+                formHandler={formHandler}
+                disabled={isOldShift}
+              />
             </div>
-          </form>
-        </Show>
+            <div class="flex-1 py-2.5 flex flex-col gap-1">
+              <label for="endTime" class="text-gray-700 font-semibold">
+                End Time
+              </label>
+              <Select
+                id="endTime"
+                name="endTime"
+                value={modalData()?.endTime! || 0}
+                placeholder="Select End Time"
+                options={timeOptions(transformTimeString(formData().startTime))}
+                formHandler={formHandler}
+                disabled={formData().startTime == "0" || isOldShift}
+              />
+            </div>
+          </div>
+        </form>
       </PopupModal.Body>
       <PopupModal.Footer>
         <div class="w-full flex justify-between items-center gap-2">
           <div class="flex gap-2 justify-center items-center">
             <button
               type="button"
+              disabled={updating()}
               onClick={onDelete}
               class="flex gap-2 justify-center items-center px-3 text-gray-500 text-sm hover:text-gray-700"
             >
               <span>
-                <FaSolidTrash />
+                <FaSolidTrash/>
               </span>
               <span>Delete</span>
             </button>
           </div>
-          <div class="flex gap-2 justify-center items-center">
-            <button
-              type="button"
-              onClick={onCancel}
-              class="flex gap-2 justify-center items-center px-3 text-gray-500 text-sm hover:text-gray-700"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={[submit, !modalData()?.published]}
-              class="py-1.5 px-3 font-semibold text-gray-600 border border-gray-300 text-sm rounded hover:text-black"
-            >
-              Save & {modalData()?.published ? "Unpublish" : "Publish"}
-            </button>
-            <button
-              type="button"
-              onClick={[submit, modalData()?.published]}
-              class="py-1.5 px-3 font-semibold text-white border border-blue-600 bg-blue-500 text-sm rounded hover:bg-blue-600"
-            >
-              Save
-            </button>
-          </div>
+          <Show when={!isOldShift}>
+            <div class="flex gap-2 justify-center items-center">
+              <button
+                type="button"
+                disabled={updating()}
+                onClick={onCancel}
+                class="flex gap-2 justify-center items-center px-3 text-gray-500 text-sm hover:text-gray-700"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={updating()}
+                onClick={[ submit, !modalData()?.published ]}
+                class="py-1.5 px-3 font-semibold text-gray-600 border border-gray-300 text-sm rounded hover:text-black"
+              >
+                Save & {modalData()?.published ? "Unpublish" : "Publish"}
+              </button>
+              <button
+                type="button"
+                onClick={[ submit, modalData()?.published ]}
+                disabled={updating()}
+                class="py-1.5 px-3 font-semibold text-white border border-blue-600 bg-blue-500 text-sm rounded hover:bg-blue-600"
+              >
+                Save
+              </button>
+            </div>
+          </Show>
         </div>
       </PopupModal.Footer>
-    </>
+    </div>
   );
 };
 
