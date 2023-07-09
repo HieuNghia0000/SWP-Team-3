@@ -14,10 +14,8 @@ export type Rule = {
   passed: boolean;
 };
 export interface DataTable extends FetcherData {
-  originShifts: { [key: Shift["shiftId"]]: Shift };
   shifts: { [key: Shift["shiftId"]]: Shift };
   cells: { [key: string]: Shift["shiftId"][] };
-  isChanged: boolean;
-  changedShifts: { [key: Shift["shiftId"]]: boolean };
+  cellInfos: { [key: string]: {staffId: Staff["staffId"], date: string} };
   shiftsRules: { [key: Shift["shiftId"]]: Rule[] };
 }

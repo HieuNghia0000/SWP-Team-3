@@ -1,20 +1,22 @@
 import {
   Component,
-  JSX,
-  Resource,
-  ResourceFetcher,
   createContext,
   createEffect,
   createResource,
   createSignal,
+  JSX,
   onMount,
+  Resource,
+  ResourceFetcher,
   useContext,
 } from "solid-js";
 import Cookies from "js-cookie";
 import { apiRoutes } from "~/utils/routes";
 import { DataResponse, Staff } from "~/types";
-import axios, { isAxiosError } from "axios";
+import axios from "axios";
 import getEndPoint from "~/utils/getEndPoint";
+import { toastSuccess } from "~/utils/toast";
+import handleFetchError from "~/utils/handleFetchError";
 
 export const apiInstance = axios.create({
   baseURL: getEndPoint(),
@@ -94,35 +96,14 @@ const fetchData: ResourceFetcher<
         apiRoutes.currentUser
       );
 
+      if (data.content === undefined) return undefined;
+
+      toastSuccess("Login successful");
       return data.content;
     }
     return undefined;
   } catch (error) {
-    if (isAxiosError(error)) {
-      if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
-        // console.log(error.response.data);
-        // console.log(error.response.status);
-        // console.log(error.response.headers);
-        if (typeof error.response.data.errors === "string")
-          throw new Error(error.response.data.errors as string);
-        else {
-          throw new Error(error.response.data.errors[0] as string);
-        }
-      } else if (error.request) {
-        // The request was made but no response was received
-        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-        // http.ClientRequest in node.js
-        console.log(error.request);
-        throw new Error("No response from server");
-      } else {
-        // Something happened in setting up the request that triggered an Error
-        console.log("Error", error.message);
-        throw new Error("Something went wrong. Please try again");
-      }
-      // console.log(error.config);
-    }
+    handleFetchError(error);
   }
 };
 
@@ -139,9 +120,9 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: Component<AuthProviderProps> = (props) => {
-  const [isClient, setIsClient] = createSignal(false);
+  const [ isClient, setIsClient ] = createSignal(false);
 
-  const [user, { mutate, refetch }] = createResource(isClient, fetchData);
+  const [ user, { mutate, refetch } ] = createResource(isClient, fetchData);
 
   onMount(() => {
     setIsClient(true);

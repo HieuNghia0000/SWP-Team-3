@@ -2,20 +2,15 @@ import moment from "moment";
 import { cellIdGenerator } from "./cellIdGenerator";
 import { DataTable, FetcherData } from "./types";
 
-// TODO: add another transform function to transform data fetched from add new shift endpoint
-// without losing the current data
 export function transformData(
   data: FetcherData,
-  simple: boolean = false
 ): DataTable {
   const transformedData: DataTable = {
-    originShifts: {},
     shifts: {},
     cells: {},
+    cellInfos: {},
     dates: data.dates,
     staffs: data.staffs,
-    changedShifts: {},
-    isChanged: false,
     shiftsRules: {},
   };
 
@@ -24,13 +19,12 @@ export function transformData(
   for (let staff of data.staffs) {
     for (let shift of staff.shifts) {
       transformedData.shifts[shift.shiftId] = { ...shift };
-      if (simple) continue;
-      transformedData.originShifts[shift.shiftId] = { ...shift };
-      transformedData.changedShifts[shift.shiftId] = false;
     }
 
     for (let date of data.dates) {
       const cellId = cellIdGenerator(staff, date);
+      transformedData.cellInfos[cellId] = { staffId: staff.staffId, date: date };
+
       const matchingShifts = staff.shifts.filter((s) =>
         moment(s.date).isSame(date, "day")
       );

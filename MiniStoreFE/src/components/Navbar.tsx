@@ -1,14 +1,16 @@
-import { Component, JSX, Show, children, createSignal } from "solid-js";
+import { children, Component, createSignal, JSX, Show } from "solid-js";
 import { TiThLargeOutline } from "solid-icons/ti";
 import { BiRegularShoppingBag } from "solid-icons/bi";
 import { RiSystemArrowDownSLine, RiSystemArrowUpSLine } from "solid-icons/ri";
-import { BsPeople, BsTicketPerforated } from "solid-icons/bs";
+import { BsPeople } from "solid-icons/bs";
 import { A } from "@solidjs/router";
 import { Transition } from "solid-transition-group";
 import routes from "~/utils/routes";
 import { FiShoppingCart } from "solid-icons/fi";
 import { IoCalendarOutline } from "solid-icons/io";
 import { TbClock } from "solid-icons/tb";
+import { useAuth } from "~/context/Auth";
+import { Role } from "~/types";
 
 type NavbarProps = {
   isOpen: () => boolean;
@@ -17,6 +19,7 @@ type NavbarProps = {
 
 const Navbar: Component<NavbarProps> = (props) => {
   const { isOpen } = props;
+  const { user } = useAuth();
 
   return (
     <section
@@ -27,7 +30,7 @@ const Navbar: Component<NavbarProps> = (props) => {
         href={routes.dashboard}
         class="flex justify-start items-center py-2 px-5 gap-2.5 w-full h-16"
       >
-        <img src="/Logo.png" alt="logo" />
+        <img src="/Logo.png" alt="logo"/>
         <span class="font-bold text-2xl" classList={{ hidden: !isOpen() }}>
           MiniStore
         </span>
@@ -36,7 +39,7 @@ const Navbar: Component<NavbarProps> = (props) => {
         {/* Dashboard */}
         <NavbarLink
           href={routes.dashboard}
-          icon={<TiThLargeOutline />}
+          icon={<TiThLargeOutline/>}
           text="Dashboard"
           isOpen={isOpen}
           end
@@ -44,7 +47,7 @@ const Navbar: Component<NavbarProps> = (props) => {
         {/* Dashboard */}
         <NavbarLink
           href={routes.shiftPlanning}
-          icon={<IoCalendarOutline />}
+          icon={<IoCalendarOutline/>}
           text="Shift&nbsp;Planning"
           isOpen={isOpen}
         />
@@ -53,7 +56,7 @@ const Navbar: Component<NavbarProps> = (props) => {
         <NavbarDropDown
           href={routes.products}
           isOpen={isOpen}
-          icon={<BiRegularShoppingBag />}
+          icon={<BiRegularShoppingBag/>}
           text="Products"
         >
           <NavbarLink
@@ -69,28 +72,32 @@ const Navbar: Component<NavbarProps> = (props) => {
         </NavbarDropDown>
 
         {/* Staff */}
-        <NavbarLink
-          href={routes.staffs}
-          icon={<BsPeople />}
-          text="Staff&nbsp;Management"
-          isOpen={isOpen}
-        />
+        <Show when={user()?.role === Role.ADMIN}>
+          <NavbarLink
+            href={routes.staffs}
+            icon={<BsPeople/>}
+            text="Staff&nbsp;Management"
+            isOpen={isOpen}
+          />
+        </Show>
 
         {/* Orders */}
         <NavbarLink
           href={routes.orders}
-          icon={<FiShoppingCart />}
+          icon={<FiShoppingCart/>}
           text="Orders"
           isOpen={isOpen}
         />
 
         {/* Time Clock */}
-        <NavbarLink
-          href={routes.timeClock}
-          icon={<TbClock />}
-          text="Time Clock"
-          isOpen={isOpen}
-        />
+        <Show when={user()?.role === Role.ADMIN}>
+          <NavbarLink
+            href={routes.timeClock}
+            icon={<TbClock/>}
+            text="Time Clock"
+            isOpen={isOpen}
+          />
+        </Show>
       </ul>
     </section>
   );
@@ -138,7 +145,7 @@ interface NavbarDropDownProps extends NavbarLinkProps {
 
 const NavbarDropDown: Component<NavbarDropDownProps> = (props) => {
   const { href, isOpen, icon, text } = props;
-  const [isDropdownOpen, setDropdownOpen] = createSignal(true);
+  const [ isDropdownOpen, setDropdownOpen ] = createSignal(true);
   const child = children(() => props.children);
 
   const toggleProductDropdown = () => setDropdownOpen(!isDropdownOpen());
@@ -165,13 +172,13 @@ const NavbarDropDown: Component<NavbarDropDownProps> = (props) => {
         </A>
         <Transition
           onEnter={(el, done) => {
-            const a = el.animate([{ opacity: 0 }, { opacity: 1 }], {
+            const a = el.animate([ { opacity: 0 }, { opacity: 1 } ], {
               duration: 300,
             });
             a.finished.then(done);
           }}
           onExit={(el, done) => {
-            const a = el.animate([{ opacity: 1 }, { opacity: 0 }], {
+            const a = el.animate([ { opacity: 1 }, { opacity: 0 } ], {
               duration: 100,
             });
             a.finished.then(done);
@@ -185,9 +192,9 @@ const NavbarDropDown: Component<NavbarDropDownProps> = (props) => {
               <span class="text-lg">
                 <Show
                   when={!isDropdownOpen()}
-                  fallback={<RiSystemArrowUpSLine />}
+                  fallback={<RiSystemArrowUpSLine/>}
                 >
-                  <RiSystemArrowDownSLine />
+                  <RiSystemArrowDownSLine/>
                 </Show>
               </span>
             </button>

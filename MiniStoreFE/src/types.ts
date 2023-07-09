@@ -42,7 +42,7 @@ export interface Staff extends Timestamp {
     leaveBalance: number;
 
     // relationship
-    salary: Salary;
+    salary?: Salary;
     shifts: Shift[];
 }
 

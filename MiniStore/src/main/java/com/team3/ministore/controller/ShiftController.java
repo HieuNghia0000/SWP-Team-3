@@ -27,14 +27,12 @@ public class ShiftController {
     @Autowired
     private StaffService staffService;
 
-    @Autowired
-    private ShiftTemplateService shiftTemplateService;
-
     @PostMapping("/add")
     public ResponseEntity<Object> createShift(@Valid @RequestBody CreateShiftDto shift, BindingResult errors) {
         if (errors.hasErrors()) return ResponseHandler.getResponse(errors, HttpStatus.BAD_REQUEST);
 
         Optional<ShiftDto> createdShift = shiftService.createShift(shift);
+
         return createdShift.map(value -> ResponseHandler.getResponse(value, HttpStatus.OK))
                 .orElseGet(() -> ResponseHandler.getResponse(new Exception("Invalid staff id"),
                         HttpStatus.BAD_REQUEST));

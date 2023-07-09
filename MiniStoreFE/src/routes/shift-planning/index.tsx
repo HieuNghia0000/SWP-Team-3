@@ -5,7 +5,6 @@ import { DataResponse, ShiftTemplate, Staff } from "~/types";
 import { getWeekDateStings } from "~/utils/getWeekDates";
 import getEndPoint from "~/utils/getEndPoint";
 import { ModalContext, PageDataContext, ShiftCard } from "~/context/ShiftPlanning";
-import { useSearchParams } from "solid-start";
 import Spinner from "~/components/Spinner";
 import NewShiftModal from "~/components/shift-planning/NewShiftModal";
 import ShiftDetailsModal from "~/components/shift-planning/ShiftDetailsModal";
@@ -14,7 +13,7 @@ import StaffDetailsModal from "~/components/shift-planning/StaffDetailsModal";
 import Table from "~/components/shift-planning/Table";
 import ToolBar from "~/components/shift-planning/ToolBar";
 import { transformData } from "~/components/shift-planning/utils/dataTransformer";
-import { DataTable, FetcherData, ParamType } from "~/components/shift-planning/utils/types";
+import { DataTable, FetcherData } from "~/components/shift-planning/utils/types";
 import ScheduleTemplateModal from "~/components/shift-planning/ScheduleTemplateModal";
 import axios from "axios";
 import handleFetchError from "~/utils/handleFetchError";
@@ -41,7 +40,6 @@ const fetcher: ResourceFetcher<boolean | string, FetcherData> = async (
 };
 
 export default function ShiftPlanning() {
-  const [ searchParams, setSearchParams ] = useSearchParams<ParamType>();
   const [ datePicked, setDatePicked ] = createSignal<string | undefined>();
 
   // Be careful with this. You should always check for error before reading the data
@@ -56,14 +54,10 @@ export default function ShiftPlanning() {
   // So we need to transform the data to a Store for better state management
   const [ tableData, setTableData ] = createStore<DataTable>({
     cells: {},
+    cellInfos: {},
     shifts: {},
-    originShifts: {},
     dates: [],
     staffs: [],
-    changedShifts: {},
-    get isChanged() {
-      return Object.values(this.changedShifts).some((v) => v);
-    },
     shiftsRules: {},
   });
 
@@ -101,6 +95,8 @@ export default function ShiftPlanning() {
         if (data.state === "errored" && datePicked() !== undefined) {
           setTableData({
             cells: {},
+            cellInfos: {},
+            shiftsRules: {},
             shifts: [],
             dates: getWeekDateStings(datePicked()!),
             staffs: [],
@@ -117,13 +113,11 @@ export default function ShiftPlanning() {
     });
     setTableData({
       cells: {},
+      cellInfos: {},
       shifts: {},
       dates: [],
       staffs: [],
-      changedShifts: {},
       shiftsRules: {},
-      isChanged: false,
-      originShifts: {}
     });
   };
 

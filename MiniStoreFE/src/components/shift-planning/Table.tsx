@@ -1,17 +1,17 @@
 import {
+  closestCenter,
   CollisionDetector,
   DragDropProvider,
   DragDropSensors,
   DragEventHandler,
-  DragOverlay,
   Draggable,
+  DragOverlay,
   Droppable,
   Id,
-  closestCenter,
 } from "@thisbeyond/solid-dnd";
 import moment from "moment";
-import { Component, For, Show, batch } from "solid-js";
-import { Shift } from "~/types";
+import { batch, Component, For, Show } from "solid-js";
+import { DataResponse, Shift } from "~/types";
 import TableCell from "./TableCell";
 import { useShiftPlanningModals, useSPData } from "~/context/ShiftPlanning";
 import { shiftTimes } from "./utils/shiftTimes";
@@ -19,10 +19,12 @@ import { cellIdGenerator } from "./utils/cellIdGenerator";
 import { capitalize } from "~/utils/capitalize";
 import ShiftCard from "./ShiftCard";
 import { sortBy } from "lodash";
-import toast from "solid-toast";
 import { getShiftMoveErrors } from "./utils/shiftRules";
 import getShiftsByCellId from "./utils/getShiftsByCellId";
-import { toastError } from "~/utils/toast";
+import { toastError, toastSuccess } from "~/utils/toast";
+import axios from "axios";
+import getEndPoint from "~/utils/getEndPoint";
+import handleFetchError from "~/utils/handleFetchError";
 
 // a cell is a droppable box
 // a shift is a draggable item
@@ -94,19 +96,19 @@ const Table: Component<DnDTableProps> = (props) => {
     return null;
   };
 
-  const move = (
+  const move = async (
     draggable: Draggable,
     droppable: Droppable,
     onlyWhenChangingContainer = true
   ) => {
     // Get the droppable box id of the draggable
-    const draggableContainerId = getCellId(draggable.id);
+    const draggableCellId = getCellId(draggable.id);
     // Get the droppable box id of the droppable
-    const droppableId = isCellId(droppable.id as string)
+    const droppableCellId = isCellId(droppable.id as string)
       ? (droppable.id as string)
       : getCellId(droppable.id);
 
-    if (draggableContainerId != droppableId || !onlyWhenChangingContainer) {
+    if (draggableCellId != droppableCellId || !onlyWhenChangingContainer) {
       const errors = getShiftMoveErrors(draggable, droppable, tableData);
       if (errors.length > 0) {
         for (let error of errors) {
@@ -115,24 +117,50 @@ const Table: Component<DnDTableProps> = (props) => {
         return;
       }
 
+      console.log(tableData.shifts[draggable.id as number])
+      const newCellInfo = tableData.cellInfos[droppableCellId];
+
+      const updatedShift = await updateShift({
+        ...tableData.shifts[draggable.id as number],
+        staffId: newCellInfo.staffId,
+        date: newCellInfo.date
+      });
+      if (!updatedShift) return;
+
       batch(() => {
-        setTableData("cells", draggableContainerId, (items) =>
+        setTableData("shifts", updatedShift.shiftId, updatedShift);
+        setTableData("cells", draggableCellId, (items) =>
           items.filter((item) => item !== draggable.id)
         );
-        setTableData("cells", droppableId, (items) => {
+        setTableData("cells", droppableCellId, (items) => {
           const sortedShifts = sortBy(
-            [...items, draggable.id as number],
-            [(shiftId) => tableData.shifts[shiftId].startTime]
+            [ ...items, draggable.id as number ],
+            [ (shiftId) => tableData.shifts[shiftId].startTime ]
           );
-          return [...sortedShifts];
+          return [ ...sortedShifts ];
         });
       });
+
+      toastSuccess("Shift updated successfully");
     }
   };
 
-  const onDragEnd: DragEventHandler = ({ draggable, droppable }) => {
+  const updateShift = async (shift: Shift) => {
+    try {
+      const { data } = await axios.put<DataResponse<Shift>>(`${getEndPoint()}/shifts/update/${shift.shiftId}`, shift)
+      if (!data) throw new Error("Invalid response from server");
+      console.log(data.content)
+
+      return data.content;
+    } catch (error: any) {
+      handleFetchError(error);
+      return null;
+    }
+  }
+
+  const onDragEnd: DragEventHandler = async ({ draggable, droppable }) => {
     if (draggable && droppable) {
-      move(draggable, droppable, false);
+      await move(draggable, droppable);
     }
   };
 
@@ -141,7 +169,8 @@ const Table: Component<DnDTableProps> = (props) => {
       <div class="min-w-[1024px]">
         {/* Header */}
         <div class="sticky top-0 z-30 flex shadow-sm border border-gray-200 rounded-t-md">
-          <div class="sticky left-0 z-30 px-3 py-2 flex flex-col justify-center border border-gray-200 w-48 flex-auto flex-grow-0 flex-shrink-0 overflow-visible bg-white"></div>
+          <div
+            class="sticky left-0 z-30 px-3 py-2 flex flex-col justify-center border border-gray-200 w-48 flex-auto flex-grow-0 flex-shrink-0 overflow-visible bg-white"></div>
           <For each={tableData.dates}>
             {(date) => (
               <div
@@ -166,12 +195,13 @@ const Table: Component<DnDTableProps> = (props) => {
               onDragEnd={onDragEnd}
               collisionDetector={closestContainerOrItem}
             >
-              <DragDropSensors />
+              <DragDropSensors/>
               {/* Row */}
               <For each={tableData.staffs}>
                 {(staff) => (
                   <div class="flex">
-                    <div class="sticky left-0 z-10 px-3 py-1.5 flex flex-col border border-t-0 border-gray-200 w-48 flex-auto flex-grow-0 flex-shrink-0 overflow-visible bg-white">
+                    <div
+                      class="sticky left-0 z-10 px-3 py-1.5 flex flex-col border border-t-0 border-gray-200 w-48 flex-auto flex-grow-0 flex-shrink-0 overflow-visible bg-white">
                       <button
                         onClick={() => {
                           setStaffModalData(staff);
@@ -205,17 +235,13 @@ const Table: Component<DnDTableProps> = (props) => {
               <DragOverlay>
                 {/* @ts-ignore */}
                 {(draggable) => {
-                  let item = () => draggable?.data?.item as Shift;
-                  let isOrigin = () => draggable?.data?.isOrigin as boolean;
+                  let item = () => tableData.shifts[draggable?.id as number];
                   let selectedShiftWidth = () => draggable?.data?.width() - 4;
                   let isErrored = () =>
-                    tableData.shiftsRules[
-                      (draggable?.data.item as Shift).shiftId
-                    ].find((rule) => !rule.passed) !== undefined;
+                    tableData.shiftsRules[draggable?.id as number].find((rule) => !rule.passed) !== undefined;
 
                   return (
                     <ShiftCard
-                      isOrigin={isOrigin()}
                       published={item().published}
                       loading={isRouteDataLoading}
                       role={item().role}

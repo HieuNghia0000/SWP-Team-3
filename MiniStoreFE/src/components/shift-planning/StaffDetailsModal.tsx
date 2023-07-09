@@ -38,7 +38,7 @@ const StaffDetailsModal: Component<{
               <span class="font-semibold text-gray-500">Hourly Wage:</span>
               <span>
                 {formatNumberWithCommas(
-                  `${modalData()?.salary.hourlyWage || 0}`
+                  `${modalData()?.salary?.hourlyWage || 0}`
                 )}{" "}
                 ₫
               </span>

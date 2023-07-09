@@ -1,11 +1,10 @@
-import {FaSolidInfo} from "solid-icons/fa";
-import {Component, Show, splitProps} from "solid-js";
-import {Role} from "~/types";
+import { FaSolidInfo } from "solid-icons/fa";
+import { Component, Show, splitProps } from "solid-js";
+import { Role } from "~/types";
 
 interface ShiftCardProps {
   isActiveDraggable?: boolean;
   published: boolean;
-  isOrigin: boolean;
   role: Role;
   shiftDuration: string;
   shiftName: string;
@@ -18,10 +17,9 @@ interface ShiftCardProps {
 }
 
 const ShiftCard: Component<ShiftCardProps> = (props) => {
-  const [local, rest] = splitProps(props, [
+  const [ local, rest ] = splitProps(props, [
     "isActiveDraggable",
     "published",
-    "isOrigin",
     "role",
     "shiftDuration",
     "shiftName",
@@ -44,14 +42,9 @@ const ShiftCard: Component<ShiftCardProps> = (props) => {
       class="rounded mx-0.5 px-1.5 py-1 relative text-left select-none"
       classList={{
         "opacity-25": local.isActiveDraggable,
-        "bg-white hover:bg-[#edf2f7] text-black border border-gray-200":
-          local.published && local.isOrigin,
-        "bg-blue-100 hover:bg-blue-200 text-blue-500 border border-blue-100":
-          local.published && !local.isOrigin,
+        "bg-white hover:bg-[#edf2f7] text-black border border-gray-200": local.published,
         "bg-[repeating-linear-gradient(-45deg,white,white_5px,#eff4f8_5px,#eff4f8_10px)] hover:bg-[repeating-linear-gradient(-45deg,white,white_5px,#eaf0f6_5px,#eaf0f6_10px)] border border-gray-200":
-          !local.published && local.isOrigin,
-        "bg-[repeating-linear-gradient(-45deg,#e7f7ff,#e7f7ff_5px,#ceefff_5px,#ceefff_10px)] hover:bg-[repeating-linear-gradient(-45deg,#e7f7ff,#e7f7ff_5px,#bfeaff_5px,#bfeaff_10px)] border border-blue-100":
-          !local.published && !local.isOrigin,
+          !local.published,
         "animate-pulse": local.loading(),
         "z-40": local.isOverlay,
       }}

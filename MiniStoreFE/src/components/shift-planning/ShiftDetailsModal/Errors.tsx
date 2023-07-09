@@ -1,6 +1,6 @@
 import { BsCheckCircle, BsExclamationCircle } from "solid-icons/bs";
 import { FaSolidPencil, FaSolidTrash } from "solid-icons/fa";
-import { Accessor, Setter, Component, For, Show } from "solid-js";
+import { Accessor, Component, For, Setter, Show } from "solid-js";
 import PopupModal from "~/components/PopupModal";
 import { Role } from "~/types";
 import { Tabs } from ".";
@@ -12,11 +12,12 @@ interface ErrorsProps {
   setModalState: Setter<Tabs>;
   onDelete: () => void;
 }
+
 const Errors: Component<ErrorsProps> = ({
-  shiftCard,
-  setModalState,
-  onDelete,
-}) => {
+                                          shiftCard,
+                                          setModalState,
+                                          onDelete,
+                                        }) => {
   console.log("shiftCard", shiftCard()?.rules);
   return (
     <>
@@ -25,14 +26,9 @@ const Errors: Component<ErrorsProps> = ({
           <div
             class="rounded mx-0.5 p-2 relative text-left select-none"
             classList={{
-              "bg-[#edf2f7] text-black":
-                shiftCard()?.published && shiftCard()?.isOrigin,
-              "bg-blue-100 text-blue-500 border border-blue-100":
-                shiftCard()?.published && !shiftCard()?.isOrigin,
+              "bg-[#edf2f7] text-black": shiftCard()?.published,
               "bg-[repeating-linear-gradient(-45deg,white,white_5px,#eaf0f6_5px,#eaf0f6_10px)] border border-gray-200":
-                !shiftCard()?.published && shiftCard()?.isOrigin,
-              "bg-[repeating-linear-gradient(-45deg,#e7f7ff,#e7f7ff_5px,#ceefff_5px,#ceefff_10px)] border border-blue-100":
-                !shiftCard()?.published && !shiftCard()?.isOrigin,
+                !shiftCard()?.published,
             }}
           >
             <i
@@ -94,9 +90,9 @@ const Errors: Component<ErrorsProps> = ({
                       "text-[#F6993F]": !rule.passed,
                     }}
                   >
-                    <Show when={!rule.passed} fallback={<BsCheckCircle />}>
+                    <Show when={!rule.passed} fallback={<BsCheckCircle/>}>
                       <span>
-                        <BsExclamationCircle />
+                        <BsExclamationCircle/>
                       </span>
                     </Show>
                     <span>{rule.passed ? "Passed" : "Flagged"}</span>
@@ -115,17 +111,17 @@ const Errors: Component<ErrorsProps> = ({
             class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
           >
             <span>
-              <FaSolidTrash />
+              <FaSolidTrash/>
             </span>
             <span>Delete</span>
           </button>
           <button
             type="button"
-            onClick={[setModalState, "edit"]}
+            onClick={[ setModalState, "edit" ]}
             class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
           >
             <span class="">
-              <FaSolidPencil />
+              <FaSolidPencil/>
             </span>
             Edit Shift
           </button>

@@ -65,7 +65,7 @@ export const getShiftMoveErrors = (
   const errors: Rule[] = [];
 
   // User can not modify a shift in the past
-  if (isDayInThePast((draggable.data.item as Shift).date)) {
+  if (isDayInThePast(tableData.shifts[draggable.id as number].date)) {
     errors.push({
       errorName: "Can not modify a shift in the past",
       description: "",
@@ -86,8 +86,8 @@ export const getShiftMoveErrors = (
 
   // If the shift's required role is not the same role as the staff
   if (
-    draggable.data.item.role !== Role.ALL_ROLES &&
-    draggable.data.item.role !== droppable.data.staff.role
+    tableData.shifts[draggable.id as number].role !== Role.ALL_ROLES &&
+    tableData.shifts[draggable.id as number].role !== droppable.data.staff.role
   )
     errors.push(rules[0]);
 
@@ -95,8 +95,8 @@ export const getShiftMoveErrors = (
   if (
     findOverlappingShifts([
       ...getShiftsByCellId(droppable.id as string, tableData),
-      draggable.data.item,
-    ]).includes(draggable.data.item.shiftId)
+      tableData.shifts[draggable.id as number],
+    ]).includes(draggable.id as number)
   )
     errors.push(rules[1]);
 

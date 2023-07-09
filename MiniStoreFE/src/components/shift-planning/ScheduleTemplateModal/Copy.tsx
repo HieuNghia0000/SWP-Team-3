@@ -34,7 +34,7 @@ const fetcher: ResourceFetcher<
 
   // TODO: We don't need to transform data here, we have APIs for schedule template.
   // return data.content;
-  return transformData({ dates, staffs: data.content }, true);
+  return transformData({ dates, staffs: data.content });
 };
 
 const Copy: Component<CopyProps> = ({ modalState }) => {

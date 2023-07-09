@@ -1,8 +1,10 @@
 import { A } from "@solidjs/router";
 import Dismiss from "solid-dismiss";
 import { RiSystemArrowDownSLine, RiSystemArrowUpSLine } from "solid-icons/ri";
-import { Component, Show, createSignal } from "solid-js";
+import { Component, createSignal, Show } from "solid-js";
 import routes from "~/utils/routes";
+import { useAuth } from "~/context/Auth";
+import { capitalize } from "~/utils/capitalize";
 
 type HeadBarProps = {
   isOpen: () => boolean;
@@ -11,13 +13,15 @@ type HeadBarProps = {
 
 const HeadBar: Component<HeadBarProps> = (props) => {
   const { isOpen, setIsNavOpen } = props;
-  const [isDropdownOpen, setIsDropdownOpen] = createSignal(false);
+  const { user } = useAuth();
+  const [ isDropdownOpen, setIsDropdownOpen ] = createSignal(false);
   let btnEl;
 
   return (
-    <nav class="flex flex-row justify-between items-center py-4 px-6 gap-4 h-[72px] bg-white border-b-1 border-gray-200 shadow-md">
+    <nav
+      class="flex flex-row justify-between items-center py-4 px-6 gap-4 h-[72px] bg-white border-b-1 border-gray-200 shadow-md">
       <button onClick={() => setIsNavOpen(!isOpen())}>
-        <img src="/buger_icon.svg" class="bx bx-menu"></img>
+        <img alt="nav-button" src="/buger_icon.svg" class="bx bx-menu"></img>
       </button>
       <div class="relative ml-3">
         <div class="h-full items-center flex">
@@ -27,19 +31,19 @@ const HeadBar: Component<HeadBarProps> = (props) => {
           >
             <img
               class="h-8 w-8 rounded-full bg-gray-400"
-              src="https://api.dicebear.com/5.x/adventurer/svg?seed=admin"
+              src={`https://api.dicebear.com/5.x/adventurer/svg?seed=${user()?.username}`}
               alt="Profile Image"
             />
             <div class="text-start hidden sm:block">
-              <p class="font-semibold">Jay Hargudson</p>
-              <p class="text-xs text-gray-500 font-medium">Manager</p>
+              <p class="font-semibold">{user()?.staffName}</p>
+              <p class="text-xs text-gray-500 font-medium">{capitalize(user()?.role || "")}</p>
             </div>
             <span class="text-lg hidden sm:block">
               <Show
                 when={!isDropdownOpen()}
-                fallback={<RiSystemArrowUpSLine />}
+                fallback={<RiSystemArrowUpSLine/>}
               >
-                <RiSystemArrowDownSLine />
+                <RiSystemArrowDownSLine/>
               </Show>
             </span>
           </button>

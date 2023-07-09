@@ -188,7 +188,7 @@ export default function StaffEdit() {
                 id="salary"
                 name="salary"
                 label="Base salary"
-                value={data()?.salary.hourlyWage}
+                value={data()?.salary?.hourlyWage}
                 type="number"
                 step={1000}
                 placeholder="Enter staff base salary"

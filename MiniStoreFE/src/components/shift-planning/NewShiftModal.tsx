@@ -141,7 +141,6 @@ const NewShiftModal: Component<{
       // NOTE: Cells must be updated at last, because we need to set the new shift data first
       batch(() => {
         setTableData("shifts", data.content.shiftId, data.content);
-        setTableData("originShifts", data.content.shiftId, data.content);
         setTableData("cells", cellIdGenerator(staff, dateStr), (shiftIds) => {
           const sortedShifts = sortBy(
             [ ...shiftIds, data.content.shiftId ],

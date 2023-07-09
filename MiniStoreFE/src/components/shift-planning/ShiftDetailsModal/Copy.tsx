@@ -2,7 +2,7 @@ import { compact } from "lodash";
 import { useFormHandler } from "solid-form-handler";
 import { yupSchema } from "solid-form-handler/yup";
 import { FaSolidPencil, FaSolidTrash } from "solid-icons/fa";
-import { Accessor, Setter, Component, createSignal, Show } from "solid-js";
+import { Accessor, Component, createSignal, Setter, Show } from "solid-js";
 import PopupModal from "~/components/PopupModal";
 import { Checkboxes } from "~/components/form/Checkboxes";
 import { TextInput } from "~/components/form/TextInput";
@@ -21,14 +21,16 @@ const copySchema: yup.Schema<CopyScheduleForm> = yup.object({
   days: yup.array(yup.string().required()).required(),
   untilDate: yup.string(),
 });
+
 interface CopyProps {
   shiftCard: Accessor<ShiftCard | undefined>;
   setModalState: Setter<Tabs>;
   onDelete: () => void;
 }
+
 const Copy: Component<CopyProps> = ({ shiftCard, setModalState, onDelete }) => {
   const { tableData } = useSPData();
-  const [enableMultiWeeks, setEnableMultiWeeks] = createSignal<boolean>(false);
+  const [ enableMultiWeeks, setEnableMultiWeeks ] = createSignal<boolean>(false);
   const formHandler = useFormHandler(yupSchema(copySchema));
   const { formData, setFieldValue } = formHandler;
 
@@ -69,11 +71,11 @@ const Copy: Component<CopyProps> = ({ shiftCard, setModalState, onDelete }) => {
       await formHandler.validateForm();
       alert(
         "Data sent with success: " +
-          JSON.stringify({
-            ...formData(),
-            shiftId: shiftCard()?.shiftId,
-            published: publish,
-          })
+        JSON.stringify({
+          ...formData(),
+          shiftId: shiftCard()?.shiftId,
+          published: publish,
+        })
       );
     } catch (error) {
       console.error(error);
@@ -96,14 +98,9 @@ const Copy: Component<CopyProps> = ({ shiftCard, setModalState, onDelete }) => {
           <div
             class="rounded mx-0.5 p-2 relative text-left select-none"
             classList={{
-              "bg-[#edf2f7] text-black":
-                shiftCard()?.published && shiftCard()?.isOrigin,
-              "bg-blue-100 text-blue-500 border border-blue-100":
-                shiftCard()?.published && !shiftCard()?.isOrigin,
+              "bg-[#edf2f7] text-black": shiftCard()?.published,
               "bg-[repeating-linear-gradient(-45deg,white,white_5px,#eaf0f6_5px,#eaf0f6_10px)] border border-gray-200":
-                !shiftCard()?.published && shiftCard()?.isOrigin,
-              "bg-[repeating-linear-gradient(-45deg,#e7f7ff,#e7f7ff_5px,#ceefff_5px,#ceefff_10px)] border border-blue-100":
-                !shiftCard()?.published && !shiftCard()?.isOrigin,
+                !shiftCard()?.published,
             }}
           >
             <i
@@ -199,7 +196,7 @@ const Copy: Component<CopyProps> = ({ shiftCard, setModalState, onDelete }) => {
             <input
               type="checkbox"
               checked={enableMultiWeeks()}
-              onChange={[setEnableMultiWeeks, !enableMultiWeeks()]}
+              onChange={[ setEnableMultiWeeks, !enableMultiWeeks() ]}
             />
             <span class="slider round"></span>
           </label>
@@ -232,17 +229,17 @@ const Copy: Component<CopyProps> = ({ shiftCard, setModalState, onDelete }) => {
               class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
             >
               <span>
-                <FaSolidTrash />
+                <FaSolidTrash/>
               </span>
               <span>Delete</span>
             </button>
             <button
               type="button"
-              onClick={[setModalState, "edit"]}
+              onClick={[ setModalState, "edit" ]}
               class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
             >
               <span class="">
-                <FaSolidPencil />
+                <FaSolidPencil/>
               </span>
               Edit Shift
             </button>
@@ -257,14 +254,14 @@ const Copy: Component<CopyProps> = ({ shiftCard, setModalState, onDelete }) => {
             </button>
             <button
               type="button"
-              onClick={[submit, true]}
+              onClick={[ submit, true ]}
               class="py-1.5 px-3 font-semibold text-gray-600 border border-gray-300 text-sm rounded hover:text-black"
             >
               Save & Publish
             </button>
             <button
               type="button"
-              onClick={[submit, false]}
+              onClick={[ submit, false ]}
               class="py-1.5 px-3 font-semibold text-white border border-blue-600 bg-blue-500 text-sm rounded hover:bg-blue-600"
             >
               Save

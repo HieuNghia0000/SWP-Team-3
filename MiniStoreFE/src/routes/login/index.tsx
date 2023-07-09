@@ -13,8 +13,8 @@ type Login = {
 };
 
 const schema: yup.Schema<Login> = yup.object({
-  username: yup.string().required("Vui lòng nhập tên đăng nhập"),
-  password: yup.string().required("Vui lòng nhập mật khẩu"),
+  username: yup.string().required("Please enter username"),
+  password: yup.string().required("Please enter password"),
 });
 
 export default function Login() {
@@ -34,8 +34,8 @@ export default function Login() {
   const submit = async (event: Event) => {
     event.preventDefault();
     try {
-      await formHandler.validateForm();
-      // alert("Data sent with success: " + JSON.stringify(formData()));
+      const f = await formHandler.validateForm({throwException: false});
+      if (f.isFormInvalid) return;
 
       logIn(formData().username, formData().password);
     } catch (error) {
@@ -43,9 +43,6 @@ export default function Login() {
     }
   };
 
-  const reset = () => {
-    formHandler.resetForm();
-  };
 
   return (
     <div

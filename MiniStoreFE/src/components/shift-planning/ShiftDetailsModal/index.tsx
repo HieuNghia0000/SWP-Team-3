@@ -54,9 +54,7 @@ const ShiftDetailsModal: Component<{
         batch(() => {
           setShowModal(false);
           setTableData("shifts", modalData()!.shiftId, undefined!);
-          setTableData("originShifts", modalData()!.shiftId, undefined!);
           setTableData("shiftsRules", modalData()!.shiftId, undefined!);
-          setTableData("changedShifts", modalData()!.shiftId, undefined!);
           setTableData("cells", cellIdGenerator(modalData()!.staff!, modalData()!.date), (items) =>
             items.filter((item) => item !== modalData()!.shiftId)
           );

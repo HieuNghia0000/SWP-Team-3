@@ -1,38 +1,25 @@
-import {
-  Accessor,
-  Component,
-  Setter,
-  createEffect,
-  createSignal,
-  on,
-  onCleanup,
-  onMount,
-} from "solid-js";
-import {useSearchParams} from "solid-start";
+import { Accessor, Component, createEffect, createSignal, on, onCleanup, onMount, Setter, } from "solid-js";
+import { useSearchParams } from "solid-start";
 import DropDownBtn from "../DropDownBtn";
-import {IoCopySharp} from "solid-icons/io";
-import {
-  FaSolidAngleLeft,
-  FaSolidAngleRight,
-  FaSolidRepeat,
-} from "solid-icons/fa";
-import {FiCalendar, FiSave} from "solid-icons/fi";
+import { IoCopySharp } from "solid-icons/io";
+import { FaSolidAngleLeft, FaSolidAngleRight, FaSolidRepeat, } from "solid-icons/fa";
+import { FiCalendar } from "solid-icons/fi";
 import moment from "moment";
 import flatpickr from "flatpickr";
-import {getWeekFirstAndLastDates} from "~/utils/getWeekDates";
-import {useSPData, useShiftPlanningModals} from "~/context/ShiftPlanning";
-import {ParamType} from "./utils/types";
+import { getWeekFirstAndLastDates } from "~/utils/getWeekDates";
+import { useShiftPlanningModals, useSPData } from "~/context/ShiftPlanning";
+import { ParamType } from "./utils/types";
 
 type ToolBarProps = {
   datePicked: Accessor<string | undefined>;
   setDatePicked: Setter<string | undefined>;
 };
 
-const ToolBar: Component<ToolBarProps> = ({datePicked, setDatePicked}) => {
-  const [searchParams, setSearchParams] = useSearchParams<ParamType>();
-  const [dateStr, setDateStr] = createSignal<string>("");
-  const {tableData, resetTableData, saveChanges} = useSPData();
-  const {setShowShiftTemplateModal, setScheduleTemplateModalState} =
+const ToolBar: Component<ToolBarProps> = ({ datePicked, setDatePicked }) => {
+  const [ searchParams, setSearchParams ] = useSearchParams<ParamType>();
+  const [ dateStr, setDateStr ] = createSignal<string>("");
+  const { resetTableData } = useSPData();
+  const { setShowShiftTemplateModal, setScheduleTemplateModalState } =
     useShiftPlanningModals();
 
   let dateRef: HTMLInputElement | undefined = undefined;
@@ -76,14 +63,14 @@ const ToolBar: Component<ToolBarProps> = ({datePicked, setDatePicked}) => {
   ) => {
     if (selectedDates.length === 0) {
       setDatePicked(undefined);
-      setSearchParams({picked_date: undefined});
+      setSearchParams({ picked_date: undefined });
       setDateStr("");
     }
     if (selectedDates.length === 1) {
       const pickedDate = dateStr;
-      const [from, to] = getWeekFirstAndLastDates(pickedDate);
+      const [ from, to ] = getWeekFirstAndLastDates(pickedDate);
       setDatePicked(pickedDate);
-      setSearchParams({picked_date: pickedDate});
+      setSearchParams({ picked_date: pickedDate });
       const start = instance.formatDate(from.toDate(), "F j");
       const end = instance.formatDate(to.toDate(), "F j, Y");
       setDateStr(`${start} - ${end}`);
@@ -92,7 +79,7 @@ const ToolBar: Component<ToolBarProps> = ({datePicked, setDatePicked}) => {
 
   const goToPrevWeek = () => {
     const pickedDate = moment(datePicked());
-    const [from] = getWeekFirstAndLastDates(
+    const [ from ] = getWeekFirstAndLastDates(
       pickedDate.subtract(1, "week").format()
     );
     fp?.setDate(from.toDate(), true);
@@ -100,7 +87,7 @@ const ToolBar: Component<ToolBarProps> = ({datePicked, setDatePicked}) => {
 
   const goToNextWeek = () => {
     const pickedDate = moment(datePicked());
-    const [from] = getWeekFirstAndLastDates(pickedDate.add(1, "week").format());
+    const [ from ] = getWeekFirstAndLastDates(pickedDate.add(1, "week").format());
     fp?.setDate(from.toDate(), true);
   };
 
@@ -109,7 +96,7 @@ const ToolBar: Component<ToolBarProps> = ({datePicked, setDatePicked}) => {
       <div class="flex flex-row gap-5 items-center">
         <button
           type="button"
-          onClick={[setShowShiftTemplateModal, true]}
+          onClick={[ setShowShiftTemplateModal, true ]}
           class="flex flex-row items-center gap-1 cursor-pointer border border-gray-300 rounded-lg py-2 px-3.5 font-medium text-sm text-gray-500 hover:text-indigo-600 hover:border-indigo-600"
         >
           <span class="text-base">
@@ -143,17 +130,16 @@ const ToolBar: Component<ToolBarProps> = ({datePicked, setDatePicked}) => {
         </button>
       </div>
       <div class="flex justify-center items-center gap-4">
-        <button
-          type="button"
-          disabled={!tableData.isChanged}
-          onClick={saveChanges}
-          class="flex flex-row items-center gap-1 border border-indigo-400 text-sm font-semibold text-white bg-indigo-600 py-2 px-3.5 rounded-lg hover:bg-indigo-700 disabled:bg-indigo-400"
-        >
-          <span class="text-base">
-            <FiSave/>
-          </span>
-          Save
-        </button>
+        {/*<button*/}
+        {/*  type="button"*/}
+        {/*  onClick={saveChanges}*/}
+        {/*  class="flex flex-row items-center gap-2 border border-indigo-400 text-sm font-semibold text-white bg-indigo-600 py-2 px-3.5 rounded-lg hover:bg-indigo-700 disabled:bg-indigo-400"*/}
+        {/*>*/}
+        {/*  <span class="text-base">*/}
+        {/*    <FiSave/>*/}
+        {/*  </span>*/}
+        {/*  Save*/}
+        {/*</button>*/}
         <DropDownBtn
           text="Copy"
           icon={<IoCopySharp/>}
@@ -163,21 +149,21 @@ const ToolBar: Component<ToolBarProps> = ({datePicked, setDatePicked}) => {
         >
           <button
             type="button"
-            onClick={[setScheduleTemplateModalState, "copy"]}
+            onClick={[ setScheduleTemplateModalState, "copy" ]}
             class="py-1.5 px-2.5 text-sm text-start text-gray-600 hover:bg-gray-100 whitespace-nowrap block"
           >
             Copy Previous Week
           </button>
           <button
             type="button"
-            onClick={[setScheduleTemplateModalState, "create"]}
+            onClick={[ setScheduleTemplateModalState, "create" ]}
             class="py-1.5 px-2.5 text-sm text-start text-gray-600 hover:bg-gray-100 whitespace-nowrap block"
           >
             Create Week Template
           </button>
           <button
             type="button"
-            onClick={[setScheduleTemplateModalState, "list"]}
+            onClick={[ setScheduleTemplateModalState, "list" ]}
             class="py-1.5 px-2.5 text-sm text-start text-gray-600 hover:bg-gray-100 whitespace-nowrap block"
           >
             Apply Week Template

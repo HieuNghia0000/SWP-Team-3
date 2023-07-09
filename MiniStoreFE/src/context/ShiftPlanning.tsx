@@ -12,7 +12,6 @@ import {
 import { Shift, Staff, ShiftTemplate } from "~/types";
 
 export interface ShiftCard extends Shift {
-  isOrigin: boolean;
   rules: Rule[];
 }
 export type ScheduleTemplateModalState =
