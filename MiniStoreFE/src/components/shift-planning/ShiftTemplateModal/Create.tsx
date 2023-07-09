@@ -13,6 +13,7 @@ import getEndPoint from "~/utils/getEndPoint";
 import axios from "axios";
 import handleFetchError from "~/utils/handleFetchError";
 import { DataResponse, ShiftTemplate } from "~/types";
+import { toastSuccess } from "~/utils/toast";
 
 const Create: Component<ShiftTemplateProps> = ({setState, refreshShiftTemplates}) => {
   const [creating, setCreating] = createSignal(false);
@@ -29,7 +30,7 @@ const Create: Component<ShiftTemplateProps> = ({setState, refreshShiftTemplates}
 
       setCreating(true);
 
-      const response = await axios.post<DataResponse<ShiftTemplate>>(
+      const {data} = await axios.post<DataResponse<ShiftTemplate>>(
         `${getEndPoint()}/shift-templates/add`,
         {
           ...formData(),
@@ -37,9 +38,13 @@ const Create: Component<ShiftTemplateProps> = ({setState, refreshShiftTemplates}
           endTime: readableToTimeStr(formData().endTime),
         }
       )
-      console.log(response.data);
+      console.log(data);
+
+      if (!data) throw new Error("Invalid response from server");
+
       refreshShiftTemplates();
       setState("list");
+      toastSuccess("Shift template created successfully");
     } catch (error: any) {
       handleFetchError(error);
     } finally {

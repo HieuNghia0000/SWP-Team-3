@@ -34,9 +34,11 @@ public class ShiftTemplateController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateShiftTemplate(@PathVariable("id") Integer id,
-                                                      @RequestBody ShiftTemplate shiftTemplate) {
-        Optional<ShiftTemplate> updatedShiftTemplate = shiftTemplateService.updateShiftTemplates(id, shiftTemplate);
+    public ResponseEntity<Object> updateShiftTemplate(@Valid @PathVariable("id") Integer id,
+                                                      @RequestBody CreateShiftTemplateDto dto, BindingResult errors) {
+        if (errors.hasErrors()) return ResponseHandler.getResponse(errors, HttpStatus.BAD_REQUEST);
+
+        Optional<ShiftTemplate> updatedShiftTemplate = shiftTemplateService.updateShiftTemplates(id, dto);
         return updatedShiftTemplate.map(value -> ResponseHandler.getResponse(value, HttpStatus.OK))
                 .orElseGet(() -> ResponseHandler.getResponse(new Exception("Shift template not found"), HttpStatus.NOT_FOUND));
     }

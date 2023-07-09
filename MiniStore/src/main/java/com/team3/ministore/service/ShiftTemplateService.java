@@ -13,7 +13,7 @@ public interface ShiftTemplateService {
 
     Optional<ShiftTemplate> getShiftTemplatesById(Integer id);
 
-    Optional<ShiftTemplate> updateShiftTemplates(Integer id, ShiftTemplate shiftTemplate);
+    Optional<ShiftTemplate> updateShiftTemplates(Integer id, CreateShiftTemplateDto dto);
 
     void deleteShiftTemplates(Integer id);
 }

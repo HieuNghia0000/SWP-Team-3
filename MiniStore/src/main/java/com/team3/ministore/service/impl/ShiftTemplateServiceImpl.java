@@ -40,15 +40,15 @@ public class ShiftTemplateServiceImpl implements ShiftTemplateService {
     }
 
     @Override
-    public Optional<ShiftTemplate> updateShiftTemplates(Integer id, ShiftTemplate shiftTemplate) {
+    public Optional<ShiftTemplate> updateShiftTemplates(Integer id, CreateShiftTemplateDto dto) {
         Optional<ShiftTemplate> existingShiftTemplate = getShiftTemplatesById(id);
 
         return existingShiftTemplate.map(value -> {
-            value.setStartTime(shiftTemplate.getStartTime());
-            value.setEndTime(shiftTemplate.getEndTime());
-            value.setName(shiftTemplate.getName());
-            value.setSalaryCoefficient(shiftTemplate.getSalaryCoefficient());
-            value.setRole(shiftTemplate.getRole());
+            value.setStartTime(dto.getStartTime());
+            value.setEndTime(dto.getEndTime());
+            value.setName(dto.getName());
+            value.setSalaryCoefficient(dto.getSalaryCoefficient());
+            value.setRole(dto.getRole());
             return shiftTemplateRepository.save(value);
         });
     }

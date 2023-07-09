@@ -1,33 +1,16 @@
 import { flatten } from "lodash";
-import {
-  Accessor,
-  Component,
-  For,
-  ResourceFetcher,
-  Show,
-  Suspense,
-  createEffect,
-  createMemo,
-  createResource,
-  createSignal,
-  onCleanup,
-  onMount,
-} from "solid-js";
+import { Accessor, Component, createResource, createSignal, For, onCleanup, onMount, ResourceFetcher, } from "solid-js";
 import ResourceWrapper from "~/components/ResourceWrapper";
 import SidePopupModal from "~/components/SidePopupModal";
-import { ScheduleTemplateModalState, useSPData } from "~/context/ShiftPlanning";
+import { ScheduleTemplateModalState } from "~/context/ShiftPlanning";
 import { DataResponse, Role, Staff } from "~/types";
 import { shiftDetailsTime } from "../utils/shiftTimes";
 import { roles } from "~/utils/roles";
 import flatpickr from "flatpickr";
 import moment from "moment";
-import {
-  getWeekDateStings,
-  getWeekFirstAndLastDates,
-} from "~/utils/getWeekDates";
+import { getWeekDateStings, getWeekFirstAndLastDates, } from "~/utils/getWeekDates";
 import { transformData } from "../utils/dataTransformer";
 import { DataTable } from "../utils/types";
-import Spinner from "~/components/Spinner";
 
 interface CopyProps {
   modalState: Accessor<ScheduleTemplateModalState>;
@@ -55,9 +38,9 @@ const fetcher: ResourceFetcher<
 };
 
 const Copy: Component<CopyProps> = ({ modalState }) => {
-  const [datePicked, setDatePicked] = createSignal<string | undefined>();
-  const [dateStr, setDateStr] = createSignal<string>("");
-  const [data, { refetch, mutate }] = createResource(datePicked, fetcher);
+  const [ datePicked, setDatePicked ] = createSignal<string | undefined>();
+  const [ dateStr, setDateStr ] = createSignal<string>("");
+  const [ data, { refetch, mutate } ] = createResource(datePicked, fetcher);
   let dateRef: HTMLInputElement | undefined = undefined;
   let fp: flatpickr.Instance | undefined = undefined;
 
@@ -91,7 +74,7 @@ const Copy: Component<CopyProps> = ({ modalState }) => {
     }
     if (selectedDates.length === 1) {
       const pickedDate = dateStr;
-      const [from, to] = getWeekFirstAndLastDates(pickedDate);
+      const [ from, to ] = getWeekFirstAndLastDates(pickedDate);
       const start = instance.formatDate(from.toDate(), "F j");
       const end = instance.formatDate(to.toDate(), "F j, Y");
       console.log(pickedDate);
@@ -126,7 +109,8 @@ const Copy: Component<CopyProps> = ({ modalState }) => {
         <div class="text-sm mb-4 text-gray-400 leading-[1.5] tracking-wide">
           The week you want to copy to this week.
         </div>
-        <div class="text-[#637286] bg-[#f8fafc] font-semibold py-2.5 px-5 border-y border-[#d5dce6] -mx-5 mt-5 mb-3.5 text-sm">
+        <div
+          class="text-[#637286] bg-[#f8fafc] font-semibold py-2.5 px-5 border-y border-[#d5dce6] -mx-5 mt-5 mb-3.5 text-sm">
           Targeted Shifts
         </div>
         <ResourceWrapper data={data}>

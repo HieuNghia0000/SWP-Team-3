@@ -5,12 +5,17 @@ import { Accessor, batch, Component, createSignal, Setter } from "solid-js";
 import PopupModal from "~/components/PopupModal";
 import { Select } from "~/components/form/Select";
 import { TextInput } from "~/components/form/TextInput";
-import { ShiftTemplate } from "~/types";
+import { DataResponse, ShiftTemplate } from "~/types";
 import { readableToTimeStr } from "../utils/shiftTimes";
 import { timeOptions, transformTimeString } from "../utils/timeOptions";
 import { ShiftTemplateProps } from "./types";
 import { roles } from "~/utils/roles";
 import { schema } from "./formSchema";
+import handleFetchError from "~/utils/handleFetchError";
+import axios from "axios";
+import getEndPoint from "~/utils/getEndPoint";
+import { toastConfirmDeletion, toastSuccess } from "~/utils/toast";
+import toast from "solid-toast";
 
 interface EditProps extends ShiftTemplateProps {
   shiftTemplateFocus: Accessor<ShiftTemplate | undefined>;
@@ -21,41 +26,72 @@ const Edit: Component<EditProps> = ({
                                       setState,
                                       shiftTemplateFocus,
                                       setShiftTemplateFocus: setShiftFocus,
+                                      refreshShiftTemplates,
                                     }) => {
-  const [editing, setEditing] = createSignal(false);
+  const [ editing, setEditing ] = createSignal(false);
   const formHandler = useFormHandler(yupSchema(schema));
-  const {formData, setFieldValue} = formHandler;
+  const { formData, setFieldValue } = formHandler;
 
   const submit = async (event: Event) => {
     event.preventDefault();
     if (editing()) return;
 
     try {
-      await formHandler.validateForm();
-      if (
-        confirm(
-          "Are you sure you want to save? This will effect all the associated shifts."
-        )
-      ) {
-        alert(
-          "Data sent with success: " +
-          JSON.stringify({
-            ...formData(),
-            startTime: readableToTimeStr(formData().startTime),
-            endTime: readableToTimeStr(formData().endTime),
-            shiftId: shiftTemplateFocus()?.shiftTemplateId,
-          })
-        );
-        setEditing(true);
-        // const response = await axios.post<DataResponse<ShiftTemplate>>(
-      }
-    } catch (error) {
-      console.error(error);
+      const f = await formHandler.validateForm({ throwException: false });
+      if (f.isFormInvalid) return;
+
+      setEditing(true);
+
+      const {data} = await axios.put<DataResponse<ShiftTemplate>>(
+        `${getEndPoint()}/shift-templates/update/${shiftTemplateFocus()?.shiftTemplateId}`,
+        {
+          ...formData(),
+          startTime: readableToTimeStr(formData().startTime),
+          endTime: readableToTimeStr(formData().endTime),
+        }
+      )
+
+      console.log(data);
+
+      if (!data) throw new Error("Invalid response from server");
+
+      refreshShiftTemplates();
+      setState("list");
+      toastSuccess("Shift template updated successfully");
+    } catch (error: any) {
+      handleFetchError(error);
+    } finally {
+      setEditing(false);
     }
   };
 
   const onDelete = async () => {
-    alert("Delete");
+    toastConfirmDeletion(<>
+      <p class="text-sm font-medium text-red-600">
+        Are you sure you want to delete this template?
+      </p>
+      <p class="mt-1 text-sm text-gray-600 font-medium">
+        This action cannot be undone.
+      </p>
+    </>, async (t) => {
+      try {
+        if (!shiftTemplateFocus()?.shiftTemplateId) throw new Error("Invalid template id");
+
+        const { data } = await axios.delete<DataResponse<null>>(
+          `${getEndPoint()}/shift-templates/delete/${shiftTemplateFocus()?.shiftTemplateId}`
+        )
+        console.log(data);
+        if (!data) throw new Error("Invalid response from server");
+
+        refreshShiftTemplates();
+        setState("list");
+        toastSuccess("Shift template deleted successfully");
+      } catch (e) {
+        handleFetchError(e);
+      } finally {
+        toast.dismiss(t.id);
+      }
+    })
   };
 
   return (
