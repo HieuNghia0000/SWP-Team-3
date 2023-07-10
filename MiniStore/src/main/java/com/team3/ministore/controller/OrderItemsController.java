@@ -28,7 +28,7 @@ public class OrderItemsController {
         return new ResponseEntity<>(orderItemsList, HttpStatus.OK);
     }
 
-    @GetMapping("/search/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<OrderItems> getOrderItemsById(@PathVariable("id") Integer id) {
         OrderItems orderItems = orderItemsService.getOrderItemsById(id);
         return new ResponseEntity<>(orderItems, HttpStatus.OK);

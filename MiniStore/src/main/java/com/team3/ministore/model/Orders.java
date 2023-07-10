@@ -16,9 +16,6 @@ public class Orders {
     @Column(name = "order_id")
     private int orderId;
 
-    @OneToMany(mappedBy = "orders")
-    private List<OrderItems> orderItems;
-
     @Column(name = "order_date")
     private LocalDateTime orderDate;
 

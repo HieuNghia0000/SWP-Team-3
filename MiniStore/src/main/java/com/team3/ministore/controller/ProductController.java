@@ -39,6 +39,12 @@ public class ProductController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Product> getProductById(@PathVariable("id") Integer id) {
+        Product product = productService.getProductById(id);
+        return new ResponseEntity<>(product, HttpStatus.OK);
+    }
+
     @GetMapping("")
     public ResponseEntity<Page<Product>> getProducts(@RequestParam("search") Optional<String> searchParam,
                                                      @RequestParam("amount_from") Optional<Float> fromAmountParam,
