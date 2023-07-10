@@ -11,6 +11,7 @@ import moment from "moment";
 import { getWeekDateStings, getWeekFirstAndLastDates, } from "~/utils/getWeekDates";
 import { transformData } from "../utils/dataTransformer";
 import { DataTable } from "../utils/types";
+import getEndPoint from "~/utils/getEndPoint";
 
 interface CopyProps {
   modalState: Accessor<ScheduleTemplateModalState>;
@@ -24,23 +25,18 @@ const fetcher: ResourceFetcher<
   const dates = getWeekDateStings(source as string);
   const from = dates[0];
   const to = dates[dates.length - 1];
-  // const response = await fetch(
-  //   `${getEndPoint()}/shift-planning?from_date=${from}&to_date=${to}`
-  // );
   const response = await fetch(
-    `http://localhost:3000/shift-planning-${source}.json`
+    `${getEndPoint()}/shift-planning?from=${from}&to=${to}`
   );
   const data: DataResponse<Staff[]> = await response.json();
 
-  // TODO: We don't need to transform data here, we have APIs for schedule template.
-  // return data.content;
   return transformData({ dates, staffs: data.content });
 };
 
 const Copy: Component<CopyProps> = ({ modalState }) => {
   const [ datePicked, setDatePicked ] = createSignal<string | undefined>();
   const [ dateStr, setDateStr ] = createSignal<string>("");
-  const [ data, { refetch, mutate } ] = createResource(datePicked, fetcher);
+  const [ data ] = createResource(datePicked, fetcher);
   let dateRef: HTMLInputElement | undefined = undefined;
   let fp: flatpickr.Instance | undefined = undefined;
 
@@ -48,7 +44,7 @@ const Copy: Component<CopyProps> = ({ modalState }) => {
     !data.error && data() ? flatten(Object.values(data()!.cells)) : [];
 
   onMount(() => {
-    const defaultDate = moment().format("YYYY-MM-DD");
+    const defaultDate = moment().subtract(7, "days").format("YYYY-MM-DD");
     setDatePicked(defaultDate);
     fp = flatpickr(dateRef!, {
       mode: "single",
@@ -120,7 +116,7 @@ const Copy: Component<CopyProps> = ({ modalState }) => {
             filters you have set:
           </div>
           <For each={shiftIds()}>
-            {(shift) => (
+            {(shiftId) => (
               <div
                 class="rounded mx-1 p-2 relative text-left mb-1"
                 classList={{
@@ -132,32 +128,32 @@ const Copy: Component<CopyProps> = ({ modalState }) => {
                   class="absolute top-1.5 left-1.5 bottom-1.5 w-1.5 rounded"
                   classList={{
                     "bg-blue-500":
-                      data()!.shifts[shift].role === Role.CASHIER,
+                      data()!.shifts[shiftId].role === Role.CASHIER,
                     "bg-yellow-500":
-                      data()!.shifts[shift].role === Role.GUARD,
+                      data()!.shifts[shiftId].role === Role.GUARD,
                     "bg-red-500":
-                      data()!.shifts[shift].role === Role.MANAGER,
+                      data()!.shifts[shiftId].role === Role.MANAGER,
                     "bg-gray-600":
-                      data()!.shifts[shift].role === Role.ADMIN,
+                      data()!.shifts[shiftId].role === Role.ADMIN,
                     "bg-gray-400":
-                      data()!.shifts[shift].role === Role.ALL_ROLES,
+                      data()!.shifts[shiftId].role === Role.ALL_ROLES,
                   }}
                 ></i>
                 <p class="ml-3.5 font-semibold text-sm tracking-wider">
                   {shiftDetailsTime(
-                    data()!.shifts[shift].date || "",
-                    data()!.shifts[shift].startTime || "",
-                    data()!.shifts[shift].endTime || ""
+                    data()!.shifts[shiftId].date || "",
+                    data()!.shifts[shiftId].startTime || "",
+                    data()!.shifts[shiftId].endTime || ""
                   )}
                 </p>
                 <p class="ml-3.5 font-normal text-xs text-[13px] tracking-wider">
-                  {data()!.shifts[shift].staff?.staffName ||
+                  {data()!.staffs.find(s => s.staffId === data()!.shifts[shiftId].staffId)!.staffName ||
                     "No staff assigned"}{" "}
                   •{" "}
                   {
                     roles.find(
                       (r) =>
-                        r.value === data()!.shifts[shift].role
+                        r.value === data()!.shifts[shiftId].role
                     )?.label
                   }
                 </p>
