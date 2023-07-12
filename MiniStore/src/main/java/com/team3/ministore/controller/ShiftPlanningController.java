@@ -11,6 +11,7 @@ import com.team3.ministore.service.LeaveRequestService;
 import com.team3.ministore.service.SalaryService;
 import com.team3.ministore.service.ShiftService;
 import com.team3.ministore.service.StaffService;
+import com.team3.ministore.utils.LeaveStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -56,7 +57,10 @@ public class ShiftPlanningController {
             // Iterate through all staffs and get their shifts and salary
             List<StaffDto> result = staffs.parallelStream().map(staff -> {
                 SalaryDto salaryDto = salaryService.getSalaryByStaffId(staff.getStaffId());
-                List<LeaveRequestDto> leaveRequestDtos = leaveRequestService.getLeaveRequestsByStaffIdAndDates(staff.getStaffId(), fromDate, toDate);
+                List<LeaveRequestDto> leaveRequestDtos = leaveRequestService.getLeaveRequestsByStaffIdAndDates(
+                                staff.getStaffId(), fromDate, toDate
+                        ).stream().filter(leaveRequestDto -> leaveRequestDto.getStatus().equals(LeaveStatus.APPROVED))
+                        .collect(Collectors.toList());
                 List<Shift> shifts = shiftService.getAllShiftsByStaffId(staff.getStaffId(), fromDate, toDate);
                 // Convert shifts to shiftDtos
                 List<ShiftDto> shiftDtos = shifts.stream().map(ShiftDto::new).collect(Collectors.toList());
@@ -75,7 +79,10 @@ public class ShiftPlanningController {
             return ResponseHandler.getResponse(new Exception("Staff not found"), HttpStatus.NOT_FOUND);
 
         SalaryDto salaryDto = salaryService.getSalaryByStaffId(staff.get().getStaffId());
-        List<LeaveRequestDto> leaveRequestDtos = leaveRequestService.getLeaveRequestsByStaffIdAndDates(staff.get().getStaffId(), fromDate, toDate);
+        List<LeaveRequestDto> leaveRequestDtos = leaveRequestService.getLeaveRequestsByStaffIdAndDates(
+                        staff.get().getStaffId(), fromDate, toDate
+                ).stream().filter(leaveRequestDto -> leaveRequestDto.getStatus().equals(LeaveStatus.APPROVED))
+                .collect(Collectors.toList());
         List<Shift> shifts = shiftService.getAllShiftsByStaffId(staff.get().getStaffId(), fromDate, toDate);
         List<ShiftDto> shiftDtos = shifts.stream().map(ShiftDto::new).collect(Collectors.toList());
         // Return a list of staffDto with only one element (the staff with the given staffId)
