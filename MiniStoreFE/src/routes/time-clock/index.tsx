@@ -50,28 +50,8 @@ export function routeData() {
 
 export default function TimeClocks() {
   const [searchParams, setSearchParams] = useSearchParams<ParamType>();
-  const [datePicked, setDatePicked] = createSignal<string>();
   const data = useRouteData<typeof routeData>();
   const totalItems = () => data()?.length ?? 0;
-  const perPage = () => Number.parseInt(searchParams.perPage || "10");
-  const curPage = () => Number.parseInt(searchParams.curPage || "1");
-  const lastPage = () => Math.ceil(totalItems() / perPage());
-
-  const prev = () => {
-    setSearchParams({ curPage: Math.max(1, curPage() - 1) });
-  };
-
-  const next = () => {
-    setSearchParams({ curPage: Math.min(lastPage(), curPage() + 1) });
-  };
-
-  const setPage = (page: number) => {
-    setSearchParams({ curPage: Math.max(1, Math.min(lastPage(), page)) });
-  };
-
-  const setPerPage = (page: number) => {
-    setSearchParams({ perPage: Math.max(1, Math.min(100, page)) });
-  };
 
   const onSearchSubmit = (e: Event) => {
     e.preventDefault();
@@ -178,15 +158,7 @@ export default function TimeClocks() {
           </table>
         </div>
 
-        <Pagination
-          totalItems={totalItems}
-          perPage={perPage}
-          curPage={curPage}
-          lastPage={lastPage}
-          prev={prev}
-          next={next}
-          setPage={setPage}
-        />
+        <Pagination totalItems={totalItems}/>
       </div>
     </main>
   );

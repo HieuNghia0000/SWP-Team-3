@@ -1,20 +1,32 @@
 import { Component, For, Show } from "solid-js";
+import { useSearchParams } from "@solidjs/router";
+import { ParamType } from "~/components/leave-requests/types";
 
 type PaginationProps = {
   totalItems: () => number;
-  perPage: () => number;
-  curPage: () => number;
-  lastPage: () => number;
-  prev: () => void;
-  next: () => void;
-  setPage: (page: number) => void;
 };
 
-const Pagination: Component<PaginationProps> = (props) => {
-  const { totalItems, perPage, curPage, lastPage, next, prev, setPage } = props;
+const Pagination: Component<PaginationProps> = ({ totalItems }) => {
+  const [searchParams, setSearchParams] = useSearchParams<ParamType>();
+
+  const perPage = () => Number.parseInt(searchParams.perPage || "10");
+  const curPage = () => Number.parseInt(searchParams.curPage || "1");
+  const lastPage = () => Math.ceil(totalItems() / perPage());
+
+  const prev = () => {
+    setSearchParams({ curPage: Math.max(1, curPage() - 1) });
+  };
+
+  const next = () => {
+    setSearchParams({ curPage: Math.min(lastPage(), curPage() + 1) });
+  };
+
+  const setPage = (page: number) => {
+    setSearchParams({ curPage: Math.max(1, Math.min(lastPage(), page)) });
+  };
 
   return (
-    <div class="flex items-center justify-between border-t border-gray-200 px-4 py-3 sm:px-6">
+    <div class="flex items-center justify-between px-4 py-3 sm:px-6">
       <div class="flex flex-1 justify-start gap-3 sm:hidden">
         <button
           onClick={prev}

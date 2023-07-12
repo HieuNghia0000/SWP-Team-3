@@ -71,9 +71,6 @@ export default function Orders() {
   );
 
   const totalItems = () => data()?.length ?? 0;
-  const perPage = () => Number.parseInt(searchParams.perPage || "10");
-  const curPage = () => Number.parseInt(searchParams.curPage || "1");
-  const lastPage = () => Math.ceil(totalItems() / perPage());
 
   onMount(() => {
     // @ts-ignore
@@ -113,18 +110,6 @@ export default function Orders() {
       if (end2.startsWith(start2)) setDateStr(end2);
       else setDateStr(`${start2} - ${end2}`);
     }
-  };
-
-  const prev = () => {
-    setSearchParams({ curPage: Math.max(1, curPage() - 1) });
-  };
-
-  const next = () => {
-    setSearchParams({ curPage: Math.min(lastPage(), curPage() + 1) });
-  };
-
-  const setPage = (page: number) => {
-    setSearchParams({ curPage: Math.max(1, Math.min(lastPage(), page)) });
   };
 
   const setGroupBtn = (ago: string | undefined) => {
@@ -377,15 +362,7 @@ export default function Orders() {
         </table>
       </div>
 
-      <Pagination
-        curPage={curPage}
-        perPage={perPage}
-        lastPage={lastPage}
-        next={next}
-        prev={prev}
-        setPage={setPage}
-        totalItems={totalItems}
-      />
+      <Pagination totalItems={totalItems}/>
     </main>
   );
 }
