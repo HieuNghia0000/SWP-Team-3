@@ -1,12 +1,18 @@
 package com.team3.ministore.service.impl;
 
+import com.team3.ministore.dto.LeaveRequestDto;
 import com.team3.ministore.model.LeaveRequest;
+import com.team3.ministore.model.Staff;
 import com.team3.ministore.repository.LeaveRequestRepository;
+import com.team3.ministore.repository.StaffRepository;
 import com.team3.ministore.service.LeaveRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class LeaveRequestServiceImpl implements LeaveRequestService {
@@ -14,34 +20,65 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
     @Autowired
     private LeaveRequestRepository leaveRequestRepository;
 
+    @Autowired
+    private StaffRepository staffRepository;
+
     @Override
-    public List<LeaveRequest> getAllLeaveRequest() {
-        return leaveRequestRepository.findAll();
+    public List<LeaveRequestDto> getAllLeaveRequest() {
+        return leaveRequestRepository.findAllLeaveRequest();
     }
 
     @Override
-    public LeaveRequest createLeaveRequest(LeaveRequest leaveRequest) {
-        return leaveRequestRepository.save(leaveRequest);
+    public Optional<LeaveRequestDto> createLeaveRequest(LeaveRequestDto dto) {
+        LeaveRequest leave = new LeaveRequest();
+
+        Optional<Staff> staff = staffRepository.findById(dto.getStaffId());
+        if (staff.isEmpty()) return Optional.empty();
+
+        leave.setStaff(staff.get());
+        leave.setLeaveType(dto.getLeaveType());
+        leave.setStartDate(dto.getStartDate());
+        leave.setEndDate(dto.getEndDate());
+        leave.setReason(dto.getReason());
+        leave.setAdminReply(dto.getAdminReply());
+        leave.setStatus(dto.getStatus());
+
+
+        return Optional.of(new LeaveRequestDto(leaveRequestRepository.save(leave)));
     }
 
     @Override
-    public LeaveRequest getLeaveRequestById(Integer id) {
-        return leaveRequestRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid Leave Requests ID: " + id));
+    public Optional<LeaveRequestDto> getLeaveRequestById(Integer id) {
+        return leaveRequestRepository.findById(id).map(LeaveRequestDto::new);
     }
 
+    public List<LeaveRequestDto> getLeaveRequestsByStaffIdAndDates(Integer id, LocalDate startDate, LocalDate endDate) {
+        return leaveRequestRepository.findLeaveRequestsByStaffIdAndDates(id, startDate, endDate)
+                .stream().map(LeaveRequestDto::new).collect(Collectors.toList());
+    }
+
+
     @Override
-    public LeaveRequest updateLeaveRequest(Integer id, LeaveRequest leaveRequest) {
-        LeaveRequest existingLeaveRequest = getLeaveRequestById(id);
+    public Optional<LeaveRequestDto> updateLeaveRequest(Integer id, LeaveRequestDto dto) {
+        Optional<LeaveRequest> existingLeaveRequest = leaveRequestRepository.findById(id);
+        Optional<Staff> staff = staffRepository.findById(dto.getStaffId());
 
-        existingLeaveRequest.setStaff(leaveRequest.getStaff());
-        existingLeaveRequest.setAdminReply(leaveRequest.getAdminReply());
-        existingLeaveRequest.setLeaveType(leaveRequest.getLeaveType());
-        existingLeaveRequest.setReason(leaveRequest.getReason());
-        existingLeaveRequest.setStatus(leaveRequest.getStatus());
-        existingLeaveRequest.setStartDate(leaveRequest.getStartDate());
-        existingLeaveRequest.setEndDate(leaveRequest.getEndDate());
+        if (staff.isEmpty()) return Optional.empty();
 
-        return leaveRequestRepository.save(existingLeaveRequest);
+        if (existingLeaveRequest.isEmpty()) return Optional.empty();
+
+        existingLeaveRequest.map(value -> {
+            value.setLeaveType(dto.getLeaveType());
+            value.setStartDate(dto.getStartDate());
+            value.setEndDate(dto.getEndDate());
+            value.setReason(dto.getReason());
+            value.setAdminReply(dto.getAdminReply());
+            value.setStatus(dto.getStatus());
+            value.setStaff(staff.get());
+            return value;
+        });
+
+        return Optional.of(new LeaveRequestDto(leaveRequestRepository.save(existingLeaveRequest.get())));
     }
 
     @Override

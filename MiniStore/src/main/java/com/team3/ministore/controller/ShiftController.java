@@ -32,7 +32,7 @@ public class ShiftController {
 
         Optional<ShiftDto> createdShift = shiftService.createShift(shift);
 
-        return createdShift.map(value -> ResponseHandler.getResponse(value, HttpStatus.OK))
+        return createdShift.map(value -> ResponseHandler.getResponse(value, HttpStatus.CREATED))
                 .orElseGet(() -> ResponseHandler.getResponse(new Exception("Invalid staff id"),
                         HttpStatus.BAD_REQUEST));
     }
