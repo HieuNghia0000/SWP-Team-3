@@ -34,7 +34,9 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
     @Override
     public List<LeaveRequestDto> getAllLeaveRequest(String search, int page, int pageSize) {
         Pageable pageable = PageRequest.of(page - 1, pageSize);
-        return leaveRequestRepository.findByStaff_StaffNameContainingIgnoreCaseOrderByLeaveRequestIdDesc(search,pageable).stream().map(LeaveRequestDto::new)
+
+        return leaveRequestRepository.findByStaff_StaffNameContainingIgnoreCaseOrderByLeaveRequestIdDesc(search, pageable)
+                .stream().map(LeaveRequestDto::new)
                 .collect(Collectors.toList());
     }
 
@@ -57,14 +59,9 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
         return Optional.of(new LeaveRequestDto(leaveRequestRepository.save(leave)));
     }
 
-    @Override
-    public Optional<LeaveRequestDto> getLeaveRequestById(Integer id) {
-        return leaveRequestRepository.findById(id).map(LeaveRequestDto::new);
-    }
-
     public List<LeaveRequestDto> getLeaveRequestsByStaffIdAndDates(Integer id, LocalDate startDate, LocalDate endDate) {
         return leaveRequestRepository.findLeaveRequestsByStaffIdAndDates(id, startDate, endDate)
-                .stream().map(value -> new LeaveRequestDto(value,false)).collect(Collectors.toList());
+                .stream().map(value -> new LeaveRequestDto(value, false)).collect(Collectors.toList());
     }
 
 

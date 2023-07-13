@@ -1,5 +1,6 @@
 package com.team3.ministore.model;
 
+import com.team3.ministore.utils.ShiftCoverStatus;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -18,9 +19,14 @@ public class ShiftCoverRequest {
     private String note;
 
     @Column(name = "status")
-    private int status;
+    @Enumerated(EnumType.ORDINAL)
+    private ShiftCoverStatus status;
 
     @ManyToOne
     @JoinColumn(name = "staff_id")
     private Staff staff;
+
+    @OneToOne
+    @JoinColumn(name = "shift_id")
+    private Shift shift;
 }

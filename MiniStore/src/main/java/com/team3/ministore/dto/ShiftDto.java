@@ -1,7 +1,6 @@
 package com.team3.ministore.dto;
 
 import com.team3.ministore.model.Shift;
-import com.team3.ministore.model.ShiftCoverRequest;
 import com.team3.ministore.model.Timesheet;
 import com.team3.ministore.utils.Role;
 import lombok.Data;
@@ -32,8 +31,7 @@ public class ShiftDto {
 
     private Timesheet timesheet;
 
-    private ShiftCoverRequest shiftCoverRequest;
-
+    private ShiftCoverDto shiftCoverRequest;
 
     public ShiftDto(Shift shift) {
         this.shiftId = shift.getShiftId();
@@ -46,6 +44,22 @@ public class ShiftDto {
         this.endTime = shift.getEndTime();
         this.staffId = shift.getStaff().getStaffId();
         this.timesheet = shift.getTimesheet();
-        this.shiftCoverRequest = shift.getShiftCoverRequest();
+        this.shiftCoverRequest = new ShiftCoverDto(shift.getShiftCoverRequest(), true, true);
     }
+
+    public ShiftDto(Shift shift, boolean withoutShiftCoverRequest) {
+        this.shiftId = shift.getShiftId();
+        this.date = shift.getDate();
+        this.published = shift.getPublished();
+        this.role = shift.getRole();
+        this.salaryCoefficient = shift.getSalaryCoefficient();
+        this.name = shift.getName();
+        this.startTime = shift.getStartTime();
+        this.endTime = shift.getEndTime();
+        this.staffId = shift.getStaff().getStaffId();
+        this.timesheet = shift.getTimesheet();
+        if (!withoutShiftCoverRequest)
+            this.shiftCoverRequest = new ShiftCoverDto(shift.getShiftCoverRequest());
+    }
+
 }

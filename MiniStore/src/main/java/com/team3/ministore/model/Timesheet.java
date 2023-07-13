@@ -32,4 +32,8 @@ public class Timesheet {
     @Column(name = "note_content", length = 100)
     private String noteContent;
 
+    @OneToOne
+    @JoinColumn(name = "shift_id")
+    private Shift shift;
+
 }

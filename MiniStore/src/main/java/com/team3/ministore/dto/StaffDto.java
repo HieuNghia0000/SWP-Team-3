@@ -1,6 +1,5 @@
 package com.team3.ministore.dto;
 
-import com.team3.ministore.model.LeaveRequest;
 import com.team3.ministore.model.Staff;
 import com.team3.ministore.utils.Role;
 import com.team3.ministore.utils.StaffStatus;

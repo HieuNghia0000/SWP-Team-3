@@ -59,7 +59,7 @@ public class ShiftServiceImpl implements ShiftService {
 
     @Override
     public ShiftDto updateShift(Shift shift) {
-        return new ShiftDto( shiftRepository.save(shift) );
+        return new ShiftDto(shiftRepository.save(shift));
     }
 
     @Override

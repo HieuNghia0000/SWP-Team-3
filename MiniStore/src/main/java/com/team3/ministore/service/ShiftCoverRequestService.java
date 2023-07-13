@@ -1,17 +1,18 @@
 package com.team3.ministore.service;
 
-import com.team3.ministore.model.ShiftCoverRequest;
+import com.team3.ministore.dto.ShiftCoverDto;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ShiftCoverRequestService {
-    List<ShiftCoverRequest> getAllShiftCoverRequests();
+    List<ShiftCoverDto> getAllShiftCoverRequests(String search, Integer page, Integer pageSize);
 
-    ShiftCoverRequest createShiftCoverRequest(ShiftCoverRequest shiftCoverRequest);
+    List<ShiftCoverDto> getAllShiftCoverRequests(Integer page, Integer pageSize);
 
-    ShiftCoverRequest getShiftCoverRequestById(Integer id);
+    Optional<ShiftCoverDto> createShiftCoverRequest(ShiftCoverDto dto);
 
-    ShiftCoverRequest updateShiftCoverRequest(Integer id, ShiftCoverRequest shiftCoverRequest);
+    Optional<ShiftCoverDto> updateShiftCoverRequest(Integer id, ShiftCoverDto dto);
 
     void deleteShiftCoverRequest(Integer id);
 }
