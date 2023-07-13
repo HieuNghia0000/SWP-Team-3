@@ -3,8 +3,20 @@ import routes from "~/utils/routes";
 import {TbDownload} from "solid-icons/tb";;
 import {OcPaperairplane2, OcPencil3} from "solid-icons/oc";
 import {BsPrinter} from "solid-icons/bs";
+import {createEffect, createResource, For} from "solid-js";
+import axios from "axios";
+import {OrderItem} from "~/types";
 
 export default function Invoice() {
+    const [data] =  createResource(async () => {
+        const response = await axios.get(`http://localhost:8080/order-items/1`);
+        return response.data as OrderItem[];
+    });
+
+    createEffect(() => {
+        if (!data.error && data.state === "ready") console.log(data());
+    });
+
   return (
     <main class="min-w-fit">
       <h1 class="mb-2 text-2xl font-medium">Invoice</h1>
@@ -54,13 +66,17 @@ export default function Invoice() {
 
                         {/*Table row*/}
                         <tbody>
-                            <tr>
-                                <td class="px-4 py-2 text-gray-500 font-medium">Product 1</td>
-                                <td class="px-4 py-2">302011</td>
-                                <td class="px-4 py-2 text-gray-500 font-medium">1 pcs</td>
-                                <td class="px-4 py-2 text-gray-500 font-medium">$10.00</td>
-                                <td class="px-4 py-2 text-right text-gray-500 font-medium">$20.00</td>
-                            </tr>
+                        <For each={data()}>
+                            {(item, index) => (
+                                <tr>
+                                    <td class="px-4 py-2 text-gray-500 font-medium">{item.product.name}</td>
+                                    <td class="px-4 py-2">{item.product.barCode}</td>
+                                    <td class="px-4 py-2 text-gray-500 font-medium">{item.quantity} pcs</td>
+                                    <td class="px-4 py-2 text-gray-500 font-medium">${item.product.price.toFixed(2)}</td>
+                                    <td class="px-4 py-2 text-right text-gray-500 font-medium">${(item.product.price * item.quantity).toFixed(2)}</td>
+                                </tr>
+                            )}
+                        </For>
                         </tbody>
 
                         {/*Total price*/}

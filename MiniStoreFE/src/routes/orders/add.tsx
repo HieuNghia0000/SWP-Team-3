@@ -51,8 +51,8 @@ export default function AddOrders() {
                                 <tr>
                                     <td class="px-4 py-2 text-indigo-500 font-bold">#302011</td>
                                     <td class="px-4 py-2 font-medium">Smartwatch E2</td>
-                                    <td class="px-4 py-2 text-gray-500 font-medium">1 pcs</td>
                                     <td class="px-4 py-2 text-gray-500 font-medium">$400.00</td>
+                                    <td class="px-4 py-2 text-gray-500 font-medium">1 pcs</td>
                                     <td class="px-4 py-2 text-gray-500 font-medium">$400.00</td>
                                     <td class="px-4 py-2 text-gray-500 font-medium">
                                         <span class="text-xl">

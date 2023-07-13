@@ -1,6 +1,7 @@
 package com.team3.ministore.controller;
 
 import com.team3.ministore.model.OrderItems;
+import com.team3.ministore.model.Product;
 import com.team3.ministore.service.OrderItemsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,9 +30,9 @@ public class OrderItemsController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<OrderItems> getOrderItemsById(@PathVariable("id") Integer id) {
-        OrderItems orderItems = orderItemsService.getOrderItemsById(id);
-        return new ResponseEntity<>(orderItems, HttpStatus.OK);
+    public ResponseEntity<List<OrderItems>> getOrderItemsByOrderId(@PathVariable("id") Integer id) {
+        List<OrderItems> orderItemsList = orderItemsService.getOrderItemsByOrderId(id);
+        return new ResponseEntity<>(orderItemsList, HttpStatus.OK);
     }
 
     @PutMapping("/update/{id}")

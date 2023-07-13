@@ -1,6 +1,7 @@
 package com.team3.ministore.service;
 
 import com.team3.ministore.model.OrderItems;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -14,4 +15,6 @@ public interface OrderItemsService {
     OrderItems updateOrderItems(Integer id, OrderItems orderItems);
 
     void deleteOrderItems(Integer id);
+
+    List<OrderItems> getOrderItemsByOrderId(Integer id);
 }

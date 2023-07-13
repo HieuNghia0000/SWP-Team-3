@@ -142,7 +142,7 @@ export interface OrderItem {
 
 export interface Product {
     productId: number;
-    barcode: string;
+    barCode: string;
     name: string;
     description: string;
     price: number;

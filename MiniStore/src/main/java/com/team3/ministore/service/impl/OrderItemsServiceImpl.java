@@ -44,4 +44,9 @@ public class OrderItemsServiceImpl implements OrderItemsService {
     public void deleteOrderItems(Integer id) {
         orderItemsRepository.deleteById(id);
     }
+
+    @Override
+    public List<OrderItems> getOrderItemsByOrderId(Integer id) {
+        return orderItemsRepository.getOrderItemsByOrderId(id);
+    }
 }
