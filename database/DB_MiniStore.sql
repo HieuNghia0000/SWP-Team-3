@@ -20,6 +20,7 @@ CREATE TABLE Staffs (
 
 CREATE TABLE Timesheets (
 	timesheet_id INT AUTO_INCREMENT NOT NULL,
+    shift_id INT NOT NULL,
     check_in_time TIME,
     check_out_time TIME,
     status INT,
@@ -30,6 +31,7 @@ CREATE TABLE Timesheets (
 
 CREATE TABLE ShiftCoverRequests (
 	shift_cover_request_id INT AUTO_INCREMENT NOT NULL,
+    shift_id INT NOT NULL,
     staff_id INT,
     note NVARCHAR(400),
     status INT,
@@ -64,6 +66,9 @@ CREATE TABLE Shifts (
     FOREIGN KEY (timesheet_id) REFERENCES Timesheets(timesheet_id) ON DELETE SET NULL,
     FOREIGN KEY (shift_cover_request_id) REFERENCES ShiftCoverRequests(shift_cover_request_id) ON DELETE SET NULL
 );
+
+alter table Timesheets add FOREIGN KEY (shift_id) REFERENCES Shifts(shift_id) ON DELETE cascade;
+alter table ShiftCoverRequests add FOREIGN KEY (shift_id) REFERENCES Shifts(shift_id) ON DELETE cascade;
 
 CREATE TABLE ScheduleTemplates (
 	schedule_template_id INT AUTO_INCREMENT NOT NULL,
