@@ -1,4 +1,4 @@
 import Cookies from "js-cookie";
+import { isServer } from "solid-js/web";
 
-// Get the endpoint from the cookie (client-side)
-export default () => Cookies.get("endpoint");
+export default () => isServer ? process.env.API_ENDPOINT : Cookies.get("endpoint");

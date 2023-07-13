@@ -7,6 +7,8 @@ import com.team3.ministore.repository.LeaveRequestRepository;
 import com.team3.ministore.repository.StaffRepository;
 import com.team3.ministore.service.LeaveRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -24,8 +26,16 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
     private StaffRepository staffRepository;
 
     @Override
-    public List<LeaveRequestDto> getAllLeaveRequest() {
-        return leaveRequestRepository.findAllLeaveRequest();
+    public List<LeaveRequestDto> getAllLeaveRequest(int page, int pageSize) {
+        Pageable pageable = PageRequest.of(page - 1, pageSize);
+        return leaveRequestRepository.findAll(pageable).stream().map(LeaveRequestDto::new).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<LeaveRequestDto> getAllLeaveRequest(String search, int page, int pageSize) {
+        Pageable pageable = PageRequest.of(page - 1, pageSize);
+        return leaveRequestRepository.findByStaff_StaffNameContainingIgnoreCase(search,pageable).stream().map(LeaveRequestDto::new)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -54,7 +64,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
 
     public List<LeaveRequestDto> getLeaveRequestsByStaffIdAndDates(Integer id, LocalDate startDate, LocalDate endDate) {
         return leaveRequestRepository.findLeaveRequestsByStaffIdAndDates(id, startDate, endDate)
-                .stream().map(LeaveRequestDto::new).collect(Collectors.toList());
+                .stream().map(value -> new LeaveRequestDto(value,false)).collect(Collectors.toList());
     }
 
 

@@ -7,7 +7,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface LeaveRequestService {
-    List<LeaveRequestDto> getAllLeaveRequest();
+
+    List<LeaveRequestDto> getAllLeaveRequest(int page, int pageSize);
+
+    List<LeaveRequestDto> getAllLeaveRequest(String search, int page, int pageSize);
 
     Optional<LeaveRequestDto> createLeaveRequest(LeaveRequestDto leaveRequest);
 

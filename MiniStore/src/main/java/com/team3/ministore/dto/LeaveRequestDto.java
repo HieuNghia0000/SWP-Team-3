@@ -1,6 +1,7 @@
 package com.team3.ministore.dto;
 
 import com.team3.ministore.model.LeaveRequest;
+import com.team3.ministore.model.Staff;
 import com.team3.ministore.utils.LeaveStatus;
 import com.team3.ministore.utils.LeaveType;
 import lombok.Data;
@@ -8,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Data
 @RequiredArgsConstructor
@@ -35,6 +37,8 @@ public class LeaveRequestDto {
     @NotNull(message = "Staff must not be null")
     private int staffId;
 
+    private StaffDto staff;
+
     public LeaveRequestDto(LeaveRequest leave) {
         this.leaveType = leave.getLeaveType();
         this.startDate = leave.getStartDate();
@@ -42,20 +46,23 @@ public class LeaveRequestDto {
         this.status = leave.getStatus();
         this.reason = leave.getReason();
         this.adminReply = leave.getAdminReply();
-        this.staffId = leave.getStaff().getStaffId();
         this.leaveRequestId = leave.getLeaveRequestId();
+        this.staffId = leave.getStaff().getStaffId();
+        this.staff = new StaffDto(leave.getStaff());
     }
 
-    //    Do not delete this constructor. It is used in LeaveRequestRepository.java
-    public LeaveRequestDto(LeaveType leaveType, LocalDate startDate, LocalDate endDate, LeaveStatus status,
-                           String reason, String adminReply, int staffId, int leaveRequestId) {
-        this.leaveType = leaveType;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.status = status;
-        this.reason = reason;
-        this.adminReply = adminReply;
-        this.staffId = staffId;
-        this.leaveRequestId = leaveRequestId;
+    public LeaveRequestDto(LeaveRequest leave, boolean getStaff) {
+        this.leaveType = leave.getLeaveType();
+        this.startDate = leave.getStartDate();
+        this.endDate = leave.getEndDate();
+        this.status = leave.getStatus();
+        this.reason = leave.getReason();
+        this.adminReply = leave.getAdminReply();
+        this.leaveRequestId = leave.getLeaveRequestId();
+        this.staffId = leave.getStaff().getStaffId();
+        if (getStaff) {
+            this.staff = new StaffDto(leave.getStaff());
+        }
     }
+
 }

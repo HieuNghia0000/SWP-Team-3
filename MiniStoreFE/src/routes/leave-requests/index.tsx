@@ -1,32 +1,41 @@
 import { A, createRouteData, useRouteData } from "solid-start";
-import { useSearchParams } from "@solidjs/router";
-import { DataResponse, Product } from "~/types";
-import { For } from "solid-js";
+import { DataResponse, LeaveRequest } from "~/types";
+import { For, Show } from "solid-js";
 import routes from "~/utils/routes";
 import Breadcrumbs from "~/components/Breadcrumbs";
-import { IoEyeOutline, IoTrashOutline } from "solid-icons/io";
+import { IoTrashOutline } from "solid-icons/io";
 import { OcPencil3 } from "solid-icons/oc";
 import Pagination from "~/components/Pagination";
-import { ParamType } from "~/components/leave-requests/types";
 import ToolBar from "~/components/leave-requests/Toolbar";
+import axios from "axios";
+import getEndPoint from "~/utils/getEndPoint";
+import handleFetchError from "~/utils/handleFetchError";
+import { capitalize } from "~/utils/capitalize";
+import { useSearchParams } from "@solidjs/router";
+import { ParamType } from "~/components/leave-requests/types";
 
 export function routeData() {
-  const [ searchParams ] = useSearchParams<ParamType>();
+  const [ params ] = useSearchParams<ParamType>();
 
   return createRouteData(
-    async ([ perPage, curPage ]) => {
-      const response = await fetch(`http://localhost:3000/products.json`);
-      const data = (await response.json()) as DataResponse<Product[]>;
-      return data.content;
+    async ([ key, perPage, curPage, search ]) => {
+      try {
+        const { data } = await axios.get<DataResponse<LeaveRequest[]>>(
+          `${getEndPoint()}/${key}?perPage=${perPage}&curPage=${curPage}&search=${search}`
+        );
+        return data.content;
+      } catch (e) {
+        throw new Error(handleFetchError(e));
+      }
     },
-    { key: () => [ searchParams.perPage ?? 10, searchParams.curPage ?? 1 ] }
+    { key: () => [ "leave-requests/list", params.perPage ?? 10, params.curPage ?? 1, params.search ?? "" ] }
   );
 }
 
 export default function LeaveRequests() {
   const data = useRouteData<typeof routeData>();
 
-  const totalItems = () => data()?.length ?? 0;
+  const totalItems = () => data.error ? 0 : data()?.length ?? 0;
 
   return (
     <main>
@@ -35,6 +44,12 @@ export default function LeaveRequests() {
 
       {/* Search bar */}
       <ToolBar/>
+
+      <Show when={data.loading}>
+        <div class="mb-2">
+          Loading...
+        </div>
+      </Show>
 
       {/* Table */}
       <div class="flex flex-col border border-gray-200 rounded-lg overflow-x-auto shadow-sm">
@@ -105,107 +120,93 @@ export default function LeaveRequests() {
           </thead>
           {/* <!-- Table row --> */}
           <tbody class="">
-          <For each={data()}>
-            {(item) => (
-              <tr class="hover:bg-[#ceefff] odd:bg-white even:bg-gray-50 text-[#333c48]">
-                <td
-                  class="px-2.5 pl-[18px] text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
-                  <A
-                    href={routes.product(item.productId)}
-                    class="hover:text-indigo-500"
-                  >
-                    {item.productId}
-                  </A>
-                </td>
-                <td
-                  style={{
-                    "border-left": "1px dashed #d5dce6",
-                  }}
-                  class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
-                  {item.barcode}
-                </td>
-                <td
-                  style={{
-                    "border-left": "1px dashed #d5dce6",
-                  }}
-                  class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
-                  {item.name}
-                </td>
-                <td
-                  style={{
-                    "border-left": "1px dashed #d5dce6",
-                  }}
-                  class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
-                  {item.category?.name || "N/A"}
-                </td>
-                <td
-                  style={{
-                    "border-left": "1px dashed #d5dce6",
-                  }}
-                  class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+          <Show when={!data.error} fallback={<div class="w-full h-full min-h-[300px] grid place-items-center">
+            Something went wrong
+          </div>}>
+            <For each={data()}>
+              {(item) => (
+                <tr class="hover:bg-[#ceefff] odd:bg-white even:bg-gray-50 text-[#333c48]">
+                  <td
+                    class="px-2.5 pl-[18px] text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                    <A
+                      href={routes.staff(item.staffId)}
+                      class="hover:text-indigo-500"
+                    >
+                      {item.staff?.staffName}
+                    </A>
+                  </td>
+                  <td
+                    style={{
+                      "border-left": "1px dashed #d5dce6",
+                    }}
+                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                    {capitalize(item.leaveType)}
+                  </td>
+                  <td
+                    style={{
+                      "border-left": "1px dashed #d5dce6",
+                    }}
+                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                    {item.startDate}
+                  </td>
+                  <td
+                    style={{
+                      "border-left": "1px dashed #d5dce6",
+                    }}
+                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                    {item.endDate}
+                  </td>
+                  <td
+                    style={{
+                      "border-left": "1px dashed #d5dce6",
+                    }}
+                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
                     <span
                       class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-bold rounded-full"
                       classList={{
                         "text-orange-400 bg-orange-100": true,
                       }}
                     >
-                        Pending
+                      {capitalize(item.status)}
                     </span>
-                </td>
-                <td
-                  style={{
-                    "border-left": "1px dashed #d5dce6",
-                  }}
-                  class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
-                  {item.price} ₫
-                </td>
-                <td
-                  style={{
-                    "border-left": "1px dashed #d5dce6",
-                  }}
-                  class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
-                  <div class="flex flex-row gap-1">
-                    <div class="relative flex justify-center items-center">
-                      <A
-                        href={routes.product(item.productId)}
-                        class="peer text-base text-gray-500 hover:text-indigo-500"
-                      >
-                        <IoEyeOutline/>
-                      </A>
-                      <span
-                        class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
-                          Details
-                        </span>
-                    </div>
-                    <div class="relative flex justify-center items-center">
-                      <A
-                        href={routes.productEdit(item.productId)}
-                        class="peer text-base text-gray-500 hover:text-indigo-500"
-                      >
-                        <OcPencil3/>
-                      </A>
-                      <span
-                        class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
+                  </td>
+                  <td
+                    style={{
+                      "border-left": "1px dashed #d5dce6",
+                    }}
+                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                    {item.reason}
+                  </td>
+                  <td
+                    style={{
+                      "border-left": "1px dashed #d5dce6",
+                    }}
+                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                    <div class="flex flex-row gap-1">
+                      <div class="relative flex justify-center items-center">
+                        <button class="peer text-base text-gray-500 hover:text-indigo-500">
+                          <OcPencil3/>
+                        </button>
+                        <span
+                          class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
                           Edit
                         </span>
-                    </div>
-                    <div class="relative flex justify-center items-center">
-                      <A
-                        href={"/"}
-                        class="peer text-base text-gray-500 hover:text-indigo-500"
-                      >
-                        <IoTrashOutline/>
-                      </A>
-                      <span
-                        class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
+                      </div>
+                      <div class="relative flex justify-center items-center">
+                        <button class="peer text-base text-gray-500 hover:text-indigo-500">
+                          <IoTrashOutline/>
+                        </button>
+                        <span
+                          class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
                           Delete
                         </span>
+                      </div>
                     </div>
-                  </div>
-                </td>
-              </tr>
-            )}
-          </For>
+                  </td>
+                </tr>
+              )}
+            </For>
+          </Show>
           </tbody>
         </table>
       </div>

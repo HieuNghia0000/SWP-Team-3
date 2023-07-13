@@ -11,7 +11,6 @@ import com.team3.ministore.service.SalaryService;
 import com.team3.ministore.service.StaffService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -88,7 +87,9 @@ public class StaffController {
     }
 
     @GetMapping("")
-    public ResponseEntity<Page<Staff>> getStaffs(@RequestParam("search") Optional<String> searchParam, @RequestParam("curPage") Optional<Integer> curPageParam, @RequestParam("perPage") Optional<Integer> perPageParam) {
+    public ResponseEntity<Object> getStaffs(@RequestParam("search") Optional<String> searchParam,
+                                            @RequestParam("curPage") Optional<Integer> curPageParam,
+                                            @RequestParam("perPage") Optional<Integer> perPageParam) {
         Page<Staff> staffPage;
         List<Staff> staffList = null;
 
@@ -116,12 +117,15 @@ public class StaffController {
         }
 
         if (staffList != null) {
-            List<Staff> filteredStaffs = staffPage.stream().filter(staffList::contains).collect(Collectors.toList());
+            List<StaffDto> filteredStaffs = staffPage.stream().filter(staffList::contains).map(value ->
+                        new StaffDto(value, salaryService.getSalaryByStaffId(value.getStaffId()))).collect(Collectors.toList());
+            return new ResponseEntity<>(filteredStaffs, HttpStatus.OK);
 
-            staffPage = new PageImpl<>(filteredStaffs, staffPage.getPageable(), filteredStaffs.size());
         }
+        return ResponseHandler.getResponse(staffPage.stream().map(value ->
+                        new StaffDto(value, salaryService.getSalaryByStaffId(value.getStaffId())))
+                .collect(Collectors.toList()), HttpStatus.OK);
 
-        return new ResponseEntity<>(staffPage, HttpStatus.OK);
     }
 
 }

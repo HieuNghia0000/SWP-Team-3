@@ -39,7 +39,7 @@ public class StaffServiceImpl implements StaffService {
 
     @Override
     public List<Staff> getStaffByNameLike(String staffName) {
-        return staffRepository.findByStaffNameLike(staffName);
+        return staffRepository.findByStaffNameContainingIgnoreCase(staffName);
     }
 
     @Override
@@ -87,7 +87,7 @@ public class StaffServiceImpl implements StaffService {
     @Override
     public Page<Staff> findAllPagingStaff(int pageIndex, int pageSize) {
         Pageable pageable = PageRequest.of(pageIndex - 1, pageSize);
-        return staffRepository.findAllPagingStaff(pageable);
+        return staffRepository.findAll(pageable);
     }
 
     @Override

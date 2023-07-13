@@ -31,8 +31,11 @@ public class LeaveRequestController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<Object> getAllLeaveRequest() {
-        return ResponseHandler.getResponse(leaveRequestService.getAllLeaveRequest(), HttpStatus.OK);
+    public ResponseEntity<Object> getAllLeaveRequest(@RequestParam("search") Optional<String> search,
+                                                     @RequestParam("curPage") Integer curPage,
+                                                     @RequestParam("perPage") Integer perPage) {
+        return search.map(s -> ResponseHandler.getResponse(leaveRequestService.getAllLeaveRequest(s, curPage, perPage), HttpStatus.OK))
+                .orElseGet(() -> ResponseHandler.getResponse(leaveRequestService.getAllLeaveRequest(curPage, perPage), HttpStatus.OK));
     }
 
     @PutMapping("/update/{id}")

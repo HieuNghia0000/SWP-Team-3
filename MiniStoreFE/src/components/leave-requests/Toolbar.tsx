@@ -2,18 +2,16 @@ import { AiOutlineSearch } from "solid-icons/ai";
 import { RiSystemAddFill } from "solid-icons/ri";
 import { useSearchParams } from "@solidjs/router";
 import { ParamType } from "~/components/leave-requests/types";
-import { A } from "solid-start";
-import routes from "~/utils/routes";
 import DropDownBtn from "~/components/DropDownBtn";
 import { BiRegularSlider } from "solid-icons/bi";
 import { createSignal } from "solid-js";
 
-export default function ToolBar(){
-  const [searchParams, setSearchParams] = useSearchParams<ParamType>();
-  const [amountFrom, setAmountFrom] = createSignal<number>(
+export default function ToolBar() {
+  const [ searchParams, setSearchParams ] = useSearchParams<ParamType>();
+  const [ amountFrom, setAmountFrom ] = createSignal<number>(
     Number.parseInt(searchParams.amount_from || "0")
   );
-  const [amountTo, setAmountTo] = createSignal<number>(
+  const [ amountTo, setAmountTo ] = createSignal<number>(
     Number.parseInt(searchParams.amount_to || "0")
   );
 
@@ -33,17 +31,18 @@ export default function ToolBar(){
             class="w-96 max-w-full border-gray-300 rounded-lg py-2 px-4 leading-tight pl-12 border-0 ring-1 ring-inset ring-gray-300 outline-0 focus:ring-1 focus:ring-inset focus:ring-indigo-600"
             placeholder="Search (type text, then press Enter)"
             name="search"
-            value=""
+            value={searchParams.search ?? ""}
           />
           <button
             class="absolute inset-y-0 left-0 flex items-center pl-4 text-lg"
             type="submit"
             title="Search"
           >
-            <AiOutlineSearch />
+            <AiOutlineSearch/>
           </button>
         </form>
-        <DropDownBtn text="Filters" icon={<BiRegularSlider />}>
+
+        <DropDownBtn text="Filters" icon={<BiRegularSlider/>}>
           <div class="flex flex-col gap-2 justify-center items-center p-3 text-sm">
             <div class="w-full">
               <label for="amount_from" class="block">
@@ -121,7 +120,7 @@ export default function ToolBar(){
           class="flex gap-1 justify-center items-center pl-3 pr-4 py-2 text-sm text-white bg-indigo-500 font-medium rounded-lg hover:bg-indigo-600"
         >
             <span class="text-lg">
-              <RiSystemAddFill />
+              <RiSystemAddFill/>
             </span>
           <span>New Leave Request</span>
         </button>
