@@ -6,7 +6,6 @@ import com.team3.ministore.dto.ShiftDto;
 import com.team3.ministore.model.Shift;
 import com.team3.ministore.model.Staff;
 import com.team3.ministore.service.ShiftService;
-import com.team3.ministore.service.ShiftTemplateService;
 import com.team3.ministore.service.StaffService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,7 +32,7 @@ public class ShiftController {
 
         Optional<ShiftDto> createdShift = shiftService.createShift(shift);
 
-        return createdShift.map(value -> ResponseHandler.getResponse(value, HttpStatus.OK))
+        return createdShift.map(value -> ResponseHandler.getResponse(value, HttpStatus.CREATED))
                 .orElseGet(() -> ResponseHandler.getResponse(new Exception("Invalid staff id"),
                         HttpStatus.BAD_REQUEST));
     }

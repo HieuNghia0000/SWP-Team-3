@@ -1,17 +1,21 @@
 package com.team3.ministore.service;
 
-import com.team3.ministore.model.LeaveRequest;
+import com.team3.ministore.dto.LeaveRequestDto;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface LeaveRequestService {
-    List<LeaveRequest> getAllLeaveRequest();
+    List<LeaveRequestDto> getAllLeaveRequest();
 
-    LeaveRequest createLeaveRequest(LeaveRequest leaveRequest);
+    Optional<LeaveRequestDto> createLeaveRequest(LeaveRequestDto leaveRequest);
 
-    LeaveRequest getLeaveRequestById(Integer id);
+    List<LeaveRequestDto> getLeaveRequestsByStaffIdAndDates(Integer id, LocalDate startDate, LocalDate endDate);
 
-    LeaveRequest updateLeaveRequest(Integer id, LeaveRequest leaveRequest);
+    Optional<LeaveRequestDto> getLeaveRequestById(Integer id);
+
+    Optional<LeaveRequestDto> updateLeaveRequest(Integer id, LeaveRequestDto dto);
 
     void deleteLeaveRequest(Integer id);
 }

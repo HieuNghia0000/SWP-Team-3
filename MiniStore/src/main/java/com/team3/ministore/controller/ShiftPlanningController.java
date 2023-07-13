@@ -1,14 +1,17 @@
 package com.team3.ministore.controller;
 
 import com.team3.ministore.common.responsehandler.ResponseHandler;
+import com.team3.ministore.dto.LeaveRequestDto;
 import com.team3.ministore.dto.SalaryDto;
 import com.team3.ministore.dto.ShiftDto;
 import com.team3.ministore.dto.StaffDto;
 import com.team3.ministore.model.Shift;
 import com.team3.ministore.model.Staff;
+import com.team3.ministore.service.LeaveRequestService;
 import com.team3.ministore.service.SalaryService;
 import com.team3.ministore.service.ShiftService;
 import com.team3.ministore.service.StaffService;
+import com.team3.ministore.utils.LeaveStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +34,8 @@ public class ShiftPlanningController {
     private StaffService staffService;
     @Autowired
     private SalaryService salaryService;
+    @Autowired
+    private LeaveRequestService leaveRequestService;
 
     @GetMapping()
     public ResponseEntity<Object> getShiftPlanning(@RequestParam(value = "from", required = false) String from,
@@ -52,11 +57,16 @@ public class ShiftPlanningController {
             // Iterate through all staffs and get their shifts and salary
             List<StaffDto> result = staffs.parallelStream().map(staff -> {
                 SalaryDto salaryDto = salaryService.getSalaryByStaffId(staff.getStaffId());
+                List<LeaveRequestDto> leaveRequestDtos = leaveRequestService.getLeaveRequestsByStaffIdAndDates(
+                                staff.getStaffId(), fromDate, toDate
+                        ).stream().filter(leaveRequestDto -> leaveRequestDto.getStatus().equals(LeaveStatus.APPROVED))
+                        .collect(Collectors.toList());
                 List<Shift> shifts = shiftService.getAllShiftsByStaffId(staff.getStaffId(), fromDate, toDate);
                 // Convert shifts to shiftDtos
                 List<ShiftDto> shiftDtos = shifts.stream().map(ShiftDto::new).collect(Collectors.toList());
+
                 // Return the staffDto
-                return new StaffDto(staff, salaryDto, shiftDtos);
+                return new StaffDto(staff, salaryDto, shiftDtos, leaveRequestDtos);
             }).collect(Collectors.toList());
 
             return ResponseHandler.getResponse(result, HttpStatus.OK);
@@ -69,9 +79,13 @@ public class ShiftPlanningController {
             return ResponseHandler.getResponse(new Exception("Staff not found"), HttpStatus.NOT_FOUND);
 
         SalaryDto salaryDto = salaryService.getSalaryByStaffId(staff.get().getStaffId());
+        List<LeaveRequestDto> leaveRequestDtos = leaveRequestService.getLeaveRequestsByStaffIdAndDates(
+                        staff.get().getStaffId(), fromDate, toDate
+                ).stream().filter(leaveRequestDto -> leaveRequestDto.getStatus().equals(LeaveStatus.APPROVED))
+                .collect(Collectors.toList());
         List<Shift> shifts = shiftService.getAllShiftsByStaffId(staff.get().getStaffId(), fromDate, toDate);
         List<ShiftDto> shiftDtos = shifts.stream().map(ShiftDto::new).collect(Collectors.toList());
         // Return a list of staffDto with only one element (the staff with the given staffId)
-        return ResponseHandler.getResponse(List.of(new StaffDto(staff.get(), salaryDto, shiftDtos)), HttpStatus.OK);
+        return ResponseHandler.getResponse(List.of(new StaffDto(staff.get(), salaryDto, shiftDtos, leaveRequestDtos)), HttpStatus.OK);
     }
 }

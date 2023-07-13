@@ -44,21 +44,6 @@ export default function Products() {
   );
 
   const totalItems = () => data()?.length ?? 0;
-  const perPage = () => Number.parseInt(searchParams.perPage || "10");
-  const curPage = () => Number.parseInt(searchParams.curPage || "1");
-  const lastPage = () => Math.ceil(totalItems() / perPage());
-
-  const prev = () => {
-    setSearchParams({ curPage: Math.max(1, curPage() - 1) });
-  };
-
-  const next = () => {
-    setSearchParams({ curPage: Math.min(lastPage(), curPage() + 1) });
-  };
-
-  const setPage = (page: number) => {
-    setSearchParams({ curPage: Math.max(1, Math.min(lastPage(), page)) });
-  };
 
   const onSearchSubmit = (e: Event) => {
     e.preventDefault();
@@ -298,15 +283,7 @@ export default function Products() {
         </table>
       </div>
 
-      <Pagination
-        curPage={curPage}
-        perPage={perPage}
-        lastPage={lastPage}
-        next={next}
-        prev={prev}
-        setPage={setPage}
-        totalItems={totalItems}
-      />
+      <Pagination totalItems={totalItems}/>
     </main>
   );
 }

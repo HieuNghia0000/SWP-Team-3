@@ -5,12 +5,10 @@ import com.team3.ministore.utils.StaffStatus;
 import com.team3.ministore.validation.annotation.ExistEmail;
 import com.team3.ministore.validation.annotation.ExistUsername;
 import lombok.Data;
-import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
 
 @Data
 public class UpdateStaffDto {
