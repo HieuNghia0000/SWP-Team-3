@@ -34,7 +34,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
     @Override
     public List<LeaveRequestDto> getAllLeaveRequest(String search, int page, int pageSize) {
         Pageable pageable = PageRequest.of(page - 1, pageSize);
-        return leaveRequestRepository.findByStaff_StaffNameContainingIgnoreCase(search,pageable).stream().map(LeaveRequestDto::new)
+        return leaveRequestRepository.findByStaff_StaffNameContainingIgnoreCaseOrderByLeaveRequestIdDesc(search,pageable).stream().map(LeaveRequestDto::new)
                 .collect(Collectors.toList());
     }
 

@@ -18,7 +18,8 @@ public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Inte
             "OR (l.startDate <= :startDate AND l.endDate >= :endDate))")
     List<LeaveRequest> findLeaveRequestsByStaffIdAndDates(Integer id, LocalDate startDate, LocalDate endDate);
 
+    @Query("SELECT l FROM LeaveRequest l ORDER BY l.leaveRequestId DESC")
     Page<LeaveRequest> findAll(Pageable pageable);
 
-    Page<LeaveRequest> findByStaff_StaffNameContainingIgnoreCase(String staff_staffName, Pageable pageable);
+    Page<LeaveRequest> findByStaff_StaffNameContainingIgnoreCaseOrderByLeaveRequestIdDesc(String staff_staffName, Pageable pageable);
 }
