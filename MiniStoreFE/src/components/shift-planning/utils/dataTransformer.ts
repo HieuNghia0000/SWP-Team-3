@@ -12,6 +12,7 @@ export function transformData(
     dates: data.dates,
     staffs: data.staffs,
     shiftsRules: {},
+    leaveRequests: [],
   };
 
   if (data.staffs.length === 0) return transformedData;
@@ -36,6 +37,10 @@ export function transformData(
       for (let shift of matchingShifts) {
         transformedData.cells[cellId].push(shift.shiftId);
       }
+    }
+
+    for (let leaveRequest of staff.leaveRequests) {
+      transformedData.leaveRequests.push(leaveRequest)
     }
   }
 

@@ -59,6 +59,7 @@ export default function ShiftPlanning() {
     dates: [],
     staffs: [],
     shiftsRules: {},
+    leaveRequests: [],
   });
 
   const [ showShiftModal, setShowShiftModal ] = createSignal<boolean>(false);
@@ -100,6 +101,7 @@ export default function ShiftPlanning() {
             shifts: [],
             dates: getWeekDateStings(datePicked()!),
             staffs: [],
+            leaveRequests: [],
           });
         }
       }
@@ -118,6 +120,7 @@ export default function ShiftPlanning() {
       dates: [],
       staffs: [],
       shiftsRules: {},
+      leaveRequests: [],
     });
   };
 

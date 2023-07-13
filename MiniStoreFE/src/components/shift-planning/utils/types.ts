@@ -1,4 +1,4 @@
-import { Staff, Shift } from "~/types";
+import { Staff, Shift, LeaveRequest } from "~/types";
 
 export type ParamType = {
   picked_date: string;
@@ -18,4 +18,5 @@ export interface DataTable extends FetcherData {
   cells: { [key: string]: Shift["shiftId"][] };
   cellInfos: { [key: string]: {staffId: Staff["staffId"], date: string} };
   shiftsRules: { [key: Shift["shiftId"]]: Rule[] };
+  leaveRequests: LeaveRequest[];
 }

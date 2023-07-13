@@ -56,7 +56,7 @@ const schema: yup.Schema<EditScheduleForm> = yup.object({
   role: yup
     .string()
     .oneOf(
-      [ Role.MANAGER, Role.CASHIER, Role.GUARD, Role.ALL_ROLES ],
+      [ Role.MANAGER, Role.CASHIER, Role.GUARD, Role.ADMIN, Role.ALL_ROLES ],
       "Invalid role"
     )
     .required("Please select a role"),
@@ -124,6 +124,7 @@ const Edit: Component<EditProps> = ({ setModalState, modalData, onDelete, setShi
           ...formData(),
           startTime: readableToTimeStr(formData().startTime),
           endTime: readableToTimeStr(formData().endTime),
+          published: publish,
         }
       )
       console.log(data);

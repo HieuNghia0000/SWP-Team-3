@@ -1,10 +1,12 @@
 import { createDroppable, useDragDropContext } from "@thisbeyond/solid-dnd";
-import { Component, For, Show, createEffect, on } from "solid-js";
-import { Staff, Shift } from "~/types";
+import { Component, createEffect, For, on, Show } from "solid-js";
+import { Shift, Staff } from "~/types";
 import DraggableCard from "./DraggableCard";
-import { useSPData, useShiftPlanningModals } from "~/context/ShiftPlanning";
+import { useShiftPlanningModals, useSPData } from "~/context/ShiftPlanning";
 import { getShiftMoveErrors } from "./utils/shiftRules";
 import isDayInThePast from "./utils/isDayInThePast";
+import { checkOverlapWithLeaveRequest } from "~/components/shift-planning/utils/checkOverlapWithLeaveRequest";
+import { toastWarning } from "~/utils/toast";
 
 const TableCell: Component<{
   id: string;
@@ -21,7 +23,7 @@ const TableCell: Component<{
     staff: props.staff,
     date: props.date,
   });
-  const [state] = useDragDropContext() || [];
+  const [ state ] = useDragDropContext() || [];
   let divRef: HTMLDivElement | undefined = undefined;
 
   createEffect(
@@ -34,6 +36,10 @@ const TableCell: Component<{
   );
 
   const onAddNewShift = () => {
+    if (checkOverlapWithLeaveRequest(tableData, props.staff.staffId, props.date)) {
+      toastWarning("This staff has a leave request on this day.");
+      return;
+    }
     setShowNewShiftModal(true);
     setNewShiftModalData({
       staff: props.staff,
@@ -61,7 +67,8 @@ const TableCell: Component<{
       <Show
         when={!isDayInThePast(props.date)}
         fallback={
-          <div class="flex flex-1 text-gray-400 min-h-[20px] items-center justify-center font-bold my-3 opacity-0 hover:opacity-100 select-none"></div>
+          <div
+            class="flex flex-1 text-gray-400 min-h-[20px] items-center justify-center font-bold my-3 opacity-0 hover:opacity-100 select-none"></div>
         }
       >
         <button
@@ -72,12 +79,13 @@ const TableCell: Component<{
           +
         </button>
       </Show>
+
       <Show when={droppable.isActiveDroppable}>
         <Show
           when={
             state &&
             getShiftMoveErrors(
-              state!.active.draggable!,
+              state.active.draggable!,
               state.active.droppable!,
               tableData
             ).length !== 0

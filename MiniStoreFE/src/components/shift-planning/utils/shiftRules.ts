@@ -5,6 +5,7 @@ import getShiftsByCellId from "./getShiftsByCellId";
 import { Role, Shift, Staff } from "~/types";
 import { cellIdGenerator } from "./cellIdGenerator";
 import isDayInThePast from "./isDayInThePast";
+import { checkOverlapWithLeaveRequest } from "~/components/shift-planning/utils/checkOverlapWithLeaveRequest";
 
 const rules: Rule[] = [
   {
@@ -18,11 +19,11 @@ const rules: Rule[] = [
     description: "Does this shift overlap with an existing shift?",
     passed: false,
   },
-  // {
-  //   errorName: "Overlap leave requests",
-  //   description: "Does this shift overlap with a time off request?",
-  //   passed: false,
-  // },
+  {
+    errorName: "Overlap with leave request",
+    description: "Does this shift overlap with a leave request?",
+    passed: false,
+  },
 ];
 
 export const getShiftRules = (
@@ -53,6 +54,10 @@ export const getShiftRules = (
     ]).includes(shift.shiftId)
   )
     result[1].passed = true;
+
+  // If the shift does not overlaps with a leave request
+  if (!checkOverlapWithLeaveRequest(tableData, shift.staffId, currentCell.date))
+    result[2].passed = true;
 
   return result;
 };
@@ -99,6 +104,10 @@ export const getShiftMoveErrors = (
     ]).includes(draggable.id as number)
   )
     errors.push(rules[1]);
+
+  // If the shift overlaps with a leave request
+  if (checkOverlapWithLeaveRequest(tableData, droppable.data.staff.staffId, droppable.data.date))
+    errors.push(rules[2]);
 
   return errors;
 };

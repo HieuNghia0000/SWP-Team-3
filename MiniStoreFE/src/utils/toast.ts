@@ -23,6 +23,18 @@ export function toastSuccess(message: string) {
     },
   });
 }
+
+export function toastWarning(message: string) {
+  toast.error(message, {
+    duration: 2000,
+    style: {
+      color: "#ff8800",
+      background: "#fefdca",
+      border: "1px solid #dcd926",
+    },
+  });
+}
+
 export function toastConfirmDeletion(message: string | JSX.Element, onConfirm: (t:Toast) => void) {
   toast.custom((t:Toast) => DeleteConfirmation({t, onConfirm, message}), {duration: Infinity} )
 }

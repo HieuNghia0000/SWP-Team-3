@@ -54,7 +54,7 @@ const schema: yup.Schema<NewScheduleForm> = yup.object({
   role: yup
     .string()
     .oneOf(
-      [ Role.MANAGER, Role.CASHIER, Role.GUARD, Role.ALL_ROLES ],
+      [ Role.MANAGER, Role.CASHIER, Role.GUARD, Role.ADMIN, Role.ALL_ROLES ],
       "Invalid role"
     )
     .required("Please select a role"),
@@ -132,6 +132,7 @@ const NewShiftModal: Component<{
           ...formData(),
           startTime: readableToTimeStr(formData().startTime),
           endTime: readableToTimeStr(formData().endTime),
+          published: publish,
         }
       )
       console.log(data);
@@ -186,8 +187,8 @@ const NewShiftModal: Component<{
       setFieldValue("role", modalData()?.staff.role);
       setFieldValue("startTime", 0, { validate: false });
       setFieldValue("endTime", 0, { validate: false });
-      setFieldValue("date", modalData()?.date);
       setFieldValue("name", "", { validate: false });
+      setFieldValue("date", modalData()?.date);
       setFieldValue("staffId", modalData()?.staff.staffId);
       return;
     }
@@ -196,11 +197,13 @@ const NewShiftModal: Component<{
     const role = template.role;
     const startTime = template.startTime;
     const endTime = template.endTime;
+    const name = template.name;
 
     setFieldValue("salaryCoefficient", coefficient);
     setFieldValue("role", role);
     setFieldValue("startTime", startTime);
     setFieldValue("endTime", endTime);
+    setFieldValue("name", name);
   };
 
   const onCloseModal = () => {
