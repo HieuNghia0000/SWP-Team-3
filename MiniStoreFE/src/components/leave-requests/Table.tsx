@@ -1,4 +1,4 @@
-import { For, Show } from "solid-js";
+import { batch, For, Show } from "solid-js";
 import { capitalize } from "~/utils/capitalize";
 import { IoTrashOutline } from "solid-icons/io";
 import { OcPencil3 } from "solid-icons/oc";
@@ -7,9 +7,18 @@ import { useRouteData } from "@solidjs/router";
 import { routeData } from "~/routes/leave-requests";
 import { A } from "solid-start";
 import { LeaveRequestStatus } from "~/types";
+import { useLRContext } from "~/context/LeaveRequest";
 
 export default function Table() {
   const { data } = useRouteData<typeof routeData>();
+  const { setChosenLeaveRequestId, setShowEditModal } = useLRContext();
+
+  let onEdit = (id: number) => {
+    batch(() => {
+      setChosenLeaveRequestId(id);
+      setShowEditModal(true);
+    });
+  };
 
   return (
     <div class="flex flex-col border border-gray-200 rounded-lg overflow-x-auto shadow-sm">
@@ -146,13 +155,15 @@ export default function Table() {
                   class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
                   <div class="flex flex-row gap-1">
                     <div class="relative flex justify-center items-center">
-                      <button class="peer text-base text-gray-500 hover:text-indigo-500">
+                      <button
+                        onClick={[ onEdit, item.leaveRequestId ]}
+                        class="peer text-base text-gray-500 hover:text-indigo-500">
                         <OcPencil3/>
                       </button>
                       <span
                         class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
                           Edit
-                        </span>
+                      </span>
                     </div>
                     <div class="relative flex justify-center items-center">
                       <button class="peer text-base text-gray-500 hover:text-indigo-500">
@@ -161,7 +172,7 @@ export default function Table() {
                       <span
                         class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
                           Delete
-                        </span>
+                      </span>
                     </div>
                   </div>
                 </td>

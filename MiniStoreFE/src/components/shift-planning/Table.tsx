@@ -180,9 +180,9 @@ const Table: Component<DnDTableProps> = (props) => {
                 <div class="font-semibold text-sm text-gray-600">
                   {moment(date).format("ddd, MMM D")}
                 </div>
-                <div class="font-normal text-sm text-gray-400">
-                  19.5 hrs / 0₫
-                </div>
+                {/*<div class="font-normal text-sm text-gray-400">*/}
+                {/*  19.5 hrs / 0₫*/}
+                {/*</div>*/}
               </div>
             )}
           </For>

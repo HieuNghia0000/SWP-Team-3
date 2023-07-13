@@ -11,10 +11,11 @@ import { useSearchParams } from "@solidjs/router";
 import { ParamType } from "~/components/leave-requests/types";
 import Table from "~/components/leave-requests/Table";
 import CreateLeaveRequestModal from "~/components/leave-requests/CreateLeaveRequestModal";
+import EditLeaveRequestModal from "~/components/leave-requests/EditLeaveRequestModal";
+import { ModalContext } from "~/context/LeaveRequest";
 
 export function routeData() {
   const [ params ] = useSearchParams<ParamType>();
-
   const leaveRequests = createRouteData(
     async ([ key, perPage, curPage, search ]) => {
       try {
@@ -28,35 +29,40 @@ export function routeData() {
     },
     { key: () => [ "leave-requests/list", params.perPage ?? 10, params.curPage ?? 1, params.search ?? "" ] }
   );
-
   return { data: leaveRequests };
 }
 
 export default function LeaveRequests() {
   const { data } = useRouteData<typeof routeData>();
   const [ showCreateModal, setShowCreateModal ] = createSignal(false);
+  const [ showEditModal, setShowEditModal ] = createSignal(false);
+  const [ chosenLeaveRequestId, setChosenLeaveRequestId ] = createSignal(0);
 
   const totalItems = () => data.error ? 0 : data()?.length ?? 0;
 
   return (
     <main>
-      <h1 class="mb-2 text-2xl font-medium">Leave Requests</h1>
-      <Breadcrumbs linkList={[ { name: "Leave Requests" } ]}/>
+      <ModalContext.Provider value={{ chosenLeaveRequestId, setChosenLeaveRequestId, showEditModal, setShowEditModal }}>
+        <h1 class="mb-2 text-2xl font-medium">Leave Requests</h1>
+        <Breadcrumbs linkList={[ { name: "Leave Requests" } ]}/>
 
-      {/* Search bar */}
-      <ToolBar setShowCreateModal={setShowCreateModal}/>
+        {/* Search bar */}
+        <ToolBar setShowCreateModal={setShowCreateModal}/>
 
-      <Show when={data.loading}>
-        <div class="mb-2">
-          Loading...
-        </div>
-      </Show>
+        <Show when={data.loading}>
+          <div class="mb-2">
+            Loading...
+          </div>
+        </Show>
 
-      <Table/>
+        <Table/>
 
-      <Pagination totalItems={totalItems}/>
+        <Pagination totalItems={totalItems}/>
 
-      <CreateLeaveRequestModal showModal={showCreateModal} setShowModal={setShowCreateModal}/>
+        <CreateLeaveRequestModal showModal={showCreateModal} setShowModal={setShowCreateModal}/>
+
+        <EditLeaveRequestModal showModal={showEditModal} setShowModal={setShowEditModal}/>
+      </ModalContext.Provider>
     </main>
   );
 }

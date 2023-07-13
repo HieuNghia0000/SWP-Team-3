@@ -80,7 +80,7 @@ const CreateLeaveRequestModal: Component<{
   }
 
   return (
-    <PopupModal.Wrapper title="New Shift" close={onCloseModal} open={showModal}>
+    <PopupModal.Wrapper title="New Leave Request" close={onCloseModal} open={showModal}>
       <div classList={{
         "cursor-progress": echoing.pending,
       }}>
