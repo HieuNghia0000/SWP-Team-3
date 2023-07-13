@@ -1,5 +1,5 @@
 import PopupModal from "~/components/PopupModal";
-import { Accessor, Component, Setter, Show } from "solid-js";
+import { Accessor, Component, createMemo, Setter, Show } from "solid-js";
 import { TextInput } from "~/components/form/TextInput";
 import { useFormHandler } from "solid-form-handler";
 import { yupSchema } from "solid-form-handler/yup";
@@ -58,9 +58,12 @@ const EditLeaveRequestModal: Component<{
   const formHandler = useFormHandler(yupSchema(schema), { validateOn: [] });
   const { formData } = formHandler;
 
-  const curLeaveRequest = () => !data.error && data() !== undefined
-    ? data()?.find((lr) => lr.leaveRequestId === chosenLeaveRequestId())
-    : undefined;
+  const curLeaveRequest =
+    createMemo(
+      () => !data.error && data() !== undefined
+        ? data()?.find((lr) => lr.leaveRequestId === chosenLeaveRequestId())
+        : undefined
+    )
 
   const submit = async (status: LeaveRequestStatus, e: Event) => {
     e.preventDefault();

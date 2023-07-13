@@ -70,6 +70,7 @@ const CreateLeaveRequestModal: Component<{
 
     if (success) {
       toastSuccess("Leave request created successfully");
+      await formHandler.resetForm();
       setShowModal(false);
     }
   }

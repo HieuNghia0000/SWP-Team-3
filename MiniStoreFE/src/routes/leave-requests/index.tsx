@@ -38,7 +38,10 @@ export function routeData() {
         throw new Error(handleFetchError(e));
       }
     },
-    { key: () => [ "leave-requests/list", params.perPage ?? 10, params.curPage ?? 1, params.search ?? "" ] }
+    {
+      key: () => [ "leave-requests/list", params.perPage ?? 10, params.curPage ?? 1, params.search ?? "" ],
+      reconcileOptions: { key: "leaveRequestId" }
+    }
   );
   return { data: leaveRequests };
 }
