@@ -3,46 +3,29 @@ import routes from "~/utils/routes";
 import {FaRegularCalendarCheck, FaRegularUser} from "solid-icons/fa";
 import {OcMail2} from "solid-icons/oc";
 import {CgSmartphone} from "solid-icons/cg";
-import {createRouteData, useSearchParams} from "solid-start";
-import {Product} from "~/types";
-import {createSignal, For} from "solid-js";
-import {useRouteData} from "@solidjs/router";
-
-const mockData = [
-    {
-        productId: 1,
-        barcode: "302011",
-        name: "Product 1",
-        description: "best product",
-        price: 4.20,
-        quantity: 3,
-    },
-];
-
-type ParamType = {
-    search?: string,
-    perPage?: string,
-    curPage?: string
-}
-
-export function routeData() {
-    const [searchParams] = useSearchParams<ParamType>();
-
-    return createRouteData(
-        async ([perPage, curPage]) => {
-            // const response =await fetch(`http://localhost:3000/product.json`);
-            // const data = (await response.json()) as DataResponse<Product[]>;
-            // return data.content;
-            return mockData as Product[];
-        },
-        { key: () => [searchParams.perPage ?? 10, searchParams.curPage ?? 1] }
-    );
-}
+import {DataResponse, OrderItem, Product} from "~/types";
+import {createEffect, createResource, createSignal, For, Show} from "solid-js";
+import axios from "axios";
 
 export default function OrderDetails() {
-    const [searchParams, setSearchParams] = useSearchParams<ParamType>();
-    const data = useRouteData<typeof routeData>();
-    const totalItems = () => data()?.length ?? 0;
+    const [data] =  createResource(async () => {
+        const response = await axios.get(`http://localhost:8080/order-items/1`);
+        return response.data as OrderItem[];
+    });
+
+    createEffect(() => {
+        if (!data.error && data.state === "ready") console.log(data());
+    });
+
+    const subTotal = () => {
+        let calculateSubTotal = 0;
+        data()?.forEach(item => {
+            const itemSubTotal = item.product.price * item.quantity;
+            calculateSubTotal += itemSubTotal;
+        });
+
+      return calculateSubTotal;
+    };
 
     return (
         <main class="min-w-fit">
@@ -133,7 +116,7 @@ export default function OrderDetails() {
                     <h2 class="text-xl font-medium mr-2">Order List</h2>
                     <div class="rounded-lg bg-green-100 pl-4 pr-4">
                         <p class="text-green-700 font-semibold">
-                            2 Products
+                            {data()?.length} Products
                         </p>
                     </div>
                 </div>
@@ -155,24 +138,26 @@ export default function OrderDetails() {
 
                         {/*Table row*/}
                         <tbody>
+                        <Show when={!data.error && data() != undefined}>
                             <For each={data()}>
                                 {(item, index) => (
                                     <tr>
-                                        <td class="px-4 py-2 text-gray-500 font-medium">{item.name}</td>
-                                        <td class="px-4 py-2 text-indigo-500 font-bold">{item.barcode}</td>
+                                        <td class="px-4 py-2 text-gray-500 font-medium">{item.product.name}</td>
+                                        <td class="px-4 py-2 text-indigo-500 font-bold">{item.product.barCode}</td>
                                         <td class="px-4 py-2 text-gray-500 font-medium">{item.quantity} pcs</td>
-                                        <td class="px-4 py-2 text-right text-gray-500 font-medium">${item.price.toFixed(2)}</td>
-                                        <td class="px-4 py-2 text-right text-gray-500 font-medium">${(item.price * item.quantity).toFixed(2)}</td>
+                                        <td class="px-4 py-2 text-right text-gray-500 font-medium">${item.product.price.toFixed(2)}</td>
+                                        <td class="px-4 py-2 text-right text-gray-500 font-medium">${(item.product.price * item.quantity).toFixed(2)}</td>
                                     </tr>
                                 )}
                             </For>
+                        </Show>
                         </tbody>
 
                         {/*Total price*/}
                         <tfoot>
                             <tr>
                                 <td colspan="4" class="text-right px-4 py-2 font-medium">Subtotal</td>
-                                <td class="px-4 py-2 text-right font-medium">$400.00</td>
+                                <td class="px-4 py-2 text-right font-medium">${subTotal().toFixed(2)}</td>
                             </tr>
                             <tr>
                                 <td colspan="4" class="text-right px-4 py-2 font-medium">VAT</td>
