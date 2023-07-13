@@ -50,10 +50,10 @@ const EditLeaveRequestModal: Component<{
   showModal: Accessor<boolean>;
   setShowModal: Setter<boolean>;
 }> = ({ setShowModal, showModal }) => {
-  const [ echoing, echo ] = createRouteAction(updateLeaveRequest);
+  const [ updating, updateAction ] = createRouteAction(updateLeaveRequest);
   const { data } = useRouteData<typeof routeData>();
   const { user } = useAuth();
-  const { chosenLeaveRequestId } = useLRContext();
+  const { chosenLeaveRequestId, onDelete } = useLRContext();
 
   const formHandler = useFormHandler(yupSchema(schema), { validateOn: [] });
   const { formData } = formHandler;
@@ -64,7 +64,7 @@ const EditLeaveRequestModal: Component<{
 
   const submit = async (status: LeaveRequestStatus, e: Event) => {
     e.preventDefault();
-    if (echoing.pending) return;
+    if (updating.pending) return;
 
     const f = await formHandler.validateForm({ throwException: false });
 
@@ -76,7 +76,7 @@ const EditLeaveRequestModal: Component<{
 
     const adminReply = user()?.role === Role.ADMIN ? formData().adminReply : "";
 
-    const success = await echo({ ...formData(), status, adminReply });
+    const success = await updateAction({ ...formData(), status, adminReply });
 
     if (success) {
       toastSuccess("Leave request updated successfully");
@@ -92,7 +92,7 @@ const EditLeaveRequestModal: Component<{
   return (
     <PopupModal.Wrapper title="Edit Leave Request" close={onCloseModal} open={showModal}>
       <div classList={{
-        "cursor-progress": echoing.pending,
+        "cursor-progress": updating.pending,
       }}>
         <PopupModal.Body>
           <form class="text-sm" onSubmit={[ submit, LeaveRequestStatus.PENDING ]}>
@@ -220,8 +220,8 @@ const EditLeaveRequestModal: Component<{
             <div class="flex gap-2 justify-center items-center">
               <button
                 type="button"
-                disabled={echoing.pending}
-                // onClick={onDelete}
+                disabled={updating.pending}
+                onClick={[ onDelete, curLeaveRequest()?.leaveRequestId || 0 ]}
                 class="flex gap-2 justify-center items-center px-3 text-gray-500 text-sm hover:text-gray-700"
               >
               <span>
@@ -234,7 +234,7 @@ const EditLeaveRequestModal: Component<{
               <Show when={user()?.role === Role.ADMIN}>
                 <button
                   type="button"
-                  disabled={echoing.pending}
+                  disabled={updating.pending}
                   onClick={[ submit, curLeaveRequest()?.status === LeaveRequestStatus.REJECTED ? LeaveRequestStatus.PENDING : LeaveRequestStatus.REJECTED ]}
                   class="py-1.5 px-3 font-semibold border text-sm rounded"
                   classList={{
@@ -246,7 +246,7 @@ const EditLeaveRequestModal: Component<{
                 </button>
                 <button
                   type="button"
-                  disabled={echoing.pending}
+                  disabled={updating.pending}
                   onClick={[ submit, curLeaveRequest()?.status === LeaveRequestStatus.APPROVED ? LeaveRequestStatus.PENDING : LeaveRequestStatus.APPROVED ]}
                   class="py-1.5 px-3 font-semibold border text-sm rounded"
                   classList={{
@@ -259,7 +259,7 @@ const EditLeaveRequestModal: Component<{
               </Show>
               <button
                 type="button"
-                disabled={echoing.pending}
+                disabled={updating.pending}
                 onClick={[ submit, curLeaveRequest()?.status || LeaveRequestStatus.PENDING ]}
                 class="py-1.5 px-3 font-semibold text-white border border-blue-600 bg-blue-500 text-sm rounded hover:bg-blue-600"
               >

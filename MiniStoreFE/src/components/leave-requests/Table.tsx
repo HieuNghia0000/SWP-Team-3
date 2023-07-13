@@ -11,7 +11,7 @@ import { useLRContext } from "~/context/LeaveRequest";
 
 export default function Table() {
   const { data } = useRouteData<typeof routeData>();
-  const { setChosenLeaveRequestId, setShowEditModal } = useLRContext();
+  const { setChosenLeaveRequestId, setShowEditModal, onDelete } = useLRContext();
 
   let onEdit = (id: number) => {
     batch(() => {
@@ -166,7 +166,9 @@ export default function Table() {
                       </span>
                     </div>
                     <div class="relative flex justify-center items-center">
-                      <button class="peer text-base text-gray-500 hover:text-indigo-500">
+                      <button
+                        onClick={[ onDelete, item.leaveRequestId ]}
+                        class="peer text-base text-gray-500 hover:text-indigo-500">
                         <IoTrashOutline/>
                       </button>
                       <span

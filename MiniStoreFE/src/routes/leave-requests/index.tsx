@@ -1,4 +1,4 @@
-import { createRouteData, useRouteData } from "solid-start";
+import { createRouteAction, createRouteData, useRouteData } from "solid-start";
 import { DataResponse, LeaveRequest } from "~/types";
 import { createSignal, Show } from "solid-js";
 import Breadcrumbs from "~/components/Breadcrumbs";
@@ -13,6 +13,17 @@ import Table from "~/components/leave-requests/Table";
 import CreateLeaveRequestModal from "~/components/leave-requests/CreateLeaveRequestModal";
 import EditLeaveRequestModal from "~/components/leave-requests/EditLeaveRequestModal";
 import { ModalContext } from "~/context/LeaveRequest";
+import { toastSuccess } from "~/utils/toast";
+
+const deleteLeaveRequest = async (id: number) => {
+  try {
+    const { data } = await axios.delete<DataResponse<LeaveRequest>>(`${getEndPoint()}/leave-requests/delete/${id}`)
+    if (!data) throw new Error("Invalid response from server");
+    return true;
+  } catch (error: any) {
+    throw new Error(handleFetchError(error));
+  }
+}
 
 export function routeData() {
   const [ params ] = useSearchParams<ParamType>();
@@ -37,12 +48,30 @@ export default function LeaveRequests() {
   const [ showCreateModal, setShowCreateModal ] = createSignal(false);
   const [ showEditModal, setShowEditModal ] = createSignal(false);
   const [ chosenLeaveRequestId, setChosenLeaveRequestId ] = createSignal(0);
+  const [ deleting, deleteAction ] = createRouteAction(deleteLeaveRequest);
 
   const totalItems = () => data.error ? 0 : data()?.length ?? 0;
 
+  const onDelete = async (id: number) => {
+    if (deleting.pending) return;
+    if (!confirm("Are you sure you want to delete this leave request?")) return;
+
+    const success = await deleteAction(id);
+    if (!success) return;
+
+    if (showEditModal()) setShowEditModal(false);
+    toastSuccess("Leave request deleted successfully");
+  }
+
   return (
     <main>
-      <ModalContext.Provider value={{ chosenLeaveRequestId, setChosenLeaveRequestId, showEditModal, setShowEditModal }}>
+      <ModalContext.Provider value={{
+        chosenLeaveRequestId,
+        setChosenLeaveRequestId,
+        showEditModal,
+        setShowEditModal,
+        onDelete
+      }}>
         <h1 class="mb-2 text-2xl font-medium">Leave Requests</h1>
         <Breadcrumbs linkList={[ { name: "Leave Requests" } ]}/>
 

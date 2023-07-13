@@ -5,6 +5,7 @@ type LRModalContext = {
   setChosenLeaveRequestId: Setter<number>;
   showEditModal: Accessor<boolean>;
   setShowEditModal: Setter<boolean>;
+  onDelete: (id: number) => Promise<void>;
 };
 
 export const ModalContext = createContext<LRModalContext>();
