@@ -42,6 +42,9 @@ type SPModalContext = {
   // Schedule Template
   scheduleTemplateModalState: Accessor<ScheduleTemplateModalState>;
   setScheduleTemplateModalState: Setter<ScheduleTemplateModalState>;
+  // Create Shift Cover
+  showCreateCoverModal: Accessor<boolean>;
+  setShowCreateCoverModal: Setter<boolean>;
 };
 type SPDataContext = {
   tableData: DataTable;
@@ -53,7 +56,7 @@ type SPDataContext = {
 
 export const ModalContext = createContext<SPModalContext>();
 
-export function useShiftPlanningModals(): SPModalContext {
+export function useSPModals(): SPModalContext {
   return useContext(ModalContext)!;
 }
 

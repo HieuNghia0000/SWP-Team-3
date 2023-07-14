@@ -12,6 +12,7 @@ import com.team3.ministore.service.SalaryService;
 import com.team3.ministore.service.ShiftService;
 import com.team3.ministore.service.StaffService;
 import com.team3.ministore.utils.LeaveStatus;
+import com.team3.ministore.utils.ShiftCoverStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -50,42 +52,58 @@ public class ShiftPlanningController {
         if (fromDate.isAfter(toDate))
             return ResponseHandler.getResponse(new Exception("Invalid input"), HttpStatus.BAD_REQUEST);
 
-        // Get all staffs with their shifts and salary in the given time range if staffId is not specified
-        if (staffId == null) {
-            // Get all staffs in the database
-            List<Staff> staffs = staffService.getAllStaffs();
-            // Iterate through all staffs and get their shifts and salary
-            List<StaffDto> result = staffs.parallelStream().map(staff -> {
-                SalaryDto salaryDto = salaryService.getSalaryByStaffId(staff.getStaffId());
-                List<LeaveRequestDto> leaveRequestDtos = leaveRequestService.getLeaveRequestsByStaffIdAndDates(
-                                staff.getStaffId(), fromDate, toDate
-                        ).stream().filter(leaveRequestDto -> leaveRequestDto.getStatus().equals(LeaveStatus.APPROVED))
-                        .collect(Collectors.toList());
-                List<Shift> shifts = shiftService.getAllShiftsByStaffId(staff.getStaffId(), fromDate, toDate);
-                // Convert shifts to shiftDtos
-                List<ShiftDto> shiftDtos = shifts.stream().map(ShiftDto::new).collect(Collectors.toList());
+        if (staffId != null) {
+            // Get the staff with the given staffId with their shifts and salary in the given time range
+            Optional<Staff> foundStaff = staffService.getStaffById(staffId);
 
-                // Return the staffDto
-                return new StaffDto(staff, salaryDto, shiftDtos, leaveRequestDtos);
-            }).collect(Collectors.toList());
-
-            return ResponseHandler.getResponse(result, HttpStatus.OK);
+            if (foundStaff.isEmpty())
+                return ResponseHandler.getResponse(new Exception("Staff not found"), HttpStatus.NOT_FOUND);
         }
 
-        // Get the staff with the given staffId with their shifts and salary in the given time range
-        Optional<Staff> staff = staffService.getStaffById(staffId);
+        // Get all staffs with their shifts and salary in the given time range if staffId is not specified
+        List<ShiftDto> coveredShifts = new ArrayList<>();
+        // Get all staffs in the database
+        List<Staff> staffs = staffService.getAllStaffs();
+        // Iterate through all staffs and get their shifts and salary
+        List<StaffDto> staffDtos = staffs.parallelStream().map(staff -> {
+            SalaryDto salaryDto = salaryService.getSalaryByStaffId(staff.getStaffId());
+            List<LeaveRequestDto> leaveRequestDtos = leaveRequestService.getLeaveRequestsByStaffIdAndDates(
+                            staff.getStaffId(), fromDate, toDate
+                    ).stream().filter(leaveRequestDto -> leaveRequestDto.getStatus().equals(LeaveStatus.APPROVED))
+                    .collect(Collectors.toList());
+            List<Shift> shifts = shiftService.getAllShiftsByStaffId(staff.getStaffId(), fromDate, toDate);
+            // Convert shifts to shiftDtos
+            List<ShiftDto> shiftDtos = shifts.stream()
+                    .map(s -> {
+                        ShiftDto sDto = new ShiftDto(s);
+                        // Add the shift to coveredShifts if it is covered
+                        if (s.getShiftCoverRequest() != null && s.getShiftCoverRequest().getStatus() == ShiftCoverStatus.APPROVED) {
+                            sDto.setStaffId(s.getShiftCoverRequest().getStaff().getStaffId());
+                            coveredShifts.add(sDto);
+                        }
+                        return sDto;
+                    })
+                    // Filter out the shifts that are covered
+                    .filter(s -> !(s.getShiftCoverRequest() != null && s.getShiftCoverRequest().getStatus() == ShiftCoverStatus.APPROVED))
+                    .collect(Collectors.toList());
 
-        if (staff.isEmpty())
-            return ResponseHandler.getResponse(new Exception("Staff not found"), HttpStatus.NOT_FOUND);
+            // Return the staffDto
+            return new StaffDto(staff, salaryDto, shiftDtos, leaveRequestDtos);
+        }).collect(Collectors.toList());
 
-        SalaryDto salaryDto = salaryService.getSalaryByStaffId(staff.get().getStaffId());
-        List<LeaveRequestDto> leaveRequestDtos = leaveRequestService.getLeaveRequestsByStaffIdAndDates(
-                        staff.get().getStaffId(), fromDate, toDate
-                ).stream().filter(leaveRequestDto -> leaveRequestDto.getStatus().equals(LeaveStatus.APPROVED))
-                .collect(Collectors.toList());
-        List<Shift> shifts = shiftService.getAllShiftsByStaffId(staff.get().getStaffId(), fromDate, toDate);
-        List<ShiftDto> shiftDtos = shifts.stream().map(ShiftDto::new).collect(Collectors.toList());
-        // Return a list of staffDto with only one element (the staff with the given staffId)
-        return ResponseHandler.getResponse(List.of(new StaffDto(staff.get(), salaryDto, shiftDtos, leaveRequestDtos)), HttpStatus.OK);
+        // Iterate through all staffDtos and add the covered shifts to the staffDto
+        List<StaffDto> result = staffDtos.stream().peek(staffDto -> coveredShifts.forEach(shiftDto -> {
+            if (shiftDto.getStaffId() == staffDto.getStaffId()) {
+                staffDto.getShifts().add(shiftDto);
+            }
+        })).collect(Collectors.toList());
+
+        // If staffId is specified, return the staff with the given staffId
+        if (staffId != null)
+            return ResponseHandler.getResponse(result.stream().filter(r -> r.getStaffId() == staffId), HttpStatus.OK);
+
+        // Return all staffs
+        return ResponseHandler.getResponse(result, HttpStatus.OK);
+
     }
 }

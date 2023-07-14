@@ -7,7 +7,7 @@ import { FiCalendar } from "solid-icons/fi";
 import moment from "moment";
 import flatpickr from "flatpickr";
 import { getWeekFirstAndLastDates } from "~/utils/getWeekDates";
-import { useShiftPlanningModals, useSPData } from "~/context/ShiftPlanning";
+import { useSPModals, useSPData } from "~/context/ShiftPlanning";
 import { ParamType } from "./utils/types";
 
 type ToolBarProps = {
@@ -20,7 +20,7 @@ const ToolBar: Component<ToolBarProps> = ({ datePicked, setDatePicked }) => {
   const [ dateStr, setDateStr ] = createSignal<string>("");
   const { resetTableData } = useSPData();
   const { setShowShiftTemplateModal, setScheduleTemplateModalState } =
-    useShiftPlanningModals();
+    useSPModals();
 
   let dateRef: HTMLInputElement | undefined = undefined;
   let fp: flatpickr.Instance | undefined = undefined;

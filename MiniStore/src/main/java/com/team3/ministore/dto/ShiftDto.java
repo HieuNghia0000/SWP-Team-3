@@ -33,6 +33,8 @@ public class ShiftDto {
 
     private ShiftCoverDto shiftCoverRequest;
 
+    private StaffDto staff;
+
     public ShiftDto(Shift shift) {
         this.shiftId = shift.getShiftId();
         this.date = shift.getDate();
@@ -44,10 +46,11 @@ public class ShiftDto {
         this.endTime = shift.getEndTime();
         this.staffId = shift.getStaff().getStaffId();
         this.timesheet = shift.getTimesheet();
-        this.shiftCoverRequest = new ShiftCoverDto(shift.getShiftCoverRequest(), true, true);
+        if (shift.getShiftCoverRequest() != null)
+            this.shiftCoverRequest = new ShiftCoverDto(shift.getShiftCoverRequest(), false, false);
     }
 
-    public ShiftDto(Shift shift, boolean withoutShiftCoverRequest) {
+    public ShiftDto(Shift shift, boolean withShiftCoverRequest) {
         this.shiftId = shift.getShiftId();
         this.date = shift.getDate();
         this.published = shift.getPublished();
@@ -58,8 +61,25 @@ public class ShiftDto {
         this.endTime = shift.getEndTime();
         this.staffId = shift.getStaff().getStaffId();
         this.timesheet = shift.getTimesheet();
-        if (!withoutShiftCoverRequest)
+        if (withShiftCoverRequest && shift.getShiftCoverRequest() != null)
             this.shiftCoverRequest = new ShiftCoverDto(shift.getShiftCoverRequest());
+    }
+
+    public ShiftDto(Shift shift, boolean withStaff, boolean withShiftCoverRequest) {
+        this.shiftId = shift.getShiftId();
+        this.date = shift.getDate();
+        this.published = shift.getPublished();
+        this.role = shift.getRole();
+        this.salaryCoefficient = shift.getSalaryCoefficient();
+        this.name = shift.getName();
+        this.startTime = shift.getStartTime();
+        this.endTime = shift.getEndTime();
+        this.staffId = shift.getStaff().getStaffId();
+        this.timesheet = shift.getTimesheet();
+        if (withShiftCoverRequest && shift.getShiftCoverRequest() != null)
+            this.shiftCoverRequest = new ShiftCoverDto(shift.getShiftCoverRequest());
+        if (withStaff)
+            this.staff = new StaffDto(shift.getStaff());
     }
 
 }

@@ -1,9 +1,9 @@
 import { A } from "@solidjs/router";
-import { Show, createSignal } from "solid-js";
+import { createSignal, Show } from "solid-js";
 import { RouteDataArgs, useRouteData } from "solid-start";
 import { createServerData$ } from "solid-start/server";
 import Breadcrumbs from "~/components/Breadcrumbs";
-import { Staff } from "~/types";
+import { Staff, StaffStatus } from "~/types";
 import routes from "~/utils/routes";
 
 export function routeData({ params }: RouteDataArgs) {
@@ -18,7 +18,11 @@ export function routeData({ params }: RouteDataArgs) {
         staffName: "Nguyen Van A",
         username: "nguyenvana",
         image: "",
-        status: 1,
+        status: StaffStatus.ACTIVATED,
+        role: "ADMIN",
+        leaveBalance: 10,
+        shifts: [],
+        leaveRequests: [],
       } as Staff;
     },
     { key: () => ["staffs", params.id] }

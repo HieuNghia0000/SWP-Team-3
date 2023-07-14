@@ -225,7 +225,7 @@ export default function Products() {
                     </A>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
-                    {item.barcode}
+                    {item.barCode}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
                     {item.name}

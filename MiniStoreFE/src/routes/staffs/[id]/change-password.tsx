@@ -5,7 +5,7 @@ import { RouteDataArgs, createRouteData } from "solid-start";
 import * as yup from "yup";
 import Breadcrumbs from "~/components/Breadcrumbs";
 import { TextInput } from "~/components/form/TextInput";
-import { Staff } from "~/types";
+import { Staff, StaffStatus } from "~/types";
 import routes from "~/utils/routes";
 
 type Password = {
@@ -31,8 +31,13 @@ export function routeData({ params }: RouteDataArgs) {
         staffId: Number.parseInt(key[1]),
         staffName: "Nguyen Van A",
         username: "nguyenvana",
-        status: 1,
         image: "",
+        status: StaffStatus.ACTIVATED,
+        role: "ADMIN",
+        leaveBalance: 10,
+        shifts: [],
+        leaveRequests: [],
+
       } as Staff;
     },
     { key: () => ["staffs", params.id] }

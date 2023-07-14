@@ -2,7 +2,7 @@ import { createDroppable, useDragDropContext } from "@thisbeyond/solid-dnd";
 import { Component, createEffect, For, on, Show } from "solid-js";
 import { Shift, Staff } from "~/types";
 import DraggableCard from "./DraggableCard";
-import { useShiftPlanningModals, useSPData } from "~/context/ShiftPlanning";
+import { useSPModals, useSPData } from "~/context/ShiftPlanning";
 import { getShiftMoveErrors } from "./utils/shiftRules";
 import isDayInThePast from "./utils/isDayInThePast";
 import { checkOverlapWithLeaveRequest } from "~/components/shift-planning/utils/checkOverlapWithLeaveRequest";
@@ -15,7 +15,7 @@ const TableCell: Component<{
   date: string;
 }> = (props) => {
   const { setShowNewShiftModal, setNewShiftModalData } =
-    useShiftPlanningModals();
+    useSPModals();
   const { tableData } = useSPData();
 
   const droppable = createDroppable(props.id, {

@@ -32,7 +32,10 @@ public class ShiftCoverRequestServiceImpl implements ShiftCoverRequestService {
     @Override
     public List<ShiftCoverDto> getAllShiftCoverRequests(Integer page, Integer pageSize) {
         Pageable pageable = PageRequest.of(page - 1, pageSize);
-        return shiftCoverRequestRepository.findAll(pageable).stream().map(ShiftCoverDto::new).collect(Collectors.toList());
+        return shiftCoverRequestRepository
+                .findAll(pageable)
+                .stream().map(sc -> new ShiftCoverDto(sc, true, true))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -40,7 +43,7 @@ public class ShiftCoverRequestServiceImpl implements ShiftCoverRequestService {
         Pageable pageable = PageRequest.of(page - 1, pageSize);
         return shiftCoverRequestRepository
                 .findAllByStaff_StaffNameContainingIgnoreCaseOrderByShiftCoverRequestIdDesc(search, pageable)
-                .stream().map(ShiftCoverDto::new)
+                .stream().map(sc -> new ShiftCoverDto(sc, true, true))
                 .collect(Collectors.toList());
     }
 

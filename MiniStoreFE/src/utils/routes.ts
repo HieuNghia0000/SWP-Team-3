@@ -23,6 +23,7 @@ const routes = {
   categoryEdit: (id: string | number) => `/categories/${id}/edit`,
   timeClock: "/time-clock",
   leaves: "/leave-requests",
+  shiftCover: "/shift-cover-requests",
 };
 
 export const apiRoutes = {

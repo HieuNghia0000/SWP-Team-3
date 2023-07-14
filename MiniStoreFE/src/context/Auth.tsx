@@ -98,7 +98,7 @@ const fetchData: ResourceFetcher<
 
       if (data.content === undefined) return undefined;
 
-      toastSuccess("Login successful");
+      toastSuccess("Authorization succeeded");
       return data.content;
     }
     return undefined;

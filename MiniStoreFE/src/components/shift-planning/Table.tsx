@@ -13,7 +13,7 @@ import moment from "moment";
 import { batch, Component, For, Show } from "solid-js";
 import { DataResponse, Shift } from "~/types";
 import TableCell from "./TableCell";
-import { useShiftPlanningModals, useSPData } from "~/context/ShiftPlanning";
+import { useSPModals, useSPData } from "~/context/ShiftPlanning";
 import { shiftTimes } from "./utils/shiftTimes";
 import { cellIdGenerator } from "./utils/cellIdGenerator";
 import { capitalize } from "~/utils/capitalize";
@@ -32,7 +32,7 @@ import handleFetchError from "~/utils/handleFetchError";
 type DnDTableProps = {};
 
 const Table: Component<DnDTableProps> = (props) => {
-  const { setStaffModalData, setShowStaffModal } = useShiftPlanningModals();
+  const { setStaffModalData, setShowStaffModal } = useSPModals();
   const { tableData, setTableData, isRouteDataLoading } = useSPData();
 
   // Get all droppable box ids

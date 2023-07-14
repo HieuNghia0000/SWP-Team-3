@@ -8,7 +8,7 @@ import { Transition } from "solid-transition-group";
 import routes from "~/utils/routes";
 import { FiShoppingCart } from "solid-icons/fi";
 import { IoCalendarOutline } from "solid-icons/io";
-import { TbClock, TbTrees } from "solid-icons/tb";
+import { TbClock, TbSpeakerphone, TbTrees } from "solid-icons/tb";
 import { useAuth } from "~/context/Auth";
 import { Role } from "~/types";
 
@@ -104,6 +104,14 @@ const Navbar: Component<NavbarProps> = (props) => {
           href={routes.leaves}
           icon={<TbTrees />}
           text="Leave Requests"
+          isOpen={isOpen}
+        />
+
+        {/* Shift Cover Requests*/}
+        <NavbarLink
+          href={routes.shiftCover}
+          icon={<TbSpeakerphone />}
+          text="Shift Cover Requests"
           isOpen={isOpen}
         />
       </ul>

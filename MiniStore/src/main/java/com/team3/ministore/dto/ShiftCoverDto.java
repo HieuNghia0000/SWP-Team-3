@@ -38,20 +38,20 @@ public class ShiftCoverDto {
         this.staffId = shiftCoverRequest.getStaff().getStaffId();
         this.staff = new StaffDto(shiftCoverRequest.getStaff());
         this.shiftId = shiftCoverRequest.getShift().getShiftId();
-        this.shift = new ShiftDto(shiftCoverRequest.getShift(),true);
+        this.shift = new ShiftDto(shiftCoverRequest.getShift(),false);
     }
 
-    public ShiftCoverDto(ShiftCoverRequest shiftCoverRequest, boolean withoutStaff, boolean withoutShift) {
+    public ShiftCoverDto(ShiftCoverRequest shiftCoverRequest, boolean withStaff, boolean withShift) {
         this.shiftCoverRequestId = shiftCoverRequest.getShiftCoverRequestId();
         this.note = shiftCoverRequest.getNote();
         this.status = shiftCoverRequest.getStatus();
         this.staffId = shiftCoverRequest.getStaff().getStaffId();
         this.shiftId = shiftCoverRequest.getShift().getShiftId();
-        if (!withoutStaff) {
+        if (withStaff) {
             this.staff = new StaffDto(shiftCoverRequest.getStaff());
         }
-        if (!withoutShift) {
-            this.shift = new ShiftDto(shiftCoverRequest.getShift(),true);
+        if (withShift) {
+            this.shift = new ShiftDto(shiftCoverRequest.getShift(), true,false);
         }
     }
 }

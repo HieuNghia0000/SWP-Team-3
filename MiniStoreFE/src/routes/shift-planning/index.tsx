@@ -17,6 +17,7 @@ import { DataTable, FetcherData } from "~/components/shift-planning/utils/types"
 import ScheduleTemplateModal from "~/components/shift-planning/ScheduleTemplateModal";
 import axios from "axios";
 import handleFetchError from "~/utils/handleFetchError";
+import CreateCoverRequestModal from "~/components/cover-requests/CreateCoverRequestModal";
 
 const fetcher: ResourceFetcher<boolean | string, FetcherData> = async (
   source
@@ -82,6 +83,8 @@ export default function ShiftPlanning() {
 
   const [ scheduleTemplateModalState, setScheduleTemplateModalState ] =
     createSignal<"list" | "copy" | "create" | "apply">();
+
+  const [ showCreateCoverModal, setShowCreateCoverModal ] = createSignal<boolean>(false);
 
   createEffect(
     on(
@@ -166,6 +169,9 @@ export default function ShiftPlanning() {
           // schedule template
           scheduleTemplateModalState,
           setScheduleTemplateModalState,
+          // shift cover request
+          showCreateCoverModal,
+          setShowCreateCoverModal
         }}
       >
         <main>
@@ -213,6 +219,10 @@ export default function ShiftPlanning() {
         <ScheduleTemplateModal
           modalState={scheduleTemplateModalState}
           setModalState={setScheduleTemplateModalState}
+        />
+        <CreateCoverRequestModal
+          showModal={showCreateCoverModal}
+          setShowModal={setShowCreateCoverModal}
         />
       </ModalContext.Provider>
     </PageDataContext.Provider>

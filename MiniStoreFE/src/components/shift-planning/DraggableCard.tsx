@@ -1,6 +1,6 @@
 import { createDraggable } from "@thisbeyond/solid-dnd";
 import { Component, batch, onMount } from "solid-js";
-import { useShiftPlanningModals, useSPData } from "~/context/ShiftPlanning";
+import { useSPModals, useSPData } from "~/context/ShiftPlanning";
 import { Shift, Staff } from "~/types";
 import { shiftTimes } from "./utils/shiftTimes";
 import ShiftCard from "./ShiftCard";
@@ -12,7 +12,7 @@ const DraggableCard: Component<{
   staff: Staff;
   date: string;
 }> = ({ shift, width, staff, date }) => {
-  const { setShiftModalData, setShowShiftModal } = useShiftPlanningModals();
+  const { setShiftModalData, setShowShiftModal } = useSPModals();
   const { isRouteDataLoading, tableData, setTableData } = useSPData();
 
 
