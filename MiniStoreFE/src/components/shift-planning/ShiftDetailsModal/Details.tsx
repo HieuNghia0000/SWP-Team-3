@@ -15,12 +15,7 @@ interface DetailsProps {
   openCreateCoverModal: () => void;
 }
 
-const Details: Component<DetailsProps> = ({
-                                            shiftCard,
-                                            setState,
-                                            onDelete,
-                                            openCreateCoverModal
-                                          }) => {
+const Details: Component<DetailsProps> = ({ shiftCard, setState, onDelete, openCreateCoverModal }) => {
 
   return (
     <>

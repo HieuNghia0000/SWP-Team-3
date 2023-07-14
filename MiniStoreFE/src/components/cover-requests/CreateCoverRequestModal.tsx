@@ -74,7 +74,7 @@ const CreateCoverRequestModal: Component<{
       toastSuccess("Shift cover request created successfully");
       await formHandler.resetForm();
       setShowModal(false);
-      // saveChanges();
+      saveChanges();
     }
   }
 

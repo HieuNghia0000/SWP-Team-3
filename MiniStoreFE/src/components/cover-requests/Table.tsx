@@ -39,6 +39,15 @@ export default function Table() {
               "border-left": "1px dashed #d5dce6",
             }}
           >
+            Shift Name
+          </th>
+          <th
+            scope="col"
+            class="px-2.5 py-[8.7px] w-36 text-sm font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
+            style={{
+              "border-left": "1px dashed #d5dce6",
+            }}
+          >
             Date
           </th>
           <th
@@ -79,7 +88,7 @@ export default function Table() {
           </th>
           <th
             scope="col"
-            class="px-2.5 py-[8.7px] w-36 text-sm font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
+            class="px-2.5 py-[8.7px] w-24 text-sm font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
             style={{
               "border-left": "1px dashed #d5dce6",
             }}
@@ -110,6 +119,13 @@ export default function Table() {
                     "border-left": "1px dashed #d5dce6",
                   }}
                   class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                  {item.shift?.name ?? "N/A"}
+                </td>
+                <td
+                  style={{
+                    "border-left": "1px dashed #d5dce6",
+                  }}
+                  class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
                   {item.shift?.date ?? "N/A"}
                 </td>
                 <td
@@ -124,7 +140,7 @@ export default function Table() {
                     "border-left": "1px dashed #d5dce6",
                   }}
                   class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
-                  {item.shift?.role ?? "N/A"}
+                  {item.shift?.role ? capitalize(item.shift?.role): "N/A"}
                 </td>
                 <td
                   style={{

@@ -10,7 +10,7 @@ import { FiShoppingCart } from "solid-icons/fi";
 import { IoCalendarOutline } from "solid-icons/io";
 import { TbClock, TbSpeakerphone, TbTrees } from "solid-icons/tb";
 import { useAuth } from "~/context/Auth";
-import { Role } from "~/types";
+import { FaRegularCalendarCheck } from "solid-icons/fa";
 
 type NavbarProps = {
   isOpen: () => boolean;
@@ -44,13 +44,48 @@ const Navbar: Component<NavbarProps> = (props) => {
           isOpen={isOpen}
           end
         />
-        {/* Dashboard */}
+
+        {/* Shift planning */}
         <NavbarLink
           href={routes.shiftPlanning}
           icon={<IoCalendarOutline/>}
           text="Shift&nbsp;Planning"
           isOpen={isOpen}
         />
+
+        {/* Leave Requests*/}
+        <NavbarLink
+          href={routes.leaves}
+          icon={<TbTrees/>}
+          text="Leave Requests"
+          isOpen={isOpen}
+        />
+
+        {/* Shift Cover Requests*/}
+        <NavbarLink
+          href={routes.shiftCover}
+          icon={<TbSpeakerphone/>}
+          text="Shift Cover Requests"
+          isOpen={isOpen}
+        />
+
+        {/* Attendance */}
+        <NavbarLink
+          href={routes.attendance}
+          icon={<FaRegularCalendarCheck />}
+          text="Attendance"
+          isOpen={isOpen}
+        />
+
+        {/* Staff */}
+        {/*<Show when={user()?.role === Role.ADMIN}>*/}
+        <NavbarLink
+          href={routes.staffs}
+          icon={<BsPeople/>}
+          text="Staff&nbsp;Management"
+          isOpen={isOpen}
+        />
+        {/*</Show>*/}
 
         {/* Product */}
         <NavbarDropDown
@@ -71,16 +106,6 @@ const Navbar: Component<NavbarProps> = (props) => {
           />
         </NavbarDropDown>
 
-        {/* Staff */}
-        {/*<Show when={user()?.role === Role.ADMIN}>*/}
-          <NavbarLink
-            href={routes.staffs}
-            icon={<BsPeople/>}
-            text="Staff&nbsp;Management"
-            isOpen={isOpen}
-          />
-        {/*</Show>*/}
-
         {/* Orders */}
         <NavbarLink
           href={routes.orders}
@@ -91,29 +116,14 @@ const Navbar: Component<NavbarProps> = (props) => {
 
         {/* Time Clock */}
         {/*<Show when={user()?.role === Role.ADMIN}>*/}
-          <NavbarLink
-            href={routes.timeClock}
-            icon={<TbClock/>}
-            text="Time Clock"
-            isOpen={isOpen}
-          />
+        <NavbarLink
+          href={routes.timeClock}
+          icon={<TbClock/>}
+          text="Time Clock"
+          isOpen={isOpen}
+        />
         {/*</Show>*/}
 
-        {/* Leave Requests*/}
-        <NavbarLink
-          href={routes.leaves}
-          icon={<TbTrees />}
-          text="Leave Requests"
-          isOpen={isOpen}
-        />
-
-        {/* Shift Cover Requests*/}
-        <NavbarLink
-          href={routes.shiftCover}
-          icon={<TbSpeakerphone />}
-          text="Shift Cover Requests"
-          isOpen={isOpen}
-        />
       </ul>
     </section>
   );

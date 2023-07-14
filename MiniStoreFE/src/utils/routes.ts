@@ -24,6 +24,7 @@ const routes = {
   timeClock: "/time-clock",
   leaves: "/leave-requests",
   shiftCover: "/shift-cover-requests",
+  attendance: "/attendance",
 };
 
 export const apiRoutes = {
