@@ -10,10 +10,9 @@ import handleFetchError from "~/utils/handleFetchError";
 import { useSearchParams } from "@solidjs/router";
 import { ParamType } from "~/components/cover-requests/types";
 import Table from "~/components/cover-requests/Table";
-import CreateCoverRequestModal from "~/components/cover-requests/CreateCoverRequestModal";
-import EditLeaveRequestModal from "~/components/cover-requests/EditLeaveRequestModal";
 import { ModalContext } from "~/context/CoverRequest";
 import { toastSuccess } from "~/utils/toast";
+import CreateModalFallback from "~/components/cover-requests/CreateModalFallback";
 
 const deleteCoverRequest = async (id: number) => {
   try {
@@ -91,7 +90,7 @@ export default function ShiftCoverRequests() {
 
         <Pagination totalItems={totalItems}/>
 
-        <CreateCoverRequestModal showModal={showCreateModal} setShowModal={setShowCreateModal}/>
+        <CreateModalFallback showModal={showCreateModal} setShowModal={setShowCreateModal}/>
 
         {/*<EditLeaveRequestModal showModal={showEditModal} setShowModal={setShowEditModal}/>*/}
       </ModalContext.Provider>

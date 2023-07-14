@@ -10,6 +10,7 @@ interface ShiftCardProps {
   shiftName: string;
   loading: () => boolean;
   isOverlay?: boolean;
+  coveredShift: boolean;
   onClick?: () => void;
   draggable?: any;
   style?: any;
@@ -27,6 +28,7 @@ const ShiftCard: Component<ShiftCardProps> = (props) => {
     "isOverlay",
     "draggable",
     "isErrored",
+    "coveredShift",
   ]);
 
   const fs = () => {
@@ -42,9 +44,12 @@ const ShiftCard: Component<ShiftCardProps> = (props) => {
       class="rounded mx-0.5 px-1.5 py-1 relative text-left select-none"
       classList={{
         "opacity-25": local.isActiveDraggable,
-        "bg-white hover:bg-[#edf2f7] text-black border border-gray-200": local.published,
+        "bg-white hover:bg-[#edf2f7] text-black border border-gray-200": local.published && !local.coveredShift,
+        "bg-[#efedfc] hover:bg-[#e4e0fa] text-[#7256e8] border border-[#efedfc]": local.published && local.coveredShift,
         "bg-[repeating-linear-gradient(-45deg,white,white_5px,#eff4f8_5px,#eff4f8_10px)] hover:bg-[repeating-linear-gradient(-45deg,white,white_5px,#eaf0f6_5px,#eaf0f6_10px)] border border-gray-200":
-          !local.published,
+          !local.published && !local.coveredShift,
+        "bg-[repeating-linear-gradient(-45deg,#efedfc,#efedfc_5px,#e4e0fa_5px,#e4e0fa_10px)] hover:bg-[repeating-linear-gradient(-45deg,#efedfc,#efedfc_5px,#d9d3f8_5px,#d9d3f8_10px)] border border-gray-200":
+          !local.published && local.coveredShift,
         "animate-pulse": local.loading(),
         "z-40": local.isOverlay,
       }}

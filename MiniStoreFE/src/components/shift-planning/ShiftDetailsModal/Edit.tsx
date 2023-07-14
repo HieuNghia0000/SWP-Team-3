@@ -5,7 +5,7 @@ import { Accessor, batch, Component, createSignal, onCleanup, Setter, Show, } fr
 import PopupModal from "~/components/PopupModal";
 import { TextInput } from "~/components/form/TextInput";
 import { ShiftCard, useSPData } from "~/context/ShiftPlanning";
-import { DataResponse, Role, Shift } from "~/types";
+import { DataResponse, Role, Shift, ShiftCoverRequestStatus } from "~/types";
 import { Tabs } from ".";
 import { readableToTimeStr, } from "../utils/shiftTimes";
 import { timeOptions, transformTimeString } from "../utils/timeOptions";
@@ -21,6 +21,7 @@ import getEndPoint from "~/utils/getEndPoint";
 import { cellIdGenerator } from "~/components/shift-planning/utils/cellIdGenerator";
 import { sortBy } from "lodash";
 import { toastSuccess } from "~/utils/toast";
+import { TbSpeakerphone } from "solid-icons/tb";
 
 type EditScheduleForm = {
   shiftId: number;
@@ -70,17 +71,20 @@ const schema: yup.Schema<EditScheduleForm> = yup.object({
 interface EditProps {
   setModalState: Setter<Tabs>;
   setShiftModalData: Setter<ShiftCard>;
+  setShowModal: Setter<boolean>;
   modalState: Accessor<Tabs>;
   modalData: Accessor<ShiftCard | undefined>;
   onDelete: () => void;
+  openCreateCoverModal: () => void;
 }
 
-const Edit: Component<EditProps> = ({ setModalState, modalData, onDelete, setShiftModalData }) => {
+const Edit: Component<EditProps> = ({ setModalState, modalData, onDelete, openCreateCoverModal, setShowModal }) => {
   const { tableData, setTableData } = useSPData();
   const formHandler = useFormHandler(yupSchema(schema));
   const { formData, setFieldValue } = formHandler;
   const [ updating, setUpdating ] = createSignal(false);
   const isOldShift = isDayInThePast(modalData()?.date || "");
+  const isCoveredShift = !!modalData()?.shiftCoverRequest && modalData()?.shiftCoverRequest?.status == ShiftCoverRequestStatus.APPROVED;
 
   // Reset the form data to the default values
   onCleanup(() => {
@@ -99,6 +103,10 @@ const Edit: Component<EditProps> = ({ setModalState, modalData, onDelete, setShi
       setUpdating(true);
       const dateStr = moment(formData().date).format("YYYY-MM-DD");
       const staff = tableData.staffs.find((staff) => staff.staffId === formData().staffId);
+
+      // If the shift has a cover request, throw an error
+      if (modalData()?.shiftCoverRequest && modalData()?.shiftCoverRequest?.status === ShiftCoverRequestStatus.APPROVED)
+        throw new Error("Can not edit a shift that has a cover request");
 
       // If the date is in the past, throw an error
       if (isDayInThePast(dateStr)) throw new Error("Can not create shift in the past");
@@ -138,8 +146,8 @@ const Edit: Component<EditProps> = ({ setModalState, modalData, onDelete, setShi
           const sortedShifts = sortBy(shiftIds, [ (shiftId) => tableData.shifts[shiftId].startTime ]);
           return [ ...sortedShifts ];
         });
-        setShiftModalData({ ...modalData()!, ...data.content });
         setModalState("details");
+        setShowModal(false);
       });
 
       toastSuccess("Shift updated successfully");
@@ -162,13 +170,24 @@ const Edit: Component<EditProps> = ({ setModalState, modalData, onDelete, setShi
     }}>
       <PopupModal.Body>
         <form class="text-sm" onSubmit={[ submit, false ]}>
-          <Show when={isOldShift}>
+          <Show when={isOldShift && !isCoveredShift}>
             <div class="mb-2 w-[560px]">
               <label class="mb-1.5 font-semibold text-gray-600 inline-block">
                 Note
               </label>
               <p class="text-gray-400 text-sm tracking-wide">
                 Since this shift has passed, you can not change the information
+                of this shift.
+              </p>
+            </div>
+          </Show>
+          <Show when={isCoveredShift}>
+            <div class="mb-2 w-[560px]">
+              <label class="mb-1.5 font-semibold text-gray-600 inline-block">
+                Note
+              </label>
+              <p class="text-red-400 text-sm tracking-wide">
+                Since this shift is a covered shift, you can not change the information
                 of this shift.
               </p>
             </div>
@@ -207,7 +226,7 @@ const Edit: Component<EditProps> = ({ setModalState, modalData, onDelete, setShi
                 id="salaryCoefficient"
                 name="salaryCoefficient"
                 type="number"
-                disabled={isOldShift}
+                disabled={isOldShift || isCoveredShift}
                 value={modalData()?.salaryCoefficient || 0}
                 step={0.1}
                 formHandler={formHandler}
@@ -224,7 +243,7 @@ const Edit: Component<EditProps> = ({ setModalState, modalData, onDelete, setShi
                 name="name"
                 value={modalData()?.name || ""}
                 formHandler={formHandler}
-                disabled={isOldShift}
+                disabled={isOldShift || isCoveredShift}
               />
             </div>
             <div class="flex-1 py-2.5 flex flex-col gap-1">
@@ -267,7 +286,7 @@ const Edit: Component<EditProps> = ({ setModalState, modalData, onDelete, setShi
                 placeholder="Select Start Time"
                 options={timeOptions()}
                 formHandler={formHandler}
-                disabled={isOldShift}
+                disabled={isOldShift || isCoveredShift}
               />
             </div>
             <div class="flex-1 py-2.5 flex flex-col gap-1">
@@ -281,7 +300,7 @@ const Edit: Component<EditProps> = ({ setModalState, modalData, onDelete, setShi
                 placeholder="Select End Time"
                 options={timeOptions(transformTimeString(formData().startTime))}
                 formHandler={formHandler}
-                disabled={formData().startTime == "0" || isOldShift}
+                disabled={formData().startTime == "0" || isOldShift || isCoveredShift}
               />
             </div>
           </div>
@@ -294,15 +313,27 @@ const Edit: Component<EditProps> = ({ setModalState, modalData, onDelete, setShi
               type="button"
               disabled={updating()}
               onClick={onDelete}
-              class="flex gap-2 justify-center items-center px-3 text-gray-500 text-sm hover:text-gray-700"
+              class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700"
             >
               <span>
                 <FaSolidTrash/>
               </span>
               <span>Delete</span>
             </button>
+            <Show when={!isCoveredShift}>
+              <button
+                type="button"
+                onClick={openCreateCoverModal}
+                class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
+              >
+            <span class="text-base font-bold">
+              <TbSpeakerphone/>
+            </span>
+                New Shift Cover
+              </button>
+            </Show>
           </div>
-          <Show when={!isOldShift}>
+          <Show when={!isOldShift && !isCoveredShift}>
             <div class="flex gap-2 justify-center items-center">
               <button
                 type="button"

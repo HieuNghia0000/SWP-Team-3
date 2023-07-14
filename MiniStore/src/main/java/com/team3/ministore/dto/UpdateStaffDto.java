@@ -2,8 +2,6 @@ package com.team3.ministore.dto;
 
 import com.team3.ministore.utils.Role;
 import com.team3.ministore.utils.StaffStatus;
-import com.team3.ministore.validation.annotation.ExistEmail;
-import com.team3.ministore.validation.annotation.ExistUsername;
 import lombok.Data;
 
 import javax.validation.constraints.Email;
@@ -12,12 +10,10 @@ import javax.validation.constraints.NotNull;
 
 @Data
 public class UpdateStaffDto {
-    @ExistEmail
     @Email
     @NotBlank(message = "Email must not be blank")
     private String email;
 
-    @ExistUsername
     @NotBlank(message = "Username must not be blank")
     private String username;
 

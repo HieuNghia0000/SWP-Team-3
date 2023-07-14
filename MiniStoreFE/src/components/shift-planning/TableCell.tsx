@@ -2,7 +2,7 @@ import { createDroppable, useDragDropContext } from "@thisbeyond/solid-dnd";
 import { Component, createEffect, For, on, Show } from "solid-js";
 import { Shift, Staff } from "~/types";
 import DraggableCard from "./DraggableCard";
-import { useSPModals, useSPData } from "~/context/ShiftPlanning";
+import { useSPData, useSPModals } from "~/context/ShiftPlanning";
 import { getShiftMoveErrors } from "./utils/shiftRules";
 import isDayInThePast from "./utils/isDayInThePast";
 import { checkOverlapWithLeaveRequest } from "~/components/shift-planning/utils/checkOverlapWithLeaveRequest";
@@ -84,11 +84,12 @@ const TableCell: Component<{
         <Show
           when={
             state &&
-            getShiftMoveErrors(
-              state.active.draggable!,
-              state.active.droppable!,
-              tableData
-            ).length !== 0
+            (getShiftMoveErrors(
+                state.active.draggable!,
+                state.active.droppable!,
+                tableData
+              ).length !== 0
+              || tableData.shifts[state.active.draggable!.id as number].shiftCoverRequest)
           }
           fallback={
             <div class="bg-sky-200 bg-opacity-50 absolute inset-0"></div>

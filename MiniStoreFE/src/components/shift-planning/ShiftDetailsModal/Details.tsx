@@ -1,10 +1,10 @@
 import { FaSolidPencil, FaSolidTrash } from "solid-icons/fa";
-import { Accessor, Setter, Component } from "solid-js";
+import { Accessor, Component, Setter, Show } from "solid-js";
 import PopupModal from "~/components/PopupModal";
-import { Role } from "~/types";
+import { Role, ShiftCoverRequestStatus } from "~/types";
 import { Tabs } from ".";
 import moment from "moment";
-import { ShiftCard, useSPData, useSPModals } from "~/context/ShiftPlanning";
+import { ShiftCard } from "~/context/ShiftPlanning";
 import { roles } from "~/utils/roles";
 import { TbSpeakerphone } from "solid-icons/tb";
 
@@ -12,13 +12,15 @@ interface DetailsProps {
   shiftCard: Accessor<ShiftCard | undefined>;
   setState: Setter<Tabs>;
   onDelete: () => void;
+  openCreateCoverModal: () => void;
 }
+
 const Details: Component<DetailsProps> = ({
-  shiftCard,
-  setState,
-  onDelete,
-}) => {
-  const { setShowCreateCoverModal }= useSPModals();
+                                            shiftCard,
+                                            setState,
+                                            onDelete,
+                                            openCreateCoverModal
+                                          }) => {
 
   return (
     <>
@@ -116,30 +118,34 @@ const Details: Component<DetailsProps> = ({
             class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
           >
             <span>
-              <FaSolidTrash />
+              <FaSolidTrash/>
             </span>
             <span>Delete</span>
           </button>
-          <button
-            type="button"
-            onClick={[setState, "edit"]}
-            class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
-          >
+          <Show when={!shiftCard()?.shiftCoverRequest || shiftCard()?.shiftCoverRequest?.status !== ShiftCoverRequestStatus.APPROVED}>
+            <>
+              <button
+                type="button"
+                onClick={[ setState, "edit" ]}
+                class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
+              >
             <span class="">
-              <FaSolidPencil />
+              <FaSolidPencil/>
             </span>
-            Edit Shift
-          </button>
-          <button
-            type="button"
-            onClick={[setShowCreateCoverModal, true]}
-            class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
-          >
+                Edit Shift
+              </button>
+              <button
+                type="button"
+                onClick={openCreateCoverModal}
+                class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
+              >
             <span class="text-base font-bold">
-              <TbSpeakerphone />
+              <TbSpeakerphone/>
             </span>
-            New Shift Cover
-          </button>
+                New Shift Cover
+              </button>
+            </>
+          </Show>
         </div>
       </PopupModal.Footer>
     </>

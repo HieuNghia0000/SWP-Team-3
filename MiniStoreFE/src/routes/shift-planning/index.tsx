@@ -128,7 +128,6 @@ export default function ShiftPlanning() {
   };
 
   const saveChanges = async () => {
-    alert("save changes");
     refetch();
   };
 

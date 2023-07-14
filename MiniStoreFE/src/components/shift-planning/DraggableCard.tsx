@@ -1,7 +1,7 @@
 import { createDraggable } from "@thisbeyond/solid-dnd";
-import { Component, batch, onMount } from "solid-js";
-import { useSPModals, useSPData } from "~/context/ShiftPlanning";
-import { Shift, Staff } from "~/types";
+import { batch, Component, onMount } from "solid-js";
+import { useSPData, useSPModals } from "~/context/ShiftPlanning";
+import { Shift, ShiftCoverRequestStatus, Staff } from "~/types";
 import { shiftTimes } from "./utils/shiftTimes";
 import ShiftCard from "./ShiftCard";
 import { getShiftRules } from "./utils/shiftRules";
@@ -54,6 +54,7 @@ const DraggableCard: Component<{
       }}
       isActiveDraggable={draggable.isActiveDraggable}
       published={shift.published}
+      coveredShift={!!shift.shiftCoverRequest && shift.shiftCoverRequest.status === ShiftCoverRequestStatus.APPROVED}
       loading={isRouteDataLoading}
       role={shift.role}
       shiftDuration={shiftTimes(

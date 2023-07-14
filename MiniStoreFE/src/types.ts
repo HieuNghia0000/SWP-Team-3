@@ -12,7 +12,7 @@ export enum Role {
 }
 
 export enum StaffStatus {
-  ACTIVATED = "ACTIVATED",
+  ACTIVATED = "ACTIVE",
   DISABLED = "DISABLED",
 }
 

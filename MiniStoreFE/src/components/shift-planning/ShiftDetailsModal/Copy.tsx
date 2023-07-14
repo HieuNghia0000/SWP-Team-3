@@ -7,7 +7,7 @@ import PopupModal from "~/components/PopupModal";
 import { Checkboxes } from "~/components/form/Checkboxes";
 import { TextInput } from "~/components/form/TextInput";
 import { ShiftCard, useSPData } from "~/context/ShiftPlanning";
-import { Role } from "~/types";
+import { Role, ShiftCoverRequestStatus } from "~/types";
 import { Tabs } from ".";
 import { shiftDetailsTime } from "../utils/shiftTimes";
 import * as yup from "yup";
@@ -233,16 +233,18 @@ const Copy: Component<CopyProps> = ({ shiftCard, setModalState, onDelete }) => {
               </span>
               <span>Delete</span>
             </button>
-            <button
-              type="button"
-              onClick={[ setModalState, "edit" ]}
-              class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
-            >
+            <Show when={!shiftCard()?.shiftCoverRequest || shiftCard()?.shiftCoverRequest?.status !== ShiftCoverRequestStatus.APPROVED}>
+              <button
+                type="button"
+                onClick={[ setModalState, "edit" ]}
+                class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
+              >
               <span class="">
                 <FaSolidPencil/>
               </span>
-              Edit Shift
-            </button>
+                Edit Shift
+              </button>
+            </Show>
           </div>
           <div class="flex gap-2 justify-center items-center">
             <button

@@ -2,21 +2,24 @@ import { BsCheckCircle, BsExclamationCircle } from "solid-icons/bs";
 import { FaSolidPencil, FaSolidTrash } from "solid-icons/fa";
 import { Accessor, Component, For, Setter, Show } from "solid-js";
 import PopupModal from "~/components/PopupModal";
-import { Role } from "~/types";
+import { Role, ShiftCoverRequestStatus } from "~/types";
 import { Tabs } from ".";
 import { shiftDetailsTime } from "../utils/shiftTimes";
 import { ShiftCard } from "~/context/ShiftPlanning";
+import { TbSpeakerphone } from "solid-icons/tb";
 
 interface ErrorsProps {
   shiftCard: Accessor<ShiftCard | undefined>;
   setModalState: Setter<Tabs>;
   onDelete: () => void;
+  openCreateCoverModal: () => void;
 }
 
 const Errors: Component<ErrorsProps> = ({
                                           shiftCard,
                                           setModalState,
                                           onDelete,
+                                          openCreateCoverModal
                                         }) => {
   console.log("shiftCard", shiftCard()?.rules);
   return (
@@ -115,16 +118,30 @@ const Errors: Component<ErrorsProps> = ({
             </span>
             <span>Delete</span>
           </button>
-          <button
-            type="button"
-            onClick={[ setModalState, "edit" ]}
-            class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
-          >
+          <Show when={!shiftCard()?.shiftCoverRequest || shiftCard()?.shiftCoverRequest?.status !== ShiftCoverRequestStatus.APPROVED}>
+            <>
+              <button
+                type="button"
+                onClick={[ setModalState, "edit" ]}
+                class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
+              >
             <span class="">
               <FaSolidPencil/>
             </span>
-            Edit Shift
-          </button>
+                Edit Shift
+              </button>
+              <button
+                type="button"
+                onClick={openCreateCoverModal}
+                class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
+              >
+            <span class="text-base font-bold">
+              <TbSpeakerphone/>
+            </span>
+                New Shift Cover
+              </button>
+            </>
+          </Show>
         </div>
       </PopupModal.Footer>
     </>

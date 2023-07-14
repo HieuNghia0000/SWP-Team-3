@@ -11,9 +11,9 @@ import {
 } from "@thisbeyond/solid-dnd";
 import moment from "moment";
 import { batch, Component, For, Show } from "solid-js";
-import { DataResponse, Shift } from "~/types";
+import { DataResponse, Shift, ShiftCoverRequestStatus } from "~/types";
 import TableCell from "./TableCell";
-import { useSPModals, useSPData } from "~/context/ShiftPlanning";
+import { useSPData, useSPModals } from "~/context/ShiftPlanning";
 import { shiftTimes } from "./utils/shiftTimes";
 import { cellIdGenerator } from "./utils/cellIdGenerator";
 import { capitalize } from "~/utils/capitalize";
@@ -114,6 +114,14 @@ const Table: Component<DnDTableProps> = (props) => {
         for (let error of errors) {
           toastError(error.errorName);
         }
+        return;
+      }
+
+      if (
+        tableData.shifts[draggable.id as number].shiftCoverRequest &&
+        tableData.shifts[draggable.id as number].shiftCoverRequest?.status === ShiftCoverRequestStatus.APPROVED
+      ) {
+        toastError("Cannot edit a shift that is a covered shift");
         return;
       }
 
@@ -253,6 +261,7 @@ const Table: Component<DnDTableProps> = (props) => {
                       style={{ width: `${selectedShiftWidth()}px` }}
                       isOverlay={true}
                       isErrored={isErrored()}
+                      coveredShift={!!item().shiftCoverRequest && item().shiftCoverRequest?.status === ShiftCoverRequestStatus.APPROVED}
                     />
                   );
                 }}

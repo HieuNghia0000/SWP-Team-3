@@ -4,7 +4,7 @@ import Details from "./Details";
 import Edit from "./Edit";
 import Errors from "./Errors";
 import Copy from "./Copy";
-import { ShiftCard, useSPData } from "~/context/ShiftPlanning";
+import { ShiftCard, useSPData, useSPModals } from "~/context/ShiftPlanning";
 import { toastConfirmDeletion, toastSuccess } from "~/utils/toast";
 import axios from "axios";
 import { DataResponse } from "~/types";
@@ -23,6 +23,7 @@ const ShiftDetailsModal: Component<{
 }> = ({ showModal, modalData, setShowModal, setShiftModalData }) => {
   const [ state, setState ] = createSignal<Tabs>("details");
   const { setTableData } = useSPData();
+  const { setShowCreateCoverModal } = useSPModals();
 
   const onCloseModal = () => {
     setShowModal(false);
@@ -74,6 +75,13 @@ const ShiftDetailsModal: Component<{
       ? modalData()!.rules.filter((rule) => !rule.passed).length
       : 0
   );
+
+  const openCreateCoverModal = () => {
+    batch(() => {
+      onCloseModal();
+      setShowCreateCoverModal(true);
+    })
+  }
 
   return (
     <PopupModal.Wrapper
@@ -128,6 +136,7 @@ const ShiftDetailsModal: Component<{
             shiftCard={modalData}
             setState={setState}
             onDelete={onDeleteShift}
+            openCreateCoverModal={openCreateCoverModal}
           />
         </Match>
         <Match when={state() === "edit"}>
@@ -135,8 +144,10 @@ const ShiftDetailsModal: Component<{
             modalState={state}
             setModalState={setState}
             setShiftModalData={setShiftModalData}
+            setShowModal={setShowModal}
             modalData={modalData}
             onDelete={onDeleteShift}
+            openCreateCoverModal={openCreateCoverModal}
           />
         </Match>
         <Match when={state() === "errors"}>
@@ -144,6 +155,7 @@ const ShiftDetailsModal: Component<{
             shiftCard={modalData}
             setModalState={setState}
             onDelete={onDeleteShift}
+            openCreateCoverModal={openCreateCoverModal}
           />
         </Match>
         <Match when={state() === "copy"}>

@@ -19,6 +19,7 @@ import { routeData } from "~/routes/leave-requests";
 import { useLRContext } from "~/context/LeaveRequest";
 import { useAuth } from "~/context/Auth";
 import { FaSolidTrash } from "solid-icons/fa";
+import { useSCRContext } from "~/context/CoverRequest";
 
 type EditLeaveRequest = Omit<LeaveRequest, "status" | "staff">;
 
@@ -53,7 +54,7 @@ const EditLeaveRequestModal: Component<{
   const [ updating, updateAction ] = createRouteAction(updateLeaveRequest);
   const { data } = useRouteData<typeof routeData>();
   const { user } = useAuth();
-  const { chosenLeaveRequestId, onDelete } = useLRContext();
+  const { setChosenRequestId, setShowEditModal, onDelete } = useSCRContext();
 
   const formHandler = useFormHandler(yupSchema(schema), { validateOn: [] });
   const { formData } = formHandler;
