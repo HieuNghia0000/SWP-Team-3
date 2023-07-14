@@ -1,13 +1,14 @@
 package com.team3.ministore.service.impl;
 
 import com.team3.ministore.dto.RegisterDto;
+import com.team3.ministore.dto.StaffDto;
+import com.team3.ministore.dto.StaffMetaInfo;
 import com.team3.ministore.dto.UpdateStaffDto;
 import com.team3.ministore.model.Staff;
 import com.team3.ministore.repository.StaffRepository;
 import com.team3.ministore.service.StaffService;
 import com.team3.ministore.utils.Role;
 import com.team3.ministore.utils.StaffStatus;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class StaffServiceImpl implements StaffService {
@@ -38,16 +40,11 @@ public class StaffServiceImpl implements StaffService {
     }
 
     @Override
-    public List<Staff> getStaffByNameLike(String staffName) {
-        return staffRepository.findByStaffNameContainingIgnoreCase(staffName);
-    }
-
-    @Override
     public Staff createStaff(RegisterDto staffDto) {
         Staff staff = new Staff();
         staff.setPassword(encoder.encode(staffDto.getPassword()));
 
-         return saveStaff(
+        return saveStaff(
                 staff,
                 staffDto.getStaffName(),
                 staffDto.getRole(),
@@ -85,9 +82,17 @@ public class StaffServiceImpl implements StaffService {
     }
 
     @Override
-    public Page<Staff> findAllPagingStaff(int pageIndex, int pageSize) {
-        Pageable pageable = PageRequest.of(pageIndex - 1, pageSize);
-        return staffRepository.findAll(pageable);
+    public List<StaffDto> getAllStaff(String search, int page, int pageSize) {
+        Pageable pageable = PageRequest.of(page - 1, pageSize);
+        return staffRepository.findByStaffNameContainingIgnoreCaseOrderByStaffIdDesc(search, pageable)
+                .stream().map(StaffDto::new).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<StaffDto> getAllStaff(int page, int pageSize) {
+        Pageable pageable = PageRequest.of(page - 1, pageSize);
+        return staffRepository.findAll(pageable)
+                .stream().map(StaffDto::new).collect(Collectors.toList());
     }
 
     @Override
@@ -100,8 +105,13 @@ public class StaffServiceImpl implements StaffService {
         return staffRepository.findByUsername(username);
     }
 
+    @Override
+    public List<StaffMetaInfo> getAllStaffMetaInfos() {
+        return staffRepository.findAll().stream().map(StaffMetaInfo::new).collect(Collectors.toList());
+    }
 
-    private Staff saveStaff(Staff staff, String staffName, Role role, String username,String phoneNumber, StaffStatus status, String image, String email, String workDays, Integer leaveBalance) {
+
+    private Staff saveStaff(Staff staff, String staffName, Role role, String username, String phoneNumber, StaffStatus status, String image, String email, String workDays, Integer leaveBalance) {
         staff.setStaffName(staffName);
         staff.setRole(role);
         staff.setUsername(username);

@@ -59,6 +59,15 @@ export interface Staff extends Timestamp {
   leaveRequests: LeaveRequest[];
 }
 
+export interface StaffInfo {
+  staffId: number;
+  staffName: string;
+  role: Role;
+  username: string;
+  email?: string;
+  status: StaffStatus;
+}
+
 export interface LeaveRequest {
   leaveRequestId: number;
   staffId: number;

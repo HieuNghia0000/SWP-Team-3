@@ -1,5 +1,5 @@
 import { createRouteAction, createRouteData, useRouteData } from "solid-start";
-import { DataResponse, LeaveRequest, ShiftCoverRequest } from "~/types";
+import { DataResponse, LeaveRequest, ShiftCoverRequest, StaffInfo } from "~/types";
 import { createSignal, Show } from "solid-js";
 import Breadcrumbs from "~/components/Breadcrumbs";
 import Pagination from "~/components/Pagination";
@@ -13,6 +13,7 @@ import Table from "~/components/cover-requests/Table";
 import { ModalContext } from "~/context/CoverRequest";
 import { toastSuccess } from "~/utils/toast";
 import CreateModalFallback from "~/components/cover-requests/CreateModalFallback";
+import EditCoverRequestModal from "~/components/cover-requests/EditCoverRequestModal";
 
 const deleteCoverRequest = async (id: number) => {
   try {
@@ -42,11 +43,26 @@ export function routeData() {
       reconcileOptions: { key: "shiftCoverRequestId" }
     }
   );
-  return { data: leaveRequests };
+
+  const staffInfos = createRouteData(
+    async ([ key ]) => {
+      try {
+        const { data } = await axios.get<DataResponse<StaffInfo[]>>(`${getEndPoint()}/${key}`);
+        return data.content;
+      } catch (e) {
+        throw new Error(handleFetchError(e));
+      }
+    },
+    {
+      key: () => [ "staffs/meta-infos" ],
+      reconcileOptions: { key: "staffId" }
+    }
+  );
+  return { data: leaveRequests, staffInfos };
 }
 
 export default function ShiftCoverRequests() {
-  const { data } = useRouteData<typeof routeData>();
+  const { data, staffInfos } = useRouteData<typeof routeData>();
   const [ showCreateModal, setShowCreateModal ] = createSignal(false);
   const [ showEditModal, setShowEditModal ] = createSignal(false);
   const [ chosenRequestId, setChosenRequestId ] = createSignal(0);
@@ -80,7 +96,7 @@ export default function ShiftCoverRequests() {
         {/* Search bar */}
         <ToolBar setShowCreateModal={setShowCreateModal}/>
 
-        <Show when={data.loading}>
+        <Show when={data.loading || staffInfos.loading}>
           <div class="mb-2">
             Loading...
           </div>
@@ -92,7 +108,7 @@ export default function ShiftCoverRequests() {
 
         <CreateModalFallback showModal={showCreateModal} setShowModal={setShowCreateModal}/>
 
-        {/*<EditLeaveRequestModal showModal={showEditModal} setShowModal={setShowEditModal}/>*/}
+        <EditCoverRequestModal showModal={showEditModal} setShowModal={setShowEditModal}/>
       </ModalContext.Provider>
     </main>
   );

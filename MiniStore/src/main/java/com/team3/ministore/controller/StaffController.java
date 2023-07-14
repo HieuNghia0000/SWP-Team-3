@@ -10,16 +10,13 @@ import com.team3.ministore.model.Staff;
 import com.team3.ministore.service.SalaryService;
 import com.team3.ministore.service.StaffService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/staffs")
@@ -86,46 +83,17 @@ public class StaffController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("")
-    public ResponseEntity<Object> getStaffs(@RequestParam("search") Optional<String> searchParam,
-                                            @RequestParam("curPage") Optional<Integer> curPageParam,
-                                            @RequestParam("perPage") Optional<Integer> perPageParam) {
-        Page<Staff> staffPage;
-        List<Staff> staffList = null;
+    @GetMapping()
+    public ResponseEntity<Object> getStaffs(@RequestParam("search") Optional<String> search,
+                                            @RequestParam("curPage") Integer curPage,
+                                            @RequestParam("perPage") Integer perPage) {
+        return search.map(s -> ResponseHandler.getResponse(staffService.getAllStaff(s, curPage, perPage), HttpStatus.OK))
+                .orElseGet(() -> ResponseHandler.getResponse(staffService.getAllStaff(curPage, perPage), HttpStatus.OK));
+    }
 
-        if (searchParam.isPresent()) {
-            String search = searchParam.get();
-
-            staffList = staffService.getStaffByNameLike(search);
-        }
-        if (curPageParam.isPresent() || perPageParam.isPresent()) {
-            int curPage = curPageParam.orElse(1);
-            int perPage = perPageParam.orElse(10);
-
-            staffPage = staffService.findAllPagingStaff(curPage, perPage);
-            if (staffPage.getSize() == 0) {
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }
-        } else {
-            int curPage = 1;
-            int perPage = 10;
-
-            staffPage = staffService.findAllPagingStaff(curPage, perPage);
-            if (staffPage.isEmpty() && (staffList == null || staffList.isEmpty())) {
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }
-        }
-
-        if (staffList != null) {
-            List<StaffDto> filteredStaffs = staffPage.stream().filter(staffList::contains).map(value ->
-                        new StaffDto(value, salaryService.getSalaryByStaffId(value.getStaffId()))).collect(Collectors.toList());
-            return new ResponseEntity<>(filteredStaffs, HttpStatus.OK);
-
-        }
-        return ResponseHandler.getResponse(staffPage.stream().map(value ->
-                        new StaffDto(value, salaryService.getSalaryByStaffId(value.getStaffId())))
-                .collect(Collectors.toList()), HttpStatus.OK);
-
+    @GetMapping("/meta-infos")
+    public ResponseEntity<Object> getStaffs() {
+        return ResponseHandler.getResponse(staffService.getAllStaffMetaInfos(), HttpStatus.OK);
     }
 
 }
