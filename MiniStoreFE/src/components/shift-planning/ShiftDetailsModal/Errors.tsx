@@ -118,29 +118,27 @@ const Errors: Component<ErrorsProps> = ({
             </span>
             <span>Delete</span>
           </button>
-          <Show when={!shiftCard()?.shiftCoverRequest || shiftCard()?.shiftCoverRequest?.status !== ShiftCoverRequestStatus.APPROVED}>
-            <>
-              <button
-                type="button"
-                onClick={[ setModalState, "edit" ]}
-                class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
-              >
+          <button
+            type="button"
+            onClick={[ setModalState, "edit" ]}
+            class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
+          >
             <span class="">
               <FaSolidPencil/>
             </span>
-                Edit Shift
-              </button>
-              <button
-                type="button"
-                onClick={openCreateCoverModal}
-                class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
-              >
+            Edit Shift
+          </button>
+          <Show when={!shiftCard()?.shiftCoverRequest}>
+            <button
+              type="button"
+              onClick={openCreateCoverModal}
+              class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
+            >
             <span class="text-base font-bold">
               <TbSpeakerphone/>
             </span>
-                New Shift Cover
-              </button>
-            </>
+              New Shift Cover
+            </button>
           </Show>
         </div>
       </PopupModal.Footer>

@@ -7,7 +7,7 @@ import PopupModal from "~/components/PopupModal";
 import { Checkboxes } from "~/components/form/Checkboxes";
 import { TextInput } from "~/components/form/TextInput";
 import { ShiftCard, useSPData } from "~/context/ShiftPlanning";
-import { Role, ShiftCoverRequestStatus } from "~/types";
+import { Role } from "~/types";
 import { Tabs } from ".";
 import { shiftDetailsTime } from "../utils/shiftTimes";
 import * as yup from "yup";
@@ -32,7 +32,7 @@ const Copy: Component<CopyProps> = ({ shiftCard, setModalState, onDelete }) => {
   const { tableData } = useSPData();
   const [ enableMultiWeeks, setEnableMultiWeeks ] = createSignal<boolean>(false);
   const formHandler = useFormHandler(yupSchema(copySchema));
-  const { formData, setFieldValue } = formHandler;
+  const { formData } = formHandler;
 
   // Get work days of the week based on the selected shift and the staff member
   // Ex: ["Monday", "Tuesday", "Wednesday"]
@@ -233,18 +233,16 @@ const Copy: Component<CopyProps> = ({ shiftCard, setModalState, onDelete }) => {
               </span>
               <span>Delete</span>
             </button>
-            <Show when={!shiftCard()?.shiftCoverRequest || shiftCard()?.shiftCoverRequest?.status !== ShiftCoverRequestStatus.APPROVED}>
-              <button
-                type="button"
-                onClick={[ setModalState, "edit" ]}
-                class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
-              >
+            <button
+              type="button"
+              onClick={[ setModalState, "edit" ]}
+              class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
+            >
               <span class="">
                 <FaSolidPencil/>
               </span>
-                Edit Shift
-              </button>
-            </Show>
+              Edit Shift
+            </button>
           </div>
           <div class="flex gap-2 justify-center items-center">
             <button

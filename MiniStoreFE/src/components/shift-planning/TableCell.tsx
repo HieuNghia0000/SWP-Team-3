@@ -84,12 +84,11 @@ const TableCell: Component<{
         <Show
           when={
             state &&
-            (getShiftMoveErrors(
-                state.active.draggable!,
-                state.active.droppable!,
-                tableData
-              ).length !== 0
-              || tableData.shifts[state.active.draggable!.id as number].shiftCoverRequest)
+            getShiftMoveErrors(
+              state.active.draggable!,
+              state.active.droppable!,
+              tableData
+            ).length !== 0
           }
           fallback={
             <div class="bg-sky-200 bg-opacity-50 absolute inset-0"></div>

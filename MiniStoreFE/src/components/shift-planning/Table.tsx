@@ -117,14 +117,6 @@ const Table: Component<DnDTableProps> = (props) => {
         return;
       }
 
-      if (
-        tableData.shifts[draggable.id as number].shiftCoverRequest &&
-        tableData.shifts[draggable.id as number].shiftCoverRequest?.status === ShiftCoverRequestStatus.APPROVED
-      ) {
-        toastError("Cannot edit a shift that is a covered shift");
-        return;
-      }
-
       console.log(tableData.shifts[draggable.id as number])
       const newCellInfo = tableData.cellInfos[droppableCellId];
 
