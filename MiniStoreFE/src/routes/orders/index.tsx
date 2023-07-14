@@ -13,7 +13,10 @@ import DropDownBtn from "~/components/DropDownBtn";
 import { Instance } from "flatpickr/dist/types/instance";
 import { isServer } from "solid-js/web";
 import moment from "moment";
-import { DataResponse, Order } from "~/types";
+import axios from "axios";
+import {DataResponse, Order} from "~/types";
+import getEndPoint from "~/utils/getEndPoint";
+import handleFetchError from "~/utils/handleFetchError";
 
 type ParamType = {
   perPage?: string;
@@ -26,16 +29,24 @@ type ParamType = {
 };
 
 export function routeData() {
-  const [searchParams] = useSearchParams<ParamType>();
+  const [params] = useSearchParams<ParamType>();
 
-  return createRouteData(
-    async ([perPage, curPage]) => {
-      const response = await fetch(`http://localhost:3000/orders.json`);
-      const data = (await response.json()) as DataResponse<Order[]>;
-      return data.content;
-    },
-    { key: () => [searchParams.perPage ?? 10, searchParams.curPage ?? 1] }
+  const orders = createRouteData(
+      async ([perPage, curPage, amount_from, amount_to]) => {
+          try {
+              const {data} = await axios.get<DataResponse<Order[]>>(
+                `${getEndPoint()}/orders?perPage=${perPage}&curPage=${curPage}&amount_from=${amount_from}&amount_to=${amount_to}`
+              );
+              return data.content;
+          }
+          catch (e) {
+            throw new Error(handleFetchError(e));
+          }
+      },
+      {key: () => [params.perPage ?? 10, params.curPage ?? 1, params.amount_from ?? "", params.amount_to ?? ""]}
   );
+
+  return {data: orders};
 }
 
 export default function Orders() {
@@ -59,7 +70,7 @@ export default function Orders() {
     }
   }
 
-  const data = useRouteData<typeof routeData>();
+  const {data} = useRouteData<typeof routeData>();
   let dateRef: HTMLInputElement | undefined = undefined;
   let fp: flatpickr.Instance | undefined = undefined;
   const [dateStr, setDateStr] = createSignal<string>("");
@@ -309,55 +320,58 @@ export default function Orders() {
           </thead>
           {/* <!-- Table row --> */}
           <tbody class="">
-            <For each={data()}>
-              {(item, index) => (
-                <tr class="hover:bg-gray-200 odd:bg-white even:bg-gray-50">
-                  <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
-                    <A
-                      href={routes.order(item.orderId)}
-                      class="hover:text-indigo-500"
-                    >
-                      {item.orderId}
-                    </A>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
-                    {item.items.map((i) => i.product.name).join(", ")}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
-                    {displayDate(item.orderDate)}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
-                    {item.totalPrice}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
-                    <div class="flex flex-row gap-1">
-                      <div class="relative flex justify-center items-center">
+            <Show when={!data.error && data() != undefined}>
+              <For each={data()}>
+                {(item, index) => (
+                    <tr class="hover:bg-gray-200 odd:bg-white even:bg-gray-50">
+                      <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
                         <A
-                          href={routes.order(item.orderId)}
-                          class="peer text-base text-gray-500 hover:text-indigo-500"
+                            href={routes.order(item.orderId)}
+                            class="hover:text-indigo-500"
                         >
-                          <IoEyeOutline />
+                          {item.orderId}
                         </A>
-                        <span class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
+                        {/*{item.items.map((i) => i.product.name).join(", ")}*/}
+                        product
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
+                        {displayDate(item.orderDate)}
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
+                        {item.grandTotal}
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
+                        <div class="flex flex-row gap-1">
+                          <div class="relative flex justify-center items-center">
+                            <A
+                                href={routes.order(item.orderId)}
+                                class="peer text-base text-gray-500 hover:text-indigo-500"
+                            >
+                              <IoEyeOutline />
+                            </A>
+                            <span class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
                           Details
                         </span>
-                      </div>
-                      <div class="relative flex justify-center items-center">
-                        <A
-                          href={routes.order(item.orderId)}
-                          class="peer text-base text-gray-500 hover:text-indigo-500"
-                        >
-                          <IoTrashOutline />
-                        </A>
-                        <span class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
+                          </div>
+                          <div class="relative flex justify-center items-center">
+                            <A
+                                href={routes.order(item.orderId)}
+                                class="peer text-base text-gray-500 hover:text-indigo-500"
+                            >
+                              <IoTrashOutline />
+                            </A>
+                            <span class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
                           Delete
                         </span>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              )}
-            </For>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                )}
+              </For>
+            </Show>
           </tbody>
         </table>
       </div>

@@ -6,10 +6,15 @@ import {CgSmartphone} from "solid-icons/cg";
 import {DataResponse, OrderItem, Product} from "~/types";
 import {createEffect, createResource, createSignal, For, Show} from "solid-js";
 import axios from "axios";
+import {useParams} from "@solidjs/router";
+import {string} from "yup";
+import getEndPoint from "~/utils/getEndPoint";
 
 export default function OrderDetails() {
+    const idOrder = useParams<{ id: string }>();
+
     const [data] =  createResource(async () => {
-        const response = await axios.get(`http://localhost:8080/order-items/1`);
+        const response = await axios.get(`${getEndPoint()}/order-items/${idOrder.id}`);
         return response.data as OrderItem[];
     });
 
@@ -39,7 +44,7 @@ export default function OrderDetails() {
             <div class="flex justify-between">
                 {/*Order*/}
                 <div class="bg-white rounded-lg w-5/12 shadow-lg p-4 border border-gray-300">
-                    <h2 class="text-xl font-medium mb-4">Order #302011</h2>
+                    <h2 class="text-xl font-medium mb-4">Order #{idOrder.id}</h2>
                     <div class="flex justify-between">
                         <div class="flex items-center">
                             <div class="border border-gray-100 bg-gray-100 p-1 rounded-full">
@@ -160,16 +165,12 @@ export default function OrderDetails() {
                                 <td class="px-4 py-2 text-right font-medium">${subTotal().toFixed(2)}</td>
                             </tr>
                             <tr>
-                                <td colspan="4" class="text-right px-4 py-2 font-medium">VAT</td>
-                                <td class="px-4 py-2 text-right font-medium">$0</td>
-                            </tr>
-                            <tr>
-                                <td colspan="4" class="text-right px-4 py-2 font-medium">Shipping Rate</td>
-                                <td class="px-4 py-2 text-right font-medium">$5.00</td>
+                                <td colspan="4" class="text-right px-4 py-2 font-medium">VAT (10%)</td>
+                                <td class="px-4 py-2 text-right font-medium">${(subTotal() * 0.1).toFixed(2)}</td>
                             </tr>
                             <tr>
                                 <td colspan="4" class="text-right px-4 py-2 font-medium">Grand Total</td>
-                                <td class="px-4 py-2 text-right font-bold">$580.00</td>
+                                <td class="px-4 py-2 text-right font-bold">${(subTotal() + subTotal()*0.1).toFixed(2)}</td>
                             </tr>
                         </tfoot>
                     </table>

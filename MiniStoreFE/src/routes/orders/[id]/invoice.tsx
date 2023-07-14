@@ -6,16 +6,31 @@ import {BsPrinter} from "solid-icons/bs";
 import {createEffect, createResource, For} from "solid-js";
 import axios from "axios";
 import {OrderItem} from "~/types";
+import {useParams} from "@solidjs/router";
+import {string} from "yup";
+import getEndPoint from "~/utils/getEndPoint";
 
 export default function Invoice() {
+    const idInvoice = useParams<{ id: string }>();
+
     const [data] =  createResource(async () => {
-        const response = await axios.get(`http://localhost:8080/order-items/1`);
+        const response = await axios.get(`${getEndPoint()}/order-items/${idInvoice.id}`);
         return response.data as OrderItem[];
     });
 
     createEffect(() => {
         if (!data.error && data.state === "ready") console.log(data());
     });
+
+    const subTotal = () => {
+        let calculateSubTotal = 0;
+        data()?.forEach(item => {
+            const itemSubTotal = item.product.price * item.quantity;
+            calculateSubTotal += itemSubTotal;
+        });
+
+        return calculateSubTotal;
+    };
 
   return (
     <main class="min-w-fit">
@@ -82,16 +97,16 @@ export default function Invoice() {
                         {/*Total price*/}
                         <tfoot>
                             <tr>
-                                <td colspan="4" class="text-right px-4 py-2">Subtotal</td>
-                                <td class="px-4 py-2 text-right">$40.00</td>
+                                <td colspan="4" class="text-right px-4 py-2 font-medium">Subtotal</td>
+                                <td class="px-4 py-2 font-medium text-right">${subTotal().toFixed(2)}</td>
                             </tr>
                             <tr>
-                                <td colspan="4" class="text-right px-4 py-2">Vouchers</td>
-                                <td class="px-4 py-2 text-right">-$5.00</td>
+                                <td colspan="4" class="text-right px-4 py-2 font-medium">VAT (10%)</td>
+                                <td class="px-4 py-2 font-medium text-right">${(subTotal() * 0.1).toFixed(2)}</td>
                             </tr>
                             <tr>
-                                <td colspan="4" class="text-right px-4 py-2">Grand Total</td>
-                                <td class="px-4 py-2 text-right">$35.00</td>
+                                <td colspan="4" class="text-right px-4 py-2 font-medium">Grand Total</td>
+                                <td class="px-4 py-2 font-bold text-right">${(subTotal() + subTotal()*0.1).toFixed(2)}</td>
                             </tr>
                         </tfoot>
                     </table>

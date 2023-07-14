@@ -153,7 +153,7 @@ export interface ShiftMetaInfo extends ShiftTemplate, ShiftScheduleTemplate {
 export interface Order extends Timestamp {
   orderId: number;
   orderDate: string;
-  totalPrice: number;
+  grandTotal: number;
 
   // relationship
   items: OrderItem[];
