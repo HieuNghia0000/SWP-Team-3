@@ -217,3 +217,29 @@ export interface DataResponse<T> extends Response {
   timestamp: string;
   status: number;
 }
+
+export interface PayrollPeriod  {
+  startDate: string;
+  endDate: string;
+}
+
+export interface PayrollData {
+  staffName: string;
+  regularHours: number;
+  holidayHours: number;
+  timeOff: number;
+  totalHours: number;
+  grossPay: number;
+  allApproved: boolean;
+}
+
+export interface StaffPayrollData extends PayrollData {
+  day: string;
+}
+
+export interface PayrollState {
+  currentPayrollPeriod: PayrollPeriod;
+  payrollData: PayrollData[];
+  selectedStaffPayroll: StaffPayrollData[];
+}
+
