@@ -1,16 +1,10 @@
 package com.team3.ministore.controller;
 
 import com.team3.ministore.common.responsehandler.ResponseHandler;
-import com.team3.ministore.dto.LeaveRequestDto;
-import com.team3.ministore.dto.SalaryDto;
-import com.team3.ministore.dto.ShiftDto;
-import com.team3.ministore.dto.StaffDto;
+import com.team3.ministore.dto.*;
 import com.team3.ministore.model.Shift;
 import com.team3.ministore.model.Staff;
-import com.team3.ministore.service.LeaveRequestService;
-import com.team3.ministore.service.SalaryService;
-import com.team3.ministore.service.ShiftService;
-import com.team3.ministore.service.StaffService;
+import com.team3.ministore.service.*;
 import com.team3.ministore.utils.LeaveStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,6 +30,8 @@ public class ShiftPlanningController {
     private SalaryService salaryService;
     @Autowired
     private LeaveRequestService leaveRequestService;
+    @Autowired
+    private ShiftCoverRequestService shiftCoverRequestService;
 
     @GetMapping()
     public ResponseEntity<Object> getShiftPlanning(@RequestParam(value = "from", required = false) String from,
@@ -89,12 +85,23 @@ public class ShiftPlanningController {
                 .collect(Collectors.toList());
         // Get the shifts of the staff
         List<Shift> shifts = shiftService.getAllShiftsByStaffId(foundStaff.get().getStaffId(), fromDate, toDate);
+
+
         // Convert shifts to shiftDtos
         List<ShiftDto> shiftDtos = shifts.stream().map(ShiftDto::new).collect(Collectors.toList());
 
+        // Get the shifts which are covered by the staff
+        List<ShiftCoverDto> shiftCoverDtos = shiftCoverRequestService.getShiftCoverRequestsByStaffId(foundStaff.get().getStaffId());
+
+        // Add the shifts which are covered by the staff to the shiftDtos
+        shiftCoverDtos.stream().map(ShiftCoverDto::getShift)
+                .forEach(shift -> {
+                    if (shiftDtos.stream().noneMatch(shift1 -> shift1.getShiftId() == shift.getShiftId())){
+                        shiftDtos.add(shift);
+                    }
+                });
+
         // Return the staffDtos
         return ResponseHandler.getResponse(new StaffDto(foundStaff.get(), salaryDto, shiftDtos, leaveRequestDtos), HttpStatus.OK);
-
-
     }
 }

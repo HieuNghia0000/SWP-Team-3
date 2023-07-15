@@ -15,4 +15,6 @@ public interface ShiftCoverRequestService {
     Optional<ShiftCoverDto> updateShiftCoverRequest(Integer id, ShiftCoverDto dto);
 
     void deleteShiftCoverRequest(Integer id);
+
+    List<ShiftCoverDto> getShiftCoverRequestsByStaffId(Integer id);
 }

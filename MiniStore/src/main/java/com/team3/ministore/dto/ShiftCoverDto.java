@@ -38,7 +38,7 @@ public class ShiftCoverDto {
         this.staffId = shiftCoverRequest.getStaff().getStaffId();
         this.staff = new StaffDto(shiftCoverRequest.getStaff());
         this.shiftId = shiftCoverRequest.getShift().getShiftId();
-        this.shift = new ShiftDto(shiftCoverRequest.getShift(),false);
+        this.shift = new ShiftDto(shiftCoverRequest.getShift(), false);
     }
 
     public ShiftCoverDto(ShiftCoverRequest shiftCoverRequest, boolean withStaff, boolean withShift) {
@@ -51,7 +51,7 @@ public class ShiftCoverDto {
             this.staff = new StaffDto(shiftCoverRequest.getStaff());
         }
         if (withShift) {
-            this.shift = new ShiftDto(shiftCoverRequest.getShift(), true,false);
+            this.shift = new ShiftDto(shiftCoverRequest.getShift(), withStaff, false);
         }
     }
 }

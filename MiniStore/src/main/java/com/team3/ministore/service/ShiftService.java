@@ -22,4 +22,5 @@ public interface ShiftService {
     void deleteShift(Integer id);
 
     List<Shift> getAllShifts(LocalDate fromDate, LocalDate toDate);
+
 }

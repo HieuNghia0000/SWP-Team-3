@@ -19,7 +19,7 @@ const ShiftsChooserModal: Component<{
             {(shift) => (
               <button
                 onClick={[ setChosenShiftId, shift.shiftId ]}
-                class="rounded p-2 relative text-left mb-1 w-full"
+                class="rounded p-2 relative text-left mb-1 block w-full max-w-[600px]"
                 classList={{
                   "bg-white hover:bg-[#edf2f7] text-black border border-gray-200": !shift.shiftCoverRequest,
                   "bg-[#efedfc] hover:bg-[#e4e0fa] text-[#7256e8] border border-[#efedfc]": !!shift.shiftCoverRequest,

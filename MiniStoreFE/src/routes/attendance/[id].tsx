@@ -19,6 +19,7 @@ import ShiftsChooserModal from "~/components/attendance/ShiftsChooserModal";
 import { roles } from "~/utils/roles";
 import { toastError, toastSuccess } from "~/utils/toast";
 import routes from "~/utils/routes";
+import { capitalize } from "~/utils/capitalize";
 
 const schema: yup.Schema<Omit<Timesheet, "timesheetId" | "checkInTime" | "checkOutTime">> = yup.object({
   shiftId: yup.number().required("Staff ID is required"),
@@ -99,7 +100,7 @@ export default function Attendance() {
 
   createEffect(() => {
     if (data.state === "ready")
-      interval = setInterval(() => setCurTime(moment().format('h:mm:ss a')), 1000);
+      interval = setInterval(() => setCurTime(moment().format('h:mm:ss a')), 500);
 
     onCleanup(() => clearInterval(interval));
   })
@@ -190,7 +191,8 @@ export default function Attendance() {
             <div class="flex-1 flex flex-row py-2.5 overflow-hidden gap-3">
               <Show when={chosenShift()} fallback={<p class="w-full text-gray-500 text-center">No shift available</p>}>
                 <div
-                  class="rounded p-2 relative text-left mb-1 w-full"
+                  onClick={[ setIsShiftsModalOpen, true ]}
+                  class="rounded p-2 relative text-left mb-1 w-full cursor-pointer"
                   classList={{
                     "bg-white text-black border border-gray-200": !chosenShift()?.shiftCoverRequest,
                     "bg-[#efedfc] text-[#7256e8] border border-[#efedfc]": !!chosenShift()?.shiftCoverRequest,
@@ -213,6 +215,16 @@ export default function Attendance() {
                     {data()?.staffName || "No staff assigned"}{" "}•{" "}
                     {roles.find((r) => r.value === chosenShift()?.role)?.label}
                   </p>
+                  <div
+                    class="absolute top-1 right-1 inline-flex text-xs p-1 justify-center items-center font-semibold ml-1 rounded"
+                    classList={{
+                      "text-red-500 bg-red-100": chosenShift()?.timesheet?.status === TimesheetStatus.REJECTED,
+                      "text-orange-500 bg-orange-100": chosenShift()?.timesheet?.status === TimesheetStatus.PENDING,
+                      "text-green-500 bg-green-100": chosenShift()?.timesheet?.status === TimesheetStatus.APPROVED,
+                    }}
+                  >
+                    {capitalize(chosenShift()?.timesheet?.status || "Not attended")}
+                  </div>
                 </div>
               </Show>
             </div>

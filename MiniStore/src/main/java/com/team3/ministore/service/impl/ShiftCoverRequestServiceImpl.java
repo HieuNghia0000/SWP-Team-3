@@ -100,4 +100,11 @@ public class ShiftCoverRequestServiceImpl implements ShiftCoverRequestService {
     public void deleteShiftCoverRequest(Integer id) {
         shiftCoverRequestRepository.deleteById(id);
     }
+
+    public List<ShiftCoverDto> getShiftCoverRequestsByStaffId(Integer staffId) {
+        return shiftCoverRequestRepository
+                .findAllByStaff_StaffId(staffId)
+                .stream().map(sc -> new ShiftCoverDto(sc, true, true))
+                .collect(Collectors.toList());
+    }
 }
