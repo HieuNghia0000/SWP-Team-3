@@ -32,10 +32,10 @@ export function routeData() {
   const [params] = useSearchParams<ParamType>();
 
   const orders = createRouteData(
-      async ([perPage, curPage, amount_from, amount_to]) => {
+      async ([perPage, curPage, amount_from, amount_to, ago, from, to]) => {
           try {
               const {data} = await axios.get<DataResponse<Order[]>>(
-                `${getEndPoint()}/orders?perPage=${perPage}&curPage=${curPage}&amount_from=${amount_from}&amount_to=${amount_to}`
+                `${getEndPoint()}/orders?perPage=${perPage}&curPage=${curPage}&amount_from=${amount_from}&amount_to=${amount_to}&ago=${ago}&from=${from}&to=${to}`
               );
               return data.content;
           }
@@ -43,7 +43,7 @@ export function routeData() {
             throw new Error(handleFetchError(e));
           }
       },
-      {key: () => [params.perPage ?? 10, params.curPage ?? 1, params.amount_from ?? "", params.amount_to ?? ""]}
+      {key: () => [params.perPage ?? 10, params.curPage ?? 1, params.amount_from ?? "", params.amount_to ?? "", params.ago ?? "", params.from ?? "", params.to ?? ""]}
   );
 
   return {data: orders};

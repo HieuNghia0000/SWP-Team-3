@@ -67,6 +67,9 @@ public class OrdersServiceImpl implements OrdersService {
             case "24hours":
                 currentDateTime = currentDateTime.minusHours(24);
                 break;
+            case "":
+                currentDateTime = LocalDateTime.of(1900, 1, 1, 0, 0, 0);
+                break;
             default:
                 throw new IllegalArgumentException("Invalid time: " + ago);
         }
