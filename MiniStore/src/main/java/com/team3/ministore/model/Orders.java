@@ -1,5 +1,6 @@
 package com.team3.ministore.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -21,4 +22,8 @@ public class Orders {
 
     @Column(name = "grand_total")
     private int grandTotal;
+
+    @OneToMany(mappedBy = "orders")
+    @JsonManagedReference
+    private List<OrderItems> orderItems;
 }

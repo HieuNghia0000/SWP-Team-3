@@ -1,5 +1,6 @@
 package com.team3.ministore.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -16,6 +17,7 @@ public class OrderItems {
 
     @ManyToOne
     @JoinColumn(name = "order_id", referencedColumnName = "order_id")
+    @JsonBackReference
     private Orders orders;
 
     @ManyToOne

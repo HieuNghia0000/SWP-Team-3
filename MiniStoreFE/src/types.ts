@@ -166,7 +166,7 @@ export interface Order extends Timestamp {
   grandTotal: number;
 
   // relationship
-  items: OrderItem[];
+  orderItems: OrderItem[];
 }
 
 export interface OrderItem {

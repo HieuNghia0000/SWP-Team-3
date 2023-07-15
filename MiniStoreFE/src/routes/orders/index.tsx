@@ -333,8 +333,7 @@ export default function Orders() {
                         </A>
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
-                        {/*{item.items.map((i) => i.product.name).join(", ")}*/}
-                        product
+                        {item.orderItems.map((item) => (item.product.name)).join(", ")}
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
                         {displayDate(item.orderDate)}
