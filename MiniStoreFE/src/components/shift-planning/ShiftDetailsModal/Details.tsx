@@ -1,10 +1,10 @@
 import { FaSolidPencil, FaSolidTrash } from "solid-icons/fa";
 import { Accessor, Component, Setter, Show } from "solid-js";
 import PopupModal from "~/components/PopupModal";
-import { Role } from "~/types";
+import { Role, TimesheetStatus } from "~/types";
 import { Tabs } from ".";
 import moment from "moment";
-import { ShiftCard } from "~/context/ShiftPlanning";
+import { ShiftCard, useSPData } from "~/context/ShiftPlanning";
 import { roles } from "~/utils/roles";
 import { TbSpeakerphone } from "solid-icons/tb";
 
@@ -16,6 +16,13 @@ interface DetailsProps {
 }
 
 const Details: Component<DetailsProps> = ({ shiftCard, setState, onDelete, openCreateCoverModal }) => {
+  const { tableData } = useSPData();
+
+  const attendance = () => shiftCard()?.timesheet?.status === TimesheetStatus.APPROVED
+    ? "Attended"
+    : moment(shiftCard()?.endTime, "HH:mm:ss").isBefore(moment())
+      ? "Absent"
+      : "Not yet"
 
   return (
     <>
@@ -29,6 +36,12 @@ const Details: Component<DetailsProps> = ({ shiftCard, setState, onDelete, openC
         >
           {shiftCard()?.published ? "Published" : "Not Published"}
         </div>
+        <Show when={shiftCard()?.shiftCoverRequest}>
+          <p class="text-center text-sm text-red-500">
+            This shift has been reassigned
+            for {tableData.staffs.find(s => s.staffId === shiftCard()?.shiftCoverRequest?.staffId)?.staffName}
+          </p>
+        </Show>
         <div class="border-t border-gray-300 border-dotted text-gray-600 text-sm">
           <div class="flex border-b border-gray-300 border-dotted">
             <div class="flex-1 py-2.5 overflow-hidden space-x-1">
@@ -92,15 +105,32 @@ const Details: Component<DetailsProps> = ({ shiftCard, setState, onDelete, openC
           <div class="flex">
             <div class="flex-1 py-2.5 overflow-hidden space-x-1">
               <span class="font-semibold text-gray-500">Status:</span>
-              <span>Not yet</span>
+              <span
+                class="inline-flex justify-center items-center ml-1 rounded-lg"
+                classList={{
+                  "text-red-700": attendance() === "Not yet",
+                  "text-red-700 font-semibold": attendance() === "Absent",
+                  "text-green-700 font-semibold": attendance() === "Attended",
+                }}
+              >
+                {attendance()}
+              </span>
             </div>
             <div class="flex-1 py-2.5 overflow-hidden space-x-1">
               <span class="font-semibold text-gray-500">Check-in Time:</span>
-              <span>Not yet</span>
+              <span>
+                {shiftCard()?.timesheet?.checkInTime
+                  ? moment(shiftCard()?.timesheet?.checkInTime, "HH:mm:ss").format("h:mm:ss a")
+                  : "Not yet"}
+              </span>
             </div>
             <div class="flex-1 py-2.5 overflow-hidden space-x-1">
               <span class="font-semibold text-gray-500">Check-out Time:</span>
-              <span>Not yet</span>
+              <span>
+                {shiftCard()?.timesheet?.checkOutTime
+                  ? moment(shiftCard()?.timesheet?.checkOutTime, "HH:mm:ss").format("h:mm:ss a")
+                  : "Not yet"}
+              </span>
             </div>
           </div>
         </div>

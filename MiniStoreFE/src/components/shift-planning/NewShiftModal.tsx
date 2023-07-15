@@ -152,6 +152,7 @@ const NewShiftModal: Component<{
       });
 
       toastSuccess("Shift created successfully");
+      reset();
       setShowModal(false);
 
     } catch (error: any) {

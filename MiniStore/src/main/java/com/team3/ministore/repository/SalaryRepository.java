@@ -22,8 +22,7 @@ public interface SalaryRepository extends JpaRepository<Salary, Integer> {
     @Query("SELECT new com.team3.ministore.dto.SalaryDto(sl.hourlyWage, sl.effectiveDate, sl.terminationDate, sl" +
             ".staff.staffId, sl.salaryId) " +
             "FROM Salary sl " +
-            "WHERE sl.staff.staffId = :staffId " +
-            "AND sl.effectiveDate <= CURRENT_DATE " +
+            "WHERE sl.effectiveDate <= CURRENT_DATE " +
             "AND (sl.terminationDate IS NULL OR sl.terminationDate >= CURRENT_DATE)")
     List<SalaryDto> findSalaryOfAllStaffs();
 

@@ -15,6 +15,7 @@ interface ShiftCardProps {
   draggable?: any;
   style?: any;
   isErrored?: boolean;
+  attendance: () => "Attended" | "Absent" | "Not yet";
 }
 
 const ShiftCard: Component<ShiftCardProps> = (props) => {
@@ -29,6 +30,7 @@ const ShiftCard: Component<ShiftCardProps> = (props) => {
     "draggable",
     "isErrored",
     "coveredShift",
+    "attendance"
   ]);
 
   const fs = () => {
@@ -65,7 +67,16 @@ const ShiftCard: Component<ShiftCardProps> = (props) => {
         }}
       ></i>
       <p class="ml-3 font-semibold text-sm">{local.shiftDuration}</p>
-      <p class="ml-3 font-normal text-xs text-gray-600">{local.shiftName}</p>
+      <p class="ml-3 font-normal text-xs text-gray-600">
+        {local.shiftName}{" "}
+        <span classList={{
+          "text-green-500 font-semibold": local.attendance() === "Attended",
+          "text-red-500 font-semibold": local.attendance() === "Absent",
+          "text-gray-400": local.attendance() === "Not yet",
+        }}>
+          ({local.attendance()})
+        </span>
+      </p>
       <Show when={local.isErrored}>
         <div
           class="absolute top-1 right-1 h-3 w-3 inline-flex text-[10px] leading-[14px] justify-center items-center font-semibold ml-1 rounded-full text-white bg-red-600">

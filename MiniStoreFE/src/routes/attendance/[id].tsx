@@ -132,7 +132,7 @@ export default function Attendance() {
     let success: boolean;
 
     if (!chosenShift()?.timesheet)
-      success = await create({ ...formData(), checkInTime, checkOutTime });
+      success = await create({ ...formData(), checkInTime, checkOutTime, status: TimesheetStatus.PENDING });
     else
       success = await update({ ...formData(), checkInTime, checkOutTime, timesheetId: chosenShift()?.timesheet?.timesheetId! });
 
@@ -280,7 +280,7 @@ export default function Attendance() {
                 onClick={submit}
                 class="py-1.5 px-3 font-semibold text-white border border-blue-600 bg-blue-500 text-sm rounded hover:bg-blue-600"
               >
-                Check In
+                Check In / Out
               </button>
             </div>
           </Show>

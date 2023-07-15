@@ -1,10 +1,11 @@
 import { createDraggable } from "@thisbeyond/solid-dnd";
 import { batch, Component, onMount } from "solid-js";
 import { useSPData, useSPModals } from "~/context/ShiftPlanning";
-import { Shift, ShiftCoverRequestStatus, Staff } from "~/types";
+import { Shift, ShiftCoverRequestStatus, Staff, TimesheetStatus } from "~/types";
 import { shiftTimes } from "./utils/shiftTimes";
 import ShiftCard from "./ShiftCard";
 import { getShiftRules } from "./utils/shiftRules";
+import moment from "moment";
 
 const DraggableCard: Component<{
   shift: Shift;
@@ -14,6 +15,11 @@ const DraggableCard: Component<{
 }> = ({ shift, width, staff, date }) => {
   const { setShiftModalData, setShowShiftModal } = useSPModals();
   const { isRouteDataLoading, tableData, setTableData } = useSPData();
+  const attendance = ()=>shift?.timesheet?.status === TimesheetStatus.APPROVED
+    ? "Attended"
+    : moment(shift?.endTime, "HH:mm:ss").isBefore(moment())
+      ? "Absent"
+      : "Not yet"
 
 
   const draggable = createDraggable(shift.shiftId, {
@@ -63,6 +69,7 @@ const DraggableCard: Component<{
       )}
       shiftName={shift.name}
       isErrored={rules.find((rule) => !rule.passed) !== undefined}
+      attendance={attendance}
     />
   );
 };

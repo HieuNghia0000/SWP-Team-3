@@ -11,7 +11,7 @@ import {
 } from "@thisbeyond/solid-dnd";
 import moment from "moment";
 import { batch, Component, For, Show } from "solid-js";
-import { DataResponse, Shift, ShiftCoverRequestStatus } from "~/types";
+import { DataResponse, Shift, ShiftCoverRequestStatus, TimesheetStatus } from "~/types";
 import TableCell from "./TableCell";
 import { useSPData, useSPModals } from "~/context/ShiftPlanning";
 import { shiftTimes } from "./utils/shiftTimes";
@@ -239,6 +239,11 @@ const Table: Component<DnDTableProps> = (props) => {
                   let selectedShiftWidth = () => draggable?.data?.width() - 4;
                   let isErrored = () =>
                     tableData.shiftsRules[draggable?.id as number].find((rule) => !rule.passed) !== undefined;
+                  let attendance = () => tableData.shifts[draggable?.id as number]?.timesheet?.status === TimesheetStatus.APPROVED
+                    ? "Attended"
+                    : moment(tableData.shifts[draggable?.id as number]?.endTime, "HH:mm:ss").isBefore(moment())
+                      ? "Absent"
+                      : "Not yet"
 
                   return (
                     <ShiftCard
@@ -254,6 +259,7 @@ const Table: Component<DnDTableProps> = (props) => {
                       isOverlay={true}
                       isErrored={isErrored()}
                       coveredShift={!!item().shiftCoverRequest && item().shiftCoverRequest?.status === ShiftCoverRequestStatus.APPROVED}
+                      attendance={attendance}
                     />
                   );
                 }}

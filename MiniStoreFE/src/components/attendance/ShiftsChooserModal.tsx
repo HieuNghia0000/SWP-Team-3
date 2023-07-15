@@ -1,8 +1,9 @@
 import { Accessor, Component, For, Setter, Show } from "solid-js";
 import PopupModal from "~/components/PopupModal";
-import { Role, Staff } from "~/types";
+import { Role, Staff, TimesheetStatus } from "~/types";
 import { shiftDetailsTime } from "~/components/shift-planning/utils/shiftTimes";
 import { roles } from "~/utils/roles";
+import { capitalize } from "~/utils/capitalize";
 
 const ShiftsChooserModal: Component<{
   showModal: Accessor<boolean>;
@@ -41,6 +42,16 @@ const ShiftsChooserModal: Component<{
                   {staff?.staffName || "No staff assigned"}{" "}•{" "}
                   {roles.find((r) => r.value === shift.role)?.label}
                 </p>
+                <div
+                  class="absolute top-1 right-1 inline-flex text-xs p-1 justify-center items-center font-semibold ml-1 rounded"
+                  classList={{
+                    "text-red-500 bg-red-100": shift?.timesheet?.status === TimesheetStatus.REJECTED,
+                    "text-orange-500 bg-orange-100": shift?.timesheet?.status === TimesheetStatus.PENDING,
+                    "text-green-500 bg-green-100": shift?.timesheet?.status === TimesheetStatus.APPROVED,
+                  }}
+                >
+                  {capitalize(shift?.timesheet?.status || "Not submitted")}
+                </div>
               </button>
             )}
           </For>
