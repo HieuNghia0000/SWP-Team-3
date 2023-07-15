@@ -7,6 +7,7 @@ import moment from "moment";
 import { ShiftCard, useSPData } from "~/context/ShiftPlanning";
 import { roles } from "~/utils/roles";
 import { TbSpeakerphone } from "solid-icons/tb";
+import { useAuth } from "~/context/Auth";
 
 interface DetailsProps {
   shiftCard: Accessor<ShiftCard | undefined>;
@@ -16,11 +17,12 @@ interface DetailsProps {
 }
 
 const Details: Component<DetailsProps> = ({ shiftCard, setState, onDelete, openCreateCoverModal }) => {
+  const { user } = useAuth();
   const { tableData } = useSPData();
 
   const attendance = () => shiftCard()?.timesheet?.status === TimesheetStatus.APPROVED
     ? "Attended"
-    : moment(shiftCard()?.endTime, "HH:mm:ss").isBefore(moment())
+    : moment(`${shiftCard()?.date} ${shiftCard()?.endTime}`).isBefore(moment())
       ? "Absent"
       : "Not yet"
 
@@ -137,26 +139,28 @@ const Details: Component<DetailsProps> = ({ shiftCard, setState, onDelete, openC
       </PopupModal.Body>
       <PopupModal.Footer>
         <div class="w-full flex justify-start items-center gap-3">
-          <button
-            type="button"
-            onClick={onDelete}
-            class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
-          >
+          <Show when={user()?.role === Role.ADMIN}>
+            <button
+              type="button"
+              onClick={onDelete}
+              class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
+            >
             <span>
               <FaSolidTrash/>
             </span>
-            <span>Delete</span>
-          </button>
-          <button
-            type="button"
-            onClick={[ setState, "edit" ]}
-            class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
-          >
+              <span>Delete</span>
+            </button>
+            <button
+              type="button"
+              onClick={[ setState, "edit" ]}
+              class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
+            >
             <span class="">
               <FaSolidPencil/>
             </span>
-            Edit Shift
-          </button>
+              Edit Shift
+            </button>
+          </Show>
           <Show when={!shiftCard()?.shiftCoverRequest}>
             <button
               type="button"

@@ -11,6 +11,7 @@ import { IoCalendarOutline } from "solid-icons/io";
 import { TbClock, TbSpeakerphone, TbTrees } from "solid-icons/tb";
 import { useAuth } from "~/context/Auth";
 import { FaRegularCalendarCheck } from "solid-icons/fa";
+import { Role } from "~/types";
 
 type NavbarProps = {
   isOpen: () => boolean;
@@ -72,39 +73,41 @@ const Navbar: Component<NavbarProps> = (props) => {
         {/* Attendance */}
         <NavbarLink
           href={routes.attendanceId(user()?.staffId!)}
-          icon={<FaRegularCalendarCheck />}
+          icon={<FaRegularCalendarCheck/>}
           text="Attendance"
           isOpen={isOpen}
         />
 
         {/* Staff */}
-        {/*<Show when={user()?.role === Role.ADMIN}>*/}
-        <NavbarLink
-          href={routes.staffs}
-          icon={<BsPeople/>}
-          text="Staff&nbsp;Management"
-          isOpen={isOpen}
-        />
-        {/*</Show>*/}
+        <Show when={user()?.role === Role.ADMIN}>
+          <NavbarLink
+            href={routes.staffs}
+            icon={<BsPeople/>}
+            text="Staff&nbsp;Management"
+            isOpen={isOpen}
+          />
+        </Show>
 
         {/* Product */}
-        <NavbarDropDown
-          href={routes.products}
-          isOpen={isOpen}
-          icon={<BiRegularShoppingBag/>}
-          text="Products"
-        >
-          <NavbarLink
+        <Show when={user()?.role === Role.ADMIN}>
+          <NavbarDropDown
             href={routes.products}
-            text="Product&nbsp;List"
             isOpen={isOpen}
-          />
-          <NavbarLink
-            href={routes.categories}
-            text="Categories"
-            isOpen={isOpen}
-          />
-        </NavbarDropDown>
+            icon={<BiRegularShoppingBag/>}
+            text="Products"
+          >
+            <NavbarLink
+              href={routes.products}
+              text="Product&nbsp;List"
+              isOpen={isOpen}
+            />
+            <NavbarLink
+              href={routes.categories}
+              text="Categories"
+              isOpen={isOpen}
+            />
+          </NavbarDropDown>
+        </Show>
 
         {/* Orders */}
         <NavbarLink
@@ -115,14 +118,14 @@ const Navbar: Component<NavbarProps> = (props) => {
         />
 
         {/* Time Clock */}
-        {/*<Show when={user()?.role === Role.ADMIN}>*/}
-        <NavbarLink
-          href={routes.timeClock}
-          icon={<TbClock/>}
-          text="Time Clock"
-          isOpen={isOpen}
-        />
-        {/*</Show>*/}
+        <Show when={user()?.role === Role.ADMIN}>
+          <NavbarLink
+            href={routes.timeClock}
+            icon={<TbClock/>}
+            text="Time Clock"
+            isOpen={isOpen}
+          />
+        </Show>
 
       </ul>
     </section>

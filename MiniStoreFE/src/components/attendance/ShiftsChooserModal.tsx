@@ -39,7 +39,7 @@ const ShiftsChooserModal: Component<{
                   {shiftDetailsTime(shift.date || "", shift.startTime || "", shift.endTime || "")}
                 </p>
                 <p class="ml-3.5 font-normal text-xs text-[13px] tracking-wider">
-                  {staff?.staffName || "No staff assigned"}{" "}•{" "}
+                  {shift.name}{" "}•{" "}
                   {roles.find((r) => r.value === shift.role)?.label}
                 </p>
                 <div

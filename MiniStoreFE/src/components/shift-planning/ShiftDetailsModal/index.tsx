@@ -7,11 +7,12 @@ import Copy from "./Copy";
 import { ShiftCard, useSPData, useSPModals } from "~/context/ShiftPlanning";
 import { toastConfirmDeletion, toastSuccess } from "~/utils/toast";
 import axios from "axios";
-import { DataResponse } from "~/types";
+import { DataResponse, Role } from "~/types";
 import getEndPoint from "~/utils/getEndPoint";
 import handleFetchError from "~/utils/handleFetchError";
 import toast from "solid-toast";
 import { cellIdGenerator } from "~/components/shift-planning/utils/cellIdGenerator";
+import { useAuth } from "~/context/Auth";
 
 export type Tabs = "details" | "edit" | "errors" | "copy";
 
@@ -24,6 +25,7 @@ const ShiftDetailsModal: Component<{
   const [ state, setState ] = createSignal<Tabs>("details");
   const { setTableData } = useSPData();
   const { setShowCreateCoverModal } = useSPModals();
+  const { user } = useAuth();
 
   const onCloseModal = () => {
     setShowModal(false);
@@ -96,7 +98,7 @@ const ShiftDetailsModal: Component<{
       }
       close={onCloseModal}
       open={showModal}
-      headerTabs={[
+      headerTabs={user()?.role === Role.ADMIN ? [
         {
           name: "Details",
           stateName: "details",
@@ -127,14 +129,44 @@ const ShiftDetailsModal: Component<{
           stateName: "copy",
           onClick: () => setState("copy"),
         },
+      ] : [
+        {
+          name: "Details",
+          stateName: "details",
+          onClick: () => setState("details"),
+        },
+        {
+          name: (
+            <>
+              <span>Errors</span>
+              <Show when={numOfErrors() > 0}>
+                <div
+                  class="h-3.5 w-3.5 inline-block text-[10px] leading-[14px] text-center font-semibold ml-1 rounded-full text-white bg-red-600">
+                  {numOfErrors()}
+                </div>
+              </Show>
+            </>
+          ),
+          stateName: "errors",
+          onClick: () => setState("errors"),
+        },
+
       ]}
       headerTabSelected={state}
     >
-      <Switch>
+      <Switch fallback={<div>Something wrong</div>}>
         <Match when={state() === "details"}>
           <Details
             shiftCard={modalData}
             setState={setState}
+            onDelete={onDeleteShift}
+            openCreateCoverModal={openCreateCoverModal}
+          />
+        </Match>
+        <Match when={state() === "errors"}>
+          <Errors
+            shiftCard={modalData}
+            setModalState={setState}
             onDelete={onDeleteShift}
             openCreateCoverModal={openCreateCoverModal}
           />
@@ -146,14 +178,6 @@ const ShiftDetailsModal: Component<{
             setShiftModalData={setShiftModalData}
             setShowModal={setShowModal}
             modalData={modalData}
-            onDelete={onDeleteShift}
-            openCreateCoverModal={openCreateCoverModal}
-          />
-        </Match>
-        <Match when={state() === "errors"}>
-          <Errors
-            shiftCard={modalData}
-            setModalState={setState}
             onDelete={onDeleteShift}
             openCreateCoverModal={openCreateCoverModal}
           />

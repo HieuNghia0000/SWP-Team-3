@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -101,9 +102,9 @@ public class ShiftCoverRequestServiceImpl implements ShiftCoverRequestService {
         shiftCoverRequestRepository.deleteById(id);
     }
 
-    public List<ShiftCoverDto> getShiftCoverRequestsByStaffId(Integer staffId) {
+    public List<ShiftCoverDto> getShiftCoverRequestsByStaffId(Integer staffId, LocalDate from, LocalDate to) {
         return shiftCoverRequestRepository
-                .findAllByStaff_StaffId(staffId)
+                .findAllByStaff_StaffIdAndShift_DateBetween(staffId, from, to)
                 .stream().map(sc -> new ShiftCoverDto(sc, true, true))
                 .collect(Collectors.toList());
     }

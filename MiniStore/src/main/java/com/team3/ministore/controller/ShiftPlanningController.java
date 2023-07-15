@@ -91,17 +91,20 @@ public class ShiftPlanningController {
         List<ShiftDto> shiftDtos = shifts.stream().map(ShiftDto::new).collect(Collectors.toList());
 
         // Get the shifts which are covered by the staff
-        List<ShiftCoverDto> shiftCoverDtos = shiftCoverRequestService.getShiftCoverRequestsByStaffId(foundStaff.get().getStaffId());
+        List<ShiftCoverDto> shiftCoverDtos = shiftCoverRequestService.getShiftCoverRequestsByStaffId(foundStaff.get().getStaffId(), fromDate, toDate);
 
         // Add the shifts which are covered by the staff to the shiftDtos
         shiftCoverDtos.stream().map(ShiftCoverDto::getShift)
                 .forEach(shift -> {
-                    if (shiftDtos.stream().noneMatch(shift1 -> shift1.getShiftId() == shift.getShiftId())){
+                    if (shiftDtos.stream().noneMatch(shift1 -> shift1.getShiftId() == shift.getShiftId())) {
                         shiftDtos.add(shift);
                     }
                 });
 
+        // Filter the shifts which are not published
+        List<ShiftDto> lShifts = shiftDtos.stream().filter(ShiftDto::getPublished).collect(Collectors.toList());
+
         // Return the staffDtos
-        return ResponseHandler.getResponse(new StaffDto(foundStaff.get(), salaryDto, shiftDtos, leaveRequestDtos), HttpStatus.OK);
+        return ResponseHandler.getResponse(List.of(new StaffDto(foundStaff.get(), salaryDto, lShifts, leaveRequestDtos)), HttpStatus.OK);
     }
 }

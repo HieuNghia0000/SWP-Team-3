@@ -2,11 +2,12 @@ import { BsCheckCircle, BsExclamationCircle } from "solid-icons/bs";
 import { FaSolidPencil, FaSolidTrash } from "solid-icons/fa";
 import { Accessor, Component, For, Setter, Show } from "solid-js";
 import PopupModal from "~/components/PopupModal";
-import { Role, ShiftCoverRequestStatus } from "~/types";
+import { Role } from "~/types";
 import { Tabs } from ".";
 import { shiftDetailsTime } from "../utils/shiftTimes";
 import { ShiftCard } from "~/context/ShiftPlanning";
 import { TbSpeakerphone } from "solid-icons/tb";
+import { useAuth } from "~/context/Auth";
 
 interface ErrorsProps {
   shiftCard: Accessor<ShiftCard | undefined>;
@@ -15,13 +16,10 @@ interface ErrorsProps {
   openCreateCoverModal: () => void;
 }
 
-const Errors: Component<ErrorsProps> = ({
-                                          shiftCard,
-                                          setModalState,
-                                          onDelete,
-                                          openCreateCoverModal
-                                        }) => {
-  console.log("shiftCard", shiftCard()?.rules);
+const Errors: Component<ErrorsProps> = ({ shiftCard, setModalState, onDelete, openCreateCoverModal }) => {
+  // console.log("shiftCard", shiftCard()?.rules);
+  const { user } = useAuth();
+
   return (
     <>
       <PopupModal.Body>
@@ -108,26 +106,28 @@ const Errors: Component<ErrorsProps> = ({
       </PopupModal.Body>
       <PopupModal.Footer>
         <div class="w-full flex justify-start items-center gap-3">
-          <button
-            type="button"
-            onClick={onDelete}
-            class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
-          >
+          <Show when={user()?.role === Role.ADMIN}>
+            <button
+              type="button"
+              onClick={onDelete}
+              class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
+            >
             <span>
               <FaSolidTrash/>
             </span>
-            <span>Delete</span>
-          </button>
-          <button
-            type="button"
-            onClick={[ setModalState, "edit" ]}
-            class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
-          >
+              <span>Delete</span>
+            </button>
+            <button
+              type="button"
+              onClick={[ setModalState, "edit" ]}
+              class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
+            >
             <span class="">
               <FaSolidPencil/>
             </span>
-            Edit Shift
-          </button>
+              Edit Shift
+            </button>
+          </Show>
           <Show when={!shiftCard()?.shiftCoverRequest}>
             <button
               type="button"

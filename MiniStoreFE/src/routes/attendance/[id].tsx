@@ -31,15 +31,16 @@ const schema: yup.Schema<Omit<Timesheet, "timesheetId" | "checkInTime" | "checkO
 });
 
 const fetcher: ResourceFetcher<boolean, Staff> = async (source) => {
+  const { id } = useParams();
   try {
     const today = moment().format('YYYY-MM-DD');
 
-    const { data } = await axios.get<DataResponse<Staff>>(
-      `${getEndPoint()}/shift-planning?from=${today}&to=${today}&staffId=1`
+    const { data } = await axios.get<DataResponse<Staff[]>>(
+      `${getEndPoint()}/shift-planning?from=${today}&to=${today}&staffId=${id}`
     );
     console.log(data.content, source);
 
-    return data.content;
+    return data.content[0];
   } catch (e) {
     throw new Error(handleFetchError(e));
   }
@@ -118,7 +119,6 @@ export default function Attendance() {
 
     if (f.isFormInvalid) return;
 
-
     const checkInTime = chosenShift()?.timesheet?.checkInTime ?
       chosenShift()!.timesheet!.checkInTime
       : moment().format('HH:mm:ss');
@@ -128,14 +128,19 @@ export default function Attendance() {
         : moment().format('HH:mm:ss')
       : null;
 
-
     // alert(JSON.stringify({ ...formData(), checkInTime, checkOutTime }))
     let success: boolean;
 
     if (!chosenShift()?.timesheet)
       success = await create({ ...formData(), checkInTime, checkOutTime, status: TimesheetStatus.PENDING });
     else
-      success = await update({ ...formData(), checkInTime, checkOutTime, timesheetId: chosenShift()?.timesheet?.timesheetId! });
+      success = await update({
+        ...formData(),
+        checkInTime,
+        checkOutTime,
+        timesheetId: chosenShift()?.timesheet?.timesheetId!,
+        status: TimesheetStatus.APPROVED
+      });
 
     if (success) {
       refetch();
@@ -212,7 +217,7 @@ export default function Attendance() {
                     {shiftDetailsTime(chosenShift()?.date || "", chosenShift()?.startTime || "", chosenShift()?.endTime || "")}
                   </p>
                   <p class="ml-3.5 font-normal text-xs text-[13px] tracking-wider">
-                    {data()?.staffName || "No staff assigned"}{" "}•{" "}
+                    {chosenShift()?.name}{" "}•{" "}
                     {roles.find((r) => r.value === chosenShift()?.role)?.label}
                   </p>
                   <div

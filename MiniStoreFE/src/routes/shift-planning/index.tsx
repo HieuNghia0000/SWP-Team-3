@@ -1,7 +1,7 @@
 import Breadcrumbs from "~/components/Breadcrumbs";
 import { createStore } from "solid-js/store";
 import { createEffect, createResource, createSignal, on, ResourceFetcher, Show } from "solid-js";
-import { DataResponse, ShiftTemplate, Staff } from "~/types";
+import { DataResponse, Role, ShiftTemplate, Staff } from "~/types";
 import { getWeekDateStings } from "~/utils/getWeekDates";
 import getEndPoint from "~/utils/getEndPoint";
 import { ModalContext, PageDataContext, ShiftCard } from "~/context/ShiftPlanning";
@@ -18,18 +18,24 @@ import ScheduleTemplateModal from "~/components/shift-planning/ScheduleTemplateM
 import axios from "axios";
 import handleFetchError from "~/utils/handleFetchError";
 import CreateCoverRequestModal from "~/components/cover-requests/CreateCoverRequestModal";
+import { useAuth } from "~/context/Auth";
 
-const fetcher: ResourceFetcher<boolean | string, FetcherData> = async (
+const fetcher: ResourceFetcher<{
+  datePicked: string | undefined;
+  staffId: number | undefined;
+  role: string | undefined;
+} | undefined, FetcherData> = async (
   source
 ) => {
   try {
-    const dates = getWeekDateStings(source as string);
+    const dates = getWeekDateStings(source?.datePicked as string);
     const from = dates[0];
     const to = dates[dates.length - 1];
+    const endpoint = source?.role === Role.ADMIN
+      ? `${getEndPoint()}/shift-planning?from=${from}&to=${to}`
+      : `${getEndPoint()}/shift-planning?from=${from}&to=${to}&staffId=${source?.staffId}`;
 
-    const response = await axios.get<DataResponse<Staff[]>>(
-      `${getEndPoint()}/shift-planning?from=${from}&to=${to}`
-    );
+    const response = await axios.get<DataResponse<Staff[]>>(endpoint);
 
     return {
       dates,
@@ -42,14 +48,21 @@ const fetcher: ResourceFetcher<boolean | string, FetcherData> = async (
 
 export default function ShiftPlanning() {
   const [ datePicked, setDatePicked ] = createSignal<string | undefined>();
+  const { user } = useAuth();
 
   // Be careful with this. You should always check for error before reading the data
-  const [ data, { refetch, mutate } ] = createResource(datePicked, fetcher, {
-    initialValue: {
-      dates: [],
-      staffs: [],
-    },
-  });
+  const [ data, { refetch, mutate } ] = createResource(
+    () => datePicked() ? {
+      datePicked: datePicked(),
+      staffId: user()?.staffId,
+      role: user()?.role
+    } : undefined, fetcher, {
+      initialValue: {
+        dates: [],
+        staffs: [],
+      },
+    }
+  );
 
   // Because the data returned from the fetcher is a Signal, which is not good for manage complex state
   // So we need to transform the data to a Store for better state management
@@ -205,20 +218,24 @@ export default function ShiftPlanning() {
           modalData={staffModalData}
           setShowModal={setShowStaffModal}
         />
-        <NewShiftModal
-          showModal={showNewShiftModal}
-          modalData={newShiftModalData}
-          setShowModal={setShowNewShiftModal}
-        />
-        <ShiftTemplateModal
-          showModal={showShiftTemplateModal}
-          modalData={shiftTemplateModalData}
-          setShowModal={setShowShiftTemplateModal}
-        />
-        <ScheduleTemplateModal
-          modalState={scheduleTemplateModalState}
-          setModalState={setScheduleTemplateModalState}
-        />
+
+        <Show when={user()?.role === Role.ADMIN}>
+          <NewShiftModal
+            showModal={showNewShiftModal}
+            modalData={newShiftModalData}
+            setShowModal={setShowNewShiftModal}
+          />
+          <ShiftTemplateModal
+            showModal={showShiftTemplateModal}
+            modalData={shiftTemplateModalData}
+            setShowModal={setShowShiftTemplateModal}
+          />
+          <ScheduleTemplateModal
+            modalState={scheduleTemplateModalState}
+            setModalState={setScheduleTemplateModalState}
+          />
+        </Show>
+
         <CreateCoverRequestModal
           showModal={showCreateCoverModal}
           setShowModal={setShowCreateCoverModal}

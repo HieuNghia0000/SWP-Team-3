@@ -1,5 +1,5 @@
 import PopupModal from "~/components/PopupModal";
-import { Accessor, Component, Setter } from "solid-js";
+import { Accessor, Component, Setter, Show } from "solid-js";
 import { useFormHandler } from "solid-form-handler";
 import { yupSchema } from "solid-form-handler/yup";
 import * as yup from "yup";
@@ -14,6 +14,7 @@ import handleFetchError from "~/utils/handleFetchError";
 import { toastSuccess } from "~/utils/toast";
 import { shiftDetailsTime } from "~/components/shift-planning/utils/shiftTimes";
 import { useSPData, useSPModals } from "~/context/ShiftPlanning";
+import { useAuth } from "~/context/Auth";
 
 type CreateCoverRequest = {
   staffId: number;
@@ -48,6 +49,7 @@ const CreateCoverRequestModal: Component<{
   const [ echoing, echo ] = createRouteAction(createCoverRequest);
   const { tableData, saveChanges } = useSPData();
   const { shiftModalData } = useSPModals();
+  const { user } = useAuth();
   const formHandler = useFormHandler(yupSchema(schema), { validateOn: [] });
   const { formData } = formHandler;
   const onCloseModal = async () => {
@@ -155,22 +157,26 @@ const CreateCoverRequestModal: Component<{
         </PopupModal.Body>
         <PopupModal.Footer>
           <div class="w-full flex justify-end items-center gap-2">
-            <button
-              type="button"
-              disabled={echoing.pending}
-              onClick={[ submit, ShiftCoverRequestStatus.REJECTED ]}
-              class="py-1.5 px-3 font-semibold text-white border border-red-600 bg-red-500 text-sm rounded hover:bg-red-600"
-            >
-              Save & Deny
-            </button>
-            <button
-              type="button"
-              disabled={echoing.pending}
-              onClick={[ submit, ShiftCoverRequestStatus.APPROVED ]}
-              class="py-1.5 px-3 font-semibold text-white border border-green-600 bg-green-500 text-sm rounded hover:bg-green-600"
-            >
-              Save & Approve
-            </button>
+            <Show when={user()?.role === Role.ADMIN}>
+              <>
+                <button
+                  type="button"
+                  disabled={echoing.pending}
+                  onClick={[ submit, ShiftCoverRequestStatus.REJECTED ]}
+                  class="py-1.5 px-3 font-semibold text-white border border-red-600 bg-red-500 text-sm rounded hover:bg-red-600"
+                >
+                  Save & Deny
+                </button>
+                <button
+                  type="button"
+                  disabled={echoing.pending}
+                  onClick={[ submit, ShiftCoverRequestStatus.APPROVED ]}
+                  class="py-1.5 px-3 font-semibold text-white border border-green-600 bg-green-500 text-sm rounded hover:bg-green-600"
+                >
+                  Save & Approve
+                </button>
+              </>
+            </Show>
             <button
               type="button"
               disabled={echoing.pending}

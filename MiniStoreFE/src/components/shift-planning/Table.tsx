@@ -11,7 +11,7 @@ import {
 } from "@thisbeyond/solid-dnd";
 import moment from "moment";
 import { batch, Component, For, Show } from "solid-js";
-import { DataResponse, Shift, ShiftCoverRequestStatus, TimesheetStatus } from "~/types";
+import { DataResponse, Role, Shift, ShiftCoverRequestStatus, TimesheetStatus } from "~/types";
 import TableCell from "./TableCell";
 import { useSPData, useSPModals } from "~/context/ShiftPlanning";
 import { shiftTimes } from "./utils/shiftTimes";
@@ -25,6 +25,8 @@ import { toastError, toastSuccess } from "~/utils/toast";
 import axios from "axios";
 import getEndPoint from "~/utils/getEndPoint";
 import handleFetchError from "~/utils/handleFetchError";
+import { useAuth } from "~/context/Auth";
+import UninteractTableCell from "~/components/shift-planning/NormalStaff/UninteractTableCell";
 
 // a cell is a droppable box
 // a shift is a draggable item
@@ -34,6 +36,7 @@ type DnDTableProps = {};
 const Table: Component<DnDTableProps> = (props) => {
   const { setStaffModalData, setShowStaffModal } = useSPModals();
   const { tableData, setTableData, isRouteDataLoading } = useSPData();
+  const { user } = useAuth();
 
   // Get all droppable box ids
   const cellIds = () => Object.keys(tableData.cells);
@@ -190,7 +193,7 @@ const Table: Component<DnDTableProps> = (props) => {
 
         {/* Body - Drag container */}
         <div class="relative shadow-sm border border-gray-200 border-t-0">
-          <Show when={tableData.staffs.length !== 0}>
+          <Show when={tableData.staffs.length !== 0 && user()?.role === Role.ADMIN}>
             <DragDropProvider
               onDragEnd={onDragEnd}
               collisionDetector={closestContainerOrItem}
@@ -241,7 +244,7 @@ const Table: Component<DnDTableProps> = (props) => {
                     tableData.shiftsRules[draggable?.id as number].find((rule) => !rule.passed) !== undefined;
                   let attendance = () => tableData.shifts[draggable?.id as number]?.timesheet?.status === TimesheetStatus.APPROVED
                     ? "Attended"
-                    : moment(tableData.shifts[draggable?.id as number]?.endTime, "HH:mm:ss").isBefore(moment())
+                    : moment(`${tableData.shifts[draggable?.id as number].date} ${tableData.shifts[draggable?.id as number]?.endTime}`).isBefore(moment())
                       ? "Absent"
                       : "Not yet"
 
@@ -265,6 +268,41 @@ const Table: Component<DnDTableProps> = (props) => {
                 }}
               </DragOverlay>
             </DragDropProvider>
+          </Show>
+          <Show when={tableData.staffs.length !== 0 && user()?.role !== Role.ADMIN}>
+            <For each={tableData.staffs}>
+              {(staff) => (
+                <div class="flex">
+                  <div
+                    class="sticky left-0 z-10 px-3 py-1.5 flex flex-col border border-t-0 border-gray-200 w-48 flex-auto flex-grow-0 flex-shrink-0 overflow-visible bg-white">
+                    <button
+                      onClick={() => {
+                        setStaffModalData(staff);
+                        setShowStaffModal(true);
+                      }}
+                      class="font-semibold text-sm text-gray-600 text-start"
+                    >
+                      {staff.staffName}
+                    </button>
+                    <div class="font-normal text-sm text-gray-400">
+                      {capitalize(staff.role)}
+                    </div>
+                  </div>
+                  <For each={tableData.dates}>
+                    {(date) => (
+                      <UninteractTableCell
+                        items={getShiftsByCellId(
+                          cellIdGenerator(staff, date),
+                          tableData
+                        )}
+                        staff={staff}
+                        date={date}
+                      />
+                    )}
+                  </For>
+                </div>
+              )}
+            </For>
           </Show>
         </div>
       </div>
