@@ -1,7 +1,6 @@
 package com.team3.ministore.dto;
 
 import com.team3.ministore.model.LeaveRequest;
-import com.team3.ministore.model.Staff;
 import com.team3.ministore.utils.LeaveStatus;
 import com.team3.ministore.utils.LeaveType;
 import lombok.Data;
@@ -9,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.util.Optional;
 
 @Data
 @RequiredArgsConstructor

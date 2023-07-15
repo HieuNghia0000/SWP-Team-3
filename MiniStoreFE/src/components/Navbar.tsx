@@ -71,7 +71,7 @@ const Navbar: Component<NavbarProps> = (props) => {
 
         {/* Attendance */}
         <NavbarLink
-          href={routes.attendance}
+          href={routes.attendanceId(user()?.staffId!)}
           icon={<FaRegularCalendarCheck />}
           text="Attendance"
           isOpen={isOpen}

@@ -112,7 +112,7 @@ export interface Timesheet {
   timesheetId: number;
   shiftId: number;
   checkInTime: string;
-  checkOutTime: string;
+  checkOutTime: string | null;
   status: TimesheetStatus;
   noteTitle?: string;
   noteContent?: string;

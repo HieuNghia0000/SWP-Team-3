@@ -1,7 +1,6 @@
 package com.team3.ministore.dto;
 
 import com.team3.ministore.model.Shift;
-import com.team3.ministore.model.Timesheet;
 import com.team3.ministore.utils.Role;
 import lombok.Data;
 
@@ -29,7 +28,7 @@ public class ShiftDto {
 
     private Time endTime;
 
-    private Timesheet timesheet;
+    private TimesheetDto timesheet;
 
     private ShiftCoverDto shiftCoverRequest;
 
@@ -45,7 +44,8 @@ public class ShiftDto {
         this.startTime = shift.getStartTime();
         this.endTime = shift.getEndTime();
         this.staffId = shift.getStaff().getStaffId();
-        this.timesheet = shift.getTimesheet();
+        if (shift.getTimesheet() != null)
+            this.timesheet = new TimesheetDto(shift.getTimesheet());
         if (shift.getShiftCoverRequest() != null)
             this.shiftCoverRequest = new ShiftCoverDto(shift.getShiftCoverRequest(), false, false);
     }
@@ -60,7 +60,8 @@ public class ShiftDto {
         this.startTime = shift.getStartTime();
         this.endTime = shift.getEndTime();
         this.staffId = shift.getStaff().getStaffId();
-        this.timesheet = shift.getTimesheet();
+        if (shift.getTimesheet() != null)
+            this.timesheet = new TimesheetDto(shift.getTimesheet());
         if (withShiftCoverRequest && shift.getShiftCoverRequest() != null)
             this.shiftCoverRequest = new ShiftCoverDto(shift.getShiftCoverRequest());
     }
@@ -75,7 +76,8 @@ public class ShiftDto {
         this.startTime = shift.getStartTime();
         this.endTime = shift.getEndTime();
         this.staffId = shift.getStaff().getStaffId();
-        this.timesheet = shift.getTimesheet();
+        if (shift.getTimesheet() != null)
+            this.timesheet = new TimesheetDto(shift.getTimesheet());
         if (withShiftCoverRequest && shift.getShiftCoverRequest() != null)
             this.shiftCoverRequest = new ShiftCoverDto(shift.getShiftCoverRequest());
         if (withStaff)

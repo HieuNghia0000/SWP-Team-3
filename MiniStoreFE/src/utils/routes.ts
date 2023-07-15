@@ -25,6 +25,7 @@ const routes = {
   leaves: "/leave-requests",
   shiftCover: "/shift-cover-requests",
   attendance: "/attendance",
+  attendanceId: (id: string | number) => `/attendance/${id}`,
 };
 
 export const apiRoutes = {

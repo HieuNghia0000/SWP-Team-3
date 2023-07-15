@@ -34,12 +34,13 @@ public class TimesheetController {
         Optional<Shift> shift = shiftService.getShiftById(dto.getShiftId());
         if (shift.isEmpty()) return ResponseHandler.getResponse(new Exception("Shift not found"), HttpStatus.NOT_FOUND);
 
-        Timesheet timesheet = timesheetService.createTimesheet(dto);
+        Timesheet timesheet = timesheetService.createTimesheet(dto, shift.get());
         shift.get().setTimesheet(timesheet);
 
+        // Update shift with the new timesheet
         ShiftDto updatedShift = shiftService.updateShift(shift.get());
 
-        return  ResponseHandler.getResponse(updatedShift.getTimesheet(), HttpStatus.CREATED);
+        return ResponseHandler.getResponse(updatedShift.getTimesheet(), HttpStatus.CREATED);
     }
 
     @GetMapping()
@@ -49,13 +50,16 @@ public class TimesheetController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateTimesheet(@PathVariable("id") Integer id, @RequestBody TimesheetDto dto,
+    public ResponseEntity<Object> updateTimesheet(@Valid @PathVariable("id") Integer id, @RequestBody TimesheetDto dto,
                                                   BindingResult errors) {
         if (errors.hasErrors()) return ResponseHandler.getResponse(errors, HttpStatus.BAD_REQUEST);
 
-        Optional<Timesheet> updatedTimesheet = timesheetService.updateTimesheet(id, dto);
+        Optional<Shift> shift = shiftService.getShiftById(dto.getShiftId());
+        if (shift.isEmpty()) return ResponseHandler.getResponse(new Exception("Shift not found"), HttpStatus.NOT_FOUND);
 
-        return updatedTimesheet.map(timesheet -> ResponseHandler.getResponse(timesheet, HttpStatus.OK))
+        Optional<Timesheet> updatedTimesheet = timesheetService.updateTimesheet(id, dto, shift.get());
+
+        return updatedTimesheet.map(timesheet -> ResponseHandler.getResponse(new TimesheetDto(timesheet), HttpStatus.OK))
                 .orElseGet(() -> ResponseHandler.getResponse(new Exception("Timesheet not found"), HttpStatus.NOT_FOUND));
 
     }

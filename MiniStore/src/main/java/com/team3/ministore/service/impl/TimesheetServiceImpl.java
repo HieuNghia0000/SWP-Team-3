@@ -1,6 +1,7 @@
 package com.team3.ministore.service.impl;
 
 import com.team3.ministore.dto.TimesheetDto;
+import com.team3.ministore.model.Shift;
 import com.team3.ministore.model.Timesheet;
 import com.team3.ministore.repository.TimesheetRepository;
 import com.team3.ministore.service.TimesheetService;
@@ -24,11 +25,12 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
-    public Timesheet createTimesheet(TimesheetDto dto) {
+    public Timesheet createTimesheet(TimesheetDto dto, Shift shift) {
         Timesheet timesheet = new Timesheet();
 
         return saveTimesheet(
                 timesheet,
+                shift,
                 dto.getCheckInTime(),
                 dto.getCheckOutTime(),
                 dto.getStatus(),
@@ -43,11 +45,12 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
-    public Optional<Timesheet> updateTimesheet(Integer id, TimesheetDto timesheet) {
+    public Optional<Timesheet> updateTimesheet(Integer id, TimesheetDto timesheet, Shift shift) {
         Optional<Timesheet> existingTimesheet = getTimesheetById(id);
 
         return existingTimesheet.map(value -> saveTimesheet(
                 value,
+                shift,
                 timesheet.getCheckInTime(),
                 timesheet.getCheckOutTime(),
                 timesheet.getStatus(),
@@ -61,8 +64,9 @@ public class TimesheetServiceImpl implements TimesheetService {
         timesheetRepository.deleteById(id);
     }
 
-    private Timesheet saveTimesheet(Timesheet timesheet, Time checkInTime, Time checkOutTime, TimesheetStatus status,
+    private Timesheet saveTimesheet(Timesheet timesheet, Shift shift, Time checkInTime, Time checkOutTime, TimesheetStatus status,
                                     String noteTitle, String noteContent) {
+        timesheet.setShift(shift);
         timesheet.setCheckInTime(checkInTime);
         timesheet.setCheckOutTime(checkOutTime);
         timesheet.setStatus(status == null ? TimesheetStatus.PENDING : status);
