@@ -21,7 +21,7 @@ import { toastError, toastSuccess } from "~/utils/toast";
 import routes from "~/utils/routes";
 import { capitalize } from "~/utils/capitalize";
 
-const schema: yup.Schema<Omit<Timesheet, "timesheetId" | "checkInTime" | "checkOutTime">> = yup.object({
+const schema: yup.Schema<Omit<Timesheet, "timesheetId" | "checkInTime" | "checkOutTime" | "shift">> = yup.object({
   shiftId: yup.number().required("Staff ID is required"),
   status: yup.string()
     .oneOf([ TimesheetStatus.PENDING, TimesheetStatus.APPROVED, TimesheetStatus.REJECTED ])
@@ -30,13 +30,12 @@ const schema: yup.Schema<Omit<Timesheet, "timesheetId" | "checkInTime" | "checkO
   noteContent: yup.string().default(""),
 });
 
-const fetcher: ResourceFetcher<boolean, Staff> = async (source) => {
-  const { id } = useParams();
+const fetcher: ResourceFetcher<{ id: string; } | undefined, Staff> = async (source) => {
   try {
     const today = moment().format('YYYY-MM-DD');
 
     const { data } = await axios.get<DataResponse<Staff[]>>(
-      `${getEndPoint()}/shift-planning?from=${today}&to=${today}&staffId=${id}`
+      `${getEndPoint()}/shift-planning?from=${today}&to=${today}&staffId=${source?.id}`
     );
     console.log(data.content, source);
 
@@ -83,7 +82,10 @@ export default function Attendance() {
   const [ chosenShiftId, setChosenShiftId ] = createSignal(0);
   const [ creating, create ] = createRouteAction(createTimesheet);
   const [ updating, update ] = createRouteAction(updateTimesheet);
-  const [ data, { refetch } ] = createResource(() => start() && params.id !== undefined, fetcher);
+  const [ data, { refetch } ] = createResource(() => start() && params.id !== undefined
+    ? { id: params.id }
+    : undefined, fetcher
+  );
   const [ curTime, setCurTime ] = createSignal(moment().format('h:mm:ss a'));
   const formHandler = useFormHandler(yupSchema(schema), { validateOn: [] });
   const { formData } = formHandler;

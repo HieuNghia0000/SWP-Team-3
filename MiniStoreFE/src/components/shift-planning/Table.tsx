@@ -119,6 +119,10 @@ const Table: Component<DnDTableProps> = (props) => {
         }
         return;
       }
+      if (tableData.shifts[draggable.id as number].timesheet) {
+        toastError("Cannot move a shift that has been timesheeted");
+        return;
+      }
 
       console.log(tableData.shifts[draggable.id as number])
       const newCellInfo = tableData.cellInfos[droppableCellId];

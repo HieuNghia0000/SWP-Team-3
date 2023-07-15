@@ -6,6 +6,7 @@ import com.team3.ministore.model.Shift;
 import com.team3.ministore.model.Staff;
 import com.team3.ministore.service.*;
 import com.team3.ministore.utils.LeaveStatus;
+import com.team3.ministore.utils.ShiftCoverStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -91,7 +92,9 @@ public class ShiftPlanningController {
         List<ShiftDto> shiftDtos = shifts.stream().map(ShiftDto::new).collect(Collectors.toList());
 
         // Get the shifts which are covered by the staff
-        List<ShiftCoverDto> shiftCoverDtos = shiftCoverRequestService.getShiftCoverRequestsByStaffId(foundStaff.get().getStaffId(), fromDate, toDate);
+        List<ShiftCoverDto> shiftCoverDtos = shiftCoverRequestService
+                .getShiftCoverRequestsByStaffId(foundStaff.get().getStaffId(), fromDate, toDate)
+                .stream().filter(s->s.getStatus() == ShiftCoverStatus.APPROVED).collect(Collectors.toList());
 
         // Add the shifts which are covered by the staff to the shiftDtos
         shiftCoverDtos.stream().map(ShiftCoverDto::getShift)

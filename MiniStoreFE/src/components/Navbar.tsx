@@ -126,14 +126,14 @@ const Navbar: Component<NavbarProps> = (props) => {
         />
 
         {/* Time Clock */}
-        <Show when={user()?.role === Role.ADMIN}>
-          <NavbarLink
-            href={routes.timeClock}
-            icon={<TbClock/>}
-            text="Time Clock"
-            isOpen={isOpen}
-          />
-        </Show>
+        {/*<Show when={user()?.role === Role.ADMIN}>*/}
+        {/*  <NavbarLink*/}
+        {/*    href={routes.timeClock}*/}
+        {/*    icon={<TbClock/>}*/}
+        {/*    text="Time Clock"*/}
+        {/*    isOpen={isOpen}*/}
+        {/*  />*/}
+        {/*</Show>*/}
 
       </ul>
     </section>
