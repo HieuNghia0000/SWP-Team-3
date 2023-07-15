@@ -89,9 +89,14 @@ export default function Table() {
         </thead>
         {/* <!-- Table row --> */}
         <tbody class="">
-        <Show when={!data.error} fallback={<div class="w-full h-full min-h-[300px] grid place-items-center">
-          Something went wrong
-        </div>}>
+        <Show when={!data.error} 
+        fallback=
+        {<div 
+          class="w-full h-full min-h-[300px] grid place-items-center"
+          >
+            Something went wrong
+        </div>
+        }>
           <For each={data()}>
             {(item) => (
               <tr class="hover:bg-[#ceefff] odd:bg-white even:bg-gray-50 text-[#333c48]">

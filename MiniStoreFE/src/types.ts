@@ -82,6 +82,7 @@ export interface LeaveRequest {
   staff?: Staff;
 }
 
+
 export interface Salary {
   salaryId: number;
   staffId: number;
