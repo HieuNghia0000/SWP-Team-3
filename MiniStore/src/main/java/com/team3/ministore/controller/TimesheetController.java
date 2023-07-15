@@ -49,6 +49,14 @@ public class TimesheetController {
         return ResponseHandler.getResponse(timesheetList, HttpStatus.OK);
     }
 
+    @GetMapping("/list")
+    public ResponseEntity<Object> getAllLeaveRequest(@RequestParam("search") Optional<String> search,
+                                                     @RequestParam("curPage") Integer curPage,
+                                                     @RequestParam("perPage") Integer perPage) {
+        return search.map(s -> ResponseHandler.getResponse(timesheetService.getAllTimeSheets(s, curPage, perPage), HttpStatus.OK))
+                .orElseGet(() -> ResponseHandler.getResponse(timesheetService.getAllTimeSheets(curPage, perPage), HttpStatus.OK));
+    }
+
     @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateTimesheet(@Valid @PathVariable("id") Integer id, @RequestBody TimesheetDto dto,
                                                   BindingResult errors) {
@@ -65,8 +73,8 @@ public class TimesheetController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteTimesheet(@PathVariable("id") Integer id) {
+    public ResponseEntity<Object> deleteTimesheet(@PathVariable("id") Integer id) {
         timesheetService.deleteTimesheet(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseHandler.getResponse(HttpStatus.OK);
     }
 }

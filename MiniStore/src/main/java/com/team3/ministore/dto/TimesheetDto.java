@@ -29,6 +29,8 @@ public class TimesheetDto {
 
     private String noteContent;
 
+    private ShiftDto shift;
+
 
     public TimesheetDto(Timesheet timesheet) {
         this.timesheetId = timesheet.getTimesheetId();
@@ -38,5 +40,17 @@ public class TimesheetDto {
         this.status = timesheet.getStatus();
         this.noteTitle = timesheet.getNoteTitle();
         this.noteContent = timesheet.getNoteContent();
+    }
+
+    public TimesheetDto(Timesheet timesheet, boolean withShift) {
+        this.timesheetId = timesheet.getTimesheetId();
+        this.shiftId = timesheet.getShift().getShiftId();
+        this.checkInTime = timesheet.getCheckInTime();
+        this.checkOutTime = timesheet.getCheckOutTime();
+        this.status = timesheet.getStatus();
+        this.noteTitle = timesheet.getNoteTitle();
+        this.noteContent = timesheet.getNoteContent();
+        if (withShift)
+            this.shift = new ShiftDto(timesheet.getShift(), true, false, false);
     }
 }

@@ -10,6 +10,10 @@ import java.util.Optional;
 public interface TimesheetService {
     List<Timesheet> getAllTimeSheets();
 
+    List<TimesheetDto> getAllTimeSheets(int page, int pageSize);
+
+    List<TimesheetDto> getAllTimeSheets(String search, int page, int pageSize);
+
     Timesheet createTimesheet(TimesheetDto timesheet, Shift shift);
 
     Optional<Timesheet> getTimesheetById(Integer id);

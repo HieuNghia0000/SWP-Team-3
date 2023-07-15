@@ -117,6 +117,9 @@ export interface Timesheet {
   status: TimesheetStatus;
   noteTitle?: string;
   noteContent?: string;
+
+  // relationship
+  shift?: Shift;
 }
 
 export interface ShiftCoverRequest {

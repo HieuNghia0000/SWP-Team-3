@@ -84,4 +84,22 @@ public class ShiftDto {
             this.staff = new StaffDto(shift.getStaff());
     }
 
+    public ShiftDto(Shift shift, boolean withStaff, boolean withTimesheet, boolean withShiftCoverRequest) {
+        this.shiftId = shift.getShiftId();
+        this.date = shift.getDate();
+        this.published = shift.getPublished();
+        this.role = shift.getRole();
+        this.salaryCoefficient = shift.getSalaryCoefficient();
+        this.name = shift.getName();
+        this.startTime = shift.getStartTime();
+        this.endTime = shift.getEndTime();
+        this.staffId = shift.getStaff().getStaffId();
+        if (withTimesheet && shift.getTimesheet() != null)
+            this.timesheet = new TimesheetDto(shift.getTimesheet());
+        if (withShiftCoverRequest && shift.getShiftCoverRequest() != null)
+            this.shiftCoverRequest = new ShiftCoverDto(shift.getShiftCoverRequest());
+        if (withStaff)
+            this.staff = new StaffDto(shift.getStaff());
+    }
+
 }

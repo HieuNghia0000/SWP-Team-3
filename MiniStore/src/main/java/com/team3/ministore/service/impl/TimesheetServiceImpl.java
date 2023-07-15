@@ -7,11 +7,14 @@ import com.team3.ministore.repository.TimesheetRepository;
 import com.team3.ministore.service.TimesheetService;
 import com.team3.ministore.utils.TimesheetStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.sql.Time;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class TimesheetServiceImpl implements TimesheetService {
@@ -22,6 +25,21 @@ public class TimesheetServiceImpl implements TimesheetService {
     @Override
     public List<Timesheet> getAllTimeSheets() {
         return timesheetRepository.findAll();
+    }
+
+    @Override
+    public List<TimesheetDto> getAllTimeSheets(int page, int pageSize) {
+        Pageable pageable = PageRequest.of(page - 1, pageSize);
+        return timesheetRepository.findAll(pageable).stream().map(t -> new TimesheetDto(t, true)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<TimesheetDto> getAllTimeSheets(String search, int page, int pageSize) {
+        Pageable pageable = PageRequest.of(page - 1, pageSize);
+
+        return timesheetRepository.findByShift_Staff_StaffNameContainingIgnoreCaseOrderByTimesheetIdDesc(search, pageable)
+                .stream().map(t -> new TimesheetDto(t, true))
+                .collect(Collectors.toList());
     }
 
     @Override

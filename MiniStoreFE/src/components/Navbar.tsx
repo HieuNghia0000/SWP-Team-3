@@ -10,7 +10,7 @@ import { FiShoppingCart } from "solid-icons/fi";
 import { IoCalendarOutline } from "solid-icons/io";
 import { TbClock, TbSpeakerphone, TbTrees } from "solid-icons/tb";
 import { useAuth } from "~/context/Auth";
-import { FaRegularCalendarCheck } from "solid-icons/fa";
+import { FaRegularCalendarCheck, FaSolidCalendarCheck } from "solid-icons/fa";
 import { Role } from "~/types";
 
 type NavbarProps = {
@@ -75,6 +75,14 @@ const Navbar: Component<NavbarProps> = (props) => {
           href={routes.attendanceId(user()?.staffId!)}
           icon={<FaRegularCalendarCheck/>}
           text="Attendance"
+          isOpen={isOpen}
+        />
+
+        {/* Timesheet */}
+        <NavbarLink
+          href={routes.timesheets}
+          icon={<FaSolidCalendarCheck />}
+          text="Timesheets"
           isOpen={isOpen}
         />
 
