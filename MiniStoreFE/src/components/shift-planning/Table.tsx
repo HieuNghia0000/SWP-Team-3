@@ -114,13 +114,7 @@ const Table: Component<DnDTableProps> = (props) => {
     if (draggableCellId != droppableCellId || !onlyWhenChangingContainer) {
       const errors = getShiftMoveErrors(draggable, droppable, tableData);
       if (errors.length > 0) {
-        for (let error of errors) {
-          toastError(error.errorName);
-        }
-        return;
-      }
-      if (tableData.shifts[draggable.id as number].timesheet) {
-        toastError("Cannot move a shift that has been timesheeted");
+        toastError(errors[0].errorName);
         return;
       }
 

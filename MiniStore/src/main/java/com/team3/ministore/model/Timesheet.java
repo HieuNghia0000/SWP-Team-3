@@ -36,4 +36,8 @@ public class Timesheet {
     @JoinColumn(name = "shift_id")
     private Shift shift;
 
+    @ManyToOne
+    @JoinColumn(name = "staff_id")
+    private Staff staff;
+
 }

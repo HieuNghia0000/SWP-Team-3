@@ -12,5 +12,5 @@ public interface TimesheetRepository extends JpaRepository<Timesheet, Integer> {
     @Query("SELECT t FROM Timesheet t ORDER BY t.timesheetId DESC")
     Page<Timesheet> findAll(Pageable pageable);
 
-    Page<Timesheet> findByShift_Staff_StaffNameContainingIgnoreCaseOrderByTimesheetIdDesc(String staff_staffName, Pageable pageable);
+    Page<Timesheet> findByStaff_StaffNameContainingIgnoreCaseOrderByTimesheetIdDesc(String staff_staffName, Pageable pageable);
 }

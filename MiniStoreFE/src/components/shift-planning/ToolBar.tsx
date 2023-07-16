@@ -1,4 +1,4 @@
-import { Accessor, Component, createEffect, createSignal, on, onCleanup, onMount, Setter, Show, } from "solid-js";
+import { Accessor, Component, createEffect, createSignal, on, onCleanup, onMount, Setter, } from "solid-js";
 import { useSearchParams } from "solid-start";
 import DropDownBtn from "../DropDownBtn";
 import { IoCopySharp } from "solid-icons/io";
@@ -94,25 +94,24 @@ const ToolBar: Component<ToolBarProps> = ({ datePicked, setDatePicked }) => {
     fp?.setDate(from.toDate(), true);
   };
 
+  const isAdmin = () => user()?.role === Role.ADMIN;
+
   return (
     <div class="mb-4 flex flex-row justify-between">
-      <Show when={user()?.role === Role.ADMIN}>
-        <div class="flex flex-row gap-5 items-center">
-          <button
-            type="button"
-            onClick={[ setShowShiftTemplateModal, true ]}
-            class="flex flex-row items-center gap-1 cursor-pointer border border-gray-300 rounded-lg py-2 px-3.5 font-medium text-sm text-gray-500 hover:text-indigo-600 hover:border-indigo-600"
-          >
+      <div class="flex flex-row gap-5 items-center" classList={{ "hidden": !isAdmin() }}>
+        <button
+          type="button"
+          onClick={[ setShowShiftTemplateModal, true ]}
+          class="flex flex-row items-center gap-1 cursor-pointer border border-gray-300 rounded-lg py-2 px-3.5 font-medium text-sm text-gray-500 hover:text-indigo-600 hover:border-indigo-600"
+        >
           <span class="text-base">
             <FaSolidRepeat/>
           </span>
-            Shift Templates
-          </button>
-        </div>
-      </Show>
-      <div class="flex justify-center items-center gap-2" classList={{
-        "w-full": user()?.role !== Role.ADMIN,
-      }}>
+          Shift Templates
+        </button>
+      </div>
+      <div class="flex justify-center items-center gap-2"
+           classList={{ "w-full": !isAdmin() }}>
         <button
           type="button"
           onClick={goToPrevWeek}
@@ -136,39 +135,39 @@ const ToolBar: Component<ToolBarProps> = ({ datePicked, setDatePicked }) => {
           <FaSolidAngleRight size={20}/>
         </button>
       </div>
-      <Show when={user()?.role === Role.ADMIN}>
-        <div class="flex justify-center items-center gap-4">
-          <DropDownBtn
-            text="Copy"
-            icon={<IoCopySharp/>}
-            classList={{
-              "w-fit flex flex-col items-stretch": true,
-            }}
+      {/*<Show when={isAdmin}>*/}
+      <div class="flex justify-center items-center gap-4" classList={{ "hidden": !isAdmin() }}>
+        <DropDownBtn
+          text="Copy"
+          icon={<IoCopySharp/>}
+          classList={{
+            "w-fit flex flex-col items-stretch": true,
+          }}
+        >
+          <button
+            type="button"
+            onClick={[ setScheduleTemplateModalState, "copy" ]}
+            class="py-1.5 px-2.5 text-sm text-start text-gray-600 hover:bg-gray-100 whitespace-nowrap block"
           >
-            <button
-              type="button"
-              onClick={[ setScheduleTemplateModalState, "copy" ]}
-              class="py-1.5 px-2.5 text-sm text-start text-gray-600 hover:bg-gray-100 whitespace-nowrap block"
-            >
-              Copy Previous Week
-            </button>
-            <button
-              type="button"
-              onClick={[ setScheduleTemplateModalState, "create" ]}
-              class="py-1.5 px-2.5 text-sm text-start text-gray-600 hover:bg-gray-100 whitespace-nowrap block"
-            >
-              Create Week Template
-            </button>
-            <button
-              type="button"
-              onClick={[ setScheduleTemplateModalState, "list" ]}
-              class="py-1.5 px-2.5 text-sm text-start text-gray-600 hover:bg-gray-100 whitespace-nowrap block"
-            >
-              Apply Week Template
-            </button>
-          </DropDownBtn>
-        </div>
-      </Show>
+            Copy Previous Week
+          </button>
+          <button
+            type="button"
+            onClick={[ setScheduleTemplateModalState, "create" ]}
+            class="py-1.5 px-2.5 text-sm text-start text-gray-600 hover:bg-gray-100 whitespace-nowrap block"
+          >
+            Create Week Template
+          </button>
+          <button
+            type="button"
+            onClick={[ setScheduleTemplateModalState, "list" ]}
+            class="py-1.5 px-2.5 text-sm text-start text-gray-600 hover:bg-gray-100 whitespace-nowrap block"
+          >
+            Apply Week Template
+          </button>
+        </DropDownBtn>
+      </div>
+      {/*</Show>*/}
     </div>
   );
 };

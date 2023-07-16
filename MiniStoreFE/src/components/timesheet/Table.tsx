@@ -1,11 +1,9 @@
 import { batch, For, Show } from "solid-js";
-import { capitalize } from "~/utils/capitalize";
 import { IoTrashOutline } from "solid-icons/io";
 import { OcPencil3 } from "solid-icons/oc";
 import routes from "~/utils/routes";
 import { useRouteData } from "@solidjs/router";
 import { A } from "solid-start";
-import { LeaveRequestStatus } from "~/types";
 import { routeData } from "~/routes/timesheets";
 import { useTSContext } from "~/context/Timesheet";
 
@@ -56,7 +54,7 @@ export default function Table() {
               "border-left": "1px dashed #d5dce6",
             }}
           >
-            Role
+            Coefficient
           </th>
           <th
             scope="col"
@@ -141,7 +139,7 @@ export default function Table() {
                     "border-left": "1px dashed #d5dce6",
                   }}
                   class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
-                  Cashier
+                  1.5
                 </td>
                 <td
                   style={{

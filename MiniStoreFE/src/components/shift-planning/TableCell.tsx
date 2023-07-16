@@ -6,7 +6,7 @@ import { useSPData, useSPModals } from "~/context/ShiftPlanning";
 import { getShiftMoveErrors } from "./utils/shiftRules";
 import isDayInThePast from "./utils/isDayInThePast";
 import { checkOverlapWithLeaveRequest } from "~/components/shift-planning/utils/checkOverlapWithLeaveRequest";
-import { toastWarning } from "~/utils/toast";
+import { toastError } from "~/utils/toast";
 
 const TableCell: Component<{
   id: string;
@@ -14,8 +14,7 @@ const TableCell: Component<{
   staff: Staff;
   date: string;
 }> = (props) => {
-  const { setShowNewShiftModal, setNewShiftModalData } =
-    useSPModals();
+  const { setShowNewShiftModal, setNewShiftModalData } = useSPModals();
   const { tableData } = useSPData();
 
   const droppable = createDroppable(props.id, {
@@ -37,7 +36,7 @@ const TableCell: Component<{
 
   const onAddNewShift = () => {
     if (checkOverlapWithLeaveRequest(tableData, props.staff.staffId, props.date)) {
-      toastWarning("This staff has a leave request on this day.");
+      toastError("This staff has a leave request on this day.");
       return;
     }
     setShowNewShiftModal(true);

@@ -1,6 +1,6 @@
 import Dismiss from "solid-dismiss";
 import { RiSystemArrowDownSLine, RiSystemArrowUpSLine } from "solid-icons/ri";
-import { Component, JSX, Show, createSignal } from "solid-js";
+import { Component, createSignal, JSX, Show } from "solid-js";
 
 const DropDownBtn: Component<{
   text: string;
@@ -8,7 +8,7 @@ const DropDownBtn: Component<{
   children: JSX.Element;
   classList?: { [key: string]: boolean };
 }> = (props) => {
-  const [open, setOpen] = createSignal(false);
+  const [ open, setOpen ] = createSignal(false);
   let btnEl;
 
   return (
@@ -21,8 +21,8 @@ const DropDownBtn: Component<{
         <Show when={props.icon}>{props.icon}</Show>
         {props.text}
         <span class="text-lg">
-          <Show when={!open()} fallback={<RiSystemArrowUpSLine />}>
-            <RiSystemArrowDownSLine />
+          <Show when={!open()} fallback={<RiSystemArrowUpSLine/>}>
+            <RiSystemArrowDownSLine/>
           </Show>
         </span>
       </button>

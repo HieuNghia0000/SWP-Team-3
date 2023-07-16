@@ -112,6 +112,7 @@ export interface Shift extends Timestamp {
 export interface Timesheet {
   timesheetId: number;
   shiftId: number;
+  staffId: number;
   checkInTime: string;
   checkOutTime: string | null;
   status: TimesheetStatus;
@@ -120,6 +121,7 @@ export interface Timesheet {
 
   // relationship
   shift?: Shift;
+  staff?: Staff;
 }
 
 export interface ShiftCoverRequest {

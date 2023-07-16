@@ -236,7 +236,7 @@ const Edit: Component<EditProps> = ({ setModalState, modalData, onDelete, openCr
                 value={modalData()?.role}
                 options={roles}
                 formHandler={formHandler}
-                disabled
+                disabled={isOldShift}
               />
             </div>
           </div>

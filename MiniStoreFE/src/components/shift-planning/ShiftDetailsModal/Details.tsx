@@ -41,7 +41,7 @@ const Details: Component<DetailsProps> = ({ shiftCard, setState, onDelete, openC
         <Show when={shiftCard()?.shiftCoverRequest}>
           <p class="text-center text-sm text-red-500">
             This shift has been reassigned
-            for {tableData.staffs.find(s => s.staffId === shiftCard()?.shiftCoverRequest?.staffId)?.staffName || "someone else"}
+            for {tableData.staffs.find(s => s.staffId === shiftCard()?.shiftCoverRequest?.staffId)?.staffName || "you"}.
           </p>
         </Show>
         <div class="border-t border-gray-300 border-dotted text-gray-600 text-sm">

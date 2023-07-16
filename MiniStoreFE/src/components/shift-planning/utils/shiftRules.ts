@@ -69,6 +69,18 @@ export const getShiftMoveErrors = (
 ) => {
   const errors: Rule[] = [];
 
+  // If the shift has been taken attendance
+  if (tableData.shifts[draggable.id as number].timesheet)
+    errors.push({
+      errorName: "Cannot move a shift that has been taken attendance",
+      description: "",
+      passed: false,
+    });
+
+  // If the shift overlaps with a leave request
+  if (checkOverlapWithLeaveRequest(tableData, droppable.data.staff.staffId, droppable.data.date))
+    errors.push(rules[2]);
+
   // User can not modify a shift in the past
   if (isDayInThePast(tableData.shifts[draggable.id as number].date)) {
     errors.push({
@@ -104,10 +116,6 @@ export const getShiftMoveErrors = (
     ]).includes(draggable.id as number)
   )
     errors.push(rules[1]);
-
-  // If the shift overlaps with a leave request
-  if (checkOverlapWithLeaveRequest(tableData, droppable.data.staff.staffId, droppable.data.date))
-    errors.push(rules[2]);
 
   return errors;
 };

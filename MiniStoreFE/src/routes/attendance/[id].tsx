@@ -3,10 +3,9 @@ import Breadcrumbs from "~/components/Breadcrumbs";
 import { useAuth } from "~/context/Auth";
 import moment from "moment";
 import axios from "axios";
-import { DataResponse, Role, Staff, Timesheet, TimesheetStatus } from "~/types";
+import { DataResponse, Staff, Timesheet, TimesheetStatus } from "~/types";
 import getEndPoint from "~/utils/getEndPoint";
 import handleFetchError from "~/utils/handleFetchError";
-import { shiftDetailsTime } from "~/components/shift-planning/utils/shiftTimes";
 import { useParams } from "@solidjs/router";
 import { TextArea } from "~/components/form/TextArea";
 import { TextInput } from "~/components/form/TextInput";
@@ -16,19 +15,20 @@ import * as yup from "yup";
 import { yupSchema } from "solid-form-handler/yup";
 import Spinner from "~/components/Spinner";
 import ShiftsChooserModal from "~/components/attendance/ShiftsChooserModal";
-import { roles } from "~/utils/roles";
 import { toastError, toastSuccess } from "~/utils/toast";
 import routes from "~/utils/routes";
-import { capitalize } from "~/utils/capitalize";
+import ShiftCard from "~/components/attendance/ShiftCard";
 
-const schema: yup.Schema<Omit<Timesheet, "timesheetId" | "checkInTime" | "checkOutTime" | "shift">> = yup.object({
-  shiftId: yup.number().required("Staff ID is required"),
-  status: yup.string()
-    .oneOf([ TimesheetStatus.PENDING, TimesheetStatus.APPROVED, TimesheetStatus.REJECTED ])
-    .required("Status is required"),
-  noteTitle: yup.string().default(""),
-  noteContent: yup.string().default(""),
-});
+const schema: yup.Schema<Omit<Timesheet, "timesheetId" | "checkInTime" | "checkOutTime" | "shift" | "staff" | "staffId">>
+  = yup
+  .object({
+    shiftId: yup.number().required("Shift ID is required"),
+    status: yup.string()
+      .oneOf([ TimesheetStatus.PENDING, TimesheetStatus.APPROVED, TimesheetStatus.REJECTED ])
+      .required("Status is required"),
+    noteTitle: yup.string().default(""),
+    noteContent: yup.string().default(""),
+  });
 
 const fetcher: ResourceFetcher<{ id: string; } | undefined, Staff> = async (source) => {
   try {
@@ -93,17 +93,21 @@ export default function Attendance() {
   const chosenShift = createMemo(() => data()?.shifts.find(s => s.shiftId === chosenShiftId()));
 
   createEffect(() => {
+    // If user is not the staff, redirect to his own attendance page
     if (params.id !== `${user()?.staffId}`) {
       navigate(routes.attendanceId(user()!.staffId))
-    } else {
+    }
+    // If user is the staff, start fetching data
+    else {
       console.log("start");
       setStart(true);
     }
   })
 
   createEffect(() => {
+    // If data is ready, set the clock interval
     if (data.state === "ready")
-      interval = setInterval(() => setCurTime(moment().format('h:mm:ss a')), 500);
+      interval = setInterval(() => setCurTime(moment().format('h:mm:ss a')), 900);
 
     onCleanup(() => clearInterval(interval));
   })
@@ -114,6 +118,11 @@ export default function Attendance() {
 
     if (chosenShift()?.timesheet?.checkInTime && chosenShift()?.timesheet?.checkOutTime) {
       toastError("You have already checked in and checked out for this shift");
+      return;
+    }
+
+    if (moment(`${chosenShift()?.date} ${chosenShift()?.startTime}`).isAfter(moment())) {
+      toastError("Shift has not started yet");
       return;
     }
 
@@ -130,18 +139,26 @@ export default function Attendance() {
         : moment().format('HH:mm:ss')
       : null;
 
-    // alert(JSON.stringify({ ...formData(), checkInTime, checkOutTime }))
     let success: boolean;
 
+    // If the staff has not checked in yet, create a new timesheet
     if (!chosenShift()?.timesheet)
-      success = await create({ ...formData(), checkInTime, checkOutTime, status: TimesheetStatus.PENDING });
+      success = await create({
+        ...formData(),
+        checkInTime,
+        checkOutTime,
+        status: TimesheetStatus.PENDING,
+        staffId: user()?.staffId!
+      });
+    // If the staff has checked in, update the timesheet
     else
       success = await update({
         ...formData(),
         checkInTime,
         checkOutTime,
         timesheetId: chosenShift()?.timesheet?.timesheetId!,
-        status: TimesheetStatus.APPROVED
+        status: TimesheetStatus.APPROVED,
+        staffId: user()?.staffId!
       });
 
     if (success) {
@@ -196,43 +213,9 @@ export default function Attendance() {
           </div>
           <div class="flex border-b border-gray-300 border-dotted">
             <div class="flex-1 flex flex-row py-2.5 overflow-hidden gap-3">
-              <Show when={chosenShift()} fallback={<p class="w-full text-gray-500 text-center">No shift available</p>}>
-                <div
-                  onClick={[ setIsShiftsModalOpen, true ]}
-                  class="rounded p-2 relative text-left mb-1 w-full cursor-pointer"
-                  classList={{
-                    "bg-white text-black border border-gray-200": !chosenShift()?.shiftCoverRequest,
-                    "bg-[#efedfc] text-[#7256e8] border border-[#efedfc]": !!chosenShift()?.shiftCoverRequest,
-                  }}
-                >
-                  <i
-                    class="absolute top-1.5 left-1.5 bottom-1.5 w-1.5 rounded"
-                    classList={{
-                      "bg-blue-500": chosenShift()?.role === Role.CASHIER,
-                      "bg-yellow-500": chosenShift()?.role === Role.GUARD,
-                      "bg-red-500": chosenShift()?.role === Role.MANAGER,
-                      "bg-gray-600": chosenShift()?.role === Role.ADMIN,
-                      "bg-gray-400": chosenShift()?.role === Role.ALL_ROLES,
-                    }}
-                  ></i>
-                  <p class="ml-3.5 font-semibold text-sm tracking-wider">
-                    {shiftDetailsTime(chosenShift()?.date || "", chosenShift()?.startTime || "", chosenShift()?.endTime || "")}
-                  </p>
-                  <p class="ml-3.5 font-normal text-xs text-[13px] tracking-wider">
-                    {chosenShift()?.name}{" "}•{" "}
-                    {roles.find((r) => r.value === chosenShift()?.role)?.label}
-                  </p>
-                  <div
-                    class="absolute top-1 right-1 inline-flex text-xs p-1 justify-center items-center font-semibold ml-1 rounded"
-                    classList={{
-                      "text-red-500 bg-red-100": chosenShift()?.timesheet?.status === TimesheetStatus.REJECTED,
-                      "text-orange-500 bg-orange-100": chosenShift()?.timesheet?.status === TimesheetStatus.PENDING,
-                      "text-green-500 bg-green-100": chosenShift()?.timesheet?.status === TimesheetStatus.APPROVED,
-                    }}
-                  >
-                    {capitalize(chosenShift()?.timesheet?.status || "Not attended")}
-                  </div>
-                </div>
+              <Show when={chosenShiftId() !== 0}
+                    fallback={<p class="w-full text-gray-500 text-center">No shift available</p>}>
+                <ShiftCard shift={chosenShift()!} onClick={() => setIsShiftsModalOpen(true)}/>
               </Show>
             </div>
           </div>
@@ -307,7 +290,7 @@ export default function Attendance() {
         <ShiftsChooserModal showModal={isShiftsModalOpen}
                             setShowModal={setIsShiftsModalOpen}
                             setChosenShiftId={selectShift}
-                            staff={data()!}/>
+                            shifts={() => data()!.shifts}/>
       </Show>
     </main>
   );

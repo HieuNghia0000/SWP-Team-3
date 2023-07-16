@@ -74,6 +74,8 @@ public class ShiftPlanningController {
 
         // ------------------------------------------------------------
         // If staffId is specified, return the staff with the given staffId
+        // This is for the staff to view their own shift planning
+        // ------------------------------------------------------------
         Optional<Staff> foundStaff = staffService.getStaffById(staffId);
 
         if (foundStaff.isEmpty())
@@ -87,6 +89,10 @@ public class ShiftPlanningController {
         // Get the shifts of the staff
         List<Shift> shifts = shiftService.getAllShiftsByStaffId(foundStaff.get().getStaffId(), fromDate, toDate);
 
+        // Filter the shifts which are not have shift cover request
+        shifts = shifts.stream()
+                .filter(s -> s.getShiftCoverRequest() == null || s.getShiftCoverRequest().getStatus() != ShiftCoverStatus.APPROVED)
+                .collect(Collectors.toList());
 
         // Convert shifts to shiftDtos
         List<ShiftDto> shiftDtos = shifts.stream().map(ShiftDto::new).collect(Collectors.toList());
@@ -94,7 +100,7 @@ public class ShiftPlanningController {
         // Get the shifts which are covered by the staff
         List<ShiftCoverDto> shiftCoverDtos = shiftCoverRequestService
                 .getShiftCoverRequestsByStaffId(foundStaff.get().getStaffId(), fromDate, toDate)
-                .stream().filter(s->s.getStatus() == ShiftCoverStatus.APPROVED).collect(Collectors.toList());
+                .stream().filter(s -> s.getStatus() == ShiftCoverStatus.APPROVED).collect(Collectors.toList());
 
         // Add the shifts which are covered by the staff to the shiftDtos
         shiftCoverDtos.stream().map(ShiftCoverDto::getShift)
