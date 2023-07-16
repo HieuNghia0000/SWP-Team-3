@@ -58,7 +58,7 @@ const Navbar: Component<NavbarProps> = (props) => {
         <NavbarLink
           href={routes.leaves}
           icon={<TbTrees/>}
-          text="Leave Requests"
+          text="Leave&nbsp;Requests"
           isOpen={isOpen}
         />
 
@@ -66,7 +66,7 @@ const Navbar: Component<NavbarProps> = (props) => {
         <NavbarLink
           href={routes.shiftCover}
           icon={<TbSpeakerphone/>}
-          text="Shift Cover Requests"
+          text="Shift&nbsp;Cover&nbsp;Requests"
           isOpen={isOpen}
         />
 
@@ -80,7 +80,7 @@ const Navbar: Component<NavbarProps> = (props) => {
           >
             <NavbarLink
               href={routes.attendanceId(user()?.staffId!)}
-              text="Attendance"
+              text="Take&nbsp;Attendance"
               isOpen={isOpen}
             />
             <NavbarLink
@@ -139,16 +139,6 @@ const Navbar: Component<NavbarProps> = (props) => {
           text="Orders"
           isOpen={isOpen}
         />
-
-        {/* Time Clock */}
-        {/*<Show when={user()?.role === Role.ADMIN}>*/}
-        {/*  <NavbarLink*/}
-        {/*    href={routes.timeClock}*/}
-        {/*    icon={<TbClock/>}*/}
-        {/*    text="Time Clock"*/}
-        {/*    isOpen={isOpen}*/}
-        {/*  />*/}
-        {/*</Show>*/}
 
       </ul>
     </section>
