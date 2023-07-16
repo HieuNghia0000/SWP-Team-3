@@ -9,13 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class SalaryServiceImpl implements SalaryService {
-    
+
     @Autowired
     private SalaryRepository salaryRepository;
-    
+
     @Override
     public List<Salary> getAllSalary() {
         return salaryRepository.findAll();
@@ -23,12 +24,12 @@ public class SalaryServiceImpl implements SalaryService {
 
     @Override
     public SalaryDto getSalaryByStaffId(Integer staffId) {
-        return salaryRepository.findSalaryInformationByStaffId(staffId);
+        return new SalaryDto(salaryRepository.findSalaryInformationByStaffId(staffId));
     }
 
     @Override
     public List<SalaryDto> getSalaryOfAllStaffs() {
-        return salaryRepository.findSalaryOfAllStaffs();
+        return salaryRepository.findSalaryOfAllStaffs().stream().map(SalaryDto::new).collect(Collectors.toList());
     }
 
     @Override

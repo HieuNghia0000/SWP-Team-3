@@ -21,6 +21,8 @@ public class TimesheetDto {
     @NotNull(message = "Staff ID is required")
     private int staffId;
 
+    private int salaryId;
+
     @NotNull(message = "Check in time is required")
     private Time checkInTime;
 
@@ -36,11 +38,14 @@ public class TimesheetDto {
 
     private StaffDto staff;
 
+    private SalaryDto salary;
+
 
     public TimesheetDto(Timesheet timesheet) {
         this.timesheetId = timesheet.getTimesheetId();
         this.shiftId = timesheet.getShift().getShiftId();
         this.staffId = timesheet.getStaff().getStaffId();
+        this.salaryId = timesheet.getSalary().getSalaryId();
         this.checkInTime = timesheet.getCheckInTime();
         this.checkOutTime = timesheet.getCheckOutTime();
         this.status = timesheet.getStatus();
@@ -48,15 +53,18 @@ public class TimesheetDto {
         this.noteContent = timesheet.getNoteContent();
     }
 
-    public TimesheetDto(Timesheet timesheet, boolean withShift, boolean withStaff) {
+    public TimesheetDto(Timesheet timesheet, boolean withShift, boolean withStaff, boolean withSalary) {
         this.timesheetId = timesheet.getTimesheetId();
         this.shiftId = timesheet.getShift().getShiftId();
         this.staffId = timesheet.getStaff().getStaffId();
+        this.salaryId = timesheet.getSalary().getSalaryId();
         this.checkInTime = timesheet.getCheckInTime();
         this.checkOutTime = timesheet.getCheckOutTime();
         this.status = timesheet.getStatus();
         this.noteTitle = timesheet.getNoteTitle();
         this.noteContent = timesheet.getNoteContent();
+        if (withSalary)
+            this.salary = new SalaryDto(timesheet.getSalary());
         if (withStaff)
             this.staff = new StaffDto(timesheet.getStaff());
         if (withShift)

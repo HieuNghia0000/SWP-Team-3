@@ -151,7 +151,7 @@ export default function Table() {
                     "border-left": "1px dashed #d5dce6",
                   }}
                   class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
-                  {formatNumberWithCommas(timesheet.staff!.salary?.hourlyWage || "0")} ₫
+                  {formatNumberWithCommas(timesheet.salary?.hourlyWage || 0)} ₫
                 </td>
                 <td
                   style={{
@@ -165,7 +165,7 @@ export default function Table() {
                     "border-left": "1px dashed #d5dce6",
                   }}
                   class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
-                  {formatNumberWithCommas((timesheet.staff!.salary?.hourlyWage || 0) * moment(timesheet.shift?.endTime, "HH:mm:ss").diff(moment(timesheet.shift?.startTime, "HH:mm:ss"), "hours"))} ₫
+                  {formatNumberWithCommas((timesheet.salary?.hourlyWage || 0) * moment(timesheet.shift?.endTime, "HH:mm:ss").diff(moment(timesheet.shift?.startTime, "HH:mm:ss"), "hours"))} ₫
                 </td>
                 <td
                   style={{

@@ -1,11 +1,13 @@
 package com.team3.ministore.controller;
 
 import com.team3.ministore.common.responsehandler.ResponseHandler;
+import com.team3.ministore.dto.SalaryDto;
 import com.team3.ministore.dto.ShiftDto;
 import com.team3.ministore.dto.TimesheetDto;
 import com.team3.ministore.model.Shift;
 import com.team3.ministore.model.Staff;
 import com.team3.ministore.model.Timesheet;
+import com.team3.ministore.service.SalaryService;
 import com.team3.ministore.service.ShiftService;
 import com.team3.ministore.service.StaffService;
 import com.team3.ministore.service.TimesheetService;
@@ -32,6 +34,9 @@ public class TimesheetController {
     @Autowired
     private StaffService staffService;
 
+    @Autowired
+    private SalaryService salaryService;
+
     @PostMapping("/add")
     public ResponseEntity<Object> createTimesheet(@Valid @RequestBody TimesheetDto dto, BindingResult errors) {
         if (errors.hasErrors()) return ResponseHandler.getResponse(errors, HttpStatus.BAD_REQUEST);
@@ -41,6 +46,8 @@ public class TimesheetController {
 
         Optional<Staff> staff = staffService.getStaffById(dto.getStaffId());
         if (staff.isEmpty()) return ResponseHandler.getResponse(new Exception("Staff not found"), HttpStatus.NOT_FOUND);
+
+        SalaryDto salaryDto = salaryService.getSalaryByStaffId(staff.get().getStaffId());
 
         Timesheet timesheet = timesheetService.createTimesheet(dto, shift.get(), staff.get());
         shift.get().setTimesheet(timesheet);
@@ -90,4 +97,19 @@ public class TimesheetController {
         timesheetService.deleteTimesheet(id);
         return ResponseHandler.getResponse(HttpStatus.OK);
     }
+
+    @GetMapping("/payroll")
+    public ResponseEntity<Object> getAllTimeSheets(@RequestParam("search") Optional<String> search,
+                                                   @RequestParam("from") Optional<String> from,
+                                                   @RequestParam("to") Optional<String> to) {
+        if (from.isEmpty() || to.isEmpty())
+            return ResponseHandler.getResponse(new Exception("Invalid input"), HttpStatus.BAD_REQUEST);
+
+        LocalDate fromDate = LocalDate.parse(from.get());
+        LocalDate toDate = LocalDate.parse(to.get());
+
+        return search.map(s -> ResponseHandler.getResponse(timesheetService.getPayroll(s, fromDate, toDate), HttpStatus.OK))
+                .orElseGet(() -> ResponseHandler.getResponse(timesheetService.getPayroll(fromDate, toDate), HttpStatus.OK));
+    }
+
 }

@@ -22,4 +22,8 @@ public interface TimesheetService {
     Optional<Timesheet> updateTimesheet(Integer id, TimesheetDto timesheet, Shift shift, Staff staff);
 
     void deleteTimesheet(Integer id);
+
+    Object getPayroll(String s, LocalDate fromDate, LocalDate toDate);
+
+    Object getPayroll(LocalDate fromDate, LocalDate toDate);
 }

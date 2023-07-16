@@ -40,4 +40,8 @@ public class Timesheet {
     @JoinColumn(name = "staff_id")
     private Staff staff;
 
+    @ManyToOne
+    @JoinColumn(name = "salary_id")
+    private Salary salary;
+
 }

@@ -1,5 +1,6 @@
 package com.team3.ministore.dto;
 
+import com.team3.ministore.model.Salary;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
@@ -19,12 +20,11 @@ public class SalaryDto {
     private final int staffId;
     private int salaryId;
 
-    //    Do not delete this constructor. It is used in SalaryRepository.java
-    public SalaryDto(String hourlyWage, LocalDate effectiveDate, LocalDate terminationDate, int staffId, int salaryId) {
-        this.hourlyWage = hourlyWage;
-        this.effectiveDate = effectiveDate;
-        this.terminationDate = terminationDate;
-        this.staffId = staffId;
-        this.salaryId = salaryId;
+    public SalaryDto(Salary salary){
+        this.hourlyWage = salary.getHourlyWage();
+        this.effectiveDate = salary.getEffectiveDate();
+        this.terminationDate = salary.getTerminationDate();
+        this.staffId = salary.getStaff().getStaffId();
+        this.salaryId = salary.getSalaryId();
     }
 }

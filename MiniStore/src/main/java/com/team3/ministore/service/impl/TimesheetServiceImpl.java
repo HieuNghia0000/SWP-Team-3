@@ -3,12 +3,15 @@ package com.team3.ministore.service.impl;
 import com.team3.ministore.dto.LeaveRequestDto;
 import com.team3.ministore.dto.SalaryDto;
 import com.team3.ministore.dto.TimesheetDto;
+import com.team3.ministore.model.Salary;
 import com.team3.ministore.model.Shift;
 import com.team3.ministore.model.Staff;
 import com.team3.ministore.model.Timesheet;
+import com.team3.ministore.repository.SalaryRepository;
 import com.team3.ministore.repository.TimesheetRepository;
 import com.team3.ministore.service.LeaveRequestService;
 import com.team3.ministore.service.SalaryService;
+import com.team3.ministore.service.StaffService;
 import com.team3.ministore.service.TimesheetService;
 import com.team3.ministore.utils.LeaveStatus;
 import com.team3.ministore.utils.TimesheetStatus;
@@ -30,7 +33,7 @@ public class TimesheetServiceImpl implements TimesheetService {
     private TimesheetRepository timesheetRepository;
 
     @Autowired
-    private SalaryService salaryService;
+    private SalaryRepository salaryRepository;
 
     @Autowired
     private LeaveRequestService leaveRequestService;
@@ -40,15 +43,13 @@ public class TimesheetServiceImpl implements TimesheetService {
         Pageable pageable = PageRequest.of(page - 1, pageSize);
         return timesheetRepository.findAllByShift_DateBetween(fromDate, toDate, pageable).stream().map(t -> {
                     // Get the salary and leave requests of the staff
-                    SalaryDto salaryDto = salaryService.getSalaryByStaffId(t.getStaff().getStaffId());
                     List<LeaveRequestDto> leaveRequestDtos = leaveRequestService
                             .getLeaveRequestsByStaffIdAndDates(t.getStaff().getStaffId(), fromDate, toDate)
                             .stream().filter(leaveRequestDto -> leaveRequestDto.getStatus().equals(LeaveStatus.APPROVED))
                             .collect(Collectors.toList());
 
                     // Set the salary and leave requests to the staff
-                    TimesheetDto dto = new TimesheetDto(t, true, true);
-                    dto.getStaff().setSalary(salaryDto);
+                    TimesheetDto dto = new TimesheetDto(t, true, true, true);
                     dto.getStaff().setLeaveRequests(leaveRequestDtos);
                     return dto;
                 })
@@ -61,15 +62,13 @@ public class TimesheetServiceImpl implements TimesheetService {
 
         return timesheetRepository.findByStaff_StaffNameContainingIgnoreCaseAndShift_DateBetweenOrderByTimesheetIdDesc(search, fromDate, toDate, pageable)
                 .stream().map(t -> {
-                    SalaryDto salaryDto = salaryService.getSalaryByStaffId(t.getStaff().getStaffId());
                     List<LeaveRequestDto> leaveRequestDtos = leaveRequestService
                             .getLeaveRequestsByStaffIdAndDates(t.getStaff().getStaffId(), fromDate, toDate)
                             .stream().filter(leaveRequestDto -> leaveRequestDto.getStatus().equals(LeaveStatus.APPROVED))
                             .collect(Collectors.toList());
 
                     // Set the salary and leave requests to the staff
-                    TimesheetDto dto = new TimesheetDto(t, true, true);
-                    dto.getStaff().setSalary(salaryDto);
+                    TimesheetDto dto = new TimesheetDto(t, true, true, true);
                     dto.getStaff().setLeaveRequests(leaveRequestDtos);
                     return dto;
                 })
@@ -79,11 +78,14 @@ public class TimesheetServiceImpl implements TimesheetService {
     @Override
     public Timesheet createTimesheet(TimesheetDto dto, Shift shift, Staff staff) {
         Timesheet timesheet = new Timesheet();
+        // Get the salary of the staff at the time of the attendance record
+        Salary salary = salaryRepository.findSalaryInformationByStaffId(staff.getStaffId());
 
         return saveTimesheet(
                 timesheet,
                 shift,
                 staff,
+                salary,
                 dto.getCheckInTime(),
                 dto.getCheckOutTime(),
                 dto.getStatus(),
@@ -105,6 +107,7 @@ public class TimesheetServiceImpl implements TimesheetService {
                 value,
                 shift,
                 staff,
+                value.getSalary(),
                 timesheet.getCheckInTime(),
                 timesheet.getCheckOutTime(),
                 timesheet.getStatus(),
@@ -118,10 +121,21 @@ public class TimesheetServiceImpl implements TimesheetService {
         timesheetRepository.deleteById(id);
     }
 
-    private Timesheet saveTimesheet(Timesheet timesheet, Shift shift, Staff staff, Time checkInTime, Time checkOutTime, TimesheetStatus status,
+    @Override
+    public Object getPayroll(String s, LocalDate fromDate, LocalDate toDate) {
+        return null;
+    }
+
+    @Override
+    public Object getPayroll(LocalDate fromDate, LocalDate toDate) {
+        return null;
+    }
+
+    private Timesheet saveTimesheet(Timesheet timesheet, Shift shift, Staff staff, Salary salary, Time checkInTime, Time checkOutTime, TimesheetStatus status,
                                     String noteTitle, String noteContent) {
         timesheet.setShift(shift);
         timesheet.setStaff(staff);
+        timesheet.setSalary(salary);
         timesheet.setCheckInTime(checkInTime);
         timesheet.setCheckOutTime(checkOutTime);
         timesheet.setStatus(status == null ? TimesheetStatus.PENDING : status);

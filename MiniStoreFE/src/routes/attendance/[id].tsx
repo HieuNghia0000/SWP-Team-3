@@ -19,7 +19,8 @@ import { toastError, toastSuccess } from "~/utils/toast";
 import routes from "~/utils/routes";
 import ShiftCard from "~/components/attendance/ShiftCard";
 
-const schema: yup.Schema<Omit<Timesheet, "timesheetId" | "checkInTime" | "checkOutTime" | "shift" | "staff" | "staffId">>
+const schema: yup
+  .Schema<Omit<Timesheet, "timesheetId" | "checkInTime" | "checkOutTime" | "shift" | "staff" | "staffId" | "salary" | "salaryId">>
   = yup
   .object({
     shiftId: yup.number().required("Shift ID is required"),
@@ -45,7 +46,7 @@ const fetcher: ResourceFetcher<{ id: string; } | undefined, Staff> = async (sour
   }
 };
 
-const createTimesheet = async (formData: Omit<Timesheet, "timesheetId">) => {
+const createTimesheet = async (formData: Omit<Timesheet, "timesheetId" | "salaryId">) => {
   try {
     const { data } = await axios.post<DataResponse<Timesheet>>(
       `${getEndPoint()}/timesheets/add`, { ...formData }
@@ -59,7 +60,7 @@ const createTimesheet = async (formData: Omit<Timesheet, "timesheetId">) => {
   }
 }
 
-const updateTimesheet = async (formData: Timesheet) => {
+const updateTimesheet = async (formData: Omit<Timesheet, "salaryId">) => {
   try {
     const { data } = await axios.put<DataResponse<Timesheet>>(
       `${getEndPoint()}/timesheets/update/${formData.timesheetId}`, { ...formData }

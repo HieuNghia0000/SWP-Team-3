@@ -113,6 +113,7 @@ export interface Timesheet {
   timesheetId: number;
   shiftId: number;
   staffId: number;
+  salaryId: number;
   checkInTime: string;
   checkOutTime: string | null;
   status: TimesheetStatus;
@@ -122,6 +123,7 @@ export interface Timesheet {
   // relationship
   shift?: Shift;
   staff?: Staff;
+  salary?: Salary;
 }
 
 export interface ShiftCoverRequest {

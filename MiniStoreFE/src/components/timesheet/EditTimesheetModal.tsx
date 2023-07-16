@@ -37,7 +37,7 @@ const schema: yup.Schema<EditTimesheetForm> = yup.object({
   noteContent: yup.string(),
 });
 
-const updateTimesheet = async (formData: Timesheet) => {
+const updateTimesheet = async (formData: Omit<Timesheet, "salaryId">) => {
   try {
     const { data } = await axios.put<DataResponse<Timesheet>>(
       `${getEndPoint()}/timesheets/update/${formData.timesheetId}`, { ...formData }
