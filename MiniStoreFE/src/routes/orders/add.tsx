@@ -5,8 +5,57 @@ import {CgTrash} from "solid-icons/cg";
 import {AiOutlineSearch} from "solid-icons/ai";
 import {OcPaperairplane2} from "solid-icons/oc";
 import {FaSolidArrowRotateRight, FaSolidPlus} from "solid-icons/fa";
+import {createRouteData, useSearchParams} from "solid-start";
+import axios from "axios";
+import {DataResponse, Product} from "~/types";
+import getEndPoint from "~/utils/getEndPoint";
+import handleFetchError from "~/utils/handleFetchError";
+import {For} from "solid-js";
+import {useRouteData} from "@solidjs/router";
+import Pagination from "~/components/Pagination";
+
+type ParamType = {
+    search?: string;
+    amount_from?: string;
+    amount_to?: string;
+    perPage?: string;
+    curPage?: string;
+};
+
+export function routeData() {
+    const [searchParams] = useSearchParams<ParamType>();
+
+    const products = createRouteData(
+        async ([perPage, curPage, amount_from, amount_to, search]) => {
+            try {
+                const {data} = await axios.get<DataResponse<Product[]>>(
+                    `${getEndPoint()}/products?perPage=${perPage}&curPage=${curPage}&amount_from=${amount_from}&amount_to=${amount_to}&search=${search}`
+                );
+                return data.content;
+            }
+            catch (e) {
+                throw new Error(handleFetchError(e));
+            }
+        },
+        { key: () => [searchParams.perPage ?? 10, searchParams.curPage ?? 1, searchParams.amount_from ?? "", searchParams.amount_to ?? "", searchParams.search ?? ""] }
+    );
+
+    return {data: products};
+}
 
 export default function AddOrders() {
+    const [searchParams, setSearchParams] = useSearchParams<ParamType>();
+    const {data} = useRouteData<typeof routeData>();
+
+    const totalItems = () => data()?.length ?? 0;
+
+    const onSearchSubmit = (e: Event) => {
+        e.preventDefault();
+        const formData = new FormData(e.target as HTMLFormElement);
+        const search = formData.get("search") as string;
+        setSearchParams({ search });
+    };
+
     return (
         <main class="min-w-fit">
             <h1 class="mb-2 text-2xl font-medium">Add Orders</h1>
@@ -109,11 +158,11 @@ export default function AddOrders() {
 
                     {/*Search product*/}
                     <div>
-                        <form class="relative">
+                        <form class="relative" onSubmit={onSearchSubmit}>
                             <input
                                 type="text"
                                 class="w-full max-w-full border-gray-300 rounded-lg py-2 px-4 leading-tight pl-12 border-0 ring-1 ring-inset ring-gray-300 outline-0 focus:ring-1 focus:ring-inset focus:ring-indigo-600"
-                                placeholder="Search the product by Name/Barcode"
+                                placeholder="Search the product by Name"
                                 name="search"
                                 value=""/>
                             <button
@@ -142,19 +191,25 @@ export default function AddOrders() {
 
                             {/*Table row*/}
                             <tbody>
-                            <tr>
-                                <td class="px-4 py-2 text-indigo-500 font-bold">#302011</td>
-                                <td class="px-4 py-2 font-medium">Smartwatch E2</td>
-                                <td class="px-4 py-2 font-medium text-gray-500">Watch</td>
-                                <td class="px-4 py-2 text-gray-500 font-medium">$400.00</td>
-                                <td class="px-4 py-2 text-gray-500 font-medium">
+                            <For each={data()}>
+                                {(item, index) => (
+                                    <tr>
+                                        <td class="px-4 py-2 text-indigo-500 font-bold">{item.productId}</td>
+                                        <td class="px-4 py-2 font-medium">{item.name}</td>
+                                        <td class="px-4 py-2 font-medium text-gray-500">{item.category?.name || "N/A"}</td>
+                                        <td class="px-4 py-2 text-gray-500 font-medium">${item.price.toFixed(2)}</td>
+                                        <td class="px-4 py-2 text-gray-500 font-medium">
                                     <span class="text-xl">
                                         <FaSolidPlus />
                                     </span>
-                                </td>
-                            </tr>
+                                        </td>
+                                    </tr>
+                                )}
+                            </For>
                             </tbody>
                         </table>
+
+                        <Pagination totalItems={totalItems}/>
                     </div>
                 </div>
             </div>

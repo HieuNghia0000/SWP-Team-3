@@ -7,18 +7,21 @@ import * as yup from "yup";
 import { Select } from "~/components/form/Select";
 import { RiSystemAddFill } from "solid-icons/ri";
 import { CgClose } from "solid-icons/cg";
+import axios from "axios";
+import {Product} from "~/types";
+import getEndPoint from "~/utils/getEndPoint";
 
 type FormValues = {
-  productName: string;
+  name: string;
   description?: string;
   price: number;
-  barcode?: string;
-  quantity: number;
+  barCode?: string;
   categoryId?: number;
+  inventory?: number
 };
 
 const schema: yup.Schema<FormValues> = yup.object({
-  productName: yup.string().required("Vui lòng nhập tên sản phẩm"),
+  name: yup.string().required("Vui lòng nhập tên sản phẩm"),
   description: yup.string(),
   price: yup
     .number()
@@ -26,14 +29,9 @@ const schema: yup.Schema<FormValues> = yup.object({
     .min(0, "Giá sản phẩm không được nhỏ hơn 0")
     .max(1000000, "Giá sản phẩm không được vượt quá 1 triệu")
     .required("Vui lòng nhập giá sản phẩm"),
-  barcode: yup.string(),
-  quantity: yup
-    .number()
-    .typeError("Dữ liệu không hợp lệ")
-    .min(0, "Số lượng sản phẩm không được nhỏ hơn 0")
-    .max(1000000, "Số lượng sản phẩm không được vượt quá 1 triệu")
-    .required("Vui lòng nhập số lượng sản phẩm"),
+  barCode: yup.string(),
   categoryId: yup.number(),
+  inventory: yup.number(),
 });
 
 export default function AddProduct() {
@@ -46,6 +44,7 @@ export default function AddProduct() {
     event.preventDefault();
     try {
       await formHandler.validateForm();
+      await axios.post<Product>(`${getEndPoint()}/products/add`, formData());
       alert("Data sent with success: " + JSON.stringify(formData()));
     } catch (error) {
       console.error(error);
@@ -75,7 +74,7 @@ export default function AddProduct() {
             <div class="space-y-2">
               <TextInput
                 id="productName"
-                name="productName"
+                name="name"
                 label="Product Name"
                 placeholder="Type product name here"
                 formHandler={formHandler}
@@ -105,20 +104,20 @@ export default function AddProduct() {
             <div class="flex flex-row gap-3.5 justify-stretch items-center">
               <TextInput
                 id="barcode"
-                name="barcode"
+                name="barCode"
                 label="Barcode"
                 placeholder="Product barcode"
                 formHandler={formHandler}
                 classList={{ "flex-1": true }}
               />
               <TextInput
-                id="quantity"
+                id="inventory"
                 type="number"
                 min={0}
                 value={0}
-                name="quantity"
-                label="Quantity"
-                placeholder="Quantity"
+                name="inventory"
+                label="Inventory"
+                placeholder="Inventory"
                 formHandler={formHandler}
                 classList={{ "flex-1": true }}
               />
