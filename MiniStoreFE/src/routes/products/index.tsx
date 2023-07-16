@@ -4,13 +4,16 @@ import { BiRegularSlider } from "solid-icons/bi";
 import { IoEyeOutline, IoTrashOutline } from "solid-icons/io";
 import { OcPencil3 } from "solid-icons/oc";
 import { RiSystemAddFill } from "solid-icons/ri";
-import { For, createSignal } from "solid-js";
+import {For, createSignal, Show} from "solid-js";
 import { createRouteData, useSearchParams } from "solid-start";
 import Breadcrumbs from "~/components/Breadcrumbs";
 import DropDownBtn from "~/components/DropDownBtn";
 import Pagination from "~/components/Pagination";
 import { DataResponse, Product } from "~/types";
 import routes from "~/utils/routes";
+import handleFetchError from "~/utils/handleFetchError";
+import axios from "axios";
+import getEndPoint from "~/utils/getEndPoint";
 
 type ParamType = {
   search?: string;
@@ -23,19 +26,27 @@ type ParamType = {
 export function routeData() {
   const [searchParams] = useSearchParams<ParamType>();
 
-  return createRouteData(
-    async ([perPage, curPage]) => {
-      const response = await fetch(`http://localhost:3000/products.json`);
-      const data = (await response.json()) as DataResponse<Product[]>;
-      return data.content;
+  const products = createRouteData(
+    async ([perPage, curPage, amount_from, amount_to, search]) => {
+      try {
+        const {data} = await axios.get<DataResponse<Product[]>>(
+            `${getEndPoint()}/products?perPage=${perPage}&curPage=${curPage}&amount_from=${amount_from}&amount_to=${amount_to}&search=${search}`
+        );
+        return data.content;
+      }
+      catch (e) {
+        throw new Error(handleFetchError(e));
+      }
     },
-    { key: () => [searchParams.perPage ?? 10, searchParams.curPage ?? 1] }
+    { key: () => [searchParams.perPage ?? 10, searchParams.curPage ?? 1, searchParams.amount_from ?? "", searchParams.amount_to ?? "", searchParams.search ?? ""] }
   );
+
+  return {data: products};
 }
 
 export default function Products() {
   const [searchParams, setSearchParams] = useSearchParams<ParamType>();
-  const data = useRouteData<typeof routeData>();
+  const {data} = useRouteData<typeof routeData>();
   const [amountFrom, setAmountFrom] = createSignal<number>(
     Number.parseInt(searchParams.amount_from || "0")
   );
@@ -213,72 +224,74 @@ export default function Products() {
           </thead>
           {/* <!-- Table row --> */}
           <tbody class="">
-            <For each={data()}>
-              {(item, index) => (
-                <tr class="hover:bg-gray-200 odd:bg-white even:bg-gray-50">
-                  <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
-                    <A
-                      href={routes.product(item.productId)}
-                      class="hover:text-indigo-500"
-                    >
-                      {item.productId}
-                    </A>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
-                    {item.barCode}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
-                    {item.name}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
-                    {item.category?.name || "N/A"}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
-                    {item.quantity}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
-                    {item.price} ₫
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
-                    <div class="flex flex-row gap-1">
-                      <div class="relative flex justify-center items-center">
+            <Show when={!data.error && data() != undefined}>
+              <For each={data()}>
+                {(item, index) => (
+                    <tr class="hover:bg-gray-200 odd:bg-white even:bg-gray-50">
+                      <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
                         <A
-                          href={routes.product(item.productId)}
-                          class="peer text-base text-gray-500 hover:text-indigo-500"
+                            href={routes.product(item.productId)}
+                            class="hover:text-indigo-500"
                         >
-                          <IoEyeOutline />
+                          {item.productId}
                         </A>
-                        <span class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
+                        {item.barCode}
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
+                        {item.name}
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
+                        {item.category?.name || "N/A"}
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
+                        {item.quantity}
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
+                        {item.price} ₫
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
+                        <div class="flex flex-row gap-1">
+                          <div class="relative flex justify-center items-center">
+                            <A
+                                href={routes.product(item.productId)}
+                                class="peer text-base text-gray-500 hover:text-indigo-500"
+                            >
+                              <IoEyeOutline />
+                            </A>
+                            <span class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
                           Details
                         </span>
-                      </div>
-                      <div class="relative flex justify-center items-center">
-                        <A
-                          href={routes.productEdit(item.productId)}
-                          class="peer text-base text-gray-500 hover:text-indigo-500"
-                        >
-                          <OcPencil3 />
-                        </A>
-                        <span class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
+                          </div>
+                          <div class="relative flex justify-center items-center">
+                            <A
+                                href={routes.productEdit(item.productId)}
+                                class="peer text-base text-gray-500 hover:text-indigo-500"
+                            >
+                              <OcPencil3 />
+                            </A>
+                            <span class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
                           Edit
                         </span>
-                      </div>
-                      <div class="relative flex justify-center items-center">
-                        <A
-                          href={"/"}
-                          class="peer text-base text-gray-500 hover:text-indigo-500"
-                        >
-                          <IoTrashOutline />
-                        </A>
-                        <span class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
+                          </div>
+                          <div class="relative flex justify-center items-center">
+                            <A
+                                href={"/"}
+                                class="peer text-base text-gray-500 hover:text-indigo-500"
+                            >
+                              <IoTrashOutline />
+                            </A>
+                            <span class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
                           Delete
                         </span>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              )}
-            </For>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                )}
+              </For>
+            </Show>
           </tbody>
         </table>
       </div>

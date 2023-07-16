@@ -15,6 +15,9 @@ import { Category, DataResponse } from "~/types";
 import routes from "~/utils/routes";
 import * as yup from "yup";
 import { CgClose } from "solid-icons/cg";
+import axios from "axios";
+import getEndPoint from "~/utils/getEndPoint";
+import handleFetchError from "~/utils/handleFetchError";
 
 type ParamType = {
   search?: string;
@@ -25,19 +28,27 @@ type ParamType = {
 export function routeData() {
   const [searchParams] = useSearchParams<ParamType>();
 
-  return createRouteData(
-    async ([perPage, curPage]) => {
-      const response = await fetch(`http://localhost:3000/categories.json`);
-      const data = (await response.json()) as DataResponse<Category[]>;
-      return data.content;
-    },
-    { key: () => [searchParams.perPage ?? 10, searchParams.curPage ?? 1] }
+  const categories = createRouteData(
+      async ([perPage, curPage, search]) => {
+        try {
+          const {data} = await axios.get<DataResponse<Category[]>>(
+              `${getEndPoint()}/categories?perPage=${perPage}&curPage=${curPage}&search=${search}`
+          );
+          return data.content;
+        }
+        catch (e) {
+          throw new Error(handleFetchError(e));
+        }
+      },
+      { key: () => [searchParams.perPage ?? 10, searchParams.curPage ?? 1, searchParams.search ?? ""] }
   );
+
+  return {data: categories};
 }
 
 export default function Categories() {
   const [searchParams, setSearchParams] = useSearchParams<ParamType>();
-  const data = useRouteData<typeof routeData>();
+  const {data} = useRouteData<typeof routeData>();
   const [showCreateModal, setShowCreateModal] = createSignal(false);
   const [showModal, setShowModal] = createSignal(false);
   const [editMode, setEditMode] = createSignal(false);
@@ -126,73 +137,75 @@ export default function Categories() {
           </thead>
           {/* <!-- Table row --> */}
           <tbody class="">
-            <For each={data()}>
-              {(item, index) => (
-                <tr class="hover:bg-gray-200 odd:bg-white even:bg-gray-50">
-                  <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
-                    <A
-                      href={routes.category(item.categoryId)}
-                      class="hover:text-indigo-500"
-                    >
-                      {item.name}
-                    </A>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
-                    {item.sales}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
-                    {item.stock}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
-                    <div class="flex flex-row gap-1">
-                      <div class="relative flex justify-center items-center">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setModalData(item);
-                            setShowModal(true);
-                            setEditMode(false);
-                          }}
-                          class="peer text-base text-gray-500 hover:text-indigo-500"
+            <Show when={!data.error && data() != undefined}>
+              <For each={data()}>
+                {(item, index) => (
+                    <tr class="hover:bg-gray-200 odd:bg-white even:bg-gray-50">
+                      <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
+                        <A
+                            href={routes.category(item.categoryId)}
+                            class="hover:text-indigo-500"
                         >
-                          <IoEyeOutline />
-                        </button>
-                        <span class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
+                          {item.name}
+                        </A>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
+                        {item.sales}
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
+                        {item.stock}
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
+                        <div class="flex flex-row gap-1">
+                          <div class="relative flex justify-center items-center">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                  setModalData(item);
+                                  setShowModal(true);
+                                  setEditMode(false);
+                                }}
+                                class="peer text-base text-gray-500 hover:text-indigo-500"
+                            >
+                              <IoEyeOutline />
+                            </button>
+                            <span class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
                           Details
                         </span>
-                      </div>
-                      <div class="relative flex justify-center items-center">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setModalData(item);
-                            setShowModal(true);
-                            setEditMode(true);
-                          }}
-                          class="peer text-base text-gray-500 hover:text-indigo-500"
-                        >
-                          <OcPencil3 />
-                        </button>
-                        <span class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
+                          </div>
+                          <div class="relative flex justify-center items-center">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                  setModalData(item);
+                                  setShowModal(true);
+                                  setEditMode(true);
+                                }}
+                                class="peer text-base text-gray-500 hover:text-indigo-500"
+                            >
+                              <OcPencil3 />
+                            </button>
+                            <span class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
                           Edit
                         </span>
-                      </div>
-                      <div class="relative flex justify-center items-center">
-                        <A
-                          href={"/"}
-                          class="peer text-base text-gray-500 hover:text-indigo-500"
-                        >
-                          <IoTrashOutline />
-                        </A>
-                        <span class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
+                          </div>
+                          <div class="relative flex justify-center items-center">
+                            <A
+                                href={"/"}
+                                class="peer text-base text-gray-500 hover:text-indigo-500"
+                            >
+                              <IoTrashOutline />
+                            </A>
+                            <span class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
                           Delete
                         </span>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              )}
-            </For>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                )}
+              </For>
+            </Show>
           </tbody>
         </table>
       </div>
