@@ -3,22 +3,76 @@ import { useSearchParams } from "@solidjs/router";
 import { ParamType } from "~/components/leave-requests/types";
 import DropDownBtn from "~/components/DropDownBtn";
 import { BiRegularSlider } from "solid-icons/bi";
-import { Component, createSignal } from "solid-js";
+import { Component, createEffect, createSignal, on, onCleanup, onMount } from "solid-js";
+import { FiCalendar } from "solid-icons/fi";
+import flatpickr from "flatpickr";
+import moment from "moment";
 
-const ToolBar: Component<{}> = ({}) => {
+const ToolBar: Component = ({}) => {
   const [ searchParams, setSearchParams ] = useSearchParams<ParamType>();
+  const [ dateStr, setDateStr ] = createSignal<string>("");
   const [ amountFrom, setAmountFrom ] = createSignal<number>(
     Number.parseInt(searchParams.amount_from || "0")
   );
   const [ amountTo, setAmountTo ] = createSignal<number>(
     Number.parseInt(searchParams.amount_to || "0")
   );
+  let dateRef: HTMLInputElement | undefined = undefined;
+  let fp: flatpickr.Instance | undefined = undefined;
 
   const onSearchSubmit = (e: Event) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
     const search = formData.get("search") as string;
     setSearchParams({ search: encodeURIComponent(search) });
+  };
+
+  createEffect(
+    on(
+      [ () => searchParams.from, () => searchParams.to ],
+      () => {
+        if (searchParams.from === undefined || searchParams.to === undefined)
+          fp?.setDate(moment().toDate(), true);
+      }
+    )
+  );
+
+  onMount(() => {
+    let from = searchParams.from
+      ? moment(searchParams.from).format("YYYY-MM-DD")
+      : moment().subtract(1, "month").format("YYYY-MM-DD");
+    let to = moment(searchParams.to).format("YYYY-MM-DD");
+
+    fp = flatpickr(dateRef!, {
+      mode: "range",
+      dateFormat: "Y-m-d",
+      defaultDate: [ from, to ],
+      onChange: updateDateStr,
+      onReady: updateDateStr,
+    });
+  });
+
+  onCleanup(() => {
+    fp?.destroy();
+  });
+
+  const updateDateStr = (
+    selectedDates: Date[],
+    dateStr: string,
+    instance: flatpickr.Instance
+  ) => {
+    if (selectedDates.length === 0) {
+      setSearchParams({ from: undefined, to: undefined });
+      setDateStr("");
+    }
+    if (selectedDates.length === 2) {
+      const from = moment(selectedDates[0]);
+      const to = moment(selectedDates[1]);
+      setSearchParams({ from: from.format("YYYY-MM-DD"), to: to.format("YYYY-MM-DD") });
+      const start = instance.formatDate(from.toDate(), "F j");
+      const end = instance.formatDate(to.toDate(), "F j, Y");
+      setDateStr(`${start} - ${end}`);
+    }
   };
 
   return (
@@ -113,6 +167,16 @@ const ToolBar: Component<{}> = ({}) => {
             </div>
           </div>
         </DropDownBtn>
+
+        <button
+          ref={dateRef}
+          type="button"
+          class="range_flatpicker flex flex-row gap-2 justify-center items-center border border-gray-300 rounded-lg py-2 px-3.5 font-medium text-sm text-gray-500 hover:text-indigo-600 hover:border-indigo-600"
+        >
+          <FiCalendar/>
+          {dateStr() || "Select Dates"}
+        </button>
+
       </div>
     </div>
   )

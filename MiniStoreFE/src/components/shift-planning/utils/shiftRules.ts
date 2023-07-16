@@ -4,7 +4,7 @@ import { DataTable, Rule } from "./types";
 import getShiftsByCellId from "./getShiftsByCellId";
 import { Role, Shift, Staff } from "~/types";
 import { cellIdGenerator } from "./cellIdGenerator";
-import isDayInThePast from "./isDayInThePast";
+import isDayInThePast from "../../../utils/isDayInThePast";
 import { checkOverlapWithLeaveRequest } from "~/components/shift-planning/utils/checkOverlapWithLeaveRequest";
 
 const rules: Rule[] = [

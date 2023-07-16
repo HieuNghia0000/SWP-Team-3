@@ -4,13 +4,13 @@ import com.team3.ministore.model.Timesheet;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+import java.time.LocalDate;
 
 @Repository
 public interface TimesheetRepository extends JpaRepository<Timesheet, Integer> {
-    @Query("SELECT t FROM Timesheet t ORDER BY t.timesheetId DESC")
-    Page<Timesheet> findAll(Pageable pageable);
+    Page<Timesheet> findAllByShift_DateBetween(LocalDate from, LocalDate to, Pageable pageable);
 
-    Page<Timesheet> findByStaff_StaffNameContainingIgnoreCaseOrderByTimesheetIdDesc(String staff_staffName, Pageable pageable);
+    Page<Timesheet> findByStaff_StaffNameContainingIgnoreCaseAndShift_DateBetweenOrderByTimesheetIdDesc(String staff_staffName, LocalDate from, LocalDate to, Pageable pageable);
 }

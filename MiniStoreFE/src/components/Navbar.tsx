@@ -8,9 +8,9 @@ import { Transition } from "solid-transition-group";
 import routes from "~/utils/routes";
 import { FiShoppingCart } from "solid-icons/fi";
 import { IoCalendarOutline } from "solid-icons/io";
-import { TbClock, TbSpeakerphone, TbTrees } from "solid-icons/tb";
+import { TbSpeakerphone, TbTrees } from "solid-icons/tb";
 import { useAuth } from "~/context/Auth";
-import { FaRegularCalendarCheck, FaSolidCalendarCheck } from "solid-icons/fa";
+import { FaRegularCalendarCheck } from "solid-icons/fa";
 import { Role } from "~/types";
 
 type NavbarProps = {
@@ -70,21 +70,36 @@ const Navbar: Component<NavbarProps> = (props) => {
           isOpen={isOpen}
         />
 
-        {/* Attendance */}
-        <NavbarLink
-          href={routes.attendanceId(user()?.staffId!)}
-          icon={<FaRegularCalendarCheck/>}
-          text="Attendance"
-          isOpen={isOpen}
-        />
+        {/* Attendance & Timesheets */}
+        <Show when={user()?.role === Role.ADMIN}>
+          <NavbarDropDown
+            href={routes.attendanceId(user()?.staffId!)}
+            isOpen={isOpen}
+            icon={<FaRegularCalendarCheck/>}
+            text="Attendance"
+          >
+            <NavbarLink
+              href={routes.attendanceId(user()?.staffId!)}
+              text="Attendance"
+              isOpen={isOpen}
+            />
+            <NavbarLink
+              href={routes.timesheets}
+              text="Timesheets"
+              isOpen={isOpen}
+            />
+          </NavbarDropDown>
+        </Show>
 
-        {/* Timesheet */}
-        <NavbarLink
-          href={routes.timesheets}
-          icon={<FaSolidCalendarCheck />}
-          text="Timesheets"
-          isOpen={isOpen}
-        />
+        <Show when={user()?.role !== Role.ADMIN}>
+          <NavbarLink
+            href={routes.attendanceId(user()?.staffId!)}
+            text="Attendance"
+            icon={<FaRegularCalendarCheck/>}
+            isOpen={isOpen}
+          />
+        </Show>
+
 
         {/* Staff */}
         <Show when={user()?.role === Role.ADMIN}>

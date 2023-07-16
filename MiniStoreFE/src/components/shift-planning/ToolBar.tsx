@@ -135,7 +135,6 @@ const ToolBar: Component<ToolBarProps> = ({ datePicked, setDatePicked }) => {
           <FaSolidAngleRight size={20}/>
         </button>
       </div>
-      {/*<Show when={isAdmin}>*/}
       <div class="flex justify-center items-center gap-4" classList={{ "hidden": !isAdmin() }}>
         <DropDownBtn
           text="Copy"
@@ -167,7 +166,6 @@ const ToolBar: Component<ToolBarProps> = ({ datePicked, setDatePicked }) => {
           </button>
         </DropDownBtn>
       </div>
-      {/*</Show>*/}
     </div>
   );
 };

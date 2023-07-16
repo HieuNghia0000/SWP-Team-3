@@ -5,14 +5,15 @@ import com.team3.ministore.model.Shift;
 import com.team3.ministore.model.Staff;
 import com.team3.ministore.model.Timesheet;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 public interface TimesheetService {
 
-    List<TimesheetDto> getAllTimeSheets(int page, int pageSize);
+    List<TimesheetDto> getAllTimeSheets(int page, int pageSize, LocalDate fromDate, LocalDate toDate);
 
-    List<TimesheetDto> getAllTimeSheets(String search, int page, int pageSize);
+    List<TimesheetDto> getAllTimeSheets(String search, int page, int pageSize, LocalDate fromDate, LocalDate toDate);
 
     Timesheet createTimesheet(TimesheetDto dto, Shift shift, Staff staff);
 

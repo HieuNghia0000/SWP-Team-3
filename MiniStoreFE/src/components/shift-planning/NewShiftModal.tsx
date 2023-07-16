@@ -17,7 +17,7 @@ import axios from "axios";
 import ResourceWrapper from "~/components/ResourceWrapper";
 import { getShiftRules } from "~/components/shift-planning/utils/shiftRules";
 import moment from "moment";
-import isDayInThePast from "~/components/shift-planning/utils/isDayInThePast";
+import isDayInThePast from "~/utils/isDayInThePast";
 import { cellIdGenerator } from "~/components/shift-planning/utils/cellIdGenerator";
 import { sortBy } from "lodash";
 import { toastSuccess } from "~/utils/toast";

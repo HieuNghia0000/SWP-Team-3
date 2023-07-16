@@ -4,7 +4,7 @@ import { Shift, Staff } from "~/types";
 import DraggableCard from "./DraggableCard";
 import { useSPData, useSPModals } from "~/context/ShiftPlanning";
 import { getShiftMoveErrors } from "./utils/shiftRules";
-import isDayInThePast from "./utils/isDayInThePast";
+import isDayInThePast from "../../utils/isDayInThePast";
 import { checkOverlapWithLeaveRequest } from "~/components/shift-planning/utils/checkOverlapWithLeaveRequest";
 import { toastError } from "~/utils/toast";
 

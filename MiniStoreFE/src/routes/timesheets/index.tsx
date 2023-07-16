@@ -1,5 +1,5 @@
 import { createRouteAction, createRouteData, useRouteData } from "solid-start";
-import { DataResponse, LeaveRequest, Timesheet } from "~/types";
+import { DataResponse, Timesheet } from "~/types";
 import { createSignal, Show } from "solid-js";
 import Breadcrumbs from "~/components/Breadcrumbs";
 import Pagination from "~/components/Pagination";
@@ -12,6 +12,7 @@ import { toastSuccess } from "~/utils/toast";
 import ToolBar from "~/components/timesheet/ToolBar";
 import { ModalContext } from "~/context/Timesheet";
 import Table from "~/components/timesheet/Table";
+import EditTimesheetModal from "~/components/timesheet/EditTimesheetModal";
 
 const deleteTimesheet = async (id: number) => {
   try {
@@ -26,10 +27,12 @@ const deleteTimesheet = async (id: number) => {
 export function routeData() {
   const [ params ] = useSearchParams<ParamType>();
   const timesheets = createRouteData(
-    async ([ key, perPage, curPage, search ]) => {
+    async ([ key, perPage, curPage, search, from, to ]) => {
       try {
+        if (!from || !to) return;
+        const uri = new URLSearchParams({ perPage, curPage, search, from, to });
         const { data } = await axios.get<DataResponse<Timesheet[]>>(
-          `${getEndPoint()}/${key}?perPage=${perPage}&curPage=${curPage}&search=${search}`
+          `${getEndPoint()}/${key}?${uri.toString()}`
         );
         return data.content;
       } catch (e) {
@@ -37,7 +40,14 @@ export function routeData() {
       }
     },
     {
-      key: () => [ "timesheets/list", params.perPage ?? 10, params.curPage ?? 1, params.search ?? "" ],
+      key: () => [
+        "timesheets/list",
+        params.perPage ?? "10",
+        params.curPage ?? "1",
+        params.search ?? "",
+        params.from ?? "",
+        params.to ?? "",
+      ],
       reconcileOptions: { key: "timesheetId" }
     }
   );
@@ -84,11 +94,13 @@ export default function Timesheets() {
           </div>
         </Show>
 
-        <Table/>
+        <Show when={!data.error} fallback={<div>Something went wrong</div>}>
+          <Table/>
+        </Show>
 
         <Pagination totalItems={totalItems}/>
 
-        {/*<EditLeaveRequestModal showModal={showEditModal} setShowModal={setShowEditModal}/>*/}
+        <EditTimesheetModal/>
       </ModalContext.Provider>
     </main>
   );

@@ -12,7 +12,7 @@ import { timeOptions, transformTimeString } from "../utils/timeOptions";
 import * as yup from "yup";
 import { Select } from "~/components/form/Select";
 import { roles } from "~/utils/roles";
-import isDayInThePast from "../utils/isDayInThePast";
+import isDayInThePast from "../../../utils/isDayInThePast";
 import moment from "moment";
 import { getShiftRules } from "~/components/shift-planning/utils/shiftRules";
 import axios from "axios";

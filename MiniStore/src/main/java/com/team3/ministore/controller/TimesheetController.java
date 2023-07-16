@@ -16,6 +16,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.util.Optional;
 
 @RestController
@@ -53,9 +54,17 @@ public class TimesheetController {
     @GetMapping("/list")
     public ResponseEntity<Object> getAllTimeSheets(@RequestParam("search") Optional<String> search,
                                                    @RequestParam("curPage") Integer curPage,
-                                                   @RequestParam("perPage") Integer perPage) {
-        return search.map(s -> ResponseHandler.getResponse(timesheetService.getAllTimeSheets(s, curPage, perPage), HttpStatus.OK))
-                .orElseGet(() -> ResponseHandler.getResponse(timesheetService.getAllTimeSheets(curPage, perPage), HttpStatus.OK));
+                                                   @RequestParam("perPage") Integer perPage,
+                                                   @RequestParam("from") Optional<String> from,
+                                                   @RequestParam("to") Optional<String> to) {
+        if (from.isEmpty() || to.isEmpty())
+            return ResponseHandler.getResponse(new Exception("Invalid input"), HttpStatus.BAD_REQUEST);
+
+        LocalDate fromDate = LocalDate.parse(from.get());
+        LocalDate toDate = LocalDate.parse(to.get());
+
+        return search.map(s -> ResponseHandler.getResponse(timesheetService.getAllTimeSheets(s, curPage, perPage, fromDate, toDate), HttpStatus.OK))
+                .orElseGet(() -> ResponseHandler.getResponse(timesheetService.getAllTimeSheets(curPage, perPage, fromDate, toDate), HttpStatus.OK));
     }
 
     @PutMapping("/update/{id}")

@@ -6,6 +6,11 @@ import { useRouteData } from "@solidjs/router";
 import { A } from "solid-start";
 import { routeData } from "~/routes/timesheets";
 import { useTSContext } from "~/context/Timesheet";
+import { shiftTimes } from "~/components/shift-planning/utils/shiftTimes";
+import formatNumberWithCommas from "~/utils/formatNumberWithCommas";
+import moment from "moment";
+import { capitalize } from "~/utils/capitalize";
+import { TimesheetStatus } from "~/types";
 
 export default function Table() {
   const { data } = useRouteData<typeof routeData>();
@@ -25,7 +30,7 @@ export default function Table() {
         <tr>
           <th
             scope="col"
-            class="px-2.5 py-[8.7px] pl-[18px] w-56 text-left text-sm font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
+            class="px-2.5 py-[8.7px] pl-[18px] w-44 text-left text-sm font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
           >
             Staff Member
           </th>
@@ -49,7 +54,7 @@ export default function Table() {
           </th>
           <th
             scope="col"
-            class="px-2.5 py-[8.7px] w-36 text-sm font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
+            class="px-2.5 py-[8.7px] w-28 text-sm font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
             style={{
               "border-left": "1px dashed #d5dce6",
             }}
@@ -106,18 +111,18 @@ export default function Table() {
         {/* <!-- Table row --> */}
         <tbody class="">
         <Show
-          when={!data.error}
+          when={!data.error && !data.loading && data.state === "ready"}
           fallback={<div class="w-full h-full min-h-[300px] grid place-items-center">Something went wrong</div>}>
           <For each={data()}>
-            {(item) => (
+            {(timesheet) => (
               <tr class="hover:bg-[#ceefff] odd:bg-white even:bg-gray-50 text-[#333c48]">
                 <td
                   class="px-2.5 pl-[18px] text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
                   <A
-                    href={routes.staff(1)}
+                    href={routes.staff(timesheet.staffId)}
                     class="hover:text-indigo-500"
                   >
-                    Anh Hieu
+                    {timesheet.staff?.staffName}
                   </A>
                 </td>
                 <td
@@ -125,42 +130,42 @@ export default function Table() {
                     "border-left": "1px dashed #d5dce6",
                   }}
                   class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
-                  12/12/2021
+                  {timesheet.shift!.date}
                 </td>
                 <td
                   style={{
                     "border-left": "1px dashed #d5dce6",
                   }}
                   class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
-                  7:58pm - 8pm
+                  {shiftTimes(timesheet.shift!.startTime, timesheet.shift!.endTime)}
                 </td>
                 <td
                   style={{
                     "border-left": "1px dashed #d5dce6",
                   }}
                   class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
-                  1.5
+                  {timesheet.shift!.salaryCoefficient}
                 </td>
                 <td
                   style={{
                     "border-left": "1px dashed #d5dce6",
                   }}
                   class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
-                  $0
+                  {formatNumberWithCommas(timesheet.staff!.salary?.hourlyWage || "0")} ₫
                 </td>
                 <td
                   style={{
                     "border-left": "1px dashed #d5dce6",
                   }}
                   class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
-                  0 hrs
+                  {moment(timesheet.shift?.endTime, "HH:mm:ss").diff(moment(timesheet.shift?.startTime, "HH:mm:ss"), "hours")} hrs
                 </td>
                 <td
                   style={{
                     "border-left": "1px dashed #d5dce6",
                   }}
                   class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
-                  $0
+                  {formatNumberWithCommas((timesheet.staff!.salary?.hourlyWage || 0) * moment(timesheet.shift?.endTime, "HH:mm:ss").diff(moment(timesheet.shift?.startTime, "HH:mm:ss"), "hours"))} ₫
                 </td>
                 <td
                   style={{
@@ -170,12 +175,12 @@ export default function Table() {
                     <span
                       class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-bold rounded-full"
                       classList={{
-                        // "text-orange-400 bg-orange-100": item.status === LeaveRequestStatus.PENDING,
-                        "text-green-400 bg-green-100": true,
-                        // "text-red-400 bg-red-100": item.status === LeaveRequestStatus.REJECTED,
+                        "text-orange-400 bg-orange-100": timesheet.status === TimesheetStatus.PENDING,
+                        "text-green-400 bg-green-100": timesheet.status === TimesheetStatus.APPROVED,
+                        "text-red-400 bg-red-100": timesheet.status === TimesheetStatus.REJECTED,
                       }}
                     >
-                      Approved
+                      {capitalize(timesheet.status)}
                     </span>
                 </td>
                 <td
@@ -186,7 +191,7 @@ export default function Table() {
                   <div class="flex flex-row gap-1">
                     <div class="relative flex justify-center items-center">
                       <button
-                        onClick={[ onEdit, 0 ]}
+                        onClick={[ onEdit, timesheet.timesheetId ]}
                         class="peer text-base text-gray-500 hover:text-indigo-500">
                         <OcPencil3/>
                       </button>
@@ -197,7 +202,7 @@ export default function Table() {
                     </div>
                     <div class="relative flex justify-center items-center">
                       <button
-                        onClick={[ onDelete, 0 ]}
+                        onClick={[ onDelete, timesheet.timesheetId ]}
                         class="peer text-base text-gray-500 hover:text-indigo-500">
                         <IoTrashOutline/>
                       </button>

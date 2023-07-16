@@ -11,7 +11,7 @@ import getEndPoint from "~/utils/getEndPoint";
 import { Select } from "~/components/form/Select";
 import { capitalize } from "~/utils/capitalize";
 import handleFetchError from "~/utils/handleFetchError";
-import { toastSuccess } from "~/utils/toast";
+import { toastError, toastSuccess } from "~/utils/toast";
 import { shiftDetailsTime } from "~/components/shift-planning/utils/shiftTimes";
 import { useSPData, useSPModals } from "~/context/ShiftPlanning";
 import { useAuth } from "~/context/Auth";
@@ -65,8 +65,20 @@ const CreateCoverRequestModal: Component<{
 
     if (f.isFormInvalid) return;
 
+    // Check if the shift is already covered
+    if (shiftModalData()?.shiftCoverRequest) {
+      toastError("This shift is already covered");
+      return;
+    }
+
+    // Check if the shift is already taken attendance
+    if (shiftModalData()?.timesheet) {
+      toastError("You can't assign this shift because it is already recorded in timesheet");
+      return;
+    }
+
     if (shiftModalData()?.staffId === formData().staffId) {
-      toastSuccess("You can't assign this shift to yourself");
+      toastError("You can't assign this shift to yourself");
       return;
     }
 
