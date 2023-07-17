@@ -24,7 +24,7 @@ public class SalaryServiceImpl implements SalaryService {
 
     @Override
     public SalaryDto getSalaryByStaffId(Integer staffId) {
-        return new SalaryDto(salaryRepository.findSalaryInformationByStaffId(staffId));
+        return salaryRepository.findSalaryInformationByStaffId(staffId).map(SalaryDto::new).orElse(null);
     }
 
     @Override

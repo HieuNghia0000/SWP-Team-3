@@ -37,7 +37,6 @@ public class RegisterDto {
     @NotNull(message = "EffectiveDate name must not be null")
     private LocalDate effectiveDate;
 
-    @NotNull(message = "TerminationDate name must not be null")
     private LocalDate terminationDate;
 
     private String phoneNumber;

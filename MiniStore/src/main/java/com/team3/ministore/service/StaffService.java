@@ -12,6 +12,8 @@ import java.util.Optional;
 public interface StaffService {
     List<Staff> getAllStaffs();
 
+    List<Staff> getAllStaffs(String search);
+
     Optional<Staff> getStaffById(Integer id);
 
     Staff createStaff(RegisterDto staff);

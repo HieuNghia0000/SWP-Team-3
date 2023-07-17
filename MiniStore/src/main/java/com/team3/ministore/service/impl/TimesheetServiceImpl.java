@@ -1,7 +1,8 @@
 package com.team3.ministore.service.impl;
 
 import com.team3.ministore.dto.LeaveRequestDto;
-import com.team3.ministore.dto.SalaryDto;
+import com.team3.ministore.dto.ShiftDto;
+import com.team3.ministore.dto.StaffDto;
 import com.team3.ministore.dto.TimesheetDto;
 import com.team3.ministore.model.Salary;
 import com.team3.ministore.model.Shift;
@@ -10,7 +11,7 @@ import com.team3.ministore.model.Timesheet;
 import com.team3.ministore.repository.SalaryRepository;
 import com.team3.ministore.repository.TimesheetRepository;
 import com.team3.ministore.service.LeaveRequestService;
-import com.team3.ministore.service.SalaryService;
+import com.team3.ministore.service.ShiftService;
 import com.team3.ministore.service.StaffService;
 import com.team3.ministore.service.TimesheetService;
 import com.team3.ministore.utils.LeaveStatus;
@@ -37,6 +38,12 @@ public class TimesheetServiceImpl implements TimesheetService {
 
     @Autowired
     private LeaveRequestService leaveRequestService;
+
+    @Autowired
+    private StaffService staffService;
+
+    @Autowired
+    private ShiftService shiftService;
 
     @Override
     public List<TimesheetDto> getAllTimeSheets(int page, int pageSize, LocalDate fromDate, LocalDate toDate) {
@@ -79,7 +86,7 @@ public class TimesheetServiceImpl implements TimesheetService {
     public Timesheet createTimesheet(TimesheetDto dto, Shift shift, Staff staff) {
         Timesheet timesheet = new Timesheet();
         // Get the salary of the staff at the time of the attendance record
-        Salary salary = salaryRepository.findSalaryInformationByStaffId(staff.getStaffId());
+        Salary salary = salaryRepository.findSalaryInformationByStaffId(staff.getStaffId()).orElse(null);
 
         return saveTimesheet(
                 timesheet,
@@ -122,13 +129,45 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
-    public Object getPayroll(String s, LocalDate fromDate, LocalDate toDate) {
-        return null;
+    public List<StaffDto> getPayroll(String s, LocalDate fromDate, LocalDate toDate) {
+        List<Staff> staffs = staffService.getAllStaffs(s);
+
+        // Iterate through all staffs and get their shifts and salary
+        return staffs.parallelStream().map(staff -> {
+            // Get the salary and leave requests of the staff
+            List<LeaveRequestDto> leaveRequestDtos = leaveRequestService
+                    .getLeaveRequestsByStaffIdAndDates(staff.getStaffId(), fromDate, toDate)
+                    .stream().filter(leaveRequestDto -> leaveRequestDto.getStatus().equals(LeaveStatus.APPROVED))
+                    .collect(Collectors.toList());
+            // Get the shifts of the staff
+            List<Shift> shifts = shiftService.getAllShiftsByStaffId(staff.getStaffId(), fromDate, toDate);
+            // Convert shifts to shiftDtos
+            List<ShiftDto> shiftDtos = shifts.stream().map(ShiftDto::new).collect(Collectors.toList());
+
+            // Return the staffDtos
+            return new StaffDto(staff, shiftDtos, leaveRequestDtos);
+        }).collect(Collectors.toList());
     }
 
     @Override
-    public Object getPayroll(LocalDate fromDate, LocalDate toDate) {
-        return null;
+    public List<StaffDto> getPayroll(LocalDate fromDate, LocalDate toDate) {
+        List<Staff> staffs = staffService.getAllStaffs();
+
+        // Iterate through all staffs and get their shifts and salary
+        return staffs.parallelStream().map(staff -> {
+            // Get the salary and leave requests of the staff
+            List<LeaveRequestDto> leaveRequestDtos = leaveRequestService
+                    .getLeaveRequestsByStaffIdAndDates(staff.getStaffId(), fromDate, toDate)
+                    .stream().filter(leaveRequestDto -> leaveRequestDto.getStatus().equals(LeaveStatus.APPROVED))
+                    .collect(Collectors.toList());
+            // Get the shifts of the staff
+            List<Shift> shifts = shiftService.getAllShiftsByStaffId(staff.getStaffId(), fromDate, toDate);
+            // Convert shifts to shiftDtos
+            List<ShiftDto> shiftDtos = shifts.stream().map(ShiftDto::new).collect(Collectors.toList());
+
+            // Return the staffDtos
+            return new StaffDto(staff, shiftDtos, leaveRequestDtos);
+        }).collect(Collectors.toList());
     }
 
     private Timesheet saveTimesheet(Timesheet timesheet, Shift shift, Staff staff, Salary salary, Time checkInTime, Time checkOutTime, TimesheetStatus status,

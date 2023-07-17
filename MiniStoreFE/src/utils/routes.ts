@@ -27,6 +27,7 @@ const routes = {
   attendance: "/attendance",
   attendanceId: (id: string | number) => `/attendance/${id}`,
   timesheets: "/timesheets",
+  payroll: "/payroll",
 };
 
 export const apiRoutes = {

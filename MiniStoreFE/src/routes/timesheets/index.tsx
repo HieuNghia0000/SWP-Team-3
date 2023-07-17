@@ -94,7 +94,7 @@ export default function Timesheets() {
           </div>
         </Show>
 
-        <Show when={!data.error} fallback={<div>Something went wrong</div>}>
+        <Show when={!data.error && data() !== undefined} fallback={<div>Something went wrong</div>}>
           <Table/>
         </Show>
 

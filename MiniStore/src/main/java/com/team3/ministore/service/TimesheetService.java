@@ -1,5 +1,6 @@
 package com.team3.ministore.service;
 
+import com.team3.ministore.dto.StaffDto;
 import com.team3.ministore.dto.TimesheetDto;
 import com.team3.ministore.model.Shift;
 import com.team3.ministore.model.Staff;
@@ -23,7 +24,7 @@ public interface TimesheetService {
 
     void deleteTimesheet(Integer id);
 
-    Object getPayroll(String s, LocalDate fromDate, LocalDate toDate);
+    List<StaffDto> getPayroll(String s, LocalDate fromDate, LocalDate toDate);
 
-    Object getPayroll(LocalDate fromDate, LocalDate toDate);
+    List<StaffDto> getPayroll(LocalDate fromDate, LocalDate toDate);
 }

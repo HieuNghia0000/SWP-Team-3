@@ -35,6 +35,11 @@ public class StaffServiceImpl implements StaffService {
     }
 
     @Override
+    public List<Staff> getAllStaffs(String search) {
+        return staffRepository.findByStaffNameContainingIgnoreCaseOrderByStaffIdDesc(search);
+    }
+
+    @Override
     public Optional<Staff> getStaffById(Integer id) {
         return staffRepository.findById(id);
     }

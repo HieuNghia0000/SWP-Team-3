@@ -19,6 +19,8 @@ public interface StaffRepository extends JpaRepository<Staff, Integer> {
 
     Page<Staff> findByStaffNameContainingIgnoreCaseOrderByStaffIdDesc(String staffName, Pageable pageable);
 
+    List<Staff> findByStaffNameContainingIgnoreCaseOrderByStaffIdDesc(String staffName);
+
     @Query("SELECT s FROM Staff s ORDER BY s.staffId DESC")
     Page<Staff> findAll(Pageable pageable);
 

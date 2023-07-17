@@ -90,7 +90,7 @@ export default function Table() {
         {/* <!-- Table row --> */}
         <tbody class="">
         <Show
-          when={!data.error}
+          when={!data.error && data() !== undefined}
           fallback={<div class="w-full h-full min-h-[300px] grid place-items-center">Something went wrong</div>}>
           <For each={data()}>
             {(item) => (

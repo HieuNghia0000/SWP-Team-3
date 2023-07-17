@@ -45,7 +45,8 @@ public class TimesheetDto {
         this.timesheetId = timesheet.getTimesheetId();
         this.shiftId = timesheet.getShift().getShiftId();
         this.staffId = timesheet.getStaff().getStaffId();
-        this.salaryId = timesheet.getSalary().getSalaryId();
+        if (timesheet.getSalary() != null)
+            this.salaryId = timesheet.getSalary().getSalaryId();
         this.checkInTime = timesheet.getCheckInTime();
         this.checkOutTime = timesheet.getCheckOutTime();
         this.status = timesheet.getStatus();

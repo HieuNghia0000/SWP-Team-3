@@ -88,6 +88,11 @@ const Navbar: Component<NavbarProps> = (props) => {
               text="Timesheets"
               isOpen={isOpen}
             />
+            <NavbarLink
+              href={routes.payroll}
+              text="Payroll"
+              isOpen={isOpen}
+            />
           </NavbarDropDown>
         </Show>
 

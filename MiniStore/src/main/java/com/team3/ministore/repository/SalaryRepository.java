@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface SalaryRepository extends JpaRepository<Salary, Integer> {
@@ -14,7 +15,7 @@ public interface SalaryRepository extends JpaRepository<Salary, Integer> {
             "WHERE sl.staff.staffId = :staffId " +
             "AND sl.effectiveDate <= CURRENT_DATE " +
             "AND (sl.terminationDate IS NULL OR sl.terminationDate >= CURRENT_DATE)")
-    Salary findSalaryInformationByStaffId(Integer staffId);
+    Optional<Salary> findSalaryInformationByStaffId(Integer staffId);
 
     @Query("SELECT sl FROM Salary sl " +
             "WHERE sl.effectiveDate <= CURRENT_DATE " +
