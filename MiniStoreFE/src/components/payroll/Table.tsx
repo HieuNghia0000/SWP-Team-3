@@ -5,6 +5,7 @@ import { routeData } from "~/routes/payroll";
 import { usePRContext } from "~/context/Payroll";
 import { TimesheetStatus } from "~/types";
 import moment from "moment";
+import formatNumberWithCommas from "~/utils/formatNumberWithCommas";
 
 export default function Table() {
   const { data } = useRouteData<typeof routeData>();
@@ -73,15 +74,6 @@ export default function Table() {
           >
             Gross Pay
           </th>
-          <th
-            scope="col"
-            class="px-2.5 py-[8.7px] text-sm font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
-            style={{
-              "border-left": "1px dashed #d5dce6",
-            }}
-          >
-            PTO Balance
-          </th>
         </tr>
         </thead>
         {/* <!-- Table row --> */}
@@ -112,28 +104,15 @@ export default function Table() {
                 return acc;
               }, 0);
 
-              // let ptoBalance = staff.leaveBalance;
-              // const grossPay = staff.shifts.reduce((acc, shift) => {
-              //   const shiftHours = moment(shift.endTime, "HH:mm:ss").diff(moment(shift.startTime, "HH:mm:ss"), "hours");
-              //   return acc + shift.salaryCoefficient * (staff.salary?.hourlyWage || 0) * shiftHours;
-              //
-              //   // if (
-              //   //   !shift.timesheet
-              //   //   || shift.timesheet.status !== TimesheetStatus.APPROVED
-              //   //   || staff.leaveRequests.some((leave) => moment(shift.date, "YYYY-MM-DD").isBetween(leave.startDate, leave.endDate, undefined, "[]")
-              //   //     && leave.status === LeaveRequestStatus.APPROVED)
-              //   // ) {
-              //   //   const ptoHours = Math.min(ptoBalance, shiftHours);
-              //   //   ptoBalance -= ptoHours;
-              //   //
-              //   //   if (ptoBalance > 0) {
-              //   //     return acc + shift.salaryCoefficient * (staff.salary?.hourlyWage || 0) * ptoHours;
-              //   //   }
-              //   //
-              //   // }
-              //   //
-              //   // return acc + shift.timesheet.grossPay;
-              // }, 0);
+              const grossPay = staff.shifts.reduce((acc, shift) => {
+                const shiftHours = moment(shift.endTime, "HH:mm:ss").diff(moment(shift.startTime, "HH:mm:ss"), "hours");
+
+                if (shift.timesheet && shift.timesheet.status === TimesheetStatus.APPROVED) {
+                  return acc + shift.salaryCoefficient * (shift.timesheet?.salary?.hourlyWage || 0) * shiftHours;
+                }
+
+                return acc;
+              }, 0);
 
               return (
                 <tr
@@ -174,12 +153,7 @@ export default function Table() {
                   <td
                     style={{ "border-left": "1px dashed #d5dce6" }}
                     class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
-                    ... ₫
-                  </td>
-                  <td
-                    style={{ "border-left": "1px dashed #d5dce6" }}
-                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
-                    {staff.leaveBalance} hrs
+                    {formatNumberWithCommas(grossPay)} ₫
                   </td>
                 </tr>
               )

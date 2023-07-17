@@ -1,20 +1,15 @@
 package com.team3.ministore.service.impl;
 
-import com.team3.ministore.dto.LeaveRequestDto;
-import com.team3.ministore.dto.ShiftDto;
-import com.team3.ministore.dto.StaffDto;
-import com.team3.ministore.dto.TimesheetDto;
+import com.team3.ministore.dto.*;
 import com.team3.ministore.model.Salary;
 import com.team3.ministore.model.Shift;
 import com.team3.ministore.model.Staff;
 import com.team3.ministore.model.Timesheet;
 import com.team3.ministore.repository.SalaryRepository;
 import com.team3.ministore.repository.TimesheetRepository;
-import com.team3.ministore.service.LeaveRequestService;
-import com.team3.ministore.service.ShiftService;
-import com.team3.ministore.service.StaffService;
-import com.team3.ministore.service.TimesheetService;
+import com.team3.ministore.service.*;
 import com.team3.ministore.utils.LeaveStatus;
+import com.team3.ministore.utils.ShiftCoverStatus;
 import com.team3.ministore.utils.TimesheetStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -44,6 +39,9 @@ public class TimesheetServiceImpl implements TimesheetService {
 
     @Autowired
     private ShiftService shiftService;
+
+    @Autowired
+    private ShiftCoverRequestService shiftCoverRequestService;
 
     @Override
     public List<TimesheetDto> getAllTimeSheets(int page, int pageSize, LocalDate fromDate, LocalDate toDate) {
@@ -129,45 +127,20 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
-    public List<StaffDto> getPayroll(String s, LocalDate fromDate, LocalDate toDate) {
-        List<Staff> staffs = staffService.getAllStaffs(s);
+    public List<StaffDto> getPayroll(String search, LocalDate fromDate, LocalDate toDate) {
+        List<Staff> staffs = staffService.getAllStaffs(search);
 
         // Iterate through all staffs and get their shifts and salary
-        return staffs.parallelStream().map(staff -> {
-            // Get the salary and leave requests of the staff
-            List<LeaveRequestDto> leaveRequestDtos = leaveRequestService
-                    .getLeaveRequestsByStaffIdAndDates(staff.getStaffId(), fromDate, toDate)
-                    .stream().filter(leaveRequestDto -> leaveRequestDto.getStatus().equals(LeaveStatus.APPROVED))
-                    .collect(Collectors.toList());
-            // Get the shifts of the staff
-            List<Shift> shifts = shiftService.getAllShiftsByStaffId(staff.getStaffId(), fromDate, toDate);
-            // Convert shifts to shiftDtos
-            List<ShiftDto> shiftDtos = shifts.stream().map(ShiftDto::new).collect(Collectors.toList());
-
-            // Return the staffDtos
-            return new StaffDto(staff, shiftDtos, leaveRequestDtos);
-        }).collect(Collectors.toList());
+        return getStaffDtos(fromDate, toDate, staffs);
     }
+
 
     @Override
     public List<StaffDto> getPayroll(LocalDate fromDate, LocalDate toDate) {
         List<Staff> staffs = staffService.getAllStaffs();
 
         // Iterate through all staffs and get their shifts and salary
-        return staffs.parallelStream().map(staff -> {
-            // Get the salary and leave requests of the staff
-            List<LeaveRequestDto> leaveRequestDtos = leaveRequestService
-                    .getLeaveRequestsByStaffIdAndDates(staff.getStaffId(), fromDate, toDate)
-                    .stream().filter(leaveRequestDto -> leaveRequestDto.getStatus().equals(LeaveStatus.APPROVED))
-                    .collect(Collectors.toList());
-            // Get the shifts of the staff
-            List<Shift> shifts = shiftService.getAllShiftsByStaffId(staff.getStaffId(), fromDate, toDate);
-            // Convert shifts to shiftDtos
-            List<ShiftDto> shiftDtos = shifts.stream().map(ShiftDto::new).collect(Collectors.toList());
-
-            // Return the staffDtos
-            return new StaffDto(staff, shiftDtos, leaveRequestDtos);
-        }).collect(Collectors.toList());
+        return getStaffDtos(fromDate, toDate, staffs);
     }
 
     private Timesheet saveTimesheet(Timesheet timesheet, Shift shift, Staff staff, Salary salary, Time checkInTime, Time checkOutTime, TimesheetStatus status,
@@ -184,4 +157,48 @@ public class TimesheetServiceImpl implements TimesheetService {
         return timesheetRepository.save(timesheet);
     }
 
+    private List<StaffDto> getStaffDtos(LocalDate fromDate, LocalDate toDate, List<Staff> staffs) {
+        return staffs.parallelStream().map(staff -> {
+            // Get the salary and leave requests of the staff
+            List<LeaveRequestDto> leaveRequestDtos = leaveRequestService
+                    .getLeaveRequestsByStaffIdAndDates(staff.getStaffId(), fromDate, toDate)
+                    .stream().filter(leaveRequestDto -> leaveRequestDto.getStatus().equals(LeaveStatus.APPROVED))
+                    .collect(Collectors.toList());
+            // Get the shifts of the staff
+            List<Shift> shifts = shiftService.getAllShiftsByStaffId(staff.getStaffId(), fromDate, toDate);
+            // Convert shifts to shiftDtos
+            List<ShiftDto> shiftDtos = shifts.stream()
+                    // Filter out the shifts which are covered by other staffs
+                    .filter(s -> s.getShiftCoverRequest() == null || s.getShiftCoverRequest().getStatus() != ShiftCoverStatus.APPROVED)
+                    // Filter out the shifts that are in the leave requests
+                    .filter(shift -> {
+                        for (LeaveRequestDto leaveRequestDto : leaveRequestDtos) {
+                            if (leaveRequestDto.getStartDate().isEqual(shift.getDate())
+                                    || leaveRequestDto.getEndDate().isEqual(shift.getDate())
+                                    || (leaveRequestDto.getStartDate().isBefore(shift.getDate()) && leaveRequestDto.getEndDate().isAfter(shift.getDate())))
+                                return false;
+                        }
+                        return true;
+                    })
+                    .map(ShiftDto::new).collect(Collectors.toList());
+
+            // Get the shifts of others which are covered by the staff
+            List<ShiftCoverDto> shiftCoverDtos = shiftCoverRequestService
+                    .getShiftCoverRequestsByStaffId(staff.getStaffId(), fromDate, toDate)
+                    .stream().filter(s -> s.getStatus() == ShiftCoverStatus.APPROVED).collect(Collectors.toList());
+
+            // Add the shifts which are covered by the staff to the shiftDtos
+            shiftCoverDtos.stream().map(ShiftCoverDto::getShift)
+                    .forEach(shift -> {
+                        if (shiftDtos.stream().noneMatch(shift1 -> shift1.getShiftId() == shift.getShiftId()))
+                            shiftDtos.add(shift);
+                    });
+
+            // Filter the shifts which are not published
+            List<ShiftDto> lShifts = shiftDtos.stream().filter(ShiftDto::getPublished).collect(Collectors.toList());
+
+            // Return the staffDtos
+            return new StaffDto(staff, lShifts, leaveRequestDtos);
+        }).collect(Collectors.toList());
+    }
 }

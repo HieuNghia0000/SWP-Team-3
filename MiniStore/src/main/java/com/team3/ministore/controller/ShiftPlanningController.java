@@ -61,6 +61,18 @@ public class ShiftPlanningController {
                         .collect(Collectors.toList());
                 // Get the shifts of the staff
                 List<Shift> shifts = shiftService.getAllShiftsByStaffId(staff.getStaffId(), fromDate, toDate);
+
+                // Filter out the shifts that are in the leave requests
+                shifts = shifts.stream().filter(shift -> {
+                    for (LeaveRequestDto leaveRequestDto : leaveRequestDtos) {
+                        if (leaveRequestDto.getStartDate().isEqual(shift.getDate())
+                                || leaveRequestDto.getEndDate().isEqual(shift.getDate())
+                                || (leaveRequestDto.getStartDate().isBefore(shift.getDate()) && leaveRequestDto.getEndDate().isAfter(shift.getDate())))
+                            return false;
+                    }
+                    return true;
+                }).collect(Collectors.toList());
+
                 // Convert shifts to shiftDtos
                 List<ShiftDto> shiftDtos = shifts.stream().map(ShiftDto::new).collect(Collectors.toList());
 
@@ -89,15 +101,23 @@ public class ShiftPlanningController {
         // Get the shifts of the staff
         List<Shift> shifts = shiftService.getAllShiftsByStaffId(foundStaff.get().getStaffId(), fromDate, toDate);
 
-        // Filter the shifts which are not have shift cover request
-        shifts = shifts.stream()
+        List<ShiftDto> shiftDtos = shifts.stream()
+                // Filter out the shifts which are covered by other staffs
                 .filter(s -> s.getShiftCoverRequest() == null || s.getShiftCoverRequest().getStatus() != ShiftCoverStatus.APPROVED)
-                .collect(Collectors.toList());
+                // Filter out the shifts that are in the leave requests
+                .filter(shift -> {
+                    for (LeaveRequestDto leaveRequestDto : leaveRequestDtos) {
+                        if (leaveRequestDto.getStartDate().isEqual(shift.getDate())
+                                || leaveRequestDto.getEndDate().isEqual(shift.getDate())
+                                || (leaveRequestDto.getStartDate().isBefore(shift.getDate()) && leaveRequestDto.getEndDate().isAfter(shift.getDate())))
+                            return false;
+                    }
+                    return true;
+                })
+                // Convert shifts to shiftDtos
+                .map(ShiftDto::new).collect(Collectors.toList());
 
-        // Convert shifts to shiftDtos
-        List<ShiftDto> shiftDtos = shifts.stream().map(ShiftDto::new).collect(Collectors.toList());
-
-        // Get the shifts which are covered by the staff
+        // Get the shifts of others which are covered by the staff
         List<ShiftCoverDto> shiftCoverDtos = shiftCoverRequestService
                 .getShiftCoverRequestsByStaffId(foundStaff.get().getStaffId(), fromDate, toDate)
                 .stream().filter(s -> s.getStatus() == ShiftCoverStatus.APPROVED).collect(Collectors.toList());
@@ -105,9 +125,7 @@ public class ShiftPlanningController {
         // Add the shifts which are covered by the staff to the shiftDtos
         shiftCoverDtos.stream().map(ShiftCoverDto::getShift)
                 .forEach(shift -> {
-                    if (shiftDtos.stream().noneMatch(shift1 -> shift1.getShiftId() == shift.getShiftId())) {
-                        shiftDtos.add(shift);
-                    }
+                    if (shiftDtos.stream().noneMatch(shift1 -> shift1.getShiftId() == shift.getShiftId())) shiftDtos.add(shift);
                 });
 
         // Filter the shifts which are not published
