@@ -10,9 +10,10 @@ import axios from "axios";
 import {DataResponse, Product} from "~/types";
 import getEndPoint from "~/utils/getEndPoint";
 import handleFetchError from "~/utils/handleFetchError";
-import {For} from "solid-js";
-import {useRouteData} from "@solidjs/router";
+import {createSignal, For} from "solid-js";
+import {A, useRouteData} from "@solidjs/router";
 import Pagination from "~/components/Pagination";
+import {IoTrashOutline} from "solid-icons/io";
 
 type ParamType = {
     search?: string;
@@ -47,6 +48,8 @@ export default function AddOrders() {
     const [searchParams, setSearchParams] = useSearchParams<ParamType>();
     const {data} = useRouteData<typeof routeData>();
 
+    const [selectedProducts, setSelectedProducts] = createSignal<Product[]>([]);
+
     const totalItems = () => data()?.length ?? 0;
 
     const onSearchSubmit = (e: Event) => {
@@ -55,6 +58,15 @@ export default function AddOrders() {
         const search = formData.get("search") as string;
         setSearchParams({ search });
     };
+
+    const getCurrentDate = () => {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = (now.getMonth() + 1).toString().padStart(2, '0');
+        const day = now.getDate().toString().padStart(2, '0');
+        return `${day}-${month}-${year}`;
+    };
+
 
     return (
         <main class="min-w-fit">
@@ -75,7 +87,7 @@ export default function AddOrders() {
                                 <FiShoppingCart />
                                 <h2 class="ml-2 text-xl font-medium">Order ID #01</h2>
                             </div>
-                            <h2 class="text-xl font-medium">Date 20-06-2023</h2>
+                            <h2 class="text-xl font-medium">Date {getCurrentDate()}</h2>
                         </div>
                     </div>
 
@@ -91,25 +103,36 @@ export default function AddOrders() {
                                 <th class="text-left px-4 py-2 font-medium" scope="col">Price</th>
                                 <th class="text-left px-4 py-2 font-medium" scope="col">Quantity</th>
                                 <th class="text-left px-4 py-2 font-medium" scope="col">Subtotal</th>
-                                <th class="text-left px-4 py-2 font-medium" scope="col">Action</th>
+                                <th class="text-center px-4 py-2 font-medium" scope="col">Action</th>
                             </tr>
                             </thead>
 
                             {/*Table row*/}
                             <tbody>
-                                <tr>
-                                    <td class="px-4 py-2 text-indigo-500 font-bold">#302011</td>
-                                    <td class="px-4 py-2 font-medium">Smartwatch E2</td>
-                                    <td class="px-4 py-2 text-gray-500 font-medium">$400.00</td>
-                                    <td class="px-4 py-2 text-gray-500 font-medium">1 pcs</td>
-                                    <td class="px-4 py-2 text-gray-500 font-medium">$400.00</td>
-                                    <td class="px-4 py-2 text-gray-500 font-medium">
-                                        <span class="text-xl">
-                                            <CgTrash />
-                                        </span>
-
-                                    </td>
-                                </tr>
+                            {selectedProducts().map((product, index) => {
+                                const subtotal = product.price * product.quantity;
+                                return (
+                                    <tr>
+                                        <td class="px-4 py-2 text-indigo-500 font-bold">{product.productId}</td>
+                                        <td class="px-4 py-2 font-medium">{product.name}</td>
+                                        <td class="px-4 py-2 text-gray-500 font-medium">{`$${product.price.toFixed(2)}`}</td>
+                                        <td class="px-4 py-2 text-gray-500 font-medium">{`${product.quantity} pcs`}</td>
+                                        <td class="px-4 py-2 text-gray-500 font-medium">{`$${subtotal.toFixed(2)}`}</td>
+                                        <td class="px-4 py-2 text-gray-500 font-medium">
+                                            <div class="relative flex justify-center">
+                                                <button
+                                                    class="peer text-gray-500 hover:text-indigo-500 text-xl"
+                                                    onClick={() => setSelectedProducts(selectedProducts().filter((_, i) => i !== index))}>
+                                                    <CgTrash/>
+                                                </button>
+                                                <span class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
+                                                  Delete
+                                                </span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                             </tbody>
                         </table>
                     </div>
@@ -142,7 +165,8 @@ export default function AddOrders() {
 
                     {/*Interactive button*/}
                     <div class="flex justify-between mt-4 p-4">
-                        <button type="button" class="flex items-center bg-red-500 px-12 py-2 text-white font-medium rounded-lg hover:bg-red-600">
+                        <button type="button" class="flex items-center bg-red-500 px-12 py-2 text-white font-medium rounded-lg hover:bg-red-600"
+                                onClick={() => setSelectedProducts([])}>
                             <span class="text-lg mr-2"><FaSolidArrowRotateRight /></span>
                             <span>Reset</span>
                         </button>
@@ -185,7 +209,7 @@ export default function AddOrders() {
                                 <th class="text-left px-4 py-2 font-medium" scope="col">Product</th>
                                 <th class="text-left px-4 py-2 font-medium" scope="col">Category</th>
                                 <th class="text-left px-4 py-2 font-medium" scope="col">Price</th>
-                                <th class="text-left px-4 py-2 font-medium" scope="col">Action</th>
+                                <th class="text-center px-4 py-2 font-medium" scope="col">Action</th>
                             </tr>
                             </thead>
 
@@ -199,9 +223,27 @@ export default function AddOrders() {
                                         <td class="px-4 py-2 font-medium text-gray-500">{item.category?.name || "N/A"}</td>
                                         <td class="px-4 py-2 text-gray-500 font-medium">${item.price.toFixed(2)}</td>
                                         <td class="px-4 py-2 text-gray-500 font-medium">
-                                    <span class="text-xl">
-                                        <FaSolidPlus />
-                                    </span>
+                                            <div class="relative flex justify-center">
+                                                <button class="peer text-base text-gray-500 hover:text-indigo-500"
+                                                        onClick={() => {
+                                                            const existingProduct = selectedProducts().find((p) => p.productId === item.productId);
+
+                                                            if (existingProduct) {
+                                                                const updatedProducts = selectedProducts().map((p) =>
+                                                                    p.productId === item.productId ? { ...p, quantity: p.quantity + 1 } : p
+                                                                );
+                                                                setSelectedProducts(updatedProducts);
+                                                            } else {
+                                                                setSelectedProducts([...selectedProducts(), { ...item, quantity: 1 }]);
+                                                            }
+                                                        }}
+                                            >
+                                                    <FaSolidPlus/>
+                                                </button>
+                                                <span class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
+                                                  Add
+                                                </span>
+                                            </div>
                                         </td>
                                     </tr>
                                 )}

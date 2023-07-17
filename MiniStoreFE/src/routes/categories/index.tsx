@@ -254,6 +254,7 @@ const CategoryModal: Component<{
     if (!editMode()) return;
     try {
       await formHandler.validateForm();
+      await axios.put<Category>(`${getEndPoint()}/categories/update/${modalData()?.categoryId}`, formData());
       alert("Data sent with success: " + JSON.stringify(formData()));
     } catch (error) {
       console.error(error);
@@ -381,6 +382,7 @@ const CreateCategoryModal: Component<{
     event.preventDefault();
     try {
       await formHandler.validateForm();
+      await axios.post<Category>(`${getEndPoint()}/categories/add`, formData());
       alert("Data sent with success: " + JSON.stringify(formData()));
     } catch (error) {
       console.error(error);

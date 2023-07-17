@@ -69,7 +69,7 @@ export default function AddProduct() {
         <div class="flex-1 min-w-[800px] space-y-6">
           <div class="p-6 bg-white rounded-lg shadow-md border border-gray-200">
             <h4 class="mb-3.5 text-lg font-medium text-gray-600">
-              General Inforamtion
+              General Information
             </h4>
             <div class="space-y-2">
               <TextInput
