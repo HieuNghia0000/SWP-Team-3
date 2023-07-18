@@ -67,6 +67,46 @@ export default function AddOrders() {
         return `${day}-${month}-${year}`;
     };
 
+    const [grandTotal, setGrandTotal] = createSignal<number>(0);
+
+    const handleRemoveProduct = (index: number) => {
+        setSelectedProducts(selectedProducts().filter((_, i) => i !== index));
+
+        const grandTotal = selectedProducts().reduce((total, product) => total + product.price * product.quantity, 0);
+        setGrandTotal(grandTotal);
+    };
+
+    const handleAddProduct = (item: Product) => {
+        const existingProduct = selectedProducts().find((p) => p.productId === item.productId);
+
+        if (existingProduct) {
+            const updatedProducts = selectedProducts().map((p) =>
+                p.productId === item.productId ? { ...p, quantity: p.quantity + 1 } : p
+            );
+            setSelectedProducts(updatedProducts);
+        } else {
+            setSelectedProducts([...selectedProducts(), { ...item, quantity: 1 }]);
+        }
+
+        const grandTotal = selectedProducts().reduce((total, product) => total + product.price * product.quantity, 0);
+        setGrandTotal(grandTotal);
+    };
+
+    const handlePayNow = () => {
+        const selectedProductDetails = selectedProducts().map((product) => ({
+            name: product.name,
+            price: product.price,
+            quantity: product.quantity,
+        }));
+
+        axios.post(`${getEndPoint()}/orders/pay`, selectedProductDetails)
+            .then((response) => {
+                console.log(response.data);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    };
 
     return (
         <main class="min-w-fit">
@@ -122,7 +162,7 @@ export default function AddOrders() {
                                             <div class="relative flex justify-center">
                                                 <button
                                                     class="peer text-gray-500 hover:text-indigo-500 text-xl"
-                                                    onClick={() => setSelectedProducts(selectedProducts().filter((_, i) => i !== index))}>
+                                                    onClick={() => handleRemoveProduct(index)}>
                                                     <CgTrash/>
                                                 </button>
                                                 <span class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
@@ -159,18 +199,22 @@ export default function AddOrders() {
                     {/*Grand total*/}
                     <div class="bg-indigo-200 p-3 mt-4">
                         <div class="text-indigo-500">
-                            <h2 class="text-3xl text-indigo-600 font-medium text-center">Grand Total: $5000.00</h2>
+                            <h2 class="text-3xl text-indigo-600 font-medium text-center">Grand Total: ${grandTotal().toFixed(2)}</h2>
                         </div>
                     </div>
 
                     {/*Interactive button*/}
                     <div class="flex justify-between mt-4 p-4">
                         <button type="button" class="flex items-center bg-red-500 px-12 py-2 text-white font-medium rounded-lg hover:bg-red-600"
-                                onClick={() => setSelectedProducts([])}>
+                                onClick={() => {
+                                    setSelectedProducts([]);
+                                    setGrandTotal(0);
+                                }}>
                             <span class="text-lg mr-2"><FaSolidArrowRotateRight /></span>
                             <span>Reset</span>
                         </button>
-                        <button type="submit" class="flex items-center bg-green-700 px-12 py-2 text-white font-medium rounded-lg hover:bg-green-800">
+                        <button type="submit" class="flex items-center bg-green-700 px-12 py-2 text-white font-medium rounded-lg hover:bg-green-800"
+                                onclick={handlePayNow}>
                             <span class="text-lg mr-2"><OcPaperairplane2 /></span>
                             <span>Pay now</span>
                         </button>
@@ -225,19 +269,7 @@ export default function AddOrders() {
                                         <td class="px-4 py-2 text-gray-500 font-medium">
                                             <div class="relative flex justify-center">
                                                 <button class="peer text-base text-gray-500 hover:text-indigo-500"
-                                                        onClick={() => {
-                                                            const existingProduct = selectedProducts().find((p) => p.productId === item.productId);
-
-                                                            if (existingProduct) {
-                                                                const updatedProducts = selectedProducts().map((p) =>
-                                                                    p.productId === item.productId ? { ...p, quantity: p.quantity + 1 } : p
-                                                                );
-                                                                setSelectedProducts(updatedProducts);
-                                                            } else {
-                                                                setSelectedProducts([...selectedProducts(), { ...item, quantity: 1 }]);
-                                                            }
-                                                        }}
-                                            >
+                                                        onClick={() => handleAddProduct(item)}>
                                                     <FaSolidPlus/>
                                                 </button>
                                                 <span class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
