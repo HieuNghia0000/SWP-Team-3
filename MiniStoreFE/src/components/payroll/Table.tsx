@@ -2,19 +2,20 @@ import { batch, For, Show } from "solid-js";
 import { OcCheckcirclefill } from "solid-icons/oc";
 import { useRouteData } from "@solidjs/router";
 import { routeData } from "~/routes/payroll";
-import { usePRContext } from "~/context/Payroll";
+import { ModalData, usePRContext } from "~/context/Payroll";
 import { TimesheetStatus } from "~/types";
 import moment from "moment";
 import formatNumberWithCommas from "~/utils/formatNumberWithCommas";
 
 export default function Table() {
   const { data } = useRouteData<typeof routeData>();
-  const { setChosenId, setShowModal } = usePRContext();
+  const { setChosenId, setShowModal, setModalData } = usePRContext();
 
-  let onOpenDetails = (id: number) => {
+  let onOpenDetails = (obj: ModalData) => {
     batch(() => {
-      setChosenId(id);
+      setChosenId(obj!.staffId);
       setShowModal(true);
+      setModalData(obj);
     });
   };
 
@@ -25,13 +26,13 @@ export default function Table() {
         <tr>
           <th
             scope="col"
-            class="px-2.5 py-[8.7px] pl-[18px] w-44 text-left text-sm font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
+            class="px-2.5 py-[8.7px] pl-[18px] w-56 text-left text-sm font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
           >
             Name
           </th>
           <th
             scope="col"
-            class="px-2.5 py-[8.7px] w-36 text-sm font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
+            class="px-2.5 py-[8.7px] w-36 text-sm font-medium text-[#637286] tracking-wider text-center border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
             style={{
               "border-left": "1px dashed #d5dce6",
             }}
@@ -40,7 +41,7 @@ export default function Table() {
           </th>
           <th
             scope="col"
-            class="px-2.5 py-[8.7px] text-sm font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
+            class="px-2.5 py-[8.7px] text-sm font-medium text-[#637286] tracking-wider text-center border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
             style={{
               "border-left": "1px dashed #d5dce6",
             }}
@@ -49,7 +50,7 @@ export default function Table() {
           </th>
           <th
             scope="col"
-            class="px-2.5 py-[8.7px] text-sm font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
+            class="px-2.5 py-[8.7px] text-sm font-medium text-[#637286] tracking-wider text-center border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
             style={{
               "border-left": "1px dashed #d5dce6",
             }}
@@ -58,7 +59,7 @@ export default function Table() {
           </th>
           <th
             scope="col"
-            class="px-2.5 py-[8.7px] text-sm font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
+            class="px-2.5 py-[8.7px] text-sm font-medium text-[#637286] tracking-wider text-center border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
             style={{
               "border-left": "1px dashed #d5dce6",
             }}
@@ -67,7 +68,7 @@ export default function Table() {
           </th>
           <th
             scope="col"
-            class="px-2.5 py-[8.7px] text-sm font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
+            class="px-2.5 py-[8.7px] text-sm font-medium text-[#637286] tracking-wider text-center border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
             style={{
               "border-left": "1px dashed #d5dce6",
             }}
@@ -117,14 +118,21 @@ export default function Table() {
               return (
                 <tr
                   class="hover:bg-[#ceefff] odd:bg-white even:bg-gray-50 text-[#333c48] cursor-pointer"
-                  onClick={[ onOpenDetails, staff.staffId ]}>
+                  onClick={[ onOpenDetails, {
+                    staffId: staff.staffId,
+                    isApproved,
+                    regularHours,
+                    leaveHours,
+                    totalHours: regularHours - leaveHours,
+                    grossPay
+                  } ]}>
                   <td
                     class="px-2.5 pl-[18px] text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
                     {staff.staffName}
                   </td>
                   <td
                     style={{ "border-left": "1px dashed #d5dce6" }}
-                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal text-center leading-10 border-[#e2e7ee] border-b">
                     <span
                       class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-bold rounded-full"
                       classList={{
@@ -137,22 +145,22 @@ export default function Table() {
                   </td>
                   <td
                     style={{ "border-left": "1px dashed #d5dce6", }}
-                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal text-center leading-10 border-[#e2e7ee] border-b">
                     {regularHours} hrs
                   </td>
                   <td
                     style={{ "border-left": "1px dashed #d5dce6" }}
-                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal text-center leading-10 border-[#e2e7ee] border-b">
                     {leaveHours} hrs
                   </td>
                   <td
                     style={{ "border-left": "1px dashed #d5dce6" }}
-                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal text-center leading-10 border-[#e2e7ee] border-b">
                     {regularHours - leaveHours} hrs
                   </td>
                   <td
                     style={{ "border-left": "1px dashed #d5dce6" }}
-                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal text-center leading-10 border-[#e2e7ee] border-b">
                     {formatNumberWithCommas(grossPay)} ₫
                   </td>
                 </tr>

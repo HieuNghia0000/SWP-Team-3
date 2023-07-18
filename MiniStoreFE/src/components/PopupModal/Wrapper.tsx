@@ -4,7 +4,7 @@ import { Accessor, Component, For, JSX, Show } from "solid-js";
 type Props = {
   open: () => boolean;
   close: () => void;
-  title: string;
+  title: string | JSX.Element;
   children: JSX.Element;
   headerTabs?: {
     name: string | JSX.Element;
@@ -12,6 +12,7 @@ type Props = {
     onClick: () => void;
   }[];
   headerTabSelected?: Accessor<string>;
+  width?: string;
 };
 
 const Wrapper: Component<Props> = (props) => {
@@ -24,7 +25,9 @@ const Wrapper: Component<Props> = (props) => {
           if (e.target.ariaModal) props.close();
         }}
       >
-        <div class="zoom-in col-span-1 bg-white shadow-md w-[600px] min-w-fit min-h-[100px] rounded-md mx-auto my-8 flex flex-col">
+        <div
+          class="zoom-in col-span-1 bg-white shadow-md min-w-fit min-h-[100px] rounded-md mx-auto my-8 flex flex-col"
+          style={{ width: props.width ?? "600px" }}>
           {/* Header */}
           <div class="py-3.5 px-5 rounded-t-md border-b border-gray-300 text-gray-600 bg-gray-50">
             <div class="flex justify-between items-center flex-wrap font-semibold">
@@ -33,7 +36,7 @@ const Wrapper: Component<Props> = (props) => {
                 onClick={props.close}
                 class="text-xl hover:text-indigo-700"
               >
-                <CgClose />
+                <CgClose/>
               </button>
             </div>
             <Show when={props.headerTabs && props.headerTabSelected?.()}>

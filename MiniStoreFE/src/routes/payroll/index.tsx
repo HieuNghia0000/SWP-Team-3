@@ -10,6 +10,7 @@ import { ModalContext } from "~/context/Payroll";
 import Breadcrumbs from "~/components/Breadcrumbs";
 import ToolBar from "~/components/payroll/Toolbar";
 import Table from "~/components/payroll/Table";
+import PayrollDetailsModal from "~/components/payroll/PayrollDetailsModal";
 
 export function routeData() {
   const [ params ] = useSearchParams<ParamType>();
@@ -44,6 +45,7 @@ export default function Payroll() {
   const { data } = useRouteData<typeof routeData>();
   const [ showModal, setShowModal ] = createSignal(false);
   const [ chosenId, setChosenId ] = createSignal(0);
+  const [ modalData, setModalData ] = createSignal(undefined);
 
   return (
     <main>
@@ -52,6 +54,8 @@ export default function Payroll() {
         setChosenId,
         showModal,
         setShowModal,
+        modalData,
+        setModalData
       }}>
         <h1 class="mb-2 text-2xl font-medium">Payroll</h1>
         <Breadcrumbs linkList={[ { name: "Payroll" } ]}/>
@@ -69,7 +73,7 @@ export default function Payroll() {
           <Table/>
         </Show>
 
-        {/*<EditTimesheetModal/>*/}
+        <PayrollDetailsModal/>
       </ModalContext.Provider>
     </main>
   );
