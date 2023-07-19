@@ -1,5 +1,5 @@
 import { createRouteAction, createRouteData, useRouteData } from "solid-start";
-import { DataResponse, Timesheet } from "~/types";
+import { DataResponse, Holiday, Timesheet } from "~/types";
 import { createSignal, Show } from "solid-js";
 import Breadcrumbs from "~/components/Breadcrumbs";
 import Pagination from "~/components/Pagination";
@@ -51,11 +51,35 @@ export function routeData() {
       reconcileOptions: { key: "timesheetId" }
     }
   );
-  return { data: timesheets };
+
+  const holidays = createRouteData(
+    async ([ key, from, to ]) => {
+      try {
+        if (!from || !to) return;
+        const uri = new URLSearchParams({ from, to });
+        const { data } = await axios.get<DataResponse<Holiday[]>>(
+          `${getEndPoint()}/${key}?${uri.toString()}`
+        );
+        console.log(data.content)
+        return data.content;
+      } catch (e) {
+        throw new Error(handleFetchError(e));
+      }
+    },
+    {
+      key: () => [
+        "holidays/all",
+        params.from ?? "",
+        params.to ?? "",
+      ],
+      reconcileOptions: { key: "holidayId" }
+    }
+  );
+  return { data: timesheets, holidays };
 }
 
 export default function Timesheets() {
-  const { data } = useRouteData<typeof routeData>();
+  const { data, holidays } = useRouteData<typeof routeData>();
   const [ showEditModal, setShowEditModal ] = createSignal(false);
   const [ chosenId, setChosenId ] = createSignal(0);
   const [ deleting, deleteAction ] = createRouteAction(deleteTimesheet);
@@ -88,13 +112,15 @@ export default function Timesheets() {
         {/* Search bar */}
         <ToolBar/>
 
-        <Show when={data.loading}>
+        <Show when={data.loading || holidays.loading}>
           <div class="mb-2">
             Loading...
           </div>
         </Show>
 
-        <Show when={!data.error && data() !== undefined} fallback={<div>Something went wrong</div>}>
+        <Show
+          when={!data.error && data() !== undefined && !holidays.error && holidays() !== undefined}
+          fallback={<div>Something went wrong</div>}>
           <Table/>
         </Show>
 

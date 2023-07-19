@@ -1,17 +1,21 @@
 package com.team3.ministore.service;
 
-import com.team3.ministore.model.Holidays;
+import com.team3.ministore.dto.HolidayDto;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface HolidaysService {
-    List<Holidays> getAllHolidays();
+    List<HolidayDto> getHolidays(String search, int page, int pageSize);
 
-    Holidays createHolidays(Holidays holidays);
+    List<HolidayDto> getHolidays(int page, int pageSize);
 
-    Holidays getHolidaysById(Integer id);
+    HolidayDto createHolidays(HolidayDto holiday);
 
-    Holidays updateHolidays(Integer id, Holidays holidays);
+    Optional<HolidayDto> updateHolidays(Integer id, HolidayDto dto);
 
     void deleteHolidays(Integer id);
+
+    List<HolidayDto> getAllHolidays(LocalDate startDate, LocalDate endDate);
 }

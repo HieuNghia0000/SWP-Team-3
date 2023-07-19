@@ -10,10 +10,10 @@ import { shiftTimes } from "~/components/shift-planning/utils/shiftTimes";
 import formatNumberWithCommas from "~/utils/formatNumberWithCommas";
 import moment from "moment";
 import { capitalize } from "~/utils/capitalize";
-import { TimesheetStatus } from "~/types";
+import { Holiday, TimesheetStatus } from "~/types";
 
 export default function Table() {
-  const { data } = useRouteData<typeof routeData>();
+  const { data, holidays } = useRouteData<typeof routeData>();
   const { setChosenId, setShowEditModal, onDelete } = useTSContext();
 
   let onEdit = (id: number) => {
@@ -22,6 +22,11 @@ export default function Table() {
       setShowEditModal(true);
     });
   };
+
+  const isHoliday = (shift: any): Holiday | undefined => {
+    return holidays()?.find((holiday) => moment(shift.date, "YYYY-MM-DD")
+      .isBetween(holiday.startDate, holiday.endDate, undefined, "[]"));
+  }
 
   return (
     <div class="flex flex-col border border-gray-200 rounded-lg overflow-x-auto shadow-sm">
@@ -114,64 +119,55 @@ export default function Table() {
           when={!data.error && !data.loading && data.state === "ready"}
           fallback={<div class="w-full h-full min-h-[300px] grid place-items-center">Something went wrong</div>}>
           <For each={data()}>
-            {(timesheet) => (
-              <tr class="hover:bg-[#ceefff] odd:bg-white even:bg-gray-50 text-[#333c48]">
-                <td
-                  class="px-2.5 pl-[18px] text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
-                  <A
-                    href={routes.staff(timesheet.staffId)}
-                    class="hover:text-indigo-500"
-                  >
-                    {timesheet.staff?.staffName}
-                  </A>
-                </td>
-                <td
-                  style={{
-                    "border-left": "1px dashed #d5dce6",
-                  }}
-                  class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
-                  {timesheet.shift!.date}
-                </td>
-                <td
-                  style={{
-                    "border-left": "1px dashed #d5dce6",
-                  }}
-                  class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
-                  {shiftTimes(timesheet.shift!.startTime, timesheet.shift!.endTime)}
-                </td>
-                <td
-                  style={{
-                    "border-left": "1px dashed #d5dce6",
-                  }}
-                  class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
-                  {timesheet.shift!.salaryCoefficient}
-                </td>
-                <td
-                  style={{
-                    "border-left": "1px dashed #d5dce6",
-                  }}
-                  class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
-                  {formatNumberWithCommas(timesheet.salary?.hourlyWage || 0)} ₫
-                </td>
-                <td
-                  style={{
-                    "border-left": "1px dashed #d5dce6",
-                  }}
-                  class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
-                  {moment(timesheet.shift?.endTime, "HH:mm:ss").diff(moment(timesheet.shift?.startTime, "HH:mm:ss"), "hours")} hrs
-                </td>
-                <td
-                  style={{
-                    "border-left": "1px dashed #d5dce6",
-                  }}
-                  class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
-                  {formatNumberWithCommas((timesheet.salary?.hourlyWage || 0) * moment(timesheet.shift?.endTime, "HH:mm:ss").diff(moment(timesheet.shift?.startTime, "HH:mm:ss"), "hours"))} ₫
-                </td>
-                <td
-                  style={{
-                    "border-left": "1px dashed #d5dce6",
-                  }}
-                  class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+            {(timesheet) => {
+
+              const holiday = isHoliday(timesheet.shift!);
+              const coefficient = holiday ? holiday.coefficient : timesheet.shift!.salaryCoefficient;
+
+              return (
+                <tr class="hover:bg-[#ceefff] odd:bg-white even:bg-gray-50 text-[#333c48]">
+                  <td
+                    class="px-2.5 pl-[18px] text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                    <A
+                      href={routes.staff(timesheet.staffId)}
+                      class="hover:text-indigo-500"
+                    >
+                      {timesheet.staff?.staffName}
+                    </A>
+                  </td>
+                  <td
+                    style={{ "border-left": "1px dashed #d5dce6" }}
+                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                    {timesheet.shift!.date}
+                  </td>
+                  <td
+                    style={{ "border-left": "1px dashed #d5dce6" }}
+                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                    {shiftTimes(timesheet.shift!.startTime, timesheet.shift!.endTime)}
+                  </td>
+                  <td
+                    style={{ "border-left": "1px dashed #d5dce6" }}
+                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                    {coefficient}
+                  </td>
+                  <td
+                    style={{ "border-left": "1px dashed #d5dce6" }}
+                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                    {formatNumberWithCommas(timesheet.salary?.hourlyWage || 0)} ₫
+                  </td>
+                  <td
+                    style={{ "border-left": "1px dashed #d5dce6", }}
+                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                    {moment(timesheet.shift?.endTime, "HH:mm:ss").diff(moment(timesheet.shift?.startTime, "HH:mm:ss"), "hours")} hrs
+                  </td>
+                  <td
+                    style={{ "border-left": "1px dashed #d5dce6" }}
+                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                    {formatNumberWithCommas((timesheet.salary?.hourlyWage || 0) * coefficient * moment(timesheet.shift?.endTime, "HH:mm:ss").diff(moment(timesheet.shift?.startTime, "HH:mm:ss"), "hours"))} ₫
+                  </td>
+                  <td
+                    style={{ "border-left": "1px dashed #d5dce6" }}
+                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
                     <span
                       class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-bold rounded-full"
                       classList={{
@@ -182,39 +178,38 @@ export default function Table() {
                     >
                       {capitalize(timesheet.status)}
                     </span>
-                </td>
-                <td
-                  style={{
-                    "border-left": "1px dashed #d5dce6",
-                  }}
-                  class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
-                  <div class="flex flex-row gap-1">
-                    <div class="relative flex justify-center items-center">
-                      <button
-                        onClick={[ onEdit, timesheet.timesheetId ]}
-                        class="peer text-base text-gray-500 hover:text-indigo-500">
-                        <OcPencil3/>
-                      </button>
-                      <span
-                        class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
+                  </td>
+                  <td
+                    style={{ "border-left": "1px dashed #d5dce6" }}
+                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                    <div class="flex flex-row gap-1">
+                      <div class="relative flex justify-center items-center">
+                        <button
+                          onClick={[ onEdit, timesheet.timesheetId ]}
+                          class="peer text-base text-gray-500 hover:text-indigo-500">
+                          <OcPencil3/>
+                        </button>
+                        <span
+                          class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
                           Edit
                       </span>
-                    </div>
-                    <div class="relative flex justify-center items-center">
-                      <button
-                        onClick={[ onDelete, timesheet.timesheetId ]}
-                        class="peer text-base text-gray-500 hover:text-indigo-500">
-                        <IoTrashOutline/>
-                      </button>
-                      <span
-                        class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
+                      </div>
+                      <div class="relative flex justify-center items-center">
+                        <button
+                          onClick={[ onDelete, timesheet.timesheetId ]}
+                          class="peer text-base text-gray-500 hover:text-indigo-500">
+                          <IoTrashOutline/>
+                        </button>
+                        <span
+                          class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
                           Delete
                       </span>
+                      </div>
                     </div>
-                  </div>
-                </td>
-              </tr>
-            )}
+                  </td>
+                </tr>
+              )
+            }}
           </For>
         </Show>
         </tbody>

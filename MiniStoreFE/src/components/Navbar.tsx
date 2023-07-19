@@ -93,6 +93,11 @@ const Navbar: Component<NavbarProps> = (props) => {
               text="Payroll"
               isOpen={isOpen}
             />
+            <NavbarLink
+              href={routes.holidays}
+              text="Holidays"
+              isOpen={isOpen}
+            />
           </NavbarDropDown>
         </Show>
 

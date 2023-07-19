@@ -3,12 +3,12 @@ import { OcCheckcirclefill } from "solid-icons/oc";
 import { useRouteData } from "@solidjs/router";
 import { routeData } from "~/routes/payroll";
 import { ModalData, usePRContext } from "~/context/Payroll";
-import { TimesheetStatus } from "~/types";
+import { Holiday, TimesheetStatus } from "~/types";
 import moment from "moment";
 import formatNumberWithCommas from "~/utils/formatNumberWithCommas";
 
 export default function Table() {
-  const { data } = useRouteData<typeof routeData>();
+  const { data, holidays } = useRouteData<typeof routeData>();
   const { setChosenId, setShowModal, setModalData } = usePRContext();
 
   let onOpenDetails = (obj: ModalData) => {
@@ -18,6 +18,12 @@ export default function Table() {
       setModalData(obj);
     });
   };
+
+  // Check if the shift is in a holiday or not
+  const isHoliday = (shift: any): Holiday | undefined => {
+    return holidays()?.find((holiday) => moment(shift.date, "YYYY-MM-DD")
+      .isBetween(holiday.startDate, holiday.endDate, undefined, "[]"));
+  }
 
   return (
     <div class="flex flex-col border border-gray-200 rounded-lg overflow-x-auto shadow-sm">
@@ -80,7 +86,8 @@ export default function Table() {
         {/* <!-- Table row --> */}
         <tbody class="">
         <Show
-          when={!data.error && !data.loading && data.state === "ready"}
+          when={!data.error && !data.loading && data.state === "ready"
+            && !holidays.error && !holidays.loading && holidays.state === "ready"}
           fallback={<div class="w-full h-full min-h-[300px] grid place-items-center">Something went wrong</div>}>
           <For each={data()}>
             {(staff) => {
@@ -107,9 +114,11 @@ export default function Table() {
 
               const grossPay = staff.shifts.reduce((acc, shift) => {
                 const shiftHours = moment(shift.endTime, "HH:mm:ss").diff(moment(shift.startTime, "HH:mm:ss"), "hours");
+                const holiday = isHoliday(shift);
+                const coefficient = holiday ? holiday.coefficient : shift.salaryCoefficient;
 
                 if (shift.timesheet && shift.timesheet.status === TimesheetStatus.APPROVED) {
-                  return acc + shift.salaryCoefficient * (shift.timesheet?.salary?.hourlyWage || 0) * shiftHours;
+                  return acc + coefficient * (shift.timesheet?.salary?.hourlyWage || 0) * shiftHours;
                 }
 
                 return acc;

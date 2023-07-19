@@ -8,7 +8,7 @@ import { ParamType } from "~/components/payroll/types";
 import moment from "moment";
 import formatNumberWithCommas from "~/utils/formatNumberWithCommas";
 import { OcCheckcirclefill } from "solid-icons/oc";
-import { TimesheetStatus } from "~/types";
+import { Holiday, TimesheetStatus } from "~/types";
 
 const getDates = (fromDate: string, toDate: string) => {
   const dates:string[] = [];
@@ -22,7 +22,7 @@ const getDates = (fromDate: string, toDate: string) => {
 };
 
 const PayrollDetailsModal: Component = () => {
-  const { data } = useRouteData<typeof routeData>();
+  const { data, holidays } = useRouteData<typeof routeData>();
   const [ params ] = useSearchParams<ParamType>();
   const { chosenId, setShowModal, showModal, modalData } = usePRContext();
 
@@ -34,6 +34,12 @@ const PayrollDetailsModal: Component = () => {
     )
 
   const dates = () => !data.error && data() !== undefined ? getDates(params.from || "", params.to || "") : []
+
+  // Check if the shift is in a holiday or not
+  const isHoliday = (shift: any): Holiday | undefined => {
+    return holidays()?.find((holiday) => moment(shift.date, "YYYY-MM-DD")
+      .isBetween(holiday.startDate, holiday.endDate, undefined, "[]"));
+  }
 
   return (
     <PopupModal.Wrapper
@@ -124,9 +130,11 @@ const PayrollDetailsModal: Component = () => {
                       if (!moment(shift.date).isSame(date)) return acc;
 
                       const shiftHours = moment(shift.endTime, "HH:mm:ss").diff(moment(shift.startTime, "HH:mm:ss"), "hours");
+                      const holiday = isHoliday(shift);
+                      const coefficient = holiday ? holiday.coefficient : shift.salaryCoefficient;
 
                       if (shift.timesheet && shift.timesheet.status === TimesheetStatus.APPROVED) {
-                        return acc + shift.salaryCoefficient * (shift.timesheet?.salary?.hourlyWage || 0) * shiftHours;
+                        return acc + coefficient * (shift.timesheet?.salary?.hourlyWage || 0) * shiftHours;
                       }
 
                       return acc;

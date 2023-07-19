@@ -126,6 +126,14 @@ export interface Timesheet {
   salary?: Salary;
 }
 
+export interface Holiday {
+  holidayId: number;
+  name: string;
+  startDate: string;
+  endDate: string;
+  coefficient: number;
+}
+
 export interface ShiftCoverRequest {
   shiftCoverRequestId: number;
   shiftId: number;
@@ -210,14 +218,6 @@ export interface Category {
   stock?: number;
 }
 
-export interface TimeClock {
-  staffId: number;
-  staffName: string;
-  checkIn: string;
-  checkOut: string;
-  totalTime: string;
-  role?: Role;
-}
 
 export interface DataResponse<T> extends Response {
   content: T;
@@ -225,29 +225,3 @@ export interface DataResponse<T> extends Response {
   timestamp: string;
   status: number;
 }
-
-export interface PayrollPeriod  {
-  startDate: string;
-  endDate: string;
-}
-
-export interface PayrollData {
-  staffName: string;
-  regularHours: number;
-  holidayHours: number;
-  timeOff: number;
-  totalHours: number;
-  grossPay: number;
-  allApproved: boolean;
-}
-
-export interface StaffPayrollData extends PayrollData {
-  day: string;
-}
-
-export interface PayrollState {
-  currentPayrollPeriod: PayrollPeriod;
-  payrollData: PayrollData[];
-  selectedStaffPayroll: StaffPayrollData[];
-}
-

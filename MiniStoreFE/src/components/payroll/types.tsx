@@ -4,4 +4,6 @@ export type ParamType = {
     amount_to?: string;
     from?: string;
     to?: string;
+    curPage?: string;
+    perPage?: string;
 }
