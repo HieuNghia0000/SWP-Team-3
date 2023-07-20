@@ -12,10 +12,10 @@ import { ShiftTemplateProps } from "./types";
 import { roles } from "~/utils/roles";
 import { schema } from "./formSchema";
 import handleFetchError from "~/utils/handleFetchError";
-import axios from "axios";
 import getEndPoint from "~/utils/getEndPoint";
 import { toastConfirmDeletion, toastSuccess } from "~/utils/toast";
 import toast from "solid-toast";
+import axios from "axios";
 
 interface EditProps extends ShiftTemplateProps {
   shiftTemplateFocus: Accessor<ShiftTemplate | undefined>;
@@ -42,14 +42,16 @@ const Edit: Component<EditProps> = ({
 
       setEditing(true);
 
-      const {data} = await axios.put<DataResponse<ShiftTemplate>>(
-        `${getEndPoint()}/shift-templates/update/${shiftTemplateFocus()?.shiftTemplateId}`,
+      const { data } = await axios.put<DataResponse<ShiftTemplate>>(
+        `${getEndPoint()}/shift-templates/update/${
+          shiftTemplateFocus()?.shiftTemplateId
+        }`,
         {
           ...formData(),
           startTime: readableToTimeStr(formData().startTime),
           endTime: readableToTimeStr(formData().endTime),
         }
-      )
+      );
 
       console.log(data);
 
@@ -66,32 +68,38 @@ const Edit: Component<EditProps> = ({
   };
 
   const onDelete = async () => {
-    toastConfirmDeletion(<>
-      <p class="text-sm font-medium text-red-600">
-        Are you sure you want to delete this template?
-      </p>
-      <p class="mt-1 text-sm text-gray-600 font-medium">
-        This action cannot be undone.
-      </p>
-    </>, async (t) => {
-      try {
-        if (!shiftTemplateFocus()?.shiftTemplateId) throw new Error("Invalid template id");
+    toastConfirmDeletion(
+      <>
+        <p class="text-sm font-medium text-red-600">
+          Are you sure you want to delete this template?
+        </p>
+        <p class="mt-1 text-sm text-gray-600 font-medium">
+          This action cannot be undone.
+        </p>
+      </>,
+      async (t) => {
+        try {
+          if (!shiftTemplateFocus()?.shiftTemplateId)
+            throw new Error("Invalid template id");
 
-        const { data } = await axios.delete<DataResponse<null>>(
-          `${getEndPoint()}/shift-templates/delete/${shiftTemplateFocus()?.shiftTemplateId}`
-        )
-        console.log(data);
-        if (!data) throw new Error("Invalid response from server");
+          const { data } = await axios.delete<DataResponse<null>>(
+            `${getEndPoint()}/shift-templates/delete/${
+              shiftTemplateFocus()?.shiftTemplateId
+            }`
+          );
+          console.log(data);
+          if (!data) throw new Error("Invalid response from server");
 
-        refreshShiftTemplates();
-        setState("list");
-        toastSuccess("Shift template deleted successfully");
-      } catch (e) {
-        handleFetchError(e);
-      } finally {
-        toast.dismiss(t.id);
+          refreshShiftTemplates();
+          setState("list");
+          toastSuccess("Shift template deleted successfully");
+        } catch (e) {
+          handleFetchError(e);
+        } finally {
+          toast.dismiss(t.id);
+        }
       }
-    })
+    );
   };
 
   return (
@@ -120,7 +128,9 @@ const Edit: Component<EditProps> = ({
               <Select
                 id="startTime"
                 name="startTime"
-                onChange={() => setFieldValue("endTime", 0, { validate: false })}
+                onChange={() =>
+                  setFieldValue("endTime", 0, { validate: false })
+                }
                 placeholder="Select Start Time"
                 value={shiftTemplateFocus()?.startTime}
                 options={timeOptions()}

@@ -10,34 +10,37 @@ import { Select } from "~/components/form/Select";
 import { roles2 } from "~/utils/roles";
 import { schema } from "./formSchema";
 import getEndPoint from "~/utils/getEndPoint";
-import axios from "axios";
 import handleFetchError from "~/utils/handleFetchError";
 import { DataResponse, ShiftTemplate } from "~/types";
 import { toastSuccess } from "~/utils/toast";
+import axios from "axios";
 
-const Create: Component<ShiftTemplateProps> = ({setState, refreshShiftTemplates}) => {
-  const [creating, setCreating] = createSignal(false);
+const Create: Component<ShiftTemplateProps> = ({
+                                                 setState,
+                                                 refreshShiftTemplates,
+                                               }) => {
+  const [ creating, setCreating ] = createSignal(false);
   const formHandler = useFormHandler(yupSchema(schema));
-  const {formData, setFieldValue} = formHandler;
+  const { formData, setFieldValue } = formHandler;
 
   const submit = async (event: Event) => {
     event.preventDefault();
     if (creating()) return;
 
     try {
-      const f = await formHandler.validateForm({throwException: false});
+      const f = await formHandler.validateForm({ throwException: false });
       if (f.isFormInvalid) return;
 
       setCreating(true);
 
-      const {data} = await axios.post<DataResponse<ShiftTemplate>>(
+      const { data } = await axios.post<DataResponse<ShiftTemplate>>(
         `${getEndPoint()}/shift-templates/add`,
         {
           ...formData(),
           startTime: readableToTimeStr(formData().startTime),
           endTime: readableToTimeStr(formData().endTime),
         }
-      )
+      );
       console.log(data);
 
       if (!data) throw new Error("Invalid response from server");
@@ -57,9 +60,11 @@ const Create: Component<ShiftTemplateProps> = ({setState, refreshShiftTemplates}
   };
 
   return (
-    <div classList={{
-      "cursor-progress": creating(),
-    }}>
+    <div
+      classList={{
+        "cursor-progress": creating(),
+      }}
+    >
       <PopupModal.Body>
         <form onSubmit={submit} class="text-sm max-w-[560px] mx-auto">
           <div class="flex">
@@ -84,7 +89,9 @@ const Create: Component<ShiftTemplateProps> = ({setState, refreshShiftTemplates}
                 id="startTime"
                 name="startTime"
                 value={0}
-                onChange={() => setFieldValue("endTime", 0, { validate: false })}
+                onChange={() =>
+                  setFieldValue("endTime", 0, { validate: false })
+                }
                 placeholder="Select Start Time"
                 options={timeOptions()}
                 formHandler={formHandler}

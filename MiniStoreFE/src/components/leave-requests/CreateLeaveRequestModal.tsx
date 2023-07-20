@@ -5,16 +5,16 @@ import { useAuth } from "~/context/Auth";
 import { useFormHandler } from "solid-form-handler";
 import { yupSchema } from "solid-form-handler/yup";
 import * as yup from "yup";
-import { DataResponse, LeaveRequest, LeaveRequestStatus, LeaveType } from "~/types";
+import { DataResponse, LeaveRequest, LeaveRequestStatus, LeaveType, } from "~/types";
 import { TextArea } from "~/components/form/TextArea";
 import { createRouteAction } from "solid-start";
-import axios from "axios";
 import getEndPoint from "~/utils/getEndPoint";
 import { Select } from "~/components/form/Select";
 import { capitalize } from "~/utils/capitalize";
 import handleFetchError from "~/utils/handleFetchError";
 import { toastError, toastSuccess } from "~/utils/toast";
 import moment from "moment";
+import axios from "axios";
 
 type CreateLeaveRequest = {
   staffId: number;
@@ -26,25 +26,30 @@ type CreateLeaveRequest = {
 
 const schema: yup.Schema<CreateLeaveRequest> = yup.object({
   staffId: yup.number().required("Staff ID is required"),
-  leaveType: yup.string().oneOf([ LeaveType.VACATION, LeaveType.SICK, LeaveType.OTHER ]).required("Leave type is required"),
+  leaveType: yup
+    .string()
+    .oneOf([ LeaveType.VACATION, LeaveType.SICK, LeaveType.OTHER ])
+    .required("Leave type is required"),
   startDate: yup.string().required("Start date is required"),
   endDate: yup.string().required("End date is required"),
   reason: yup.string().default(""),
 });
 
-const createLeaveRequest = async (formData: Omit<LeaveRequest, "leaveRequestId">) => {
+const createLeaveRequest = async (
+  formData: Omit<LeaveRequest, "leaveRequestId">
+) => {
   try {
     const { data } = await axios.post<DataResponse<LeaveRequest>>(
-      `${getEndPoint()}/leave-requests/add`, { ...formData }
-    )
+      `${getEndPoint()}/leave-requests/add`,
+      { ...formData }
+    );
     console.log(data);
     if (!data) throw new Error("Invalid response from server");
     return true;
-
   } catch (error: any) {
     throw new Error(handleFetchError(error));
   }
-}
+};
 
 const CreateLeaveRequestModal: Component<{
   showModal: Accessor<boolean>;
@@ -73,18 +78,24 @@ const CreateLeaveRequestModal: Component<{
       await formHandler.resetForm();
       setShowModal(false);
     }
-  }
+  };
 
   const onCloseModal = async () => {
     await formHandler.resetForm();
     setShowModal(false);
-  }
+  };
 
   return (
-    <PopupModal.Wrapper title="New Leave Request" close={onCloseModal} open={showModal}>
-      <div classList={{
-        "cursor-progress": echoing.pending,
-      }}>
+    <PopupModal.Wrapper
+      title="New Leave Request"
+      close={onCloseModal}
+      open={showModal}
+    >
+      <div
+        classList={{
+          "cursor-progress": echoing.pending,
+        }}
+      >
         <PopupModal.Body>
           <form class="text-sm" onSubmit={[ submit, LeaveRequestStatus.PENDING ]}>
             <div class="flex">
@@ -137,20 +148,19 @@ const CreateLeaveRequestModal: Component<{
                   options={[
                     {
                       label: capitalize(LeaveType.VACATION),
-                      value: LeaveType.VACATION
+                      value: LeaveType.VACATION,
                     },
                     {
                       label: capitalize(LeaveType.SICK),
-                      value: LeaveType.SICK
+                      value: LeaveType.SICK,
                     },
                     {
                       label: capitalize(LeaveType.OTHER),
-                      value: LeaveType.OTHER
-                    }
+                      value: LeaveType.OTHER,
+                    },
                   ]}
                   formHandler={formHandler}
                 />
-
               </div>
             </div>
             <div class="flex gap-2">
@@ -196,8 +206,7 @@ const CreateLeaveRequestModal: Component<{
         </PopupModal.Footer>
       </div>
     </PopupModal.Wrapper>
-
-  )
-}
+  );
+};
 
 export default CreateLeaveRequestModal;

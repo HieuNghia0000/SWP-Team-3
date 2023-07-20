@@ -2,13 +2,18 @@ package com.team3.ministore.controller;
 
 import com.team3.ministore.common.responsehandler.ResponseHandler;
 import com.team3.ministore.dto.ShiftCoverDto;
+import com.team3.ministore.jwt.JwtUtils;
+import com.team3.ministore.model.Staff;
 import com.team3.ministore.service.ShiftCoverRequestService;
+import com.team3.ministore.service.StaffService;
+import com.team3.ministore.utils.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.Optional;
 
@@ -19,10 +24,25 @@ public class ShiftCoverRequestController {
     @Autowired
     private ShiftCoverRequestService shiftCoverRequestService;
 
+    @Autowired
+    private StaffService staffService;
+
+    @Autowired
+    private JwtUtils jwt;
+
     @GetMapping()
     public ResponseEntity<Object> getAllShiftCoverRequests(@RequestParam("search") Optional<String> search,
                                                            @RequestParam("curPage") Integer curPage,
-                                                           @RequestParam("perPage") Integer perPage) {
+                                                           @RequestParam("perPage") Integer perPage,
+                                                           HttpServletRequest request) {
+        if (jwt.getJwtTokenFromRequest(request) != null) {
+            Optional<Staff> staff = staffService.getStaffByUsername(jwt.getUsernameFromToken(jwt.getJwtTokenFromRequest(request)));
+
+            if (staff.isPresent() && !staff.get().getRole().equals(Role.ADMIN)) {
+                return ResponseHandler.getResponse(shiftCoverRequestService.getShiftCoverRequestsByStaffId(staff.get().getStaffId(), curPage, perPage), HttpStatus.OK);
+            }
+        }
+
         return search.map(s -> ResponseHandler.getResponse(shiftCoverRequestService.getAllShiftCoverRequests(s, curPage, perPage), HttpStatus.OK))
                 .orElseGet(() -> ResponseHandler.getResponse(shiftCoverRequestService.getAllShiftCoverRequests(curPage, perPage), HttpStatus.OK));
     }

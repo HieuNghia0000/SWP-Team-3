@@ -122,7 +122,7 @@ public class ShiftPlanningController {
 
         // Get the shifts of others which are covered by the staff
         List<ShiftCoverDto> shiftCoverDtos = shiftCoverRequestService
-                .getShiftCoverRequestsByStaffId(foundStaff.get().getStaffId(), fromDate, toDate)
+                .getShiftCoverRequestsByStaffIdAndDates(foundStaff.get().getStaffId(), fromDate, toDate)
                 .stream().filter(s -> s.getStatus() == ShiftCoverStatus.APPROVED).collect(Collectors.toList());
 
         // Add the shifts which are covered by the staff to the shiftDtos

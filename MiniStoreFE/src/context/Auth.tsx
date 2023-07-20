@@ -96,7 +96,10 @@ const fetchData: ResourceFetcher<
         apiRoutes.currentUser
       );
 
-      if (data.content === undefined || data.content.status === StaffStatus.DISABLED) {
+      if (
+        data.content === undefined ||
+        data.content.status === StaffStatus.DISABLED
+      ) {
         clearItem("token");
         setApiAuthorization("");
         return undefined;

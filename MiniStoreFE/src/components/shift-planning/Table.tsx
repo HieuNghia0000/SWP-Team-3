@@ -11,7 +11,7 @@ import {
 } from "@thisbeyond/solid-dnd";
 import moment from "moment";
 import { batch, Component, For, Show } from "solid-js";
-import { DataResponse, Role, Shift, ShiftCoverRequestStatus, TimesheetStatus } from "~/types";
+import { DataResponse, Role, Shift, ShiftCoverRequestStatus, TimesheetStatus, } from "~/types";
 import TableCell from "./TableCell";
 import { useSPData, useSPModals } from "~/context/ShiftPlanning";
 import { shiftTimes } from "./utils/shiftTimes";
@@ -22,11 +22,11 @@ import { sortBy } from "lodash";
 import { getShiftMoveErrors } from "./utils/shiftRules";
 import getShiftsByCellId from "./utils/getShiftsByCellId";
 import { toastError, toastSuccess } from "~/utils/toast";
-import axios from "axios";
 import getEndPoint from "~/utils/getEndPoint";
 import handleFetchError from "~/utils/handleFetchError";
 import { useAuth } from "~/context/Auth";
 import UninteractTableCell from "~/components/shift-planning/NormalStaff/UninteractTableCell";
+import axios from "axios";
 
 // a cell is a droppable box
 // a shift is a draggable item
@@ -118,13 +118,13 @@ const Table: Component<DnDTableProps> = (props) => {
         return;
       }
 
-      console.log(tableData.shifts[draggable.id as number])
+      console.log(tableData.shifts[draggable.id as number]);
       const newCellInfo = tableData.cellInfos[droppableCellId];
 
       const updatedShift = await updateShift({
         ...tableData.shifts[draggable.id as number],
         staffId: newCellInfo.staffId,
-        date: newCellInfo.date
+        date: newCellInfo.date,
       });
       if (!updatedShift) return;
 
@@ -148,16 +148,19 @@ const Table: Component<DnDTableProps> = (props) => {
 
   const updateShift = async (shift: Shift) => {
     try {
-      const { data } = await axios.put<DataResponse<Shift>>(`${getEndPoint()}/shifts/update/${shift.shiftId}`, shift)
+      const { data } = await axios.put<DataResponse<Shift>>(
+        `${getEndPoint()}/shifts/update/${shift.shiftId}`,
+        shift
+      );
       if (!data) throw new Error("Invalid response from server");
-      console.log(data.content)
+      console.log(data.content);
 
       return data.content;
     } catch (error: any) {
       handleFetchError(error);
       return null;
     }
-  }
+  };
 
   const onDragEnd: DragEventHandler = async ({ draggable, droppable }) => {
     if (draggable && droppable) {
@@ -191,7 +194,9 @@ const Table: Component<DnDTableProps> = (props) => {
 
         {/* Body - Drag container */}
         <div class="relative shadow-sm border border-gray-200 border-t-0">
-          <Show when={tableData.staffs.length !== 0 && user()?.role === Role.ADMIN}>
+          <Show
+            when={tableData.staffs.length !== 0 && user()?.role === Role.ADMIN}
+          >
             <DragDropProvider
               onDragEnd={onDragEnd}
               collisionDetector={closestContainerOrItem}
@@ -239,12 +244,20 @@ const Table: Component<DnDTableProps> = (props) => {
                   let item = () => tableData.shifts[draggable?.id as number];
                   let selectedShiftWidth = () => draggable?.data?.width() - 4;
                   let isErrored = () =>
-                    tableData.shiftsRules[draggable?.id as number].find((rule) => !rule.passed) !== undefined;
-                  let attendance = () => tableData.shifts[draggable?.id as number]?.timesheet?.status === TimesheetStatus.APPROVED
-                    ? "Attended"
-                    : moment(`${tableData.shifts[draggable?.id as number].date} ${tableData.shifts[draggable?.id as number]?.endTime}`).isBefore(moment())
-                      ? "Absent"
-                      : "Not yet"
+                    tableData.shiftsRules[draggable?.id as number].find(
+                      (rule) => !rule.passed
+                    ) !== undefined;
+                  let attendance = () =>
+                    tableData.shifts[draggable?.id as number]?.timesheet
+                      ?.status === TimesheetStatus.APPROVED
+                      ? "Attended"
+                      : moment(
+                        `${tableData.shifts[draggable?.id as number].date} ${
+                          tableData.shifts[draggable?.id as number]?.endTime
+                        }`
+                      ).isBefore(moment())
+                        ? "Absent"
+                        : "Not yet";
 
                   return (
                     <ShiftCard
@@ -259,7 +272,11 @@ const Table: Component<DnDTableProps> = (props) => {
                       style={{ width: `${selectedShiftWidth()}px` }}
                       isOverlay={true}
                       isErrored={isErrored()}
-                      coveredShift={!!item().shiftCoverRequest && item().shiftCoverRequest?.status === ShiftCoverRequestStatus.APPROVED}
+                      coveredShift={
+                        !!item().shiftCoverRequest &&
+                        item().shiftCoverRequest?.status ===
+                        ShiftCoverRequestStatus.APPROVED
+                      }
                       attendance={attendance}
                     />
                   );
@@ -267,7 +284,9 @@ const Table: Component<DnDTableProps> = (props) => {
               </DragOverlay>
             </DragDropProvider>
           </Show>
-          <Show when={tableData.staffs.length !== 0 && user()?.role !== Role.ADMIN}>
+          <Show
+            when={tableData.staffs.length !== 0 && user()?.role !== Role.ADMIN}
+          >
             <For each={tableData.staffs}>
               {(staff) => (
                 <div class="flex">

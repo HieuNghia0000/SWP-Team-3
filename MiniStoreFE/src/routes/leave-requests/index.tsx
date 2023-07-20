@@ -1,10 +1,9 @@
-import { createRouteAction, createRouteData, useRouteData } from "solid-start";
+import { createRouteAction, createRouteData, parseCookie, useRouteData, useServerContext, } from "solid-start";
 import { DataResponse, LeaveRequest } from "~/types";
 import { createSignal, Show } from "solid-js";
 import Breadcrumbs from "~/components/Breadcrumbs";
 import Pagination from "~/components/Pagination";
 import ToolBar from "~/components/leave-requests/Toolbar";
-import axios from "axios";
 import getEndPoint from "~/utils/getEndPoint";
 import handleFetchError from "~/utils/handleFetchError";
 import { useSearchParams } from "@solidjs/router";
@@ -14,24 +13,42 @@ import CreateLeaveRequestModal from "~/components/leave-requests/CreateLeaveRequ
 import EditLeaveRequestModal from "~/components/leave-requests/EditLeaveRequestModal";
 import { ModalContext } from "~/context/LeaveRequest";
 import { toastSuccess } from "~/utils/toast";
+import { isServer } from "solid-js/web";
+import axios from "axios";
 
 const deleteLeaveRequest = async (id: number) => {
   try {
-    const { data } = await axios.delete<DataResponse<LeaveRequest>>(`${getEndPoint()}/leave-requests/delete/${id}`)
+    const { data } = await axios.delete<DataResponse<LeaveRequest>>(
+      `${getEndPoint()}/leave-requests/delete/${id}`
+    );
     if (!data) throw new Error("Invalid response from server");
     return true;
   } catch (error: any) {
     throw new Error(handleFetchError(error));
   }
-}
+};
 
 export function routeData() {
   const [ params ] = useSearchParams<ParamType>();
   const leaveRequests = createRouteData(
     async ([ key, perPage, curPage, search ]) => {
       try {
+        const uri = new URLSearchParams({ perPage, curPage, search });
+        const event = useServerContext();
+        const cookie = () =>
+          parseCookie(
+            isServer
+              ? event.request.headers.get("cookie") ?? ""
+              : document.cookie
+          );
+        // console.log("ia", cookie());
         const { data } = await axios.get<DataResponse<LeaveRequest[]>>(
-          `${getEndPoint()}/${key}?perPage=${perPage}&curPage=${curPage}&search=${search}`
+          `${getEndPoint()}/${key}?${uri.toString()}`,
+          {
+            headers: {
+              Authorization: "Bearer " + cookie().token,
+            },
+          }
         );
         return data.content;
       } catch (e) {
@@ -39,8 +56,13 @@ export function routeData() {
       }
     },
     {
-      key: () => [ "leave-requests/list", params.perPage ?? 10, params.curPage ?? 1, params.search ?? "" ],
-      reconcileOptions: { key: "leaveRequestId" }
+      key: () => [
+        "leave-requests/list",
+        params.perPage ?? "10",
+        params.curPage ?? "1",
+        params.search ?? "",
+      ],
+      reconcileOptions: { key: "leaveRequestId" },
     }
   );
   return { data: leaveRequests };
@@ -53,7 +75,7 @@ export default function LeaveRequests() {
   const [ chosenLeaveRequestId, setChosenLeaveRequestId ] = createSignal(0);
   const [ deleting, deleteAction ] = createRouteAction(deleteLeaveRequest);
 
-  const totalItems = () => data.error ? 0 : data()?.length ?? 0;
+  const totalItems = () => (data.error ? 0 : data()?.length ?? 0);
 
   const onDelete = async (id: number) => {
     if (deleting.pending) return;
@@ -64,17 +86,19 @@ export default function LeaveRequests() {
 
     if (showEditModal()) setShowEditModal(false);
     toastSuccess("Leave request deleted successfully");
-  }
+  };
 
   return (
     <main>
-      <ModalContext.Provider value={{
-        chosenLeaveRequestId,
-        setChosenLeaveRequestId,
-        showEditModal,
-        setShowEditModal,
-        onDelete
-      }}>
+      <ModalContext.Provider
+        value={{
+          chosenLeaveRequestId,
+          setChosenLeaveRequestId,
+          showEditModal,
+          setShowEditModal,
+          onDelete,
+        }}
+      >
         <h1 class="mb-2 text-2xl font-medium">Leave Requests</h1>
         <Breadcrumbs linkList={[ { name: "Leave Requests" } ]}/>
 
@@ -82,18 +106,22 @@ export default function LeaveRequests() {
         <ToolBar setShowCreateModal={setShowCreateModal}/>
 
         <Show when={data.loading}>
-          <div class="mb-2">
-            Loading...
-          </div>
+          <div class="mb-2">Loading...</div>
         </Show>
 
         <Table/>
 
         <Pagination totalItems={totalItems}/>
 
-        <CreateLeaveRequestModal showModal={showCreateModal} setShowModal={setShowCreateModal}/>
+        <CreateLeaveRequestModal
+          showModal={showCreateModal}
+          setShowModal={setShowCreateModal}
+        />
 
-        <EditLeaveRequestModal showModal={showEditModal} setShowModal={setShowEditModal}/>
+        <EditLeaveRequestModal
+          showModal={showEditModal}
+          setShowModal={setShowEditModal}
+        />
       </ModalContext.Provider>
     </main>
   );

@@ -2,13 +2,18 @@ package com.team3.ministore.controller;
 
 import com.team3.ministore.common.responsehandler.ResponseHandler;
 import com.team3.ministore.dto.LeaveRequestDto;
+import com.team3.ministore.jwt.JwtUtils;
+import com.team3.ministore.model.Staff;
 import com.team3.ministore.service.LeaveRequestService;
+import com.team3.ministore.service.StaffService;
+import com.team3.ministore.utils.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.Optional;
 
@@ -18,6 +23,12 @@ public class LeaveRequestController {
 
     @Autowired
     private LeaveRequestService leaveRequestService;
+
+    @Autowired
+    private StaffService staffService;
+
+    @Autowired
+    private JwtUtils jwt;
 
     @PostMapping("/add")
     public ResponseEntity<Object> createLeaveRequest(@Valid @RequestBody LeaveRequestDto leaveRequest, BindingResult errors) {
@@ -33,7 +44,16 @@ public class LeaveRequestController {
     @GetMapping("/list")
     public ResponseEntity<Object> getAllLeaveRequest(@RequestParam("search") Optional<String> search,
                                                      @RequestParam("curPage") Integer curPage,
-                                                     @RequestParam("perPage") Integer perPage) {
+                                                     @RequestParam("perPage") Integer perPage,
+                                                     HttpServletRequest request) {
+        if (jwt.getJwtTokenFromRequest(request) != null) {
+            Optional<Staff> staff = staffService.getStaffByUsername(jwt.getUsernameFromToken(jwt.getJwtTokenFromRequest(request)));
+
+            if (staff.isPresent() && !staff.get().getRole().equals(Role.ADMIN)) {
+                return ResponseHandler.getResponse(leaveRequestService.getLeaveRequestsByStaffId(staff.get().getStaffId(), curPage, perPage), HttpStatus.OK);
+            }
+        }
+
         return search.map(s -> ResponseHandler.getResponse(leaveRequestService.getAllLeaveRequest(s, curPage, perPage), HttpStatus.OK))
                 .orElseGet(() -> ResponseHandler.getResponse(leaveRequestService.getAllLeaveRequest(curPage, perPage), HttpStatus.OK));
     }

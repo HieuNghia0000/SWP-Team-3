@@ -7,12 +7,12 @@ import { yupSchema } from "solid-form-handler/yup";
 import * as yup from "yup";
 import { DataResponse, Holiday } from "~/types";
 import { createRouteAction } from "solid-start";
-import axios from "axios";
 import getEndPoint from "~/utils/getEndPoint";
 import handleFetchError from "~/utils/handleFetchError";
 import { toastError, toastSuccess } from "~/utils/toast";
 import moment from "moment";
 import { useHContext } from "~/context/Holiday";
+import axios from "axios";
 
 type CreateHoliday = {
   name: string;
@@ -31,16 +31,16 @@ const schema: yup.Schema<CreateHoliday> = yup.object({
 const createHoliday = async (formData: Omit<Holiday, "holidayId">) => {
   try {
     const { data } = await axios.post<DataResponse<Holiday>>(
-      `${getEndPoint()}/holidays/add`, { ...formData }
-    )
+      `${getEndPoint()}/holidays/add`,
+      { ...formData }
+    );
     console.log(data);
     if (!data) throw new Error("Invalid response from server");
     return true;
-
   } catch (error: any) {
     throw new Error(handleFetchError(error));
   }
-}
+};
 
 const CreateHolidayModal: Component = () => {
   const [ echoing, echo ] = createRouteAction(createHoliday);
@@ -67,15 +67,19 @@ const CreateHolidayModal: Component = () => {
       await formHandler.resetForm();
       setShowCreateModal(false);
     }
-  }
+  };
 
   const onCloseModal = async () => {
     await formHandler.resetForm();
     setShowCreateModal(false);
-  }
+  };
 
   return (
-    <PopupModal.Wrapper title="New Holiday" close={onCloseModal} open={showCreateModal}>
+    <PopupModal.Wrapper
+      title="New Holiday"
+      close={onCloseModal}
+      open={showCreateModal}
+    >
       <div classList={{ "cursor-progress": echoing.pending }}>
         <PopupModal.Body>
           <form class="text-sm" onSubmit={submit}>
@@ -139,8 +143,7 @@ const CreateHolidayModal: Component = () => {
         </PopupModal.Footer>
       </div>
     </PopupModal.Wrapper>
-
-  )
-}
+  );
+};
 
 export default CreateHolidayModal;

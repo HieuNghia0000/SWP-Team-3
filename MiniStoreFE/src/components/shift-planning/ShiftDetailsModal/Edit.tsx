@@ -7,7 +7,7 @@ import { TextInput } from "~/components/form/TextInput";
 import { ShiftCard, useSPData } from "~/context/ShiftPlanning";
 import { DataResponse, Role, Shift } from "~/types";
 import { Tabs } from ".";
-import { readableToTimeStr, } from "../utils/shiftTimes";
+import { readableToTimeStr } from "../utils/shiftTimes";
 import { timeOptions, transformTimeString } from "../utils/timeOptions";
 import * as yup from "yup";
 import { Select } from "~/components/form/Select";
@@ -15,13 +15,13 @@ import { roles } from "~/utils/roles";
 import isDayInThePast from "../../../utils/isDayInThePast";
 import moment from "moment";
 import { getShiftRules } from "~/components/shift-planning/utils/shiftRules";
-import axios from "axios";
 import handleFetchError from "~/utils/handleFetchError";
 import getEndPoint from "~/utils/getEndPoint";
 import { cellIdGenerator } from "~/components/shift-planning/utils/cellIdGenerator";
 import { sortBy } from "lodash";
 import { toastSuccess } from "~/utils/toast";
 import { TbSpeakerphone } from "solid-icons/tb";
+import axios from "axios";
 
 type EditScheduleForm = {
   shiftId: number;
@@ -36,12 +36,8 @@ type EditScheduleForm = {
 
 const validTimeOptions = timeOptions().map((item) => item.value);
 const schema: yup.Schema<EditScheduleForm> = yup.object({
-  shiftId: yup
-    .number()
-    .required("Invalid shift id"),
-  name: yup
-    .string()
-    .required("Please give this shift a name"),
+  shiftId: yup.number().required("Invalid shift id"),
+  name: yup.string().required("Please give this shift a name"),
   staffId: yup
     .number()
     .min(1, "Please select a staff")
@@ -78,7 +74,13 @@ interface EditProps {
   openCreateCoverModal: () => void;
 }
 
-const Edit: Component<EditProps> = ({ setModalState, modalData, onDelete, openCreateCoverModal, setShowModal }) => {
+const Edit: Component<EditProps> = ({
+                                      setModalState,
+                                      modalData,
+                                      onDelete,
+                                      openCreateCoverModal,
+                                      setShowModal,
+                                    }) => {
   const { tableData, setTableData } = useSPData();
   const formHandler = useFormHandler(yupSchema(schema));
   const { formData, setFieldValue } = formHandler;
@@ -96,15 +98,18 @@ const Edit: Component<EditProps> = ({ setModalState, modalData, onDelete, openCr
 
     try {
       const f = await formHandler.validateForm({ throwException: false });
-      console.log("submit", formData())
+      console.log("submit", formData());
       if (f.isFormInvalid) return;
 
       setUpdating(true);
       const dateStr = moment(formData().date).format("YYYY-MM-DD");
-      const staff = tableData.staffs.find((staff) => staff.staffId === formData().staffId);
+      const staff = tableData.staffs.find(
+        (staff) => staff.staffId === formData().staffId
+      );
 
       // If the date is in the past, throw an error
-      if (isDayInThePast(dateStr)) throw new Error("Can not edit shift in the past");
+      if (isDayInThePast(dateStr))
+        throw new Error("Can not edit shift in the past");
 
       // If the staff is not found, throw an error
       if (!staff) throw new Error("Invalid staff");
@@ -115,7 +120,8 @@ const Edit: Component<EditProps> = ({ setModalState, modalData, onDelete, openCr
         { staff, date: dateStr },
         tableData
       ).filter((rule) => !rule.passed);
-      if (notPassedRules.length > 0) throw new Error(notPassedRules[0].errorName);
+      if (notPassedRules.length > 0)
+        throw new Error(notPassedRules[0].errorName);
 
       // Update the shift
       const { data } = await axios.put<DataResponse<Shift>>(
@@ -126,7 +132,7 @@ const Edit: Component<EditProps> = ({ setModalState, modalData, onDelete, openCr
           endTime: readableToTimeStr(formData().endTime),
           published: publish,
         }
-      )
+      );
       console.log(data);
       if (!data) throw new Error("Invalid response from server");
 
@@ -135,7 +141,9 @@ const Edit: Component<EditProps> = ({ setModalState, modalData, onDelete, openCr
       batch(() => {
         setTableData("shifts", data.content.shiftId, data.content);
         setTableData("cells", cellIdGenerator(staff, dateStr), (shiftIds) => {
-          const sortedShifts = sortBy(shiftIds, [ (shiftId) => tableData.shifts[shiftId].startTime ]);
+          const sortedShifts = sortBy(shiftIds, [
+            (shiftId) => tableData.shifts[shiftId].startTime,
+          ]);
           return [ ...sortedShifts ];
         });
         setModalState("details");
@@ -143,7 +151,6 @@ const Edit: Component<EditProps> = ({ setModalState, modalData, onDelete, openCr
       });
 
       toastSuccess("Shift updated successfully");
-
     } catch (error: any) {
       handleFetchError(error);
     } finally {
@@ -156,9 +163,11 @@ const Edit: Component<EditProps> = ({ setModalState, modalData, onDelete, openCr
   };
 
   return (
-    <div classList={{
-      "cursor-progress": updating(),
-    }}>
+    <div
+      classList={{
+        "cursor-progress": updating(),
+      }}
+    >
       <PopupModal.Body>
         <form class="text-sm" onSubmit={[ submit, false ]}>
           <Show when={isOldShift}>
@@ -199,7 +208,10 @@ const Edit: Component<EditProps> = ({ setModalState, modalData, onDelete, openCr
               />
             </div>
             <div class="flex-1 py-2.5 max-w-[140px] flex flex-col gap-1">
-              <label for="salaryCoefficient" class="text-gray-700 font-semibold">
+              <label
+                for="salaryCoefficient"
+                class="text-gray-700 font-semibold"
+              >
                 Salary Coefficient
               </label>
               <TextInput
@@ -262,7 +274,9 @@ const Edit: Component<EditProps> = ({ setModalState, modalData, onDelete, openCr
                 id="startTime"
                 name="startTime"
                 value={modalData()?.startTime! || 0}
-                onChange={() => setFieldValue("endTime", 0, { validate: false })}
+                onChange={() =>
+                  setFieldValue("endTime", 0, { validate: false })
+                }
                 placeholder="Select Start Time"
                 options={timeOptions()}
                 formHandler={formHandler}

@@ -6,4 +6,5 @@ export type ParamType = {
   curPage?: string;
   from?: string;
   to?: string;
+  staffId?: string;
 };

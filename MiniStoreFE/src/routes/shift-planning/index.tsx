@@ -1,10 +1,10 @@
 import Breadcrumbs from "~/components/Breadcrumbs";
 import { createStore } from "solid-js/store";
-import { createEffect, createResource, createSignal, on, ResourceFetcher, Show } from "solid-js";
+import { createEffect, createResource, createSignal, on, ResourceFetcher, Show, } from "solid-js";
 import { DataResponse, Holiday, Role, ShiftTemplate, Staff } from "~/types";
 import { getWeekDateStings } from "~/utils/getWeekDates";
 import getEndPoint from "~/utils/getEndPoint";
-import { ModalContext, PageDataContext, ShiftCard } from "~/context/ShiftPlanning";
+import { ModalContext, PageDataContext, ShiftCard, } from "~/context/ShiftPlanning";
 import Spinner from "~/components/Spinner";
 import NewShiftModal from "~/components/shift-planning/NewShiftModal";
 import ShiftDetailsModal from "~/components/shift-planning/ShiftDetailsModal";
@@ -13,27 +13,32 @@ import StaffDetailsModal from "~/components/shift-planning/StaffDetailsModal";
 import Table from "~/components/shift-planning/Table";
 import ToolBar from "~/components/shift-planning/ToolBar";
 import { transformData } from "~/components/shift-planning/utils/dataTransformer";
-import { DataTable, FetcherData } from "~/components/shift-planning/utils/types";
+import { DataTable, FetcherData, } from "~/components/shift-planning/utils/types";
 import ScheduleTemplateModal from "~/components/shift-planning/ScheduleTemplateModal";
-import axios from "axios";
 import handleFetchError from "~/utils/handleFetchError";
 import CreateCoverRequestModal from "~/components/cover-requests/CreateCoverRequestModal";
 import { useAuth } from "~/context/Auth";
+import axios from "axios";
 
-const fetcher: ResourceFetcher<{
+const fetcher: ResourceFetcher<
+  | {
   datePicked: string | undefined;
   staffId: number | undefined;
   role: string | undefined;
-} | undefined, FetcherData> = async (
-  source
-) => {
+}
+  | undefined,
+  FetcherData
+> = async (source) => {
   try {
     const dates = getWeekDateStings(source?.datePicked as string);
     const from = dates[0];
     const to = dates[dates.length - 1];
-    const endpoint = source?.role === Role.ADMIN
-      ? `${getEndPoint()}/shift-planning?from=${from}&to=${to}`
-      : `${getEndPoint()}/shift-planning?from=${from}&to=${to}&staffId=${source?.staffId}`;
+    const endpoint =
+      source?.role === Role.ADMIN
+        ? `${getEndPoint()}/shift-planning?from=${from}&to=${to}`
+        : `${getEndPoint()}/shift-planning?from=${from}&to=${to}&staffId=${
+          source?.staffId
+        }`;
 
     const response = await axios.get<DataResponse<Staff[]>>(endpoint);
 
@@ -57,11 +62,16 @@ export default function ShiftPlanning() {
 
   // Be careful with this. You should always check for error before reading the data
   const [ data, { refetch, mutate } ] = createResource(
-    () => datePicked() ? {
-      datePicked: datePicked(),
-      staffId: user()?.staffId,
-      role: user()?.role
-    } : undefined, fetcher, {
+    () =>
+      datePicked()
+        ? {
+          datePicked: datePicked(),
+          staffId: user()?.staffId,
+          role: user()?.role,
+        }
+        : undefined,
+    fetcher,
+    {
       initialValue: {
         dates: [],
         staffs: [],
@@ -104,7 +114,8 @@ export default function ShiftPlanning() {
   const [ scheduleTemplateModalState, setScheduleTemplateModalState ] =
     createSignal<"list" | "copy" | "create" | "apply">();
 
-  const [ showCreateCoverModal, setShowCreateCoverModal ] = createSignal<boolean>(false);
+  const [ showCreateCoverModal, setShowCreateCoverModal ] =
+    createSignal<boolean>(false);
 
   createEffect(
     on(
@@ -162,7 +173,7 @@ export default function ShiftPlanning() {
         setTableData,
         isRouteDataLoading,
         resetTableData,
-        saveChanges
+        saveChanges,
       }}
     >
       <ModalContext.Provider
@@ -192,7 +203,7 @@ export default function ShiftPlanning() {
           setScheduleTemplateModalState,
           // shift cover request
           showCreateCoverModal,
-          setShowCreateCoverModal
+          setShowCreateCoverModal,
         }}
       >
         <main>

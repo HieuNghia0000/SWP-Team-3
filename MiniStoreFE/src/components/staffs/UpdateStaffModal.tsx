@@ -6,7 +6,6 @@ import { yupSchema } from "solid-form-handler/yup";
 import * as yup from "yup";
 import { DataResponse, Role, Salary, Staff, StaffStatus } from "~/types";
 import { createRouteAction } from "solid-start";
-import axios from "axios";
 import getEndPoint from "~/utils/getEndPoint";
 import handleFetchError from "~/utils/handleFetchError";
 import { toastSuccess } from "~/utils/toast";
@@ -15,18 +14,26 @@ import { Select } from "~/components/form/Select";
 import moment from "moment";
 import { useRouteData } from "@solidjs/router";
 import { routeData } from "~/routes/staffs";
+import axios from "axios";
 
-interface UpdateStaff extends Omit<Staff, "salary" | "leaveRequests" | "shifts" | "image">,
-  Omit<Salary, "staffId" | "salaryId" | "terminationDate"> {
+interface UpdateStaff
+  extends Omit<Staff, "salary" | "leaveRequests" | "shifts" | "image">,
+    Omit<Salary, "staffId" | "salaryId" | "terminationDate"> {
 }
 
 const schema: yup.Schema<UpdateStaff> = yup.object({
   staffId: yup.number().required("Staff ID is required"),
   staffName: yup.string().required("Staff name is required"),
-  role: yup.string().oneOf([ Role.ADMIN, Role.MANAGER, Role.CASHIER, Role.GUARD ]).required("Role is required"),
+  role: yup
+    .string()
+    .oneOf([ Role.ADMIN, Role.MANAGER, Role.CASHIER, Role.GUARD ])
+    .required("Role is required"),
   username: yup.string().required("Username is required"),
   phoneNumber: yup.string().default(""),
-  status: yup.string().oneOf([ StaffStatus.ACTIVATED, StaffStatus.DISABLED ]).required("Status is required"),
+  status: yup
+    .string()
+    .oneOf([ StaffStatus.ACTIVATED, StaffStatus.DISABLED ])
+    .required("Status is required"),
   email: yup.string().required("Email is required"),
   workDays: yup.string().default(""),
   leaveBalance: yup.number().required("Leave balance is required"),
@@ -37,16 +44,16 @@ const schema: yup.Schema<UpdateStaff> = yup.object({
 const updateStaff = async (formData: UpdateStaff) => {
   try {
     const { data } = await axios.put<DataResponse<Staff>>(
-      `${getEndPoint()}/staffs/${formData.staffId}/edit`, { ...formData }
-    )
+      `${getEndPoint()}/staffs/${formData.staffId}/edit`,
+      { ...formData }
+    );
     console.log(data);
     if (!data) throw new Error("Invalid response from server");
     return true;
-
   } catch (error: any) {
     throw new Error(handleFetchError(error));
   }
-}
+};
 
 const UpdateStaffModal: Component = () => {
   const { data } = useRouteData<typeof routeData>();
@@ -55,12 +62,11 @@ const UpdateStaffModal: Component = () => {
   const formHandler = useFormHandler(yupSchema(schema), { validateOn: [] });
   const { formData } = formHandler;
 
-  const staff =
-    createMemo(
-      () => !data.error && data() !== undefined
-        ? data()?.find((t) => t.staffId === chosenId())
-        : undefined
-    )
+  const staff = createMemo(() =>
+    !data.error && data() !== undefined
+      ? data()?.find((t) => t.staffId === chosenId())
+      : undefined
+  );
 
   const submit = async (e: Event) => {
     e.preventDefault();
@@ -78,15 +84,20 @@ const UpdateStaffModal: Component = () => {
       await formHandler.resetForm();
       setShowEditModal(false);
     }
-  }
+  };
 
   const onCloseModal = async () => {
     await formHandler.resetForm();
     setShowEditModal(false);
-  }
+  };
 
   return (
-    <PopupModal.Wrapper title="New Staff" close={onCloseModal} open={showEditModal} width="750px">
+    <PopupModal.Wrapper
+      title="New Staff"
+      close={onCloseModal}
+      open={showEditModal}
+      width="750px"
+    >
       <Show when={staff() !== undefined}>
         <div classList={{ "cursor-progress": echoing.pending }}>
           <PopupModal.Body>
@@ -220,8 +231,7 @@ const UpdateStaffModal: Component = () => {
         </div>
       </Show>
     </PopupModal.Wrapper>
-
-  )
-}
+  );
+};
 
 export default UpdateStaffModal;

@@ -1,6 +1,7 @@
 package com.team3.ministore.service;
 
 import com.team3.ministore.dto.ShiftCoverDto;
+import org.springframework.validation.BindingResult;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,5 +18,7 @@ public interface ShiftCoverRequestService {
 
     void deleteShiftCoverRequest(Integer id);
 
-    List<ShiftCoverDto> getShiftCoverRequestsByStaffId(Integer id, LocalDate from, LocalDate to);
+    List<ShiftCoverDto> getShiftCoverRequestsByStaffIdAndDates(Integer id, LocalDate from, LocalDate to);
+
+    List<ShiftCoverDto> getShiftCoverRequestsByStaffId(Integer staffId, Integer page, Integer pageSize);
 }

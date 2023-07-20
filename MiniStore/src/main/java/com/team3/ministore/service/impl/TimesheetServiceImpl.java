@@ -187,7 +187,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
             // Get the shifts of others which are covered by the staff
             List<ShiftCoverDto> shiftCoverDtos = shiftCoverRequestService
-                    .getShiftCoverRequestsByStaffId(staff.getStaffId(), fromDate, toDate)
+                    .getShiftCoverRequestsByStaffIdAndDates(staff.getStaffId(), fromDate, toDate)
                     .stream().filter(s -> s.getStatus() == ShiftCoverStatus.APPROVED).collect(Collectors.toList());
 
             // Add the shifts which are covered by the staff to the shiftDtos

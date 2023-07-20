@@ -49,6 +49,15 @@ public class ShiftCoverRequestServiceImpl implements ShiftCoverRequestService {
     }
 
     @Override
+    public List<ShiftCoverDto> getShiftCoverRequestsByStaffId(Integer staffId, Integer page, Integer pageSize) {
+        Pageable pageable = PageRequest.of(page - 1, pageSize);
+        return shiftCoverRequestRepository
+                .findAllByStaff_StaffIdOrderByShiftCoverRequestIdDesc(staffId, pageable)
+                .stream().map(sc -> new ShiftCoverDto(sc, true, true))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public Optional<ShiftCoverDto> createShiftCoverRequest(ShiftCoverDto dto) {
 
         Optional<Staff> staff = staffRepository.findById(dto.getStaffId());
@@ -102,10 +111,11 @@ public class ShiftCoverRequestServiceImpl implements ShiftCoverRequestService {
         shiftCoverRequestRepository.deleteById(id);
     }
 
-    public List<ShiftCoverDto> getShiftCoverRequestsByStaffId(Integer staffId, LocalDate from, LocalDate to) {
+    public List<ShiftCoverDto> getShiftCoverRequestsByStaffIdAndDates(Integer staffId, LocalDate from, LocalDate to) {
         return shiftCoverRequestRepository
                 .findAllByStaff_StaffIdAndShift_DateBetween(staffId, from, to)
                 .stream().map(sc -> new ShiftCoverDto(sc, true, true))
                 .collect(Collectors.toList());
     }
+
 }

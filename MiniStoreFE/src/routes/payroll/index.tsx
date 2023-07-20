@@ -1,7 +1,6 @@
 import { useSearchParams } from "@solidjs/router";
 import { ParamType } from "~/components/payroll/types";
 import { DataResponse, Holiday, Staff } from "~/types";
-import axios from "axios";
 import getEndPoint from "~/utils/getEndPoint";
 import handleFetchError from "~/utils/handleFetchError";
 import { createRouteData, useRouteData } from "solid-start";
@@ -11,6 +10,7 @@ import Breadcrumbs from "~/components/Breadcrumbs";
 import ToolBar from "~/components/payroll/Toolbar";
 import Table from "~/components/payroll/Table";
 import PayrollDetailsModal from "~/components/payroll/PayrollDetailsModal";
+import axios from "axios";
 
 export function routeData() {
   const [ params ] = useSearchParams<ParamType>();
@@ -22,7 +22,7 @@ export function routeData() {
         const { data } = await axios.get<DataResponse<Staff[]>>(
           `${getEndPoint()}/${key}?${uri.toString()}`
         );
-        console.log(data.content)
+        console.log(data.content);
         return data.content;
       } catch (e) {
         throw new Error(handleFetchError(e));
@@ -35,7 +35,7 @@ export function routeData() {
         params.from ?? "",
         params.to ?? "",
       ],
-      reconcileOptions: { key: "staffId" }
+      reconcileOptions: { key: "staffId" },
     }
   );
 
@@ -47,19 +47,15 @@ export function routeData() {
         const { data } = await axios.get<DataResponse<Holiday[]>>(
           `${getEndPoint()}/${key}?${uri.toString()}`
         );
-        console.log(data.content)
+        console.log(data.content);
         return data.content;
       } catch (e) {
         throw new Error(handleFetchError(e));
       }
     },
     {
-      key: () => [
-        "holidays/all",
-        params.from ?? "",
-        params.to ?? "",
-      ],
-      reconcileOptions: { key: "holidayId" }
+      key: () => [ "holidays/all", params.from ?? "", params.to ?? "" ],
+      reconcileOptions: { key: "holidayId" },
     }
   );
   return { data: timesheets, holidays };
@@ -73,14 +69,16 @@ export default function Payroll() {
 
   return (
     <main>
-      <ModalContext.Provider value={{
-        chosenId,
-        setChosenId,
-        showModal,
-        setShowModal,
-        modalData,
-        setModalData
-      }}>
+      <ModalContext.Provider
+        value={{
+          chosenId,
+          setChosenId,
+          showModal,
+          setShowModal,
+          modalData,
+          setModalData,
+        }}
+      >
         <h1 class="mb-2 text-2xl font-medium">Payroll</h1>
         <Breadcrumbs linkList={[ { name: "Payroll" } ]}/>
 
@@ -88,13 +86,18 @@ export default function Payroll() {
         <ToolBar/>
 
         <Show when={data.loading || holidays.loading}>
-          <div class="mb-2">
-            Loading...
-          </div>
+          <div class="mb-2">Loading...</div>
         </Show>
 
-        <Show when={!data.error && data() !== undefined && !holidays.error && holidays() !== undefined}
-              fallback={<div>Something went wrong</div>}>
+        <Show
+          when={
+            !data.error &&
+            data() !== undefined &&
+            !holidays.error &&
+            holidays() !== undefined
+          }
+          fallback={<div>Something went wrong</div>}
+        >
           <Table/>
         </Show>
 

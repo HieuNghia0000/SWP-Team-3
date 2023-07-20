@@ -27,20 +27,26 @@ export default createHandler(
           if (content && content.status === StaffStatus.ACTIVATED) {
             // console.log(content);
             user = content;
+            event.locals.token = token;
           }
         } catch (error) {
           console.log(error);
         }
       }
 
+      const accessUrl = new URL(event.request.url);
       // if user accesses a non public route, and he is not authenticated - redirect him to the login page
-      if (!publicRoutes.includes(new URL(event.request.url).pathname) && !user) {
+      if (!publicRoutes.includes(accessUrl.pathname) && !user) {
         return redirect(routes.login);
       }
 
       // if user accesses a public route, and he is authenticated - redirect him to the main page
-      if (publicRoutes.includes(new URL(event.request.url).pathname) && user) {
-        return redirect(routes.dashboard);
+      if (publicRoutes.includes(accessUrl.pathname) && user) {
+        return redirect(routes.dashboard, {
+          headers: {
+            "Set-Cookie": createCookieVariable("token", token!, 1),
+          }
+        });
       }
 
       return forward(event); // if we got here, and the pathname is inside the `protectedPaths` array - user is logged in
@@ -51,6 +57,11 @@ export default createHandler(
     event.responseHeaders.set(
       "Set-Cookie",
       createCookieVariable("endpoint", process.env.API_ENDPOINT!, 1)
+    );
+    // console.log(event.locals.token);
+    event.responseHeaders.set(
+      "Set-Cookie",
+      createCookieVariable("token", event.locals.token as string, 1)
     );
 
     return <StartServer event={event}/>;

@@ -1,4 +1,4 @@
-import { Accessor, batch, Component, createResource, createSignal, ResourceFetcher, Setter } from "solid-js";
+import { Accessor, batch, Component, createResource, createSignal, ResourceFetcher, Setter, } from "solid-js";
 import PopupModal from "../PopupModal";
 import { DataResponse, Role, Shift, ShiftTemplate, Staff } from "~/types";
 import { Select } from "../form/Select";
@@ -6,14 +6,13 @@ import { useFormHandler } from "solid-form-handler";
 import { yupSchema } from "solid-form-handler/yup";
 import * as yup from "yup";
 import { TextInput } from "../form/TextInput";
-import { readableToTimeStr, shiftTimes, } from "./utils/shiftTimes";
+import { readableToTimeStr, shiftTimes } from "./utils/shiftTimes";
 import { capitalize } from "~/utils/capitalize";
 import { useSPData } from "~/context/ShiftPlanning";
 import { timeOptions, transformTimeString } from "./utils/timeOptions";
 import { roles } from "~/utils/roles";
 import getEndPoint from "~/utils/getEndPoint";
 import handleFetchError from "~/utils/handleFetchError";
-import axios from "axios";
 import ResourceWrapper from "~/components/ResourceWrapper";
 import { getShiftRules } from "~/components/shift-planning/utils/shiftRules";
 import moment from "moment";
@@ -21,6 +20,7 @@ import isDayInThePast from "~/utils/isDayInThePast";
 import { cellIdGenerator } from "~/components/shift-planning/utils/cellIdGenerator";
 import { sortBy } from "lodash";
 import { toastSuccess } from "~/utils/toast";
+import axios from "axios";
 
 type NewScheduleForm = {
   shiftTemplateId?: number;
@@ -40,9 +40,7 @@ const schema: yup.Schema<NewScheduleForm> = yup.object({
     .number()
     .min(1, "Please select a staff")
     .required("Please select a staff"),
-  name: yup
-    .string()
-    .required("Please give this shift a name"),
+  name: yup.string().required("Please give this shift a name"),
   startTime: yup
     .string()
     .oneOf(validTimeOptions, "Invalid time options")
@@ -86,14 +84,13 @@ const NewShiftModal: Component<{
   setShowModal: Setter<boolean>;
 }> = ({ showModal, modalData, setShowModal }) => {
   const { tableData, setTableData } = useSPData();
-  const [ shiftTemplates ] = createResource(
-    showModal,
-    fetcher
-  );
+  const [ shiftTemplates ] = createResource(showModal, fetcher);
   const [ chosenTemplate, setChosenTemplate ] = createSignal<number>(0);
   const [ creating, setCreating ] = createSignal(false);
 
-  const formHandler = useFormHandler(yupSchema(schema), { validateOn: [ "blur" ] });
+  const formHandler = useFormHandler(yupSchema(schema), {
+    validateOn: [ "blur" ],
+  });
   const { formData, setFieldValue } = formHandler;
 
   const submit = async (publish: boolean, event: Event) => {
@@ -106,10 +103,13 @@ const NewShiftModal: Component<{
 
       setCreating(true);
       const dateStr = moment(formData().date).format("YYYY-MM-DD");
-      const staff = tableData.staffs.find((staff) => staff.staffId === formData().staffId);
+      const staff = tableData.staffs.find(
+        (staff) => staff.staffId === formData().staffId
+      );
 
       // If the date is in the past, throw an error
-      if (isDayInThePast(dateStr)) throw new Error("Can not create shift in the past");
+      if (isDayInThePast(dateStr))
+        throw new Error("Can not create shift in the past");
 
       // If the staff is not found, throw an error
       if (!staff) throw new Error("Invalid staff");
@@ -119,11 +119,12 @@ const NewShiftModal: Component<{
         { ...formData(), shiftId: 0, published: publish, date: dateStr },
         {
           staff,
-          date: dateStr
+          date: dateStr,
         },
         tableData
       ).filter((rule) => !rule.passed);
-      if (notPassedRules.length > 0) throw new Error(notPassedRules[0].errorName);
+      if (notPassedRules.length > 0)
+        throw new Error(notPassedRules[0].errorName);
 
       // Create the shift
       const { data } = await axios.post<DataResponse<Shift>>(
@@ -134,7 +135,7 @@ const NewShiftModal: Component<{
           endTime: readableToTimeStr(formData().endTime),
           published: publish,
         }
-      )
+      );
       console.log(data);
       if (!data) throw new Error("Invalid response from server");
 
@@ -154,7 +155,6 @@ const NewShiftModal: Component<{
       toastSuccess("Shift created successfully");
       reset();
       setShowModal(false);
-
     } catch (error: any) {
       handleFetchError(error);
     } finally {
@@ -216,9 +216,11 @@ const NewShiftModal: Component<{
   return (
     <PopupModal.Wrapper title="New Shift" close={onCloseModal} open={showModal}>
       <ResourceWrapper data={shiftTemplates}>
-        <div classList={{
-          "cursor-progress": creating(),
-        }}>
+        <div
+          classList={{
+            "cursor-progress": creating(),
+          }}
+        >
           <PopupModal.Body>
             <form class="text-sm" onSubmit={[ submit, false ]}>
               <div class="flex">
@@ -258,7 +260,10 @@ const NewShiftModal: Component<{
                   />
                 </div>
                 <div class="flex-1 py-2.5 max-w-[140px] flex flex-col gap-1">
-                  <label for="salaryCoefficient" class="text-gray-700 font-semibold">
+                  <label
+                    for="salaryCoefficient"
+                    class="text-gray-700 font-semibold"
+                  >
                     Salary Coefficient
                   </label>
                   <TextInput
@@ -280,7 +285,11 @@ const NewShiftModal: Component<{
                   <TextInput
                     id="name"
                     name="name"
-                    value={shiftTemplates()?.find(t => t.shiftTemplateId === chosenTemplate())?.name || ""}
+                    value={
+                      shiftTemplates()?.find(
+                        (t) => t.shiftTemplateId === chosenTemplate()
+                      )?.name || ""
+                    }
                     formHandler={formHandler}
                     disabled={chosenTemplate() !== 0}
                   />
@@ -323,7 +332,9 @@ const NewShiftModal: Component<{
                     placeholder="Select Start Time"
                     options={timeOptions()}
                     formHandler={formHandler}
-                    onChange={() => setFieldValue("endTime", 0, {validate: false})}
+                    onChange={() =>
+                      setFieldValue("endTime", 0, { validate: false })
+                    }
                     disabled={chosenTemplate() !== 0}
                   />
                 </div>
@@ -336,11 +347,14 @@ const NewShiftModal: Component<{
                     name="endTime"
                     value={0}
                     placeholder="Select End Time"
-                    options={timeOptions(transformTimeString(formData().startTime))}
+                    options={timeOptions(
+                      transformTimeString(formData().startTime)
+                    )}
                     formHandler={formHandler}
-                    disabled={formData().startTime == "0" || chosenTemplate() !== 0}
+                    disabled={
+                      formData().startTime == "0" || chosenTemplate() !== 0
+                    }
                   />
-
                 </div>
               </div>
             </form>

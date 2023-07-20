@@ -16,8 +16,8 @@ import Edit from "./Edit";
 import List from "./List";
 import Create from "./Create";
 import getEndPoint from "~/utils/getEndPoint";
-import axios from "axios";
 import handleFetchError from "~/utils/handleFetchError";
+import axios from "axios";
 
 const fetcher: ResourceFetcher<
   boolean,
@@ -38,13 +38,14 @@ const ShiftTemplateModal: Component<{
   showModal: Accessor<boolean>;
   modalData: Accessor<ShiftTemplate | undefined>;
   setShowModal: Setter<boolean>;
-}> = ({showModal, modalData, setShowModal}) => {
-  const [state, setState] = createSignal<"list" | "edit" | "create">("list");
-  const [shiftTemplateFocus, setShiftTemplateFocus] =
+}> = ({ showModal, modalData, setShowModal }) => {
+  const [ state, setState ] = createSignal<"list" | "edit" | "create">("list");
+  const [ shiftTemplateFocus, setShiftTemplateFocus ] =
     createSignal<ShiftTemplate>();
-  const [shiftTemplates, {refetch, mutate}] = createResource(
+  const [ shiftTemplates, { refetch, mutate } ] = createResource(
     showModal,
-    fetcher, {
+    fetcher,
+    {
       initialValue: [],
     }
   );
@@ -87,7 +88,11 @@ const ShiftTemplateModal: Component<{
           />
         </Match>
         <Match when={state() === "create"}>
-          <Create setState={setState} shiftTemplates={shiftTemplates} refreshShiftTemplates={refetch}/>
+          <Create
+            setState={setState}
+            shiftTemplates={shiftTemplates}
+            refreshShiftTemplates={refetch}
+          />
         </Match>
         <Match when={state() === "edit"}>
           <Edit

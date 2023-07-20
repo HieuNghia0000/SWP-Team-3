@@ -4,10 +4,9 @@ import { TextInput } from "~/components/form/TextInput";
 import { useFormHandler } from "solid-form-handler";
 import { yupSchema } from "solid-form-handler/yup";
 import * as yup from "yup";
-import { DataResponse, LeaveRequest, LeaveRequestStatus, LeaveType, Role } from "~/types";
+import { DataResponse, LeaveRequest, LeaveRequestStatus, LeaveType, Role, } from "~/types";
 import { TextArea } from "~/components/form/TextArea";
 import { createRouteAction } from "solid-start";
-import axios from "axios";
 import getEndPoint from "~/utils/getEndPoint";
 import { Select } from "~/components/form/Select";
 import { capitalize } from "~/utils/capitalize";
@@ -19,13 +18,17 @@ import { routeData } from "~/routes/leave-requests";
 import { useLRContext } from "~/context/LeaveRequest";
 import { useAuth } from "~/context/Auth";
 import { FaSolidTrash } from "solid-icons/fa";
+import axios from "axios";
 
 type EditLeaveRequest = Omit<LeaveRequest, "status" | "staff">;
 
 const schema: yup.Schema<EditLeaveRequest> = yup.object({
   leaveRequestId: yup.number().required("Leave request ID is required"),
   staffId: yup.number().required("Staff ID is required"),
-  leaveType: yup.string().oneOf([ LeaveType.VACATION, LeaveType.SICK, LeaveType.OTHER ]).required("Leave type is required"),
+  leaveType: yup
+    .string()
+    .oneOf([ LeaveType.VACATION, LeaveType.SICK, LeaveType.OTHER ])
+    .required("Leave type is required"),
   startDate: yup.string().required("Start date is required"),
   endDate: yup.string().required("End date is required"),
   reason: yup.string().default(""),
@@ -35,16 +38,16 @@ const schema: yup.Schema<EditLeaveRequest> = yup.object({
 const updateLeaveRequest = async (formData: LeaveRequest) => {
   try {
     const { data } = await axios.put<DataResponse<LeaveRequest>>(
-      `${getEndPoint()}/leave-requests/update/${formData.leaveRequestId}`, { ...formData }
-    )
+      `${getEndPoint()}/leave-requests/update/${formData.leaveRequestId}`,
+      { ...formData }
+    );
     console.log(data);
     if (!data) throw new Error("Invalid response from server");
     return true;
-
   } catch (error: any) {
     throw new Error(handleFetchError(error));
   }
-}
+};
 
 const EditLeaveRequestModal: Component<{
   showModal: Accessor<boolean>;
@@ -58,12 +61,11 @@ const EditLeaveRequestModal: Component<{
   const formHandler = useFormHandler(yupSchema(schema), { validateOn: [] });
   const { formData } = formHandler;
 
-  const curLeaveRequest =
-    createMemo(
-      () => !data.error && data() !== undefined
-        ? data()?.find((lr) => lr.leaveRequestId === chosenLeaveRequestId())
-        : undefined
-    )
+  const curLeaveRequest = createMemo(() =>
+    !data.error && data.state === "ready"
+      ? data()?.find((lr) => lr.leaveRequestId === chosenLeaveRequestId())
+      : undefined
+  );
 
   const submit = async (status: LeaveRequestStatus, e: Event) => {
     e.preventDefault();
@@ -71,7 +73,7 @@ const EditLeaveRequestModal: Component<{
 
     const f = await formHandler.validateForm({ throwException: false });
 
-    console.log(f.isFormInvalid)
+    console.log(f.isFormInvalid);
     if (f.isFormInvalid) return;
 
     if (moment(formData().startDate, "YYYY-MM-DD").isAfter(formData().endDate))
@@ -85,18 +87,24 @@ const EditLeaveRequestModal: Component<{
       toastSuccess("Leave request updated successfully");
       setShowModal(false);
     }
-  }
+  };
 
   const onCloseModal = async () => {
     await formHandler.resetForm();
     setShowModal(false);
-  }
+  };
 
   return (
-    <PopupModal.Wrapper title="Edit Leave Request" close={onCloseModal} open={showModal}>
-      <div classList={{
-        "cursor-progress": updating.pending,
-      }}>
+    <PopupModal.Wrapper
+      title="Edit Leave Request"
+      close={onCloseModal}
+      open={showModal}
+    >
+      <div
+        classList={{
+          "cursor-progress": updating.pending,
+        }}
+      >
         <PopupModal.Body>
           <form class="text-sm" onSubmit={[ submit, LeaveRequestStatus.PENDING ]}>
             <div class="flex">
@@ -167,16 +175,16 @@ const EditLeaveRequestModal: Component<{
                   options={[
                     {
                       label: capitalize(LeaveType.VACATION),
-                      value: LeaveType.VACATION
+                      value: LeaveType.VACATION,
                     },
                     {
                       label: capitalize(LeaveType.SICK),
-                      value: LeaveType.SICK
+                      value: LeaveType.SICK,
                     },
                     {
                       label: capitalize(LeaveType.OTHER),
-                      value: LeaveType.OTHER
-                    }
+                      value: LeaveType.OTHER,
+                    },
                   ]}
                   formHandler={formHandler}
                   disabled={
@@ -184,7 +192,6 @@ const EditLeaveRequestModal: Component<{
                     curLeaveRequest()?.staffId !== user()?.staffId
                   }
                 />
-
               </div>
             </div>
             <div class="flex gap-2">
@@ -227,9 +234,9 @@ const EditLeaveRequestModal: Component<{
                 onClick={[ onDelete, curLeaveRequest()?.leaveRequestId || 0 ]}
                 class="flex gap-2 justify-center items-center px-3 text-gray-500 text-sm hover:text-gray-700"
               >
-              <span>
-                <FaSolidTrash/>
-              </span>
+                <span>
+                  <FaSolidTrash/>
+                </span>
                 <span>Delete</span>
               </button>
             </div>
@@ -238,32 +245,53 @@ const EditLeaveRequestModal: Component<{
                 <button
                   type="button"
                   disabled={updating.pending}
-                  onClick={[ submit, curLeaveRequest()?.status === LeaveRequestStatus.REJECTED ? LeaveRequestStatus.PENDING : LeaveRequestStatus.REJECTED ]}
+                  onClick={[
+                    submit,
+                    curLeaveRequest()?.status === LeaveRequestStatus.REJECTED
+                      ? LeaveRequestStatus.PENDING
+                      : LeaveRequestStatus.REJECTED,
+                  ]}
                   class="py-1.5 px-3 font-semibold border text-sm rounded"
                   classList={{
-                    "text-white border-red-600 bg-red-500 hover:bg-red-600": curLeaveRequest()?.status !== LeaveRequestStatus.REJECTED,
-                    "text-gray-600 border-gray-300 bg-white hover:text-black": curLeaveRequest()?.status === LeaveRequestStatus.REJECTED,
+                    "text-white border-red-600 bg-red-500 hover:bg-red-600":
+                      curLeaveRequest()?.status !== LeaveRequestStatus.REJECTED,
+                    "text-gray-600 border-gray-300 bg-white hover:text-black":
+                      curLeaveRequest()?.status === LeaveRequestStatus.REJECTED,
                   }}
                 >
-                  {curLeaveRequest()?.status === LeaveRequestStatus.REJECTED ? "Save & Reset" : "Save & Deny"}
+                  {curLeaveRequest()?.status === LeaveRequestStatus.REJECTED
+                    ? "Save & Reset"
+                    : "Save & Deny"}
                 </button>
                 <button
                   type="button"
                   disabled={updating.pending}
-                  onClick={[ submit, curLeaveRequest()?.status === LeaveRequestStatus.APPROVED ? LeaveRequestStatus.PENDING : LeaveRequestStatus.APPROVED ]}
+                  onClick={[
+                    submit,
+                    curLeaveRequest()?.status === LeaveRequestStatus.APPROVED
+                      ? LeaveRequestStatus.PENDING
+                      : LeaveRequestStatus.APPROVED,
+                  ]}
                   class="py-1.5 px-3 font-semibold border text-sm rounded"
                   classList={{
-                    "text-white border-green-600 bg-green-500 hover:bg-green-600": curLeaveRequest()?.status !== LeaveRequestStatus.APPROVED,
-                    "text-gray-600 border-gray-300 bg-white hover:text-black": curLeaveRequest()?.status === LeaveRequestStatus.APPROVED,
+                    "text-white border-green-600 bg-green-500 hover:bg-green-600":
+                      curLeaveRequest()?.status !== LeaveRequestStatus.APPROVED,
+                    "text-gray-600 border-gray-300 bg-white hover:text-black":
+                      curLeaveRequest()?.status === LeaveRequestStatus.APPROVED,
                   }}
                 >
-                  {curLeaveRequest()?.status === LeaveRequestStatus.APPROVED ? "Save & Reset" : "Save & Approve"}
+                  {curLeaveRequest()?.status === LeaveRequestStatus.APPROVED
+                    ? "Save & Reset"
+                    : "Save & Approve"}
                 </button>
               </Show>
               <button
                 type="button"
                 disabled={updating.pending}
-                onClick={[ submit, curLeaveRequest()?.status || LeaveRequestStatus.PENDING ]}
+                onClick={[
+                  submit,
+                  curLeaveRequest()?.status || LeaveRequestStatus.PENDING,
+                ]}
                 class="py-1.5 px-3 font-semibold text-white border border-blue-600 bg-blue-500 text-sm rounded hover:bg-blue-600"
               >
                 Save
@@ -273,8 +301,7 @@ const EditLeaveRequestModal: Component<{
         </PopupModal.Footer>
       </div>
     </PopupModal.Wrapper>
-
-  )
-}
+  );
+};
 
 export default EditLeaveRequestModal;
