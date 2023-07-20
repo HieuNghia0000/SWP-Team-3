@@ -41,6 +41,9 @@ public class TimesheetServiceImpl implements TimesheetService {
     private ShiftService shiftService;
 
     @Autowired
+    private SalaryService salaryService;
+
+    @Autowired
     private ShiftCoverRequestService shiftCoverRequestService;
 
     @Override
@@ -159,7 +162,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
     private List<StaffDto> getStaffDtos(LocalDate fromDate, LocalDate toDate, List<Staff> staffs) {
         return staffs.parallelStream().map(staff -> {
-            // Get the salary and leave requests of the staff
+            // Get leave requests of the staff
             List<LeaveRequestDto> leaveRequestDtos = leaveRequestService
                     .getLeaveRequestsByStaffIdAndDates(staff.getStaffId(), fromDate, toDate)
                     .stream().filter(leaveRequestDto -> leaveRequestDto.getStatus().equals(LeaveStatus.APPROVED))
@@ -195,7 +198,15 @@ public class TimesheetServiceImpl implements TimesheetService {
                     });
 
             // Filter the shifts which are not published
-            List<ShiftDto> lShifts = shiftDtos.stream().filter(ShiftDto::getPublished).collect(Collectors.toList());
+            List<ShiftDto> lShifts = shiftDtos.stream()
+                    .filter(ShiftDto::getPublished)
+                    // Get salary for each timesheet
+                    .peek(shiftDto ->{
+                        Optional<Salary> salary = salaryService.getSalaryById(shiftDto.getTimesheet().getTimesheetId());
+                        if (salary.isEmpty()) return;
+                        shiftDto.getTimesheet().setSalary(new SalaryDto(salary.get()));
+                    })
+                    .collect(Collectors.toList());
 
             // Return the staffDtos
             return new StaffDto(staff, lShifts, leaveRequestDtos);

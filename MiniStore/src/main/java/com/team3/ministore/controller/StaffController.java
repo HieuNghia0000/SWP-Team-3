@@ -63,17 +63,36 @@ public class StaffController {
     //Update an existing staff
     @PutMapping("/{id}/edit")
     public ResponseEntity<Object> updateStaff(@PathVariable("id") Integer id,
-                                              @Valid @RequestBody UpdateStaffDto staff, BindingResult errors) {
+                                              @Valid @RequestBody UpdateStaffDto dto, BindingResult errors) {
         if (errors.hasErrors()) return ResponseHandler.getResponse(errors, HttpStatus.BAD_REQUEST);
 
-        Optional<Staff> updatedStaff = staffService.updateStaff(id, staff);
+        Optional<Staff> updatedStaff = staffService.updateStaff(id, dto);
 
-        return updatedStaff.map(value ->
-                        ResponseHandler.getResponse(new StaffDto(value,
-                                        salaryService.getSalaryByStaffId(value.getStaffId())),
-                                HttpStatus.OK))
-                .orElseGet(() -> ResponseHandler.getResponse(new Exception("Invalid staff id"),
-                        HttpStatus.BAD_REQUEST));
+        if (updatedStaff.isEmpty())
+            return ResponseHandler.getResponse(new Exception("Invalid staff id"), HttpStatus.BAD_REQUEST);
+
+        SalaryDto curSalary = salaryService.getSalaryByStaffId(updatedStaff.get().getStaffId());
+
+        // Update salary if hourly wage and effective date are changed
+        if (curSalary != null && dto.getHourlyWage() != null && !dto.getHourlyWage().equals(curSalary.getHourlyWage())) {
+
+            SalaryDto newSalaryDto = new SalaryDto(
+                    dto.getHourlyWage(),
+                    dto.getEffectiveDate(),
+                    dto.getTerminationDate(),
+                    updatedStaff.get().getStaffId()
+            );
+            Salary salary = salaryService.createSalary(newSalaryDto, updatedStaff.get());
+            newSalaryDto.setSalaryId(salary.getSalaryId());
+
+            // Update old salary
+            curSalary.setTerminationDate(dto.getEffectiveDate());
+            salaryService.updateSalary(curSalary.getSalaryId(), curSalary);
+
+            return ResponseHandler.getResponse(new StaffDto(updatedStaff.get(), newSalaryDto), HttpStatus.OK);
+        }
+
+        return ResponseHandler.getResponse(new StaffDto(updatedStaff.get(), curSalary), HttpStatus.OK);
     }
 
     //Delete a staff

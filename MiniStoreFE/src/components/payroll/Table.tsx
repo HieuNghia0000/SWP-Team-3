@@ -118,7 +118,7 @@ export default function Table() {
                 const coefficient = holiday ? holiday.coefficient : shift.salaryCoefficient;
 
                 if (shift.timesheet && shift.timesheet.status === TimesheetStatus.APPROVED) {
-                  return acc + coefficient * (shift.timesheet?.salary?.hourlyWage || 0) * shiftHours;
+                  return acc + coefficient * (Number.parseFloat(shift.timesheet?.salary?.hourlyWage || "0")) * shiftHours;
                 }
 
                 return acc;

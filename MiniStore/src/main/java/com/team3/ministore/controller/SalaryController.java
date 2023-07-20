@@ -47,12 +47,6 @@ public class SalaryController {
         return new ResponseEntity<>(createdSalary, HttpStatus.CREATED);
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<Salary> updateSalary(@PathVariable("id") Integer id, @RequestBody Salary salary) {
-        Salary updatedSalary = salaryService.updateSalary(id, salary);
-        return new ResponseEntity<>(updatedSalary, HttpStatus.OK);
-    }
-
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteSalary(@PathVariable("id") Integer id) {
         salaryService.deleteSalary(id);

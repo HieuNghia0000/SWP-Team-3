@@ -9,6 +9,8 @@ type StaffModalContext = {
   onDelete: (staff: Staff) => Promise<void>;
   showCreateModal: Accessor<boolean>;
   setShowCreateModal: Setter<boolean>;
+  showEditModal: Accessor<boolean>;
+  setShowEditModal: Setter<boolean>;
 };
 
 export const ModalContext = createContext<StaffModalContext>();

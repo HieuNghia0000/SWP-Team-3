@@ -11,7 +11,7 @@ import { OcCheckcirclefill } from "solid-icons/oc";
 import { Holiday, TimesheetStatus } from "~/types";
 
 const getDates = (fromDate: string, toDate: string) => {
-  const dates:string[] = [];
+  const dates: string[] = [];
   const dif = moment(toDate).diff(fromDate, "days");
 
   for (let i = 0; i <= dif; i++) {
@@ -134,7 +134,7 @@ const PayrollDetailsModal: Component = () => {
                       const coefficient = holiday ? holiday.coefficient : shift.salaryCoefficient;
 
                       if (shift.timesheet && shift.timesheet.status === TimesheetStatus.APPROVED) {
-                        return acc + coefficient * (shift.timesheet?.salary?.hourlyWage || 0) * shiftHours;
+                        return acc + coefficient * (Number.parseFloat(shift.timesheet?.salary?.hourlyWage || "0")) * shiftHours;
                       }
 
                       return acc;

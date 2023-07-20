@@ -13,6 +13,7 @@ import { toastSuccess } from "~/utils/toast";
 import StaffDetailsModal from "~/components/staffs/StaffDetailsModal";
 import Table from "~/components/staffs/Table";
 import CreateStaffModal from "~/components/staffs/CreateStaffModal";
+import UpdateStaffModal from "~/components/staffs/UpdateStaffModal";
 
 const disableStaff = async (staff: Omit<Staff, "shifts" | "leaveRequests">) => {
   try {
@@ -59,6 +60,7 @@ export function routeData() {
 export default function Staffs() {
   const { data } = useRouteData<typeof routeData>();
   const [ showDetailsModal, setShowDetailsModal ] = createSignal<boolean>(false);
+  const [ showEditModal, setShowEditModal ] = createSignal<boolean>(false);
   const [ showCreateModal, setShowCreateModal ] = createSignal<boolean>(false);
   const [ chosenId, setChosenId ] = createSignal<number>(0);
   const [ disabling, disableAction ] = createRouteAction(disableStaff);
@@ -85,7 +87,9 @@ export default function Staffs() {
         setShowDetailsModal,
         onDelete,
         showCreateModal,
-        setShowCreateModal
+        setShowCreateModal,
+        showEditModal,
+        setShowEditModal,
       }}>
         <h1 class="mb-2 text-2xl font-medium">Staff Management</h1>
         <Breadcrumbs linkList={[ { name: "Staff Management" } ]}/>
@@ -105,7 +109,10 @@ export default function Staffs() {
         <Pagination totalItems={totalItems}/>
 
         <StaffDetailsModal/>
+
         <CreateStaffModal/>
+
+        <UpdateStaffModal/>
       </ModalContext.Provider>
     </main>
   );

@@ -1,7 +1,7 @@
 import { FaSolidPencil, FaSolidTrash } from "solid-icons/fa";
-import { Accessor, Component, Setter, Show } from "solid-js";
+import { Accessor, Component, createMemo, Setter, Show } from "solid-js";
 import PopupModal from "~/components/PopupModal";
-import { Role, TimesheetStatus } from "~/types";
+import { Holiday, Role, Shift, TimesheetStatus } from "~/types";
 import { Tabs } from ".";
 import moment from "moment";
 import { ShiftCard, useSPData } from "~/context/ShiftPlanning";
@@ -25,6 +25,19 @@ const Details: Component<DetailsProps> = ({ shiftCard, setState, onDelete, openC
     : moment(`${shiftCard()?.date} ${shiftCard()?.endTime}`).isBefore(moment())
       ? "Absent"
       : "Not yet"
+
+  const isHoliday = (shift: Shift | undefined): Holiday | undefined => {
+    if (!shift) return undefined;
+
+    return tableData.holidays.find((holiday) => moment(shift.date, "YYYY-MM-DD")
+      .isBetween(holiday.startDate, holiday.endDate, undefined, "[]"));
+  }
+
+  const holiday = createMemo(() => isHoliday(shiftCard()));
+
+  const coefficient = createMemo(() => {
+    return holiday() ? holiday()!.coefficient : shiftCard()?.salaryCoefficient || 0;
+  });
 
   return (
     <>
@@ -54,7 +67,7 @@ const Details: Component<DetailsProps> = ({ shiftCard, setState, onDelete, openC
               <span class="font-semibold text-gray-500">
                 Salary Coefficient:
               </span>
-              <span>{shiftCard()?.salaryCoefficient}</span>
+              <span>{coefficient()}</span>
             </div>
           </div>
           <div class="flex border-b border-gray-300 border-dotted">
@@ -124,6 +137,16 @@ const Details: Component<DetailsProps> = ({ shiftCard, setState, onDelete, openC
             </div>
           </div>
         </div>
+        <Show when={holiday()}>
+          <div class="border-t border-gray-300 border-dotted text-gray-600 text-sm">
+            <label class="py-2.5 font-semibold text-gray-500 inline-block">
+              Note
+            </label>
+            <p class="text-sm text-green-500 tracking-wide">
+              This shift is on a holiday ({holiday()!.name}). The salary coefficient is readjusted to {coefficient()}
+            </p>
+          </div>
+        </Show>
       </PopupModal.Body>
       <PopupModal.Footer>
         <div class="w-full flex justify-start items-center gap-3">

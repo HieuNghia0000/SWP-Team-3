@@ -92,7 +92,7 @@ const StaffDetailsModal: Component = () => {
         <PopupModal.Footer>
           <div class="flex w-full items-center justify-start gap-3">
             <A
-              href={routes.staffEdit(staff()!.staffId)}
+              href={routes.staff(staff()!.staffId)}
               class="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-2"
             >
             <span class="">

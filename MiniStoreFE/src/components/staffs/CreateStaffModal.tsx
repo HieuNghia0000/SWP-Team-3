@@ -14,8 +14,7 @@ import { useStaffContext } from "~/context/Staff";
 import { Select } from "~/components/form/Select";
 import moment from "moment";
 
-interface CreateStaff extends
-  Omit<Staff, "staffId" | "salary" | "leaveRequests" | "shifts" | "image">,
+interface CreateStaff extends Omit<Staff, "staffId" | "salary" | "leaveRequests" | "shifts" | "image">,
   Omit<Salary, "staffId" | "salaryId" | "terminationDate"> {
   confirmPassword: string;
 }
@@ -31,7 +30,7 @@ const schema: yup.Schema<CreateStaff> = yup.object({
   email: yup.string().required("Email is required"),
   workDays: yup.string().default(""),
   leaveBalance: yup.number().required("Leave balance is required"),
-  hourlyWage: yup.number().required("Hourly wage is required"),
+  hourlyWage: yup.string().required("Hourly wage is required"),
   effectiveDate: yup.string().required("Effective date is required"),
 });
 
@@ -64,7 +63,7 @@ const CreateStaffModal: Component = () => {
 
     if (f.isFormInvalid) return;
 
-    if (formData().confirmPassword !== formData().password){
+    if (formData().confirmPassword !== formData().password) {
       toastError("Confirm password is not matching the password");
       return;
     }
@@ -165,7 +164,7 @@ const CreateStaffModal: Component = () => {
                   name="hourlyWage"
                   label="Hourly Wage"
                   type="number"
-                  placeholder="Enter hourly wage"
+                  placeholder="Enter hourly wage (VND)"
                   formHandler={formHandler}
                 />
                 <TextInput
@@ -177,8 +176,6 @@ const CreateStaffModal: Component = () => {
                   formHandler={formHandler}
                 />
               </div>
-            </div>
-            <div class="flex gap-2">
               <div class="flex-1 py-2.5 flex flex-col gap-1">
                 <TextInput
                   id="workDays"

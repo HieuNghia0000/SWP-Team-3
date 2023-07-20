@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,24 +44,27 @@ public class SalaryServiceImpl implements SalaryService {
     }
 
     @Override
-    public Salary getSalaryById(Integer id) {
-        return salaryRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid Salary ID: " + id));
-    }
+    public Optional<Salary> updateSalary(Integer id, SalaryDto dto) {
+        Optional<Salary> existingSalary = salaryRepository.findById(id);
 
-    @Override
-    public Salary updateSalary(Integer id, Salary salary) {
-        Salary existingSalary = getSalaryById(id);
+        if (existingSalary.isEmpty()) return Optional.empty();
 
-        existingSalary.setStaff(salary.getStaff());
-        existingSalary.setHourlyWage(salary.getHourlyWage());
-        existingSalary.setEffectiveDate(salary.getEffectiveDate());
-        existingSalary.setTerminationDate(salary.getTerminationDate());
-
-        return salaryRepository.save(existingSalary);
+        return existingSalary.map(salary -> {
+            salary.setStaff(salary.getStaff());
+            salary.setHourlyWage(dto.getHourlyWage());
+            salary.setEffectiveDate(dto.getEffectiveDate());
+            salary.setTerminationDate(dto.getTerminationDate());
+            return salaryRepository.save(salary);
+        });
     }
 
     @Override
     public void deleteSalary(Integer id) {
         salaryRepository.deleteById(id);
+    }
+
+    @Override
+    public Optional<Salary> getSalaryById(Integer id) {
+        return salaryRepository.findById(id);
     }
 }

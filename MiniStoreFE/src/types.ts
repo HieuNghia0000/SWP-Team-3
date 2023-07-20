@@ -86,7 +86,7 @@ export interface LeaveRequest {
 export interface Salary {
   salaryId: number;
   staffId: number;
-  hourlyWage: number;
+  hourlyWage: string;
   effectiveDate: string;
   terminationDate?: string;
 }

@@ -1,23 +1,29 @@
 import { batch, For, Show } from "solid-js";
 import { IoEyeOutline } from "solid-icons/io";
-import routes from "~/utils/routes";
 import { useRouteData } from "@solidjs/router";
-import { A } from "solid-start";
 import formatNumberWithCommas from "~/utils/formatNumberWithCommas";
 import { Role, StaffStatus } from "~/types";
 import { routeData } from "~/routes/staffs";
 import { useStaffContext } from "~/context/Staff";
 import { FiLock, FiUnlock } from "solid-icons/fi";
 import { capitalize } from "~/utils/capitalize";
+import { OcPencil3 } from "solid-icons/oc";
 
 export default function Table() {
   const { data } = useRouteData<typeof routeData>();
-  const { setChosenId, setShowDetailsModal, onDelete } = useStaffContext();
+  const { setChosenId, setShowDetailsModal, setShowEditModal, onDelete } = useStaffContext();
 
   let onViewDetails = (id: number) => {
     batch(() => {
       setChosenId(id);
       setShowDetailsModal(true);
+    });
+  };
+
+  let onEdit = (id: number) => {
+    batch(() => {
+      setChosenId(id);
+      setShowEditModal(true);
     });
   };
 
@@ -93,12 +99,7 @@ export default function Table() {
               <tr class="hover:bg-[#ceefff] odd:bg-white even:bg-gray-50 text-[#333c48]">
                 <td
                   class="px-2.5 pl-[18px] text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
-                  <A
-                    href={routes.staffEdit(item.staffId)}
-                    class="hover:text-indigo-500"
-                  >
-                    {item.staffName}
-                  </A>
+                  {item.staffName}
                 </td>
                 <td
                   style={{ "border-left": "1px dashed #d5dce6" }}
@@ -156,6 +157,17 @@ export default function Table() {
                   <div class="flex flex-row gap-1">
                     <div class="relative flex justify-center items-center">
                       <button
+                        onClick={[ onEdit, item.staffId ]}
+                        class="peer text-base text-gray-500 hover:text-indigo-500">
+                        <OcPencil3/>
+                      </button>
+                      <span
+                        class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
+                          Edit
+                      </span>
+                    </div>
+                    <div class="relative flex justify-center items-center">
+                      <button
                         class="peer text-base text-gray-500 hover:text-indigo-500"
                         onClick={[ onViewDetails, item.staffId ]}
                       >
@@ -167,7 +179,7 @@ export default function Table() {
                       </span>
                     </div>
                     <div class="relative flex justify-center items-center">
-                      <button class="peer text-base text-gray-500 hover:text-indigo-500" onClick={[onDelete, item]}>
+                      <button class="peer text-base text-gray-500 hover:text-indigo-500" onClick={[ onDelete, item ]}>
                         <Show
                           when={item.status === StaffStatus.ACTIVATED}
                           fallback={<FiUnlock/>}

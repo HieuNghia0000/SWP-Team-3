@@ -24,6 +24,8 @@ export default function Table() {
   };
 
   const isHoliday = (shift: any): Holiday | undefined => {
+    if (!shift) return undefined;
+
     return holidays()?.find((holiday) => moment(shift.date, "YYYY-MM-DD")
       .isBetween(holiday.startDate, holiday.endDate, undefined, "[]"));
   }
@@ -129,7 +131,7 @@ export default function Table() {
                   <td
                     class="px-2.5 pl-[18px] text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
                     <A
-                      href={routes.staffEdit(timesheet.staffId)}
+                      href={routes.staff(timesheet.staffId)}
                       class="hover:text-indigo-500"
                     >
                       {timesheet.staff?.staffName}
@@ -163,7 +165,7 @@ export default function Table() {
                   <td
                     style={{ "border-left": "1px dashed #d5dce6" }}
                     class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
-                    {formatNumberWithCommas((timesheet.salary?.hourlyWage || 0) * coefficient * moment(timesheet.shift?.endTime, "HH:mm:ss").diff(moment(timesheet.shift?.startTime, "HH:mm:ss"), "hours"))} ₫
+                    {formatNumberWithCommas((Number.parseFloat(timesheet.salary?.hourlyWage || "0")) * coefficient * moment(timesheet.shift?.endTime, "HH:mm:ss").diff(moment(timesheet.shift?.startTime, "HH:mm:ss"), "hours"))} ₫
                   </td>
                   <td
                     style={{ "border-left": "1px dashed #d5dce6" }}
