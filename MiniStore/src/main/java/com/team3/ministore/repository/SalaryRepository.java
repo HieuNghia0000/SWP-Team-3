@@ -14,12 +14,12 @@ public interface SalaryRepository extends JpaRepository<Salary, Integer> {
     @Query("SELECT sl FROM Salary sl " +
             "WHERE sl.staff.staffId = :staffId " +
             "AND sl.effectiveDate <= CURRENT_DATE " +
-            "AND (sl.terminationDate IS NULL OR sl.terminationDate >= CURRENT_DATE)")
+            "AND sl.terminationDate IS NULL")
     Optional<Salary> findSalaryInformationByStaffId(Integer staffId);
 
     @Query("SELECT sl FROM Salary sl " +
             "WHERE sl.effectiveDate <= CURRENT_DATE " +
-            "AND (sl.terminationDate IS NULL OR sl.terminationDate >= CURRENT_DATE)")
+            "AND sl.terminationDate IS NULL")
     List<Salary> findSalaryOfAllStaffs();
 
 
