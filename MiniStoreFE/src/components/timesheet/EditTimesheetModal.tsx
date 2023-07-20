@@ -2,12 +2,12 @@ import * as yup from "yup";
 import { useTSContext } from "~/context/Timesheet";
 import { yupSchema } from "solid-form-handler/yup";
 import { useFormHandler } from "solid-form-handler";
-import { Component, createMemo, onCleanup, Show } from "solid-js";
+import { Component, createMemo, onCleanup } from "solid-js";
 import { createRouteAction } from "solid-start";
 import { useRouteData } from "@solidjs/router";
 import { routeData } from "~/routes/timesheets";
 import axios from "axios";
-import { DataResponse, Holiday, Shift, Timesheet, TimesheetStatus } from "~/types";
+import { DataResponse, Timesheet, TimesheetStatus } from "~/types";
 import getEndPoint from "~/utils/getEndPoint";
 import { readableToTimeStr } from "~/components/shift-planning/utils/shiftTimes";
 import handleFetchError from "~/utils/handleFetchError";
@@ -52,7 +52,7 @@ const updateTimesheet = async (formData: Omit<Timesheet, "salaryId">) => {
 }
 
 const EditTimesheetModal: Component = () => {
-  const { data, holidays } = useRouteData<typeof routeData>();
+  const { data } = useRouteData<typeof routeData>();
   const { chosenId, setShowEditModal, showEditModal, onDelete } = useTSContext();
   const formHandler = useFormHandler(yupSchema(schema));
   const { formData } = formHandler;
@@ -104,31 +104,10 @@ const EditTimesheetModal: Component = () => {
     setShowEditModal(false);
   }
 
-  const isHoliday = (shift: Shift | undefined): Holiday | undefined => {
-    if (!shift) return undefined;
-
-    return holidays()?.find((holiday) => moment(shift.date, "YYYY-MM-DD")
-      .isBetween(holiday.startDate, holiday.endDate, undefined, "[]"));
-  }
-
-  const holiday = createMemo(() => isHoliday(timesheet()?.shift));
-
-  const coefficient = createMemo(() => {
-    return holiday() ? holiday()!.coefficient : timesheet()?.shift?.salaryCoefficient || 0;
-  });
-
   return (
     <PopupModal.Wrapper title="Edit Timesheet" close={onCloseModal} open={showEditModal}>
       <div classList={{ "cursor-progress": updating.pending }}>
         <PopupModal.Body>
-          <Show when={holiday()}>
-            <label class="mb-1.5 font-semibold text-gray-600 inline-block">
-              Note
-            </label>
-            <p class="text-sm text-green-400 tracking-wide">
-              This shift is on a holiday ({holiday()!.name}). The salary coefficient is readjusted to {coefficient()}
-            </p>
-          </Show>
           <form class="text-sm" onSubmit={[ submit, false ]}>
             <div class="flex gap-2">
               <div class="flex-1 py-2.5 flex flex-col gap-1">
@@ -147,7 +126,7 @@ const EditTimesheetModal: Component = () => {
                   label="Salary Coefficient"
                   type="number"
                   disabled={true}
-                  value={coefficient()}
+                  value={timesheet()?.shift?.salaryCoefficient || 0}
                   step={0.1}
                 />
               </div>

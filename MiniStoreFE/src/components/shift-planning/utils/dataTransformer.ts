@@ -11,7 +11,6 @@ export function transformData(
     cellInfos: {},
     dates: data.dates,
     staffs: data.staffs,
-    holidays: data.holidays,
     shiftsRules: {},
     leaveRequests: [],
   };

@@ -1,7 +1,7 @@
 import Breadcrumbs from "~/components/Breadcrumbs";
 import { createStore } from "solid-js/store";
 import { createEffect, createResource, createSignal, on, ResourceFetcher, Show } from "solid-js";
-import { DataResponse, Holiday, Role, ShiftTemplate, Staff } from "~/types";
+import { DataResponse, Role, ShiftTemplate, Staff } from "~/types";
 import { getWeekDateStings } from "~/utils/getWeekDates";
 import getEndPoint from "~/utils/getEndPoint";
 import { ModalContext, PageDataContext, ShiftCard } from "~/context/ShiftPlanning";
@@ -37,14 +37,9 @@ const fetcher: ResourceFetcher<{
 
     const response = await axios.get<DataResponse<Staff[]>>(endpoint);
 
-    const { data: holidays } = await axios.get<DataResponse<Holiday[]>>(
-      `${getEndPoint()}/holidays/all?from=${from}&to=${to}`
-    );
-
     return {
       dates,
       staffs: response.data.content,
-      holidays: holidays.content,
     };
   } catch (e) {
     throw new Error(handleFetchError(e));
@@ -65,7 +60,6 @@ export default function ShiftPlanning() {
       initialValue: {
         dates: [],
         staffs: [],
-        holidays: [],
       },
     }
   );
@@ -78,7 +72,6 @@ export default function ShiftPlanning() {
     shifts: {},
     dates: [],
     staffs: [],
-    holidays: [],
     shiftsRules: {},
     leaveRequests: [],
   });
@@ -135,7 +128,6 @@ export default function ShiftPlanning() {
     mutate({
       dates: [],
       staffs: [],
-      holidays: [],
     });
     setTableData({
       cells: {},
@@ -143,7 +135,6 @@ export default function ShiftPlanning() {
       shifts: {},
       dates: [],
       staffs: [],
-      holidays: [],
       shiftsRules: {},
       leaveRequests: [],
     });

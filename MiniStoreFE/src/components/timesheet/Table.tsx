@@ -24,8 +24,6 @@ export default function Table() {
   };
 
   const isHoliday = (shift: any): Holiday | undefined => {
-    if (!shift) return undefined;
-
     return holidays()?.find((holiday) => moment(shift.date, "YYYY-MM-DD")
       .isBetween(holiday.startDate, holiday.endDate, undefined, "[]"));
   }

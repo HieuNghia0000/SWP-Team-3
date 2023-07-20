@@ -5,7 +5,6 @@ import com.team3.ministore.model.Salary;
 import com.team3.ministore.model.Staff;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface SalaryService {
     List<Salary> getAllSalary();
@@ -16,9 +15,9 @@ public interface SalaryService {
 
     Salary createSalary(SalaryDto salary, Staff staff);
 
-    Optional<Salary> getSalaryById(Integer id);
+    Salary getSalaryById(Integer id);
 
-    Optional<Salary> updateSalary(Integer id, Salary salary);
+    Salary updateSalary(Integer id, Salary salary);
 
     void deleteSalary(Integer id);
 }

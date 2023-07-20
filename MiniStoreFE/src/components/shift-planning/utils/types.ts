@@ -1,4 +1,4 @@
-import { Staff, Shift, LeaveRequest, Holiday } from "~/types";
+import { Staff, Shift, LeaveRequest } from "~/types";
 
 export type ParamType = {
   picked_date: string;
@@ -6,7 +6,6 @@ export type ParamType = {
 export interface FetcherData {
   dates: string[];
   staffs: Staff[];
-  holidays: Holiday[];
 }
 
 export type Rule = {
