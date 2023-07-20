@@ -31,9 +31,9 @@
 <body>
   <div class="flex h-screen bg-gray-50  " :class="{ 'overflow-hidden': isSideMenuOpen}">
     <!-- Desktop sidebar -->
-    <aside class="z-20 hidden w-64 overflow-y-auto bg-white   md:block flex-shrink-0">
+    <aside class="z-20 hidden w-64 overflow-y-auto bg-white md:block flex-shrink-0">
       <div class="py-4 text-gray-500 " style="height: 100vh">
-        <a class="ml-6 text-lg font-bold text-gray-800" href="#" style="
+        <a class="ml-6 text-lg font-bold text-gray-800 " href="#" style="
               display: flex;
               justify-content: flex-start;
               align-items: center;
@@ -51,7 +51,7 @@
 
             <!-- Add this classes to an active anchor (a tag) -->
             <!-- text-gray-800 dark:text-gray-100 -->
-            <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 "
+            <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800  "
               href="index.html">
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" clip-rule="evenodd"
@@ -95,7 +95,7 @@
                 x-transition:enter-start="opacity-25 max-h-0" x-transition:enter-end="opacity-100 max-h-xl"
                 x-transition:leave="transition-all ease-in-out duration-300"
                 x-transition:leave-start="opacity-100 max-h-xl" x-transition:leave-end="opacity-0 max-h-0"
-                class="p-2 mt-2 space-y-2 overflow-hidden text-sm font-medium text-gray-500 rounded-md shadow-inner bg-gray-50  "
+                class="p-2 mt-2 space-y-2 overflow-hidden text-sm font-medium text-gray-500 rounded-md shadow-inner bg-gray-50 "
                 aria-label="submenu">
                 <li class="px-2 py-1 transition-colors duration-150 hover:text-gray-800  ">
                   <a class="w-full" href="">Products List</a>
@@ -109,7 +109,7 @@
             </template>
           </li>
           <li class="relative px-6 py-3">
-            <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 "
+            <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800  "
               href="forms.html">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" clip-rule="evenodd"
@@ -148,7 +148,7 @@
             </a>
           </li>
           <li class="relative px-6 py-3">
-            <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 "
+            <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800  "
               href="charts.html">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" clip-rule="evenodd"
@@ -176,7 +176,7 @@
         <div class="my-6" style="position: fixed; bottom: 10px">
           <ul class="">
             <li class="relative px-6 py-3">
-              <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800  "
+              <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 "
                 href="index.html">
                 <svg width="18" height="20" viewBox="0 0 18 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path fill-rule="evenodd" clip-rule="evenodd"
@@ -188,7 +188,7 @@
               </a>
             </li>
             <li class="relative px-6 py-3">
-              <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800  "
+              <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 "
                 href="index.html">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path fill-rule="evenodd" clip-rule="evenodd"
@@ -218,7 +218,7 @@
       x-transition:leave="transition ease-in-out duration-150" x-transition:leave-start="opacity-100"
       x-transition:leave-end="opacity-0 transform -translate-x-20" @click.away="closeSideMenu"
       @keydown.escape="closeSideMenu">
-      <div class="py-4 text-gray-500  " style="height: 100vh">
+      <div class="py-4 text-gray-500 " style="height: 100vh">
         <a class="ml-6 text-lg font-bold text-gray-800 " href="#" style="
               display: flex;
               justify-content: flex-start;
@@ -281,7 +281,7 @@
                 x-transition:enter-start="opacity-25 max-h-0" x-transition:enter-end="opacity-100 max-h-xl"
                 x-transition:leave="transition-all ease-in-out duration-300"
                 x-transition:leave-start="opacity-100 max-h-xl" x-transition:leave-end="opacity-0 max-h-0"
-                class="p-2 mt-2 space-y-2 overflow-hidden text-sm font-medium text-gray-500 rounded-md shadow-inner bg-gray-50 "
+                class="p-2 mt-2 space-y-2 overflow-hidden text-sm font-medium text-gray-500 rounded-md shadow-inner bg-gray-50  "
                 aria-label="submenu">
                 <li class="px-2 py-1 transition-colors duration-150 hover:text-gray-800  ">
                   <a class="w-full" href="">Products List</a>
@@ -295,7 +295,7 @@
             </template>
           </li>
           <li class="relative px-6 py-3">
-            <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 "
+            <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800  "
               href="forms.html">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" clip-rule="evenodd"
@@ -313,7 +313,7 @@
             </a>
           </li>
           <li class="relative px-6 py-3">
-            <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800  "
+            <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 "
               href="cards.html">
               <svg width="20" height="19" viewBox="0 0 20 19" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" clip-rule="evenodd"
@@ -334,7 +334,7 @@
             </a>
           </li>
           <li class="relative px-6 py-3">
-            <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 "
+            <a class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800  "
               href="charts.html">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" clip-rule="evenodd"
@@ -392,7 +392,7 @@
       </div>
     </aside>
     <div class="flex flex-col flex-1">
-      <header class="z-10 py-4 bg-white shadow-md ">
+      <header class="z-10 py-4 bg-white shadow-md  ">
         <div
           class="container flex items-center justify-between h-full px-6 mx-auto text-purple-600 ">
           <!-- Mobile hamburger -->
@@ -459,11 +459,11 @@
                   class="absolute right-0 w-56 p-2 mt-2 space-y-2 text-gray-600 bg-white border border-gray-100 rounded-md shadow-md "
                   aria-label="submenu">
                   <li class="flex">
-                    <a class="inline-flex items-center justify-between w-full px-2 py-1 text-sm font-semibold transition-colors duration-150 rounded-md hover:bg-gray-100 hover:text-gray-80 "
+                    <a class="inline-flex items-center justify-between w-full px-2 py-1 text-sm font-semibold transition-colors duration-150 rounded-md hover:bg-gray-100 hover:text-gray-800 "
                       href="#">
                       <span>Messages</span>
                       <span
-                        class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-600 bg-red-100  ">
+                        class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-600 bg-red-100 ">
                         13
                       </span>
                     </a>
@@ -498,10 +498,10 @@
               <template x-if="isProfileMenuOpen">
                 <ul x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100"
                   x-transition:leave-end="opacity-0" @click.away="closeProfileMenu" @keydown.escape="closeProfileMenu"
-                  class="absolute right-0 w-56 p-2 mt-2 space-y-2 text-gray-600 bg-white border border-gray-100 rounded-md shadow-md "
+                  class="absolute right-0 w-56 p-2 mt-2 space-y-2 text-gray-600 bg-white border border-gray-100 rounded-md shadow-md  "
                   aria-label="submenu">
                   <li class="flex">
-                    <a class="inline-flex items-center w-full px-2 py-1 text-sm font-semibold transition-colors duration-150 rounded-md hover:bg-gray-100 hover:text-gray-800  "
+                    <a class="inline-flex items-center w-full px-2 py-1 text-sm font-semibold transition-colors duration-150 rounded-md hover:bg-gray-100 hover:text-gray-800 "
                       href="#">
                       <svg class="w-4 h-4 mr-3" aria-hidden="true" fill="none" stroke-linecap="round"
                         stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
@@ -524,7 +524,7 @@
                     </a>
                   </li>
                   <li class="flex">
-                    <a class="inline-flex items-center w-full px-2 py-1 text-sm font-semibold transition-colors duration-150 rounded-md hover:bg-gray-100 hover:text-gray-800  "
+                    <a class="inline-flex items-center w-full px-2 py-1 text-sm font-semibold transition-colors duration-150 rounded-md hover:bg-gray-100 hover:text-gray-800 "
                       href="#">
                       <svg class="w-4 h-4 mr-3" aria-hidden="true" fill="none" stroke-linecap="round"
                         stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
@@ -646,7 +646,7 @@
               <table class="w-full whitespace-no-wrap">
                 <thead>
                   <tr
-                    class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b  ">
+                    class="text-xs font-semibold tracking-wide text-left text-gray-500 uppercase border-b >
                     <th class="px-4 py-3">
                       <input type="checkbox"
                         class="form-checkbox focus:border-purple-400 focus:outline-none focus:shadow-outline-purple  " />
@@ -658,10 +658,10 @@
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y  ">
-                  <tr class="text-gray-700 ">
+                  <tr class="text-gray-700  ">
                     <td class="px-4 py-3">
                       <input type="checkbox"
-                        class="form-checkbox focus:border-purple-400 focus:outline-none focus:shadow-outline-purple  " />
+                        class="form-checkbox focus:border-purple-400 focus:outline-none focus:shadow-outline-purple " />
                     </td>
                     <td class="px-4 py-3">
                       <div class="flex items-center text-sm">
@@ -674,7 +674,7 @@
                         </div>
                         <div>
                           <p class="font-semibold">Hans Burger</p>
-                          <p class="text-xs text-gray-600  ">
+                          <p class="text-xs text-gray-600 ">
                             10x Developer
                           </p>
                         </div>
@@ -706,10 +706,10 @@
                     </td>
                   </tr>
 
-                  <tr class="text-gray-700  ">
+                  <tr class="text-gray-700 ">
                     <td class="px-4 py-3">
                       <input type="checkbox"
-                        class="form-checkbox focus:border-purple-400 focus:outline-none focus:shadow-outline-purple " />
+                        class="form-checkbox focus:border-purple-400 focus:outline-none focus:shadow-outline-purple  " />
                     </td>
                     <td class="px-4 py-3">
                       <div class="flex items-center text-sm">
@@ -722,7 +722,7 @@
                         </div>
                         <div>
                           <p class="font-semibold">Jolina Angelie</p>
-                          <p class="text-xs text-gray-600  ">
+                          <p class="text-xs text-gray-600 ">
                             Unemployed
                           </p>
                         </div>
@@ -757,7 +757,7 @@
                   <tr class="text-gray-700 ">
                     <td class="px-4 py-3">
                       <input type="checkbox"
-                        class="form-checkbox focus:border-purple-400 focus:outline-none focus:shadow-outline-purple  " />
+                        class="form-checkbox focus:border-purple-400 focus:outline-none focus:shadow-outline-purple " />
                     </td>
                     <td class="px-4 py-3">
                       <div class="flex items-center text-sm">
@@ -781,7 +781,7 @@
                     <td class="px-4 py-3">
                       <div class="flex items-center space-x-4 text-sm">
                         <button
-                          class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-purple-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
+                          class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-purple-600 rounded-lg  focus:outline-none focus:shadow-outline-gray"
                           aria-label="Edit">
                           <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
                             <path
@@ -790,7 +790,7 @@
                           </svg>
                         </button>
                         <button
-                          class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-purple-600 rounded-lg  focus:outline-none focus:shadow-outline-gray"
+                          class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-purple-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
                           aria-label="Delete">
                           <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd"
@@ -802,7 +802,7 @@
                     </td>
                   </tr>
 
-                  <tr class="text-gray-700  ">
+                  <tr class="text-gray-700 ">
                     <td class="px-4 py-3">
                       <input type="checkbox"
                         class="form-checkbox focus:border-purple-400 focus:outline-none focus:shadow-outline-purple " />
@@ -829,7 +829,7 @@
                     <td class="px-4 py-3">
                       <div class="flex items-center space-x-4 text-sm">
                         <button
-                          class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-purple-600 rounded-lg  focus:outline-none focus:shadow-outline-gray"
+                          class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-purple-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
                           aria-label="Edit">
                           <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
                             <path
@@ -838,7 +838,7 @@
                           </svg>
                         </button>
                         <button
-                          class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-purple-600 rounded-lg  focus:outline-none focus:shadow-outline-gray"
+                          class="flex items-center justify-between px-2 py-2 text-sm font-medium leading-5 text-purple-600 rounded-lg focus:outline-none focus:shadow-outline-gray"
                           aria-label="Delete">
                           <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd"
