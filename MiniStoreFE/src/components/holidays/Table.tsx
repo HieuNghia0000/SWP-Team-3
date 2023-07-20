@@ -1,12 +1,20 @@
-import { For, Show } from "solid-js";
+import { batch, For, Show } from "solid-js";
 import { IoTrashOutline } from "solid-icons/io";
 import { useRouteData } from "@solidjs/router";
 import { routeData } from "~/routes/holidays";
 import { useHContext } from "~/context/Holiday";
+import { OcPencil3 } from "solid-icons/oc";
 
 export default function Table() {
   const { data } = useRouteData<typeof routeData>();
-  const { onDelete } = useHContext();
+  const { onDelete, setChosenId, setShowEditModal } = useHContext();
+
+  let onEdit = (id: number) => {
+    batch(() => {
+      setChosenId(id);
+      setShowEditModal(true);
+    });
+  };
 
   return (
     <div class="flex flex-col border border-gray-200 rounded-lg overflow-x-auto shadow-sm">
@@ -89,6 +97,17 @@ export default function Table() {
                   }}
                   class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
                   <div class="flex flex-row gap-1">
+                    <div class="relative flex justify-center items-center">
+                      <button
+                        onClick={[ onEdit, item.holidayId ]}
+                        class="peer text-base text-gray-500 hover:text-indigo-500">
+                        <OcPencil3/>
+                      </button>
+                      <span
+                        class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
+                          Edit
+                      </span>
+                    </div>
                     <div class="relative flex justify-center items-center">
                       <button
                         onClick={[ onDelete, item.holidayId ]}

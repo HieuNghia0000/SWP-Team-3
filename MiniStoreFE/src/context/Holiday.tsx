@@ -6,6 +6,8 @@ type HModalContext = {
   showCreateModal: Accessor<boolean>;
   setShowCreateModal: Setter<boolean>;
   onDelete: (id: number) => Promise<void>;
+  showEditModal: Accessor<boolean>;
+  setShowEditModal: Setter<boolean>;
 };
 
 export const ModalContext = createContext<HModalContext>();

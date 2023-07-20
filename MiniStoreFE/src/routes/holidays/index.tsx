@@ -13,6 +13,7 @@ import { ModalContext } from "~/context/Holiday";
 import ToolBar from "~/components/holidays/Toolbar";
 import Table from "~/components/holidays/Table";
 import CreateHolidayModal from "~/components/holidays/CreateHolidayModal";
+import EditHolidayModal from "~/components/holidays/EditHolidayModal";
 
 const deleteHoliday = async (id: number) => {
   try {
@@ -54,6 +55,7 @@ export function routeData() {
 export default function Holidays() {
   const { data } = useRouteData<typeof routeData>();
   const [ showCreateModal, setShowCreateModal ] = createSignal(false);
+  const [ showEditModal, setShowEditModal ] = createSignal(false);
   const [ chosenId, setChosenId ] = createSignal(0);
   const [ deleting, deleteAction ] = createRouteAction(deleteHoliday);
 
@@ -66,6 +68,7 @@ export default function Holidays() {
     const success = await deleteAction(id);
     if (!success) return;
 
+    if (showEditModal()) setShowEditModal(false);
     toastSuccess("Holiday deleted successfully");
   }
 
@@ -76,6 +79,8 @@ export default function Holidays() {
         setChosenId,
         showCreateModal,
         setShowCreateModal,
+        showEditModal,
+        setShowEditModal,
         onDelete
       }}>
         <h1 class="mb-2 text-2xl font-medium">Holidays</h1>
@@ -97,6 +102,7 @@ export default function Holidays() {
         <Pagination totalItems={totalItems}/>
 
         <CreateHolidayModal/>
+        <EditHolidayModal/>
       </ModalContext.Provider>
     </main>
   );

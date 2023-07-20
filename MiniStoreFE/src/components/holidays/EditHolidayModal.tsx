@@ -10,7 +10,6 @@ import getEndPoint from "~/utils/getEndPoint";
 import handleFetchError from "~/utils/handleFetchError";
 import { toastSuccess } from "~/utils/toast";
 import { useRouteData } from "@solidjs/router";
-import { useAuth } from "~/context/Auth";
 import { routeData } from "~/routes/holidays";
 import { useHContext } from "~/context/Holiday";
 import { TextInput } from "~/components/form/TextInput";
@@ -41,8 +40,7 @@ const updateHoliday = async (formData: Holiday) => {
 const EditHolidayModal: Component = () => {
   const [ updating, updateAction ] = createRouteAction(updateHoliday);
   const { data } = useRouteData<typeof routeData>();
-  const { user } = useAuth();
-  const { chosenId, onDelete } = useHContext();
+  const { chosenId, onDelete, setShowEditModal, showEditModal } = useHContext();
 
   const formHandler = useFormHandler(yupSchema(schema), { validateOn: [] });
   const { formData } = formHandler;
@@ -67,17 +65,17 @@ const EditHolidayModal: Component = () => {
 
     if (success) {
       toastSuccess("Shift cover request updated successfully");
-      setShowModal(false);
+      setShowEditModal(false);
     }
   }
 
   const onCloseModal = async () => {
     await formHandler.resetForm();
-    setShowModal(false);
+    setShowEditModal(false);
   }
 
   return (
-    <PopupModal.Wrapper title="Edit Shift Cover Request" close={onCloseModal} open={showModal}>
+    <PopupModal.Wrapper title="Edit Holiday" close={onCloseModal} open={showEditModal}>
       <div classList={{
         "cursor-progress": updating.pending,
       }}>
@@ -90,6 +88,14 @@ const EditHolidayModal: Component = () => {
                   name="name"
                   label="Holiday Name"
                   placeholder="Holiday name"
+                  value={curHoliday()?.name}
+                  formHandler={formHandler}
+                />
+                <TextInput
+                  id="holidayId"
+                  name="holidayId"
+                  hidden={true}
+                  value={curHoliday()?.holidayId}
                   formHandler={formHandler}
                 />
               </div>
@@ -102,6 +108,7 @@ const EditHolidayModal: Component = () => {
                   label="Start Date"
                   type="date"
                   placeholder="Select a date"
+                  value={curHoliday()?.startDate}
                   formHandler={formHandler}
                 />
               </div>
@@ -112,6 +119,7 @@ const EditHolidayModal: Component = () => {
                   label="End Date"
                   type="date"
                   placeholder="Select a date"
+                  value={curHoliday()?.endDate}
                   formHandler={formHandler}
                 />
               </div>
@@ -121,7 +129,8 @@ const EditHolidayModal: Component = () => {
                   name="coefficient"
                   type="number"
                   label="Coefficient"
-                  value={3}
+                  placeholder="Coefficient"
+                  value={curHoliday()?.coefficient}
                   step={0.1}
                   formHandler={formHandler}
                 />
