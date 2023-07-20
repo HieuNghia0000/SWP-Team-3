@@ -7,6 +7,7 @@ import com.team3.ministore.model.Staff;
 import com.team3.ministore.service.*;
 import com.team3.ministore.utils.LeaveStatus;
 import com.team3.ministore.utils.ShiftCoverStatus;
+import com.team3.ministore.utils.StaffStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,33 +53,35 @@ public class ShiftPlanningController {
             // Get all staffs in the database
             List<Staff> staffs = staffService.getAllStaffs();
             // Iterate through all staffs and get their shifts and salary
-            List<StaffDto> staffDtos = staffs.parallelStream().map(staff -> {
-                // Get the salary and leave requests of the staff
-                SalaryDto salaryDto = salaryService.getSalaryByStaffId(staff.getStaffId());
-                List<LeaveRequestDto> leaveRequestDtos = leaveRequestService
-                        .getLeaveRequestsByStaffIdAndDates(staff.getStaffId(), fromDate, toDate)
-                        .stream().filter(leaveRequestDto -> leaveRequestDto.getStatus().equals(LeaveStatus.APPROVED))
-                        .collect(Collectors.toList());
-                // Get the shifts of the staff
-                List<Shift> shifts = shiftService.getAllShiftsByStaffId(staff.getStaffId(), fromDate, toDate);
+            List<StaffDto> staffDtos = staffs.parallelStream()
+                    .filter(staff -> staff.getStatus() == StaffStatus.ACTIVE).map(staff -> {
+                        // Get the salary and leave requests of the staff
+                        SalaryDto salaryDto = salaryService.getSalaryByStaffId(staff.getStaffId());
+                        List<LeaveRequestDto> leaveRequestDtos = leaveRequestService
+                                .getLeaveRequestsByStaffIdAndDates(staff.getStaffId(), fromDate, toDate)
+                                .stream().filter(leaveRequestDto -> leaveRequestDto.getStatus().equals(LeaveStatus.APPROVED))
+                                .collect(Collectors.toList());
+                        // Get the shifts of the staff
+                        List<Shift> shifts = shiftService.getAllShiftsByStaffId(staff.getStaffId(), fromDate, toDate);
 
-                // Filter out the shifts that are in the leave requests
-                shifts = shifts.stream().filter(shift -> {
-                    for (LeaveRequestDto leaveRequestDto : leaveRequestDtos) {
-                        if (leaveRequestDto.getStartDate().isEqual(shift.getDate())
-                                || leaveRequestDto.getEndDate().isEqual(shift.getDate())
-                                || (leaveRequestDto.getStartDate().isBefore(shift.getDate()) && leaveRequestDto.getEndDate().isAfter(shift.getDate())))
-                            return false;
-                    }
-                    return true;
-                }).collect(Collectors.toList());
+                        // Filter out the shifts that are in the leave requests
+                        shifts = shifts.stream().filter(shift -> {
+                            for (LeaveRequestDto leaveRequestDto : leaveRequestDtos) {
+                                if (leaveRequestDto.getStartDate().isEqual(shift.getDate())
+                                        || leaveRequestDto.getEndDate().isEqual(shift.getDate())
+                                        || (leaveRequestDto.getStartDate().isBefore(shift.getDate())
+                                        && leaveRequestDto.getEndDate().isAfter(shift.getDate())))
+                                    return false;
+                            }
+                            return true;
+                        }).collect(Collectors.toList());
 
-                // Convert shifts to shiftDtos
-                List<ShiftDto> shiftDtos = shifts.stream().map(ShiftDto::new).collect(Collectors.toList());
+                        // Convert shifts to shiftDtos
+                        List<ShiftDto> shiftDtos = shifts.stream().map(ShiftDto::new).collect(Collectors.toList());
 
-                // Return the staffDtos
-                return new StaffDto(staff, salaryDto, shiftDtos, leaveRequestDtos);
-            }).collect(Collectors.toList());
+                        // Return the staffDtos
+                        return new StaffDto(staff, salaryDto, shiftDtos, leaveRequestDtos);
+                    }).collect(Collectors.toList());
 
             // Return all staffs
             return ResponseHandler.getResponse(staffDtos, HttpStatus.OK);
@@ -90,7 +93,7 @@ public class ShiftPlanningController {
         // ------------------------------------------------------------
         Optional<Staff> foundStaff = staffService.getStaffById(staffId);
 
-        if (foundStaff.isEmpty())
+        if (foundStaff.isEmpty() || foundStaff.get().getStatus() == StaffStatus.DISABLED)
             return ResponseHandler.getResponse(new Exception("Staff not found"), HttpStatus.NOT_FOUND);
 
         SalaryDto salaryDto = salaryService.getSalaryByStaffId(foundStaff.get().getStaffId());
@@ -125,7 +128,8 @@ public class ShiftPlanningController {
         // Add the shifts which are covered by the staff to the shiftDtos
         shiftCoverDtos.stream().map(ShiftCoverDto::getShift)
                 .forEach(shift -> {
-                    if (shiftDtos.stream().noneMatch(shift1 -> shift1.getShiftId() == shift.getShiftId())) shiftDtos.add(shift);
+                    if (shiftDtos.stream().noneMatch(shift1 -> shift1.getShiftId() == shift.getShiftId()))
+                        shiftDtos.add(shift);
                 });
 
         // Filter the shifts which are not published

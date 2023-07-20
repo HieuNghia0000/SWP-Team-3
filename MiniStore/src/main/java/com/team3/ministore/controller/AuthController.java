@@ -7,6 +7,7 @@ import com.team3.ministore.jwt.JwtUtils;
 import com.team3.ministore.model.Staff;
 import com.team3.ministore.service.SalaryService;
 import com.team3.ministore.service.StaffService;
+import com.team3.ministore.utils.StaffStatus;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
@@ -69,6 +70,9 @@ public class AuthController {
             String username = jwtUtils.getUsernameFromToken(token);
             Optional<Staff> foundStaff = staffService.getStaffByUsername(username);
 
+            if (foundStaff.isPresent() && foundStaff.get().getStatus() == StaffStatus.DISABLED)
+                return ResponseHandler.getResponse(new Exception("Your account has been deactivated."), HttpStatus.BAD_REQUEST);
+
             return foundStaff.map(value -> ResponseHandler.getResponse(
                     new StaffDto(value, salaryService.getSalaryByStaffId(value.getStaffId())), HttpStatus.OK)
             ).orElseGet(() -> ResponseHandler.getResponse(new Exception("Invalid staff id"), HttpStatus.BAD_REQUEST));
@@ -78,7 +82,7 @@ public class AuthController {
             return ResponseHandler.getResponse(e, HttpStatus.FORBIDDEN);
         } catch (MalformedJwtException e) {
             e.printStackTrace();
-            return ResponseHandler.getResponse("Forbidden request.", HttpStatus.FORBIDDEN);
+            return ResponseHandler.getResponse(new Exception("Forbidden request."), HttpStatus.FORBIDDEN);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseHandler.getResponse(e, HttpStatus.BAD_REQUEST);

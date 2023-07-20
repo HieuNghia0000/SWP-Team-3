@@ -12,7 +12,7 @@ import {
 } from "solid-js";
 import Cookies from "js-cookie";
 import { apiRoutes } from "~/utils/routes";
-import { DataResponse, Staff } from "~/types";
+import { DataResponse, Staff, StaffStatus } from "~/types";
 import axios from "axios";
 import getEndPoint from "~/utils/getEndPoint";
 import { toastSuccess } from "~/utils/toast";
@@ -96,7 +96,11 @@ const fetchData: ResourceFetcher<
         apiRoutes.currentUser
       );
 
-      if (data.content === undefined) return undefined;
+      if (data.content === undefined || data.content.status === StaffStatus.DISABLED) {
+        clearItem("token");
+        setApiAuthorization("");
+        return undefined;
+      }
 
       toastSuccess("Authorization succeeded");
       return data.content;

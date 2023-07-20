@@ -4,7 +4,6 @@ const routes = {
   dashboard: "/",
   shiftPlanning: "/shift-planning",
   staffs: "/staffs",
-  staff: (id: string | number) => `/staffs/${id}`,
   staffAdd: "/staffs/add",
   staffEdit: (id: string | number) => `/staffs/${id}/edit`,
   staffImageEdit: (id: string | number) => `/staffs/${id}/edit-image`,

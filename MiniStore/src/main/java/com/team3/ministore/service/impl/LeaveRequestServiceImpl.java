@@ -6,6 +6,7 @@ import com.team3.ministore.model.Staff;
 import com.team3.ministore.repository.LeaveRequestRepository;
 import com.team3.ministore.repository.StaffRepository;
 import com.team3.ministore.service.LeaveRequestService;
+import com.team3.ministore.utils.StaffStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -36,8 +37,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
         Pageable pageable = PageRequest.of(page - 1, pageSize);
 
         return leaveRequestRepository.findByStaff_StaffNameContainingIgnoreCaseOrderByLeaveRequestIdDesc(search, pageable)
-                .stream().map(LeaveRequestDto::new)
-                .collect(Collectors.toList());
+                .stream().map(LeaveRequestDto::new).collect(Collectors.toList());
     }
 
     @Override
@@ -45,7 +45,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
         LeaveRequest leave = new LeaveRequest();
 
         Optional<Staff> staff = staffRepository.findById(dto.getStaffId());
-        if (staff.isEmpty()) return Optional.empty();
+        if (staff.isEmpty() || staff.get().getStatus() == StaffStatus.DISABLED) return Optional.empty();
 
         leave.setStaff(staff.get());
         leave.setLeaveType(dto.getLeaveType());
@@ -70,7 +70,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
         Optional<LeaveRequest> existingLeaveRequest = leaveRequestRepository.findById(id);
         Optional<Staff> staff = staffRepository.findById(dto.getStaffId());
 
-        if (staff.isEmpty()) return Optional.empty();
+        if (staff.isEmpty() || staff.get().getStatus() == StaffStatus.DISABLED) return Optional.empty();
 
         if (existingLeaveRequest.isEmpty()) return Optional.empty();
 

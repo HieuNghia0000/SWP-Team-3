@@ -3,9 +3,10 @@ import * as yup from "yup";
 import { useFormHandler } from "solid-form-handler";
 import { yupSchema } from "solid-form-handler/yup";
 import { useAuth } from "~/context/Auth";
-import { Show, createEffect } from "solid-js";
+import { createEffect, Show } from "solid-js";
 import { useNavigate } from "solid-start";
 import routes from "~/utils/routes";
+import { StaffStatus } from "~/types";
 
 type Login = {
   username: string;
@@ -26,7 +27,7 @@ export default function Login() {
   const { formData } = formHandler;
 
   createEffect(() => {
-    if (!user.error && user()) {
+    if (!user.error && user() && user()?.status === StaffStatus.ACTIVATED) {
       navigate(routes.dashboard);
     }
   });
