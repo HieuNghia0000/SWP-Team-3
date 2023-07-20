@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,20 +44,23 @@ public class SalaryServiceImpl implements SalaryService {
     }
 
     @Override
-    public Salary getSalaryById(Integer id) {
-        return salaryRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid Salary ID: " + id));
+    public Optional<Salary> getSalaryById(Integer id) {
+        return salaryRepository.findById(id);
     }
 
     @Override
-    public Salary updateSalary(Integer id, Salary salary) {
-        Salary existingSalary = getSalaryById(id);
+    public Optional<Salary> updateSalary(Integer id, Salary salary) {
+        Optional<Salary> existingSalary = getSalaryById(id);
 
-        existingSalary.setStaff(salary.getStaff());
-        existingSalary.setHourlyWage(salary.getHourlyWage());
-        existingSalary.setEffectiveDate(salary.getEffectiveDate());
-        existingSalary.setTerminationDate(salary.getTerminationDate());
+        if (existingSalary.isEmpty()) return Optional.empty();
+        return existingSalary.map(s -> {
+            s.setStaff(salary.getStaff());
+            s.setHourlyWage(salary.getHourlyWage());
+            s.setEffectiveDate(salary.getEffectiveDate());
+            s.setTerminationDate(salary.getTerminationDate());
+            return salaryRepository.save(s);
+        });
 
-        return salaryRepository.save(existingSalary);
     }
 
     @Override
