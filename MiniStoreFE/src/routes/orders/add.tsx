@@ -99,7 +99,9 @@ export default function AddOrders() {
             quantity: product.quantity,
         }));
 
-        axios.post(`${getEndPoint()}/orders/pay`, selectedProductDetails)
+        console.log(selectedProductDetails);
+
+        axios.post(`${getEndPoint()}/orders/payment`, selectedProductDetails)
             .then((response) => {
                 console.log(response.data);
             })

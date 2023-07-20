@@ -1,10 +1,18 @@
 package com.team3.ministore.controller;
 
+import com.paypal.api.payments.Links;
+import com.paypal.api.payments.Payment;
+import com.paypal.base.rest.PayPalRESTException;
+import com.team3.ministore.dto.PaymentItems;
 import com.team3.ministore.model.Orders;
 import com.team3.ministore.service.OrdersService;
+import com.team3.ministore.service.PaypalService;
+import com.team3.ministore.utils.PaypalPaymentIntent;
+import com.team3.ministore.utils.PaypalPaymentMethod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +31,9 @@ public class OrdersController {
 
     @Autowired
     private OrdersService ordersService;
+
+    @Autowired
+    private PaypalService paypalService;
 
     @PostMapping("/add")
     public ResponseEntity<Orders> createOrders(@RequestBody Orders orders) {
@@ -110,6 +121,50 @@ public class OrdersController {
 
         return new ResponseEntity<>(ordersPage, HttpStatus.OK);
     }
+
+    @PostMapping("/payment")
+    public ResponseEntity<?> paymentOrders(@RequestBody List<PaymentItems> paymentItems) {
+
+        try {
+            Payment payment = paypalService.createPayment(paymentItems, "USD", PaypalPaymentMethod.paypal, PaypalPaymentIntent.sale, "description payment", "/cancel", "/success");
+
+            String approvalUrl = null;
+            for (Links link : payment.getLinks()) {
+                if (link.getRel().equals("approval_url")) {
+                    approvalUrl = link.getHref();
+                    break;
+                }
+            }
+
+            if (approvalUrl != null) {
+                return ResponseEntity.status(HttpStatus.FOUND)
+                        .header("Location", approvalUrl)
+                        .build();
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("Failed to retrieve PayPal approval URL");
+            }
+        } catch (PayPalRESTException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @GetMapping("/success")
+    public ResponseEntity<?> successPay(@RequestParam("paymentId") String paymentId, @RequestParam("PayerID") String payerId) {
+        try {
+            Payment payment = paypalService.executePayment(paymentId, payerId);
+            if (payment.getState().equals("approved")) {
+                HttpHeaders headers = new HttpHeaders();
+                headers.add("Location", "/orders/success");
+                return new ResponseEntity<>(headers, HttpStatus.FOUND);
+            }
+        } catch (PayPalRESTException e) {
+            throw new RuntimeException(e);
+        }
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
 
     private LocalDateTime parseDateTime(String dateString) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
