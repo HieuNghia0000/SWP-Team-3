@@ -1,28 +1,29 @@
 package com.team3.ministore.controller;
 
-import com.paypal.api.payments.Links;
-import com.paypal.api.payments.Payment;
-import com.paypal.base.rest.PayPalRESTException;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.team3.ministore.config.VnPayConfig;
 import com.team3.ministore.dto.PaymentItems;
 import com.team3.ministore.model.Orders;
 import com.team3.ministore.service.OrdersService;
-import com.team3.ministore.service.PaypalService;
-import com.team3.ministore.utils.PaypalPaymentIntent;
-import com.team3.ministore.utils.PaypalPaymentMethod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -31,9 +32,6 @@ public class OrdersController {
 
     @Autowired
     private OrdersService ordersService;
-
-    @Autowired
-    private PaypalService paypalService;
 
     @PostMapping("/add")
     public ResponseEntity<Orders> createOrders(@RequestBody Orders orders) {
@@ -123,48 +121,79 @@ public class OrdersController {
     }
 
     @PostMapping("/payment")
-    public ResponseEntity<?> paymentOrders(@RequestBody List<PaymentItems> paymentItems) {
+    public ResponseEntity<String> createPayment(HttpServletRequest request, @RequestBody PaymentItems paymentItems) throws UnsupportedEncodingException {
+        String vnp_Version = "2.1.0";
+        String vnp_Command = "pay";
 
-        try {
-            Payment payment = paypalService.createPayment(paymentItems, "USD", PaypalPaymentMethod.paypal, PaypalPaymentIntent.sale, "description payment", "/cancel", "/success");
+        long vnpAmount = paymentItems.getGrandTotal() * 100;
+        String vnp_TxnRef = VnPayConfig.getRandomNumber(8);
+        String vnp_IpAddr = VnPayConfig.getIpAddress(request);
+        String vnp_TmnCode = VnPayConfig.vnp_TmnCode;
+        String bankCode = "";
 
-            String approvalUrl = null;
-            for (Links link : payment.getLinks()) {
-                if (link.getRel().equals("approval_url")) {
-                    approvalUrl = link.getHref();
-                    break;
+        Map<String, String> vnp_Params = new HashMap<>();
+        vnp_Params.put("vnp_Version", vnp_Version);
+        vnp_Params.put("vnp_Command", vnp_Command);
+        vnp_Params.put("vnp_TmnCode", vnp_TmnCode);
+        vnp_Params.put("vnp_Amount", String.valueOf(vnpAmount));
+        vnp_Params.put("vnp_CurrCode", "VND");
+
+        if (bankCode != null && !bankCode.isEmpty()) {
+            vnp_Params.put("vnp_BankCode", bankCode);
+        }
+
+        vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
+        vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang:" + vnp_TxnRef);
+        vnp_Params.put("vnp_OrderType", paymentItems.getOrderType());
+        vnp_Params.put("vnp_Locale", "vn");
+
+        vnp_Params.put("vnp_ReturnUrl", VnPayConfig.vnp_Returnurl);
+        vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
+
+        Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+        String vnp_CreateDate = formatter.format(cld.getTime());
+        vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
+
+        cld.add(Calendar.MINUTE, 10);
+        String vnp_ExpireDate = formatter.format(cld.getTime());
+        vnp_Params.put("vnp_ExpireDate", vnp_ExpireDate);
+
+        List<String> fieldNames = new ArrayList<>(vnp_Params.keySet());
+        Collections.sort(fieldNames);
+
+        StringBuilder hashData = new StringBuilder();
+        StringBuilder query = new StringBuilder();
+        Iterator<String> itr = fieldNames.iterator();
+        while (itr.hasNext()) {
+            String fieldName = itr.next();
+            String fieldValue = vnp_Params.get(fieldName);
+            if (fieldValue != null && !fieldValue.isEmpty()) {
+                // Build hash data
+                hashData.append(fieldName).append('=')
+                        .append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                // Build query
+                query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString())).append('=')
+                        .append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                if (itr.hasNext()) {
+                    query.append('&');
+                    hashData.append('&');
                 }
             }
-
-            if (approvalUrl != null) {
-                return ResponseEntity.status(HttpStatus.FOUND)
-                        .header("Location", approvalUrl)
-                        .build();
-            } else {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body("Failed to retrieve PayPal approval URL");
-            }
-        } catch (PayPalRESTException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @GetMapping("/success")
-    public ResponseEntity<?> successPay(@RequestParam("paymentId") String paymentId, @RequestParam("PayerID") String payerId) {
-        try {
-            Payment payment = paypalService.executePayment(paymentId, payerId);
-            if (payment.getState().equals("approved")) {
-                HttpHeaders headers = new HttpHeaders();
-                headers.add("Location", "/orders/success");
-                return new ResponseEntity<>(headers, HttpStatus.FOUND);
-            }
-        } catch (PayPalRESTException e) {
-            throw new RuntimeException(e);
         }
 
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
+        String queryUrl = query.toString();
+        String vnp_SecureHash = VnPayConfig.hmacSHA512(VnPayConfig.vnp_HashSecret, hashData.toString());
+        queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
+        String paymentUrl = VnPayConfig.vnp_PayUrl + "?" + queryUrl;
 
+        com.google.gson.JsonObject job = new JsonObject();
+        job.addProperty("code", "00");
+        job.addProperty("message", "success");
+        job.addProperty("data", paymentUrl);
+        Gson gson = new Gson();
+        return new ResponseEntity<>(gson.toJson(job), HttpStatus.OK);
+    }
 
     private LocalDateTime parseDateTime(String dateString) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");

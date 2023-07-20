@@ -11,9 +11,8 @@ import {DataResponse, Product} from "~/types";
 import getEndPoint from "~/utils/getEndPoint";
 import handleFetchError from "~/utils/handleFetchError";
 import {createSignal, For} from "solid-js";
-import {A, useRouteData} from "@solidjs/router";
+import {useRouteData} from "@solidjs/router";
 import Pagination from "~/components/Pagination";
-import {IoTrashOutline} from "solid-icons/io";
 
 type ParamType = {
     search?: string;
@@ -93,17 +92,18 @@ export default function AddOrders() {
     };
 
     const handlePayNow = () => {
-        const selectedProductDetails = selectedProducts().map((product) => ({
-            name: product.name,
-            price: product.price,
-            quantity: product.quantity,
-        }));
+            const selectedProductDetails = {
+                orderType: "100000",
+                grandTotal: grandTotal(),
+            }
 
         console.log(selectedProductDetails);
 
         axios.post(`${getEndPoint()}/orders/payment`, selectedProductDetails)
             .then((response) => {
                 console.log(response.data);
+
+                window.location.href = response.data.data;
             })
             .catch((error) => {
                 console.error(error);
