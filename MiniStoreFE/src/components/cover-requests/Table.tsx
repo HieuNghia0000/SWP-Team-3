@@ -108,7 +108,7 @@ export default function Table() {
                 <td
                   class="px-2.5 pl-[18px] text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
                   <A
-                    href={routes.staff(item.staffId)}
+                    href={routes.staffEdit(item.staffId)}
                     class="hover:text-indigo-500"
                   >
                     {item.shift?.staff?.staffName ?? "N/A"}

@@ -2,7 +2,7 @@ import { redirect } from "solid-start";
 import { createHandler, renderAsync, StartServer, } from "solid-start/entry-server";
 import routes, { apiRoutes } from "./utils/routes";
 import { createCookieVariable, getCookie } from "./utils/getCookie";
-import { DataResponse, Staff } from "./types";
+import { DataResponse, Staff, StaffStatus } from "./types";
 
 const protectedRoutes = [];
 const publicRoutes = [ routes.login ];
@@ -23,7 +23,8 @@ export default createHandler(
             },
           });
           const { content } = (await data.json()) as DataResponse<Staff>;
-          if (content) {
+
+          if (content && content.status === StaffStatus.ACTIVATED) {
             // console.log(content);
             user = content;
           }

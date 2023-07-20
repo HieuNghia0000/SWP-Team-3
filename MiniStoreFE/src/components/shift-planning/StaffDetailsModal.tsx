@@ -20,13 +20,18 @@ const StaffDetailsModal: Component<{
     >
       <PopupModal.Body>
         <div class="text-lg mb-2.5 font-semibold text-center text-gray-800">
-          {modalData()?.staffName}
+          <p>{modalData()?.staffName}</p>
+          <p class="text-sm text-gray-400">ID: {modalData()?.staffId}</p>
         </div>
         <div class="border-t border-gray-300 border-dotted text-gray-600 text-sm">
           <div class="flex border-b border-gray-300 border-dotted">
             <div class="flex-1 py-2.5 overflow-hidden space-x-1">
               <span class="font-semibold text-gray-500">Email:</span>
               <span>{modalData()?.email}</span>
+            </div>
+            <div class="flex-1 py-2.5 overflow-hidden space-x-1">
+              <span class="font-semibold text-gray-500">Username:</span>
+              <span>{modalData()?.username}</span>
             </div>
           </div>
           <div class="flex border-b border-gray-300 border-dotted">
@@ -36,31 +41,22 @@ const StaffDetailsModal: Component<{
             </div>
             <div class="flex-1 py-2.5 overflow-hidden space-x-1">
               <span class="font-semibold text-gray-500">Hourly Wage:</span>
-              <span>
-                {formatNumberWithCommas(
-                  `${modalData()?.salary?.hourlyWage || 0}`
-                )}{" "}
-                ₫
-              </span>
+              <span>{formatNumberWithCommas(modalData()?.salary?.hourlyWage || 0)} ₫</span>
             </div>
           </div>
-          <div class="flex">
+          <div class="flex border-b border-gray-300 border-dotted">
             <div class="flex-1 py-2.5 overflow-hidden space-x-1">
               <span class="font-semibold text-gray-500">Role:</span>
               <span
                 class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-semibold rounded-full"
                 classList={{
-                  "bg-blue-200 text-blue-700":
-                    modalData()?.role === Role.CASHIER,
-                  "bg-yellow-200 text-yellow-700":
-                    modalData()?.role === Role.GUARD,
+                  "bg-blue-200 text-blue-700": modalData()?.role === Role.CASHIER,
+                  "bg-yellow-200 text-yellow-700": modalData()?.role === Role.GUARD,
                   "bg-red-200 text-red-700": modalData()?.role === Role.MANAGER,
-                  "bg-gray-200 text-gray-700":
-                    modalData()?.role === Role.ADMIN ||
-                    modalData()?.role === Role.ALL_ROLES,
+                  "bg-gray-200 text-gray-700": modalData()?.role === Role.ADMIN || modalData()?.role === Role.ALL_ROLES,
                 }}
               >
-                {roles.find((r) => r.value === modalData()?.role)?.label}
+                {modalData()?.role}
               </span>
             </div>
             <div class="flex-1 py-2.5 overflow-hidden space-x-1">
@@ -72,10 +68,14 @@ const StaffDetailsModal: Component<{
                   "bg-red-500": modalData()?.status === StaffStatus.DISABLED,
                 }}
               >
-                {modalData()?.status === StaffStatus.ACTIVATED
-                  ? "Activated"
-                  : "Disabled"}
+                {modalData()?.status === StaffStatus.ACTIVATED ? "Activated" : "Disabled"}
               </span>
+            </div>
+          </div>
+          <div class="flex">
+            <div class="flex-1 py-2.5 overflow-hidden space-x-1">
+              <span class="font-semibold text-gray-500">Working days:</span>
+              <span>{modalData()?.workDays}</span>
             </div>
           </div>
         </div>

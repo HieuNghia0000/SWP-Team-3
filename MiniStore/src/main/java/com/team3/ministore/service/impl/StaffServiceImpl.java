@@ -6,9 +6,11 @@ import com.team3.ministore.dto.StaffMetaInfo;
 import com.team3.ministore.dto.UpdateStaffDto;
 import com.team3.ministore.model.Staff;
 import com.team3.ministore.repository.StaffRepository;
+import com.team3.ministore.service.SalaryService;
 import com.team3.ministore.service.StaffService;
 import com.team3.ministore.utils.Role;
 import com.team3.ministore.utils.StaffStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,6 +25,9 @@ public class StaffServiceImpl implements StaffService {
 
     private final StaffRepository staffRepository;
     private final PasswordEncoder encoder;
+
+    @Autowired
+    private SalaryService salaryService;
 
     public StaffServiceImpl(StaffRepository staffRepository, PasswordEncoder encoder) {
         this.staffRepository = staffRepository;
@@ -90,14 +95,16 @@ public class StaffServiceImpl implements StaffService {
     public List<StaffDto> getAllStaff(String search, int page, int pageSize) {
         Pageable pageable = PageRequest.of(page - 1, pageSize);
         return staffRepository.findByStaffNameContainingIgnoreCaseOrderByStaffIdDesc(search, pageable)
-                .stream().map(StaffDto::new).collect(Collectors.toList());
+                .stream().map(staff -> new StaffDto(staff, salaryService.getSalaryByStaffId(staff.getStaffId())))
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<StaffDto> getAllStaff(int page, int pageSize) {
         Pageable pageable = PageRequest.of(page - 1, pageSize);
         return staffRepository.findAll(pageable)
-                .stream().map(StaffDto::new).collect(Collectors.toList());
+                .stream().map(staff -> new StaffDto(staff, salaryService.getSalaryByStaffId(staff.getStaffId())))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -112,7 +119,8 @@ public class StaffServiceImpl implements StaffService {
 
     @Override
     public List<StaffMetaInfo> getAllStaffMetaInfos() {
-        return staffRepository.findAll().stream().map(StaffMetaInfo::new).collect(Collectors.toList());
+        return staffRepository.findAll().stream().filter(s -> s.getStatus() == StaffStatus.ACTIVE)
+                .map(StaffMetaInfo::new).collect(Collectors.toList());
     }
 
 

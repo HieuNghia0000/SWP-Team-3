@@ -9,6 +9,7 @@ import com.team3.ministore.model.Timesheet;
 import com.team3.ministore.service.ShiftService;
 import com.team3.ministore.service.StaffService;
 import com.team3.ministore.service.TimesheetService;
+import com.team3.ministore.utils.StaffStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,10 +38,12 @@ public class TimesheetController {
         if (errors.hasErrors()) return ResponseHandler.getResponse(errors, HttpStatus.BAD_REQUEST);
 
         Optional<Shift> shift = shiftService.getShiftById(dto.getShiftId());
-        if (shift.isEmpty()) return ResponseHandler.getResponse(new Exception("Shift not found"), HttpStatus.NOT_FOUND);
+        if (shift.isEmpty())
+            return ResponseHandler.getResponse(new Exception("Shift not found"), HttpStatus.NOT_FOUND);
 
         Optional<Staff> staff = staffService.getStaffById(dto.getStaffId());
-        if (staff.isEmpty()) return ResponseHandler.getResponse(new Exception("Staff not found"), HttpStatus.NOT_FOUND);
+        if (staff.isEmpty() || staff.get().getStatus() == StaffStatus.DISABLED)
+            return ResponseHandler.getResponse(new Exception("Staff not found"), HttpStatus.NOT_FOUND);
 
         Timesheet timesheet = timesheetService.createTimesheet(dto, shift.get(), staff.get());
         shift.get().setTimesheet(timesheet);
@@ -76,7 +79,8 @@ public class TimesheetController {
         if (shift.isEmpty()) return ResponseHandler.getResponse(new Exception("Shift not found"), HttpStatus.NOT_FOUND);
 
         Optional<Staff> staff = staffService.getStaffById(dto.getStaffId());
-        if (staff.isEmpty()) return ResponseHandler.getResponse(new Exception("Staff not found"), HttpStatus.NOT_FOUND);
+        if (staff.isEmpty())
+            return ResponseHandler.getResponse(new Exception("Staff not found"), HttpStatus.NOT_FOUND);
 
         Optional<Timesheet> updatedTimesheet = timesheetService.updateTimesheet(id, dto, shift.get(), staff.get());
 

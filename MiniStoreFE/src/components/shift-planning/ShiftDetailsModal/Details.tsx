@@ -63,22 +63,14 @@ const Details: Component<DetailsProps> = ({ shiftCard, setState, onDelete, openC
               <span
                 class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-semibold rounded-full"
                 classList={{
-                  "bg-blue-200 text-blue-700":
-                    shiftCard()?.role === Role.CASHIER,
-                  "bg-yellow-200 text-yellow-700":
-                    shiftCard()?.role === Role.GUARD,
-                  "bg-red-200 text-red-700":
-                    shiftCard()?.role === Role.MANAGER,
-                  "bg-gray-200 text-gray-700":
-                    shiftCard()?.role === Role.ADMIN,
-                  "bg-gray-200 text-gray-800":
-                    shiftCard()?.role === Role.ALL_ROLES,
+                  "bg-blue-200 text-blue-700": shiftCard()?.role === Role.CASHIER,
+                  "bg-yellow-200 text-yellow-700": shiftCard()?.role === Role.GUARD,
+                  "bg-red-200 text-red-700": shiftCard()?.role === Role.MANAGER,
+                  "bg-gray-200 text-gray-700": shiftCard()?.role === Role.ADMIN,
+                  "bg-gray-200 text-gray-800": shiftCard()?.role === Role.ALL_ROLES,
                 }}
               >
-                {
-                  roles.find((r) => r.value === shiftCard()?.role)
-                    ?.label
-                }
+                {roles.find((r) => r.value === shiftCard()?.role)?.label}
               </span>
             </div>
           </div>
@@ -90,17 +82,13 @@ const Details: Component<DetailsProps> = ({ shiftCard, setState, onDelete, openC
             <div class="flex-1 py-2.5 overflow-hidden space-x-1">
               <span class="font-semibold text-gray-500">Start Time:</span>
               <span>
-                {moment(shiftCard()?.startTime, "h:mm:ss").format(
-                  "h:mma"
-                )}
+                {moment(shiftCard()?.startTime, "h:mm:ss").format("h:mma")}
               </span>
             </div>
             <div class="flex-1 py-2.5 overflow-hidden space-x-1">
               <span class="font-semibold text-gray-500">End Time:</span>
               <span>
-                {moment(shiftCard()?.endTime, "h:mm:ss").format(
-                  "h:mma"
-                )}
+                {moment(shiftCard()?.endTime, "h:mm:ss").format("h:mma")}
               </span>
             </div>
           </div>

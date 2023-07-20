@@ -56,7 +56,7 @@ export const Select: Component<SelectProps> = (props) => {
             {...rest}
             {...field.props}
             classList={{
-              "w-full border outline-none text-gray-600 focus:border-indigo-500 focus:shadow px-4 py-[9px] rounded truncate disabled:bg-[#FAFAFA] disabled:border-gray-300 disabled:appearance-none":
+              "w-full border outline-none text-gray-600 focus:border-indigo-500 focus:shadow px-4 py-[8px] rounded truncate disabled:bg-[#FAFAFA] disabled:border-gray-300 disabled:appearance-none":
                 true,
               "border-red-400": field.helpers.error,
             }}
