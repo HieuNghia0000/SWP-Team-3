@@ -48,9 +48,11 @@ public class SalaryController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Salary> updateSalary(@PathVariable("id") Integer id, @RequestBody Salary salary) {
-        Salary updatedSalary = salaryService.updateSalary(id, salary);
-        return new ResponseEntity<>(updatedSalary, HttpStatus.OK);
+    public ResponseEntity<Object> updateSalary(@PathVariable("id") Integer id, @RequestBody Salary salary) {
+        Optional<Salary> updatedSalary = salaryService.updateSalary(id, salary);
+        if (updatedSalary.isEmpty()) return ResponseHandler.getResponse(new Exception("Staff not found"), HttpStatus.BAD_REQUEST);
+
+        return ResponseHandler.getResponse(updatedSalary, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")
