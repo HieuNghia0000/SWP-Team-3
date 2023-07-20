@@ -12,6 +12,7 @@ import { ModalContext } from "~/context/Staff";
 import { toastSuccess } from "~/utils/toast";
 import StaffDetailsModal from "~/components/staffs/StaffDetailsModal";
 import Table from "~/components/staffs/Table";
+import CreateStaffModal from "~/components/staffs/CreateStaffModal";
 
 const disableStaff = async (staff: Omit<Staff, "shifts" | "leaveRequests">) => {
   try {
@@ -104,6 +105,7 @@ export default function Staffs() {
         <Pagination totalItems={totalItems}/>
 
         <StaffDetailsModal/>
+        <CreateStaffModal/>
       </ModalContext.Provider>
     </main>
   );
