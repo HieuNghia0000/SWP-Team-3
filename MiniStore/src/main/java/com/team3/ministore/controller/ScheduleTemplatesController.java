@@ -1,42 +1,52 @@
 package com.team3.ministore.controller;
 
+import com.team3.ministore.common.responsehandler.ResponseHandler;
+import com.team3.ministore.dto.ScheduleTemplateDto;
 import com.team3.ministore.model.ScheduleTemplate;
 import com.team3.ministore.service.ScheduleTemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/schedule-templates")
 public class ScheduleTemplatesController {
-    
+
     @Autowired
     private ScheduleTemplateService scheduleTemplateService;
 
-    @GetMapping("")
-    public ResponseEntity<List<ScheduleTemplate>> getAllScheduleTemplates() {
+    @GetMapping("/list")
+    public ResponseEntity<Object> getAllScheduleTemplates() {
         List<ScheduleTemplate> scheduleTemplateList = scheduleTemplateService.getAllScheduleTemplates();
-        return new ResponseEntity<>(scheduleTemplateList, HttpStatus.OK);
+        return ResponseHandler.getResponse(scheduleTemplateList, HttpStatus.OK);
+    }
+
+    @GetMapping("/list/{id}")
+    public ResponseEntity<Object> getScheduleTemplate(@PathVariable("id") Integer id) {
+        Optional<ScheduleTemplate> scheduleTemplateList = scheduleTemplateService.getScheduleTemplateById(id);
+
+        return scheduleTemplateList.map(scheduleTemplate -> ResponseHandler.getResponse(new ScheduleTemplateDto(scheduleTemplate), HttpStatus.OK))
+                .orElseGet(() -> ResponseHandler.getResponse(new Exception("Schedule template not found"), HttpStatus.NOT_FOUND));
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ScheduleTemplate> createScheduleTemplates(@RequestBody ScheduleTemplate scheduleTemplate) {
-        ScheduleTemplate createdScheduleTemplate = scheduleTemplateService.createScheduleTemplates(scheduleTemplate);
-        return new ResponseEntity<>(createdScheduleTemplate, HttpStatus.CREATED);
-    }
+    public ResponseEntity<Object> createScheduleTemplate(@Valid @RequestBody ScheduleTemplateDto dto, BindingResult errors) {
+        if (errors.hasErrors()) return ResponseHandler.getResponse(errors, HttpStatus.BAD_REQUEST);
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<ScheduleTemplate> updateScheduleTemplates(@PathVariable("id") Integer id, @RequestBody ScheduleTemplate scheduleTemplate) {
-        ScheduleTemplate updatedScheduleTemplate = scheduleTemplateService.updateScheduleTemplates(id, scheduleTemplate);
-        return new ResponseEntity<>(updatedScheduleTemplate, HttpStatus.OK);
+        ScheduleTemplateDto createdScheduleTemplate = scheduleTemplateService.createScheduleTemplate(dto);
+
+        return ResponseHandler.getResponse(createdScheduleTemplate, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteScheduleTemplates(@PathVariable("id") Integer id) {
-        scheduleTemplateService.deleteScheduleTemplates(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    public ResponseEntity<Object> deleteScheduleTemplate(@PathVariable("id") Integer id) {
+        scheduleTemplateService.deleteScheduleTemplate(id);
+        return ResponseHandler.getResponse(HttpStatus.OK);
     }
 }

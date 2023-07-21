@@ -3,6 +3,7 @@ package com.team3.ministore.model;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Data
@@ -10,6 +11,7 @@ import javax.persistence.*;
 public class ScheduleTemplate {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "schedule_template_id")
     private int scheduleTemplateId;
 
@@ -21,4 +23,7 @@ public class ScheduleTemplate {
 
     @Column(name = "num_of_shifts")
     private int numOfShifts;
+
+    @OneToMany(mappedBy = "scheduleTemplate")
+    private List<ScheduleShiftTemplate> scheduleShiftTemplates;
 }

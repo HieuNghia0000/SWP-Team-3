@@ -1,17 +1,17 @@
 package com.team3.ministore.service;
 
+import com.team3.ministore.dto.ScheduleTemplateDto;
 import com.team3.ministore.model.ScheduleTemplate;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ScheduleTemplateService {
     List<ScheduleTemplate> getAllScheduleTemplates();
 
-    ScheduleTemplate createScheduleTemplates(ScheduleTemplate scheduleTemplate);
+    ScheduleTemplateDto createScheduleTemplate(ScheduleTemplateDto scheduleTemplate);
 
-    ScheduleTemplate getScheduleTemplatesById(Integer id);
+    Optional<ScheduleTemplate> getScheduleTemplateById(Integer id);
 
-    ScheduleTemplate updateScheduleTemplates(Integer id, ScheduleTemplate scheduleTemplate);
-
-    void deleteScheduleTemplates(Integer id);
+    void deleteScheduleTemplate(Integer id);
 }

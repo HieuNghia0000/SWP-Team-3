@@ -26,6 +26,9 @@ public class ScheduleShiftTemplate {
     @Column(name = "end_time")
     private Time endTime;
 
+    @Column(name = "name", length = 50)
+    private String name;
+
     @Column(name = "role")
     private Role role;
 
@@ -34,7 +37,7 @@ public class ScheduleShiftTemplate {
 
     @ManyToOne
     @JoinColumn(name = "schedule_template_id")
-    private ScheduleTemplate scheduleTemplateId;
+    private ScheduleTemplate scheduleTemplate;
 
     @ManyToOne
     @JoinColumn(name = "staff_id")

@@ -7,13 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ScheduleShiftTemplateServiceImpl implements ScheduleShiftTemplateService {
 
     @Autowired
     private ScheduleShiftTemplateRepository scheduleShiftTemplateRepository;
+
 
     @Override
     public List<ScheduleShiftTemplate> getAllShiftScheduleTemplates() {
@@ -23,22 +23,6 @@ public class ScheduleShiftTemplateServiceImpl implements ScheduleShiftTemplateSe
     @Override
     public ScheduleShiftTemplate createShiftScheduleTemplates(ScheduleShiftTemplate scheduleShiftTemplate) {
         return scheduleShiftTemplateRepository.save(scheduleShiftTemplate);
-    }
-
-    @Override
-    public Optional<ScheduleShiftTemplate> updateShiftScheduleTemplates(Integer id, ScheduleShiftTemplate scheduleShiftTemplate) {
-        Optional<ScheduleShiftTemplate> existingScheduleShiftTemplate = scheduleShiftTemplateRepository.findById(id);
-
-        return existingScheduleShiftTemplate.map(value-> {
-            value.setDate(scheduleShiftTemplate.getDate());
-            value.setStartTime(scheduleShiftTemplate.getStartTime());
-            value.setEndTime(scheduleShiftTemplate.getEndTime());
-            value.setRole(scheduleShiftTemplate.getRole());
-            value.setSalaryCoefficient(scheduleShiftTemplate.getSalaryCoefficient());
-            value.setScheduleTemplateId(scheduleShiftTemplate.getScheduleTemplateId());
-            value.setStaff(scheduleShiftTemplate.getStaff());
-            return scheduleShiftTemplateRepository.save(value);
-        });
     }
 
     @Override
