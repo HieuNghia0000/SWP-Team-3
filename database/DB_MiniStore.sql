@@ -85,6 +85,7 @@ CREATE TABLE ScheduleShiftTemplates (
 	start_time TIME,
     end_time TIME,
 	salary_coefficient FLOAT,
+    name NVARCHAR(50),
     role NVARCHAR(50),
     PRIMARY KEY (schedule_shift_template_id),
     FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id) ON DELETE cascade,
