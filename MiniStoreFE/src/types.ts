@@ -166,6 +166,7 @@ export interface ScheduleShiftTemplate {
   scheduleShiftTemplateId: number;
   scheduleTemplateId: number;
   staffId: number;
+  staffName: string;
   date: string;
   startTime: string;
   endTime: string;

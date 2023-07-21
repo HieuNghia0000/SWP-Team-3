@@ -1,7 +1,7 @@
 import { FaSolidTrash } from "solid-icons/fa";
-import { Accessor, Component, createResource, For, onCleanup, ResourceFetcher, Setter, } from "solid-js";
-import { DataResponse, Role, ScheduleTemplate } from "~/types";
-import { ScheduleTemplateModalState } from "~/context/ShiftPlanning";
+import { Accessor, Component, createResource, createSignal, For, onCleanup, ResourceFetcher, Setter, } from "solid-js";
+import { DataResponse, Role, ScheduleTemplate, Shift } from "~/types";
+import { ScheduleTemplateModalState, useSPData } from "~/context/ShiftPlanning";
 import { shiftDetailsTime } from "../utils/shiftTimes";
 import { roles } from "~/utils/roles";
 import ResourceWrapper from "~/components/ResourceWrapper";
@@ -9,6 +9,11 @@ import SidePopupModal from "~/components/SidePopupModal";
 import axios from "axios";
 import getEndPoint from "~/utils/getEndPoint";
 import handleFetchError from "~/utils/handleFetchError";
+import { getWeekDateStings } from "~/utils/getWeekDates";
+import isDayInThePast from "~/utils/isDayInThePast";
+import { toastSuccess } from "~/utils/toast";
+import getSameWeekDay from "~/utils/getSameWeekDay";
+import moment from "moment";
 
 interface DetailsProps {
   setModalState: Setter<ScheduleTemplateModalState>;
@@ -32,26 +37,84 @@ const fetcher: ResourceFetcher<
 };
 
 const Apply: Component<DetailsProps> = ({ setModalState, scheduleTemplateFocus, setScheduleTemplateFocus }) => {
-  const [ scheduleTemplate ] = createResource(
-    () => scheduleTemplateFocus()?.scheduleTemplateId,
-    fetcher
-  );
+  const [ scheduleTemplate ] = createResource(() => scheduleTemplateFocus()?.scheduleTemplateId, fetcher);
+  const [ applying, setApplying ] = createSignal(false);
+  const [ deleting, setDeleting ] = createSignal(false);
+  const { pickedDate: curPickedDate, saveChanges } = useSPData();
 
   onCleanup(() => {
     setScheduleTemplateFocus(undefined);
   });
 
   const onDelete = async () => {
-    alert("delete");
+    if (applying() || deleting() || scheduleTemplate.error || scheduleTemplate() === undefined) return;
+
+    try {
+      if (curPickedDate() === undefined) throw new Error("No date picked");
+
+      setDeleting(true);
+
+      const response = await axios
+        .delete<DataResponse<Shift[]>>(`${getEndPoint()}/schedule-templates/delete/${scheduleTemplate()!.scheduleTemplateId}`);
+
+      if (!response.data) throw new Error("Invalid response from server");
+
+      toastSuccess("Week template was deleted successfully");
+      saveChanges();
+      setModalState("list");
+    } catch (error: any) {
+      handleFetchError(error);
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const submit = async () => {
-    alert("apply");
+    if (applying() || deleting() || scheduleTemplate.error || scheduleTemplate() === undefined) return;
+
+    try {
+      if (curPickedDate() === undefined) throw new Error("No date picked");
+
+      const shifts: Shift[] = scheduleTemplate()!.scheduleShiftTemplates.map((st) => {
+        return {
+          date: getSameWeekDay(st.date, moment(curPickedDate()).format("YYYY-MM-DD")),
+          staffId: st.staffId,
+          published: false,
+          startTime: st.startTime,
+          endTime: st.endTime,
+          name: st.name,
+          salaryCoefficient: st.salaryCoefficient,
+          role: st.role
+        } as Shift;
+      })
+        // only apply shifts that are not in the past
+        .filter(s => !isDayInThePast(s.date));
+
+      if (getWeekDateStings(curPickedDate()!).some(d => isDayInThePast(d))) {
+        const confirm = window.confirm("The current chosen week has some past days. Only days that are not in the past will create shifts. Continue?");
+        if (!confirm) return;
+      }
+
+      // alert(JSON.stringify(shifts));
+      setApplying(true);
+
+      const response = await axios.post<DataResponse<Shift[]>>(`${getEndPoint()}/shifts/add/multiple`, shifts);
+
+      if (!response.data) throw new Error("Invalid response from server");
+
+      toastSuccess("Shifts are applied successfully");
+      saveChanges();
+      setModalState(undefined);
+    } catch (error: any) {
+      handleFetchError(error);
+    } finally {
+      setApplying(false);
+    }
   };
 
   return (
     <ResourceWrapper data={scheduleTemplate}>
-      <SidePopupModal.Body>
+      <SidePopupModal.Body classList={{ "cursor-progress": applying() || deleting() }}>
         <div class="flex py-2.5 overflow-hidden rounded bg-[#ceefff] px-2.5 -mx-2.5">
           <div class="flex-1 flex items-center">
             <div class="text-gray-700 font-semibold tracking-wide">
@@ -119,6 +182,7 @@ const Apply: Component<DetailsProps> = ({ setModalState, scheduleTemplateFocus, 
           <button
             type="button"
             onClick={onDelete}
+            disabled={deleting() || applying() || scheduleTemplate.error || scheduleTemplate() === undefined}
             class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
           >
             <span>
@@ -129,7 +193,8 @@ const Apply: Component<DetailsProps> = ({ setModalState, scheduleTemplateFocus, 
           <button
             type="button"
             onClick={submit}
-            class="py-1.5 px-3 font-semibold text-white border border-blue-400 bg-[#00a8ff] text-sm rounded hover:bg-blue-400 transition-colors"
+            disabled={deleting() || applying() || scheduleTemplate.error || scheduleTemplate() === undefined}
+            class="py-1.5 px-3 font-semibold text-white border border-blue-400 bg-[#00a8ff] text-sm rounded hover:bg-blue-400"
           >
             Apply Template - {scheduleTemplate()?.numOfShifts} Shifts
           </button>

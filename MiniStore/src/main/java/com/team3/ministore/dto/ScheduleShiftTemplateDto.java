@@ -30,6 +30,8 @@ public class ScheduleShiftTemplateDto {
 
     private int staffId;
 
+    private String staffName;
+
     public ScheduleShiftTemplateDto(ScheduleShiftTemplate scheduleShiftTemplate) {
         this.scheduleShiftTemplateId = scheduleShiftTemplate.getScheduleShiftTemplateId();
         this.date = scheduleShiftTemplate.getDate();
@@ -40,5 +42,6 @@ public class ScheduleShiftTemplateDto {
         this.salaryCoefficient = scheduleShiftTemplate.getSalaryCoefficient();
         this.scheduleTemplateId = scheduleShiftTemplate.getScheduleTemplate().getScheduleTemplateId();
         this.staffId = scheduleShiftTemplate.getStaff().getStaffId();
+        this.staffName = scheduleShiftTemplate.getStaff().getStaffName();
     }
 }

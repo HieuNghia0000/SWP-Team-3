@@ -25,7 +25,7 @@ const schema: yup.Schema<{ name: string; description?: string }> = yup.object({
   description: yup.string().default(""),
 });
 
-const Create: Component<CreateProps> = ({ modalState, setModalState }) => {
+const Create: Component<CreateProps> = ({ setModalState }) => {
   const { tableData } = useSPData();
   const formHandler = useFormHandler(yupSchema(schema));
   const { formData } = formHandler;
@@ -151,7 +151,16 @@ const Create: Component<CreateProps> = ({ modalState, setModalState }) => {
         </For>
       </SidePopupModal.Body>
       <SidePopupModal.Footer>
-        <div class="w-full flex justify-end items-center gap-3">
+        <div class="w-full flex justify-between items-center gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              setModalState("list");
+            }}
+            class="flex gap-2 justify-center items-center px-3 text-gray-500 text-sm hover:text-gray-700"
+          >
+            Back to list
+          </button>
           <button
             type="button"
             onClick={submit}

@@ -139,7 +139,7 @@ const Copy: Component<CopyProps> = ({ setModalState }) => {
 
       if (!response.data) throw new Error("Invalid response from server");
 
-      toastSuccess("Shift updated successfully");
+      toastSuccess("Shifts are created successfully");
       saveChanges();
       setModalState(undefined);
     } catch (error: any) {

@@ -1,6 +1,5 @@
 package com.team3.ministore.dto;
 
-import com.team3.ministore.model.ScheduleShiftTemplate;
 import com.team3.ministore.model.ScheduleTemplate;
 import lombok.AllArgsConstructor;
 import lombok.Data;
