@@ -194,6 +194,7 @@ const ShiftDetailsModal: Component<{
         <Match when={state() === "copy"}>
           <Copy
             shiftCard={modalData}
+            setShowModal={setShowModal}
             setModalState={setState}
             onDelete={onDeleteShift}
           />

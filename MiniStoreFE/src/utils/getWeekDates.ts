@@ -26,7 +26,7 @@ export default function getWeekDates(dateString: string) {
   return weekDates;
 }
 
-export function getWeekDateStings(dateString: string) {
+export function getWeekDateStings(dateString: string | undefined) {
   let date = moment(dateString, "YYYY-MM-DD");
   if (!date.isValid()) {
     date = moment();

@@ -1,4 +1,3 @@
-import { compact } from "lodash";
 import { useFormHandler } from "solid-form-handler";
 import { yupSchema } from "solid-form-handler/yup";
 import { FaSolidPencil, FaSolidTrash } from "solid-icons/fa";
@@ -7,11 +6,18 @@ import PopupModal from "~/components/PopupModal";
 import { Checkboxes } from "~/components/form/Checkboxes";
 import { TextInput } from "~/components/form/TextInput";
 import { ShiftCard, useSPData } from "~/context/ShiftPlanning";
-import { Role } from "~/types";
+import { DataResponse, Role, Shift } from "~/types";
 import { Tabs } from ".";
 import { shiftDetailsTime } from "../utils/shiftTimes";
 import * as yup from "yup";
 import moment from "moment";
+import { toastError, toastSuccess } from "~/utils/toast";
+import handleFetchError from "~/utils/handleFetchError";
+import isDayInThePast from "~/utils/isDayInThePast";
+import { getWeekDateStings } from "~/utils/getWeekDates";
+import getDatesUntilWeek from "~/utils/getDatesUtilWeek";
+import axios from "axios";
+import getEndPoint from "~/utils/getEndPoint";
 
 type CopyScheduleForm = {
   days: string[];
@@ -25,60 +31,77 @@ const copySchema: yup.Schema<CopyScheduleForm> = yup.object({
 interface CopyProps {
   shiftCard: Accessor<ShiftCard | undefined>;
   setModalState: Setter<Tabs>;
+  setShowModal: Setter<boolean>;
   onDelete: () => void;
 }
 
-const Copy: Component<CopyProps> = ({ shiftCard, setModalState, onDelete }) => {
-  const { tableData } = useSPData();
+const Copy: Component<CopyProps> = ({ shiftCard, setModalState, onDelete, setShowModal }) => {
+  const { saveChanges } = useSPData();
   const [ enableMultiWeeks, setEnableMultiWeeks ] = createSignal<boolean>(false);
+  const [ coping, setCoping ] = createSignal<boolean>(false);
   const formHandler = useFormHandler(yupSchema(copySchema));
   const { formData } = formHandler;
 
-  // Get work days of the week based on the selected shift and the staff member
-  // Ex: ["Monday", "Tuesday", "Wednesday"]
-  const getWorkDays = (staffId: number) => {
-    const staffWorkDates = Object.keys(tableData.shifts).map((id) => {
-      const s = tableData.shifts[Number.parseInt(id)];
-      if (s.staffId === staffId)
-        return s.date;
-      else return "";
-    });
-    const dates = compact(staffWorkDates);
-    return dates.map((date) => moment(date).format("dddd"));
-  };
-
-  const workDays = getWorkDays(
-    shiftCard()?.staffId || 0
-  );
-
-  function formatDaysArray(daysArray: string[]) {
-    if (daysArray.length === 1) {
-      return `a ${daysArray[0]}`;
-    }
-    const formattedDays = daysArray.map((day, index) => {
-      if (index === daysArray.length - 1) {
-        return `and a ${day}`;
-      } else {
-        return `a ${day}`;
-      }
-    });
-    return formattedDays.join(", ");
-  }
+  const weekDays = getWeekDateStings(shiftCard()?.date);
+  const workDay = moment(shiftCard()?.date).format("dddd");
 
   const submit = async (publish: boolean, event: Event) => {
     event.preventDefault();
+    if (coping() || shiftCard() === undefined) return;
+
     try {
-      await formHandler.validateForm();
-      alert(
-        "Data sent with success: " +
-        JSON.stringify({
-          ...formData(),
-          shiftId: shiftCard()?.shiftId,
-          published: publish,
+      if (enableMultiWeeks() && (!formData().untilDate || moment(formData().untilDate).isBefore(moment()))) {
+        toastError("The until date is not valid. Please select a date in the future.");
+        return;
+      }
+      let shifts: Shift[];
+
+      const confirm = window.confirm("Only days that are not in the past will create shifts. Continue?");
+      if (!confirm) return;
+
+      if (enableMultiWeeks()) {
+        shifts = getDatesUntilWeek(formData().days, formData().untilDate!)
+          .filter(d => d !== shiftCard()?.date && !isDayInThePast(d))
+          .map((date) => {
+            return {
+              date,
+              staffId: shiftCard()?.staffId,
+              published: false,
+              startTime: shiftCard()?.startTime,
+              endTime: shiftCard()?.endTime,
+              name: shiftCard()?.name,
+              salaryCoefficient: shiftCard()?.salaryCoefficient,
+              role: shiftCard()?.role
+            } as Shift;
+          })
+      } else {
+        shifts = formData().days.filter(d => d !== shiftCard()?.date && !isDayInThePast(d)).map((date) => {
+          return {
+            date,
+            staffId: shiftCard()?.staffId,
+            published: false,
+            startTime: shiftCard()?.startTime,
+            endTime: shiftCard()?.endTime,
+            name: shiftCard()?.name,
+            salaryCoefficient: shiftCard()?.salaryCoefficient,
+            role: shiftCard()?.role
+          } as Shift;
         })
-      );
-    } catch (error) {
-      console.error(error);
+      }
+
+      setCoping(true);
+
+      const response = await axios.post<DataResponse<Shift[]>>(`${getEndPoint()}/shifts/add/multiple`, shifts);
+
+      if (!response.data) throw new Error("Invalid response from server");
+
+      toastSuccess("Shifts are created successfully");
+      saveChanges();
+      setShowModal(false);
+    } catch (error: any) {
+      handleFetchError(error);
+    } finally {
+      setCoping(false);
     }
   };
 
@@ -137,50 +160,50 @@ const Copy: Component<CopyProps> = ({ shiftCard, setModalState, onDelete }) => {
                 options={[
                   {
                     label: "Monday",
-                    value: "Monday",
-                    disabled: workDays.includes("Monday"),
+                    value: weekDays[0],
+                    disabled: workDay === "Monday" || (isDayInThePast(weekDays[0]) && !enableMultiWeeks()),
                   },
                   {
                     label: "Tuesday",
-                    value: "Tuesday",
-                    disabled: workDays.includes("Tuesday"),
+                    value: weekDays[1],
+                    disabled: workDay === "Tuesday" || (isDayInThePast(weekDays[1]) && !enableMultiWeeks()),
                   },
                   {
                     label: "Wednesday",
-                    value: "Wednesday",
-                    disabled: workDays.includes("Wednesday"),
+                    value: weekDays[2],
+                    disabled: workDay === "Wednesday" || (isDayInThePast(weekDays[2]) && !enableMultiWeeks()),
                   },
                   {
                     label: "Thursday",
-                    value: "Thursday",
-                    disabled: workDays.includes("Thursday"),
+                    value: weekDays[3],
+                    disabled: workDay === "Thursday" || (isDayInThePast(weekDays[3]) && !enableMultiWeeks()),
                   },
                   {
                     label: "Friday",
-                    value: "Friday",
-                    disabled: workDays.includes("Friday"),
+                    value: weekDays[4],
+                    disabled: workDay === "Friday" || (isDayInThePast(weekDays[4]) && !enableMultiWeeks()),
                   },
                   {
                     label: "Saturday",
-                    value: "Saturday",
-                    disabled: workDays.includes("Saturday"),
+                    value: weekDays[5],
+                    disabled: workDay === "Saturday" || (isDayInThePast(weekDays[5]) && !enableMultiWeeks()),
                   },
                   {
                     label: "Sunday",
-                    value: "Sunday",
-                    disabled: workDays.includes("Sunday"),
+                    value: weekDays[6],
+                    disabled: workDay === "Sunday" || (isDayInThePast(weekDays[6]) && !enableMultiWeeks()),
                   },
                 ]}
-                value={workDays}
+                value={[ shiftCard()!.date ]}
                 formHandler={formHandler}
               />
             </div>
           </div>
           <p class="text-gray-400 text-sm tracking-wide">
             Select the other weekdays you would like to copy this shift to. This
-            shift is currently scheduled on {formatDaysArray(workDays)}, which
+            shift is currently scheduled on {workDay}, which
             is why you can't deselect{" "}
-            {workDays.length > 1 ? "those options" : "this option"}.
+            {workDay.length > 1 ? "those options" : "this option"}.
           </p>
         </div>
         <div class="mb-4 w-[560px] flex justify-between items-center">
@@ -196,7 +219,10 @@ const Copy: Component<CopyProps> = ({ shiftCard, setModalState, onDelete }) => {
             <input
               type="checkbox"
               checked={enableMultiWeeks()}
-              onChange={[ setEnableMultiWeeks, !enableMultiWeeks() ]}
+              onChange={async () => {
+                await formHandler.resetForm();
+                setEnableMultiWeeks(!enableMultiWeeks());
+              }}
             />
             <span class="slider round"></span>
           </label>
