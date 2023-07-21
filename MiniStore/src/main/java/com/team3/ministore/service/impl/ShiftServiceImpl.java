@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ShiftServiceImpl implements ShiftService {
@@ -50,6 +51,12 @@ public class ShiftServiceImpl implements ShiftService {
         shift.setRole(dto.getRole());
 
         return Optional.of(new ShiftDto(shiftRepository.save(shift)));
+    }
+
+    @Override
+    public List<ShiftDto> createShifts(List<CreateShiftDto> dtos) {
+        return dtos.stream().map(this::createShift)
+                .filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
     }
 
     @Override

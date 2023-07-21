@@ -34,4 +34,14 @@ public class ScheduleTemplateDto {
             this.scheduleShiftTemplates = scheduleTemplate.getScheduleShiftTemplates()
                     .stream().map(ScheduleShiftTemplateDto::new).collect(Collectors.toList());
     }
+
+    public ScheduleTemplateDto(ScheduleTemplate scheduleTemplate, boolean withScheduleShiftTemplates) {
+        this.scheduleTemplateId = scheduleTemplate.getScheduleTemplateId();
+        this.name = scheduleTemplate.getName();
+        this.description = scheduleTemplate.getDescription();
+        this.numOfShifts = scheduleTemplate.getNumOfShifts();
+        if (withScheduleShiftTemplates && scheduleTemplate.getScheduleShiftTemplates() != null)
+            this.scheduleShiftTemplates = scheduleTemplate.getScheduleShiftTemplates()
+                    .stream().map(ScheduleShiftTemplateDto::new).collect(Collectors.toList());
+    }
 }

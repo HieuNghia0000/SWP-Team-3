@@ -47,6 +47,8 @@ type SPModalContext = {
   setShowCreateCoverModal: Setter<boolean>;
 };
 type SPDataContext = {
+  pickedDate: Accessor<string | undefined>;
+  setPickedDate: Setter<string | undefined>;
   tableData: DataTable;
   setTableData: SetStoreFunction<DataTable>;
   isRouteDataLoading: () => boolean;

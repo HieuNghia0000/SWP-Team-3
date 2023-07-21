@@ -1,66 +1,77 @@
 import { flatten } from "lodash";
-import { Component, For } from "solid-js";
-import ResourceWrapper from "~/components/ResourceWrapper";
+import { Accessor, Component, createSignal, For, Setter } from "solid-js";
 import SidePopupModal from "~/components/SidePopupModal";
 import { TextArea } from "~/components/form/TextArea";
 import { TextInput } from "~/components/form/TextInput";
-import { useSPData } from "~/context/ShiftPlanning";
-import { Role } from "~/types";
+import { ScheduleTemplateModalState, useSPData } from "~/context/ShiftPlanning";
+import { DataResponse, Role, Shift } from "~/types";
 import { shiftDetailsTime } from "../utils/shiftTimes";
 import { roles } from "~/utils/roles";
 import { useFormHandler } from "solid-form-handler";
 import { yupSchema } from "solid-form-handler/yup";
 import * as yup from "yup";
+import axios from "axios";
+import getEndPoint from "~/utils/getEndPoint";
+import { toastSuccess } from "~/utils/toast";
+import handleFetchError from "~/utils/handleFetchError";
 
-type NewScheduleTemplateForm = {
-  name: string;
-  description?: string;
-  numOfShifts: number;
-  shiftInfos: {
-    shiftTemplateId: number;
-    date: string;
-    staffName: string;
-  }[];
+type CreateProps = {
+  modalState: Accessor<ScheduleTemplateModalState>;
+  setModalState: Setter<ScheduleTemplateModalState>;
 };
 
 const schema: yup.Schema<{ name: string; description?: string }> = yup.object({
   name: yup.string().required("Please enter a name"),
-  description: yup.string(),
+  description: yup.string().default(""),
 });
 
-const Create: Component = ({}) => {
+const Create: Component<CreateProps> = ({ modalState, setModalState }) => {
   const { tableData } = useSPData();
   const formHandler = useFormHandler(yupSchema(schema));
-  const { formData, setFieldValue } = formHandler;
+  const { formData } = formHandler;
+  const [ creating, setCreating ] = createSignal(false);
 
   const shiftIds = flatten(Object.values(tableData.cells));
 
   const submit = async () => {
+    if (creating()) return;
     try {
-      await formHandler.validateForm();
-      alert(
-        "Data sent with success: " +
-          JSON.stringify({
-            ...formData(),
-            numOfShifts: shiftIds.length,
-            shiftInfos: shiftIds.map((id) => ({
-              staffId: tableData.shifts[id].staffId,
-              date: tableData.shifts[id].date,
-              startTime: tableData.shifts[id].startTime,
-              endTime: tableData.shifts[id].endTime,
-              role: tableData.shifts[id].role,
-              salaryCoefficient: tableData.shifts[id].salaryCoefficient
-            })),
-          })
+      const f = await formHandler.validateForm({ throwException: false });
+      if (f.isFormInvalid) return;
+
+      setCreating(true);
+      // Create shifts
+      const { data } = await axios.post<DataResponse<Shift[]>>(
+        `${getEndPoint()}/schedule-templates/add`,
+        {
+          name: formData().name,
+          description: formData().description,
+          scheduleShiftTemplates: shiftIds.map((id) => ({
+            date: tableData.shifts[id].date,
+            startTime: tableData.shifts[id].startTime,
+            endTime: tableData.shifts[id].endTime,
+            role: tableData.shifts[id].role,
+            name: tableData.shifts[id].name,
+            salaryCoefficient: tableData.shifts[id].salaryCoefficient,
+            staffId: tableData.shifts[id].staffId,
+          }))
+        }
       );
-    } catch (error) {
-      console.error(error);
+      // console.log(data);
+      if (!data) throw new Error("Invalid response from server");
+
+      toastSuccess("Week template was created successfully");
+      setModalState("list");
+    } catch (error: any) {
+      handleFetchError(error);
+    } finally {
+      setCreating(false);
     }
   };
 
   return (
     <>
-      <SidePopupModal.Body>
+      <SidePopupModal.Body classList={{ "cursor-progress": creating() }}>
         <div class="text-sm mb-4 text-gray-400 leading-[1.5] tracking-wide">
           Select the template that you would like to use from the list below.
           You will be able to preview the shifts that will be created in the
@@ -84,7 +95,8 @@ const Create: Component = ({}) => {
           class="shadow-inner"
           formHandler={formHandler}
         />
-        <div class="text-[#637286] bg-[#f8fafc] font-semibold py-2.5 px-5 border-y border-[#d5dce6] -mx-5 mt-5 mb-3.5 text-sm">
+        <div
+          class="text-[#637286] bg-[#f8fafc] font-semibold py-2.5 px-5 border-y border-[#d5dce6] -mx-5 mt-5 mb-3.5 text-sm">
           Targeted Shifts
         </div>
         <div class="text-sm mb-4 text-gray-400 leading-[1.5] tracking-wide">

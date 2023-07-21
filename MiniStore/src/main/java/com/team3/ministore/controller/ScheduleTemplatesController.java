@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/schedule-templates")
@@ -23,7 +24,9 @@ public class ScheduleTemplatesController {
 
     @GetMapping("/list")
     public ResponseEntity<Object> getAllScheduleTemplates() {
-        List<ScheduleTemplate> scheduleTemplateList = scheduleTemplateService.getAllScheduleTemplates();
+        List<ScheduleTemplateDto> scheduleTemplateList = scheduleTemplateService.getAllScheduleTemplates()
+                .stream().map(st -> new ScheduleTemplateDto(st, false)).collect(Collectors.toList());
+
         return ResponseHandler.getResponse(scheduleTemplateList, HttpStatus.OK);
     }
 

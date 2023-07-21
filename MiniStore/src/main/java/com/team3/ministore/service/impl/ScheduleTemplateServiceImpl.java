@@ -41,6 +41,7 @@ public class ScheduleTemplateServiceImpl implements ScheduleTemplateService {
         scheduleTemplate.setName(dto.getName());
         scheduleTemplate.setDescription(dto.getDescription());
         scheduleTemplate.setNumOfShifts(dto.getScheduleShiftTemplates().size());
+
         scheduleTemplate.setScheduleShiftTemplates(new ArrayList<>());
 
         ScheduleTemplate createdScheduleTemplate = scheduleTemplateRepository.save(scheduleTemplate);

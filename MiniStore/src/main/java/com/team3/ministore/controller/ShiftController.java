@@ -14,6 +14,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -35,6 +36,15 @@ public class ShiftController {
         return createdShift.map(value -> ResponseHandler.getResponse(value, HttpStatus.CREATED))
                 .orElseGet(() -> ResponseHandler.getResponse(new Exception("Invalid staff id"),
                         HttpStatus.BAD_REQUEST));
+    }
+
+    @PostMapping("/add/multiple")
+    public ResponseEntity<Object> createShifts(@Valid @RequestBody List<CreateShiftDto> dtos, BindingResult errors) {
+        if (errors.hasErrors()) return ResponseHandler.getResponse(errors, HttpStatus.BAD_REQUEST);
+
+        List<ShiftDto> createdShifts = shiftService.createShifts(dtos);
+
+        return ResponseHandler.getResponse(createdShifts, HttpStatus.CREATED);
     }
 
     @GetMapping("/list")

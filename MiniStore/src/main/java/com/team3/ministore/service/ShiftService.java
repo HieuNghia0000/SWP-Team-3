@@ -23,4 +23,5 @@ public interface ShiftService {
 
     List<Shift> getAllShifts(LocalDate fromDate, LocalDate toDate);
 
+    List<ShiftDto> createShifts(List<CreateShiftDto> dtos);
 }

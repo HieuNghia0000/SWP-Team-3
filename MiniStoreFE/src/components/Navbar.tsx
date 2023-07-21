@@ -122,7 +122,7 @@ const Navbar: Component<NavbarProps> = (props) => {
         </Show>
 
         {/* Product */}
-        <Show when={user()?.role === Role.ADMIN}>
+        <Show when={user()?.role === Role.MANAGER || user()?.role === Role.CASHIER}>
           <NavbarDropDown
             href={routes.products}
             isOpen={isOpen}
@@ -140,15 +140,15 @@ const Navbar: Component<NavbarProps> = (props) => {
               isOpen={isOpen}
             />
           </NavbarDropDown>
-        </Show>
 
-        {/* Orders */}
-        <NavbarLink
-          href={routes.orders}
-          icon={<FiShoppingCart/>}
-          text="Orders"
-          isOpen={isOpen}
-        />
+          {/* Orders */}
+          <NavbarLink
+            href={routes.orders}
+            icon={<FiShoppingCart/>}
+            text="Orders"
+            isOpen={isOpen}
+          />
+        </Show>
 
       </ul>
     </section>

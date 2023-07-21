@@ -1,12 +1,4 @@
-import {
-  Component,
-  Accessor,
-  Setter,
-  createSignal,
-  batch,
-  Switch,
-  Match,
-} from "solid-js";
+import { Accessor, batch, Component, createSignal, Match, Setter, Switch, } from "solid-js";
 import SidePopupModal from "~/components/SidePopupModal";
 import { ScheduleTemplate } from "~/types";
 import List from "./List";
@@ -20,7 +12,7 @@ const ScheduleTemplateModal: Component<{
   modalState: Accessor<ScheduleTemplateModalState>;
   setModalState: Setter<ScheduleTemplateModalState>;
 }> = ({ modalState, setModalState }) => {
-  const [scheduleTemplateFocus, setScheduleTemplateFocus] =
+  const [ scheduleTemplateFocus, setScheduleTemplateFocus ] =
     createSignal<ScheduleTemplate>();
 
   const onCloseModal = () => {
@@ -38,10 +30,10 @@ const ScheduleTemplateModal: Component<{
           <Match when={modalState() === "apply"}>
             <div class="flex gap-2">
               <button
-                onClick={[setModalState, "list"]}
+                onClick={[ setModalState, "list" ]}
                 class="text-lg text-gray-400 hover:text-gray-700"
               >
-                <FaSolidAngleLeft />
+                <FaSolidAngleLeft/>
               </button>
               <p>Apply Week Template</p>
             </div>
@@ -75,10 +67,10 @@ const ScheduleTemplateModal: Component<{
           />
         </Match>
         <Match when={modalState() === "create"}>
-          <Create />
+          <Create modalState={modalState} setModalState={setModalState}/>
         </Match>
         <Match when={modalState() === "copy"}>
-          <Copy modalState={modalState} />
+          <Copy modalState={modalState} setModalState={setModalState}/>
         </Match>
       </Switch>
     </SidePopupModal.Wrapper>

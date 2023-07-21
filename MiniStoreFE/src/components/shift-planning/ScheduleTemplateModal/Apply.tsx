@@ -1,20 +1,14 @@
 import { FaSolidTrash } from "solid-icons/fa";
-import {
-  Accessor,
-  Setter,
-  Component,
-  ResourceFetcher,
-  createResource,
-  onCleanup,
-  For,
-} from "solid-js";
+import { Accessor, Component, createResource, For, onCleanup, ResourceFetcher, Setter, } from "solid-js";
 import { DataResponse, Role, ScheduleTemplate } from "~/types";
 import { ScheduleTemplateModalState } from "~/context/ShiftPlanning";
-import displayDate from "./displayDate";
 import { shiftDetailsTime } from "../utils/shiftTimes";
 import { roles } from "~/utils/roles";
 import ResourceWrapper from "~/components/ResourceWrapper";
 import SidePopupModal from "~/components/SidePopupModal";
+import axios from "axios";
+import getEndPoint from "~/utils/getEndPoint";
+import handleFetchError from "~/utils/handleFetchError";
 
 interface DetailsProps {
   setModalState: Setter<ScheduleTemplateModalState>;
@@ -26,24 +20,19 @@ const fetcher: ResourceFetcher<
   number,
   ScheduleTemplate,
   { state: ScheduleTemplateModalState }
-> = async () => {
-  // const response = await fetch(
-  //   `${getEndPoint()}/shift-planning?from_date=${from}&to_date=${to}`
-  // );
-  const response = await fetch(
-    `http://localhost:3000/schedule-template-details.json`
-  );
-  const data: DataResponse<ScheduleTemplate> = await response.json();
+> = async (id) => {
+  try {
+    const { data: staffs } = await axios
+      .get<DataResponse<ScheduleTemplate>>(`${getEndPoint()}/schedule-templates/list/${id}`);
 
-  return data.content;
+    return staffs.content;
+  } catch (e) {
+    throw new Error(handleFetchError(e));
+  }
 };
 
-const Apply: Component<DetailsProps> = ({
-  setModalState,
-  scheduleTemplateFocus,
-  setScheduleTemplateFocus,
-}) => {
-  const [scheduleTemplate, { refetch, mutate }] = createResource(
+const Apply: Component<DetailsProps> = ({ setModalState, scheduleTemplateFocus, setScheduleTemplateFocus }) => {
+  const [ scheduleTemplate ] = createResource(
     () => scheduleTemplateFocus()?.scheduleTemplateId,
     fetcher
   );
@@ -63,22 +52,24 @@ const Apply: Component<DetailsProps> = ({
   return (
     <ResourceWrapper data={scheduleTemplate}>
       <SidePopupModal.Body>
-        <div class="flex py-2.5 overflow-hidden">
-          <div class="flex-1">
+        <div class="flex py-2.5 overflow-hidden rounded bg-[#ceefff] px-2.5 -mx-2.5">
+          <div class="flex-1 flex items-center">
             <div class="text-gray-700 font-semibold tracking-wide">
               {scheduleTemplate()!.name}
             </div>
-            <div class="text-gray-500 tracking-wide text-sm">
-              {displayDate(scheduleTemplate()!.createdAt)}
-            </div>
+            {/*<div class="text-gray-500 tracking-wide text-sm">*/}
+            {/*  {displayDate(scheduleTemplate()!.createdAt)}*/}
+            {/*</div>*/}
           </div>
           <div class="ml-3.5 flex items-start">
-            <div class="text-[#00a8ff] bg-[#ceefff] text-xs font-semibold capitalize rounded-full aspect-square w-7 flex justify-center items-center border-2 border-white">
+            <div
+              class="text-[#00a8ff] bg-[#ceefff] text-xs font-semibold capitalize rounded-full aspect-square w-7 flex justify-center items-center border-2 border-white">
               {scheduleTemplate()!.numOfShifts}
             </div>
           </div>
         </div>
-        <div class="text-[#637286] bg-[#f8fafc] font-semibold py-2.5 px-5 border-y border-[#d5dce6] -mx-5 mt-5 mb-3.5 text-sm">
+        <div
+          class="text-[#637286] bg-[#f8fafc] font-semibold py-2.5 px-5 border-y border-[#d5dce6] -mx-5 mt-5 mb-3.5 text-sm">
           Preview Shifts
         </div>
         <div class="text-sm mb-4 text-gray-400 leading-[1.5] tracking-wide">
@@ -89,7 +80,7 @@ const Apply: Component<DetailsProps> = ({
           that match the filters you have set. These shifts will be duplicated
           to this week when you apply this template:
         </div>
-        <For each={scheduleTemplate()!.shiftInfos}>
+        <For each={scheduleTemplate()!.scheduleShiftTemplates}>
           {(shift) => (
             <div
               class="rounded mx-1 p-2 relative text-left mb-1"
@@ -131,7 +122,7 @@ const Apply: Component<DetailsProps> = ({
             class="flex gap-2 justify-center items-center text-gray-500 text-sm hover:text-gray-700 tracking-wide"
           >
             <span>
-              <FaSolidTrash />
+              <FaSolidTrash/>
             </span>
             <span>Delete</span>
           </button>

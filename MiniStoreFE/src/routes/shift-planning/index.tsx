@@ -132,7 +132,8 @@ export default function ShiftPlanning() {
             cells: {},
             cellInfos: {},
             shiftsRules: {},
-            shifts: [],
+            shifts: {},
+            holidays: [],
             dates: getWeekDateStings(datePicked()!),
             staffs: [],
             leaveRequests: [],
@@ -169,6 +170,8 @@ export default function ShiftPlanning() {
   return (
     <PageDataContext.Provider
       value={{
+        pickedDate: datePicked,
+        setPickedDate: setDatePicked,
         tableData,
         setTableData,
         isRouteDataLoading,

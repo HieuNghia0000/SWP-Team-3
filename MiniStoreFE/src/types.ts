@@ -82,7 +82,6 @@ export interface LeaveRequest {
   staff?: Staff;
 }
 
-
 export interface Salary {
   salaryId: number;
   staffId: number;
@@ -155,24 +154,24 @@ export interface ShiftTemplate extends Timestamp {
   role: Role;
 }
 
-export interface ScheduleTemplate extends Timestamp {
+export interface ScheduleTemplate {
   scheduleTemplateId: number;
   name: string;
   description: string;
   numOfShifts: number;
-
-  // relationship
-  shiftInfos?: ShiftMetaInfo[];
+  scheduleShiftTemplates: ScheduleShiftTemplate[];
 }
 
-export interface ShiftScheduleTemplate {
-  shiftTemplateId: number;
+export interface ScheduleShiftTemplate {
+  scheduleShiftTemplateId: number;
   scheduleTemplateId: number;
+  staffId: number;
   date: string;
-  staffName: string;
-}
-
-export interface ShiftMetaInfo extends ShiftTemplate, ShiftScheduleTemplate {
+  startTime: string;
+  endTime: string;
+  name: string;
+  salaryCoefficient: number;
+  role: Role;
 }
 
 export interface Order extends Timestamp {
@@ -217,7 +216,6 @@ export interface Category {
   sales?: number;
   stock?: number;
 }
-
 
 export interface DataResponse<T> extends Response {
   content: T;
