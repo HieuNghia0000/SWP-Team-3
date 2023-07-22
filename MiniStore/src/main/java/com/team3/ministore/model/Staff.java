@@ -1,11 +1,9 @@
 package com.team3.ministore.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.team3.ministore.common.entity.BaseEntity;
 import com.team3.ministore.utils.Role;
 import com.team3.ministore.utils.StaffStatus;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -13,9 +11,8 @@ import java.util.List;
 
 @Entity
 @Data
-@EqualsAndHashCode(callSuper = true)
 @Table(name = "staffs")
-public class Staff extends BaseEntity {
+public class Staff {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "staff_id")

@@ -59,10 +59,12 @@ export default createHandler(
       createCookieVariable("endpoint", process.env.API_ENDPOINT!, 1)
     );
     // console.log(event.locals.token);
-    event.responseHeaders.set(
-      "Set-Cookie",
-      createCookieVariable("token", event.locals.token as string, 1)
-    );
+    if (event.locals.token !== undefined) {
+      event.responseHeaders.set(
+        "Set-Cookie",
+        createCookieVariable("token", event.locals.token as string, 1)
+      );
+    }
 
     return <StartServer event={event}/>;
   })

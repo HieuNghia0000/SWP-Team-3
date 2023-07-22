@@ -1,17 +1,14 @@
 package com.team3.ministore.model;
 
-import com.team3.ministore.common.entity.BaseEntity;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
 @Data
-@EqualsAndHashCode(callSuper = true)
 @Table(name = "salaries")
-public class Salary extends BaseEntity {
+public class Salary {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
