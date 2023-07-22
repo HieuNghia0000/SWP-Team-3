@@ -1,6 +1,6 @@
 import Breadcrumbs from "~/components/Breadcrumbs";
 import routes from "~/utils/routes";
-import {TbDownload} from "solid-icons/tb";;
+import {TbDownload} from "solid-icons/tb";
 import {OcPaperairplane2, OcPencil3} from "solid-icons/oc";
 import {BsPrinter} from "solid-icons/bs";
 import {createEffect, createResource, For} from "solid-js";
