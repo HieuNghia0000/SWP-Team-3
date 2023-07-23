@@ -4,7 +4,7 @@ import { BiRegularSlider } from "solid-icons/bi";
 import { IoEyeOutline, IoTrashOutline } from "solid-icons/io";
 import { OcPencil3 } from "solid-icons/oc";
 import { RiSystemAddFill } from "solid-icons/ri";
-import {For, createSignal, Show} from "solid-js";
+import {For, createSignal, Show, createEffect} from "solid-js";
 import { createRouteData, useSearchParams } from "solid-start";
 import Breadcrumbs from "~/components/Breadcrumbs";
 import DropDownBtn from "~/components/DropDownBtn";
@@ -14,6 +14,7 @@ import routes from "~/utils/routes";
 import handleFetchError from "~/utils/handleFetchError";
 import axios from "axios";
 import getEndPoint from "~/utils/getEndPoint";
+import {data} from "autoprefixer";
 
 type ParamType = {
   search?: string;
@@ -54,14 +55,34 @@ export default function Products() {
     Number.parseInt(searchParams.amount_to || "0")
   );
 
-  const totalItems = () => data()?.length ?? 0;
+  const [products, setProducts] = createSignal<Product[]>([]);
 
+  const totalItems = () => products()?.length ?? 0;
   const onSearchSubmit = (e: Event) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
     const search = formData.get("search") as string;
     setSearchParams({ search });
+
   };
+
+  const handleDelete = async (productId: number) => {
+    try {
+      await axios.delete(`${getEndPoint()}/products/delete/${productId}`);
+      setProducts(products().filter((product) => product.productId !== productId));
+    } catch (e) {
+      console.error("Error deleting product:", e);
+    }
+  };
+
+  createEffect(() => {
+    const newData = data();
+    if (newData && newData.length > 0) {
+      setProducts([...newData]);
+    } else {
+      setProducts([]);
+    }
+  });
 
   return (
     <main>
@@ -225,7 +246,7 @@ export default function Products() {
           {/* <!-- Table row --> */}
           <tbody class="">
             <Show when={!data.error && data() != undefined}>
-              <For each={data()}>
+              <For each={products()}>
                 {(item, index) => (
                     <tr class="hover:bg-gray-200 odd:bg-white even:bg-gray-50">
                       <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
@@ -276,15 +297,13 @@ export default function Products() {
                         </span>
                           </div>
                           <div class="relative flex justify-center items-center">
-                            <A
-                                href={"/"}
-                                class="peer text-base text-gray-500 hover:text-indigo-500"
-                            >
-                              <IoTrashOutline />
-                            </A>
+                            <button class="peer text-base text-gray-500 hover:text-indigo-500"
+                                    onclick={() => handleDelete(item.productId)}>
+                              <IoTrashOutline/>
+                            </button>
                             <span class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
-                          Delete
-                        </span>
+                                Delete
+                              </span>
                           </div>
                         </div>
                       </td>

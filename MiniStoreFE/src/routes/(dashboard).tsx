@@ -1,27 +1,22 @@
 import {FaSolidCoins} from "solid-icons/fa";
 import {BiRegularWorld} from "solid-icons/bi";
-import {Chart, Colors, Tooltip, Title, Legend} from "chart.js";
-import {onMount} from "solid-js";
 import {Line} from "solid-chartjs";
 import {FiArrowUp} from "solid-icons/fi";
 
 export default function Page() {
-    onMount(() => {
-        Chart.register(Title, Tooltip, Legend)
-    })
 
     const chartData = {
-        labels: ['January', 'February', 'March', 'April', 'May'],
+        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
         datasets: [
             {
-                label: 'Sales',
-                data: [50, 60, 70, 80, 90],
+                label: 'Rice',
+                data: [43, 48, 40, 54, 67, 73, 70],
                 backgroundColor: '#cc0eed',
                 borderColor: '#cc0eed',
             },
             {
-                label: 'Monday',
-                data: [60, 20, 10, 70, 80],
+                label: 'Milk',
+                data: [24, 50, 64, 74, 52, 51, 65],
                 backgroundColor: '#2f2830',
                 borderColor: '#2f2830',
             },
@@ -30,10 +25,38 @@ export default function Page() {
     const chartOptions = {
         responsive: true,
         maintainAspectRatio: false,
-        cubicInterpolationMode: 'monotone'
-    }
+        cubicInterpolationMode: 'monotone',
+        elements: {
+            point: {
+                radius: 0
+            },
+            line: {
+                borderJoinStyle: 'round',
+                borderWidth: 2
+            }
+        },
+        hover: {
+            mode: 'index',
+            intersect: false
+        },
+        scales: {
+            x: {
+                grid: {
+                    drawOnChartArea: false
+                }
+            },
+        },
+        plugins: {
+            tooltip: {
+                enabled: true,
+                mode: 'index',
+                intersect: false
+            },
+        }
+    };
 
-  return (
+
+    return (
       <main class="min-w-fit">
 
         {/*Card*/}
