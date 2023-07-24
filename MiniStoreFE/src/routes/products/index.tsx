@@ -227,7 +227,7 @@ export default function Products() {
                 scope="col"
                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
               >
-                Quantity
+                Inventory
               </th>
               <th
                 scope="col"
@@ -267,7 +267,7 @@ export default function Products() {
                         {item.category?.name || "N/A"}
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
-                        {item.quantity}
+                        {item.inventory}
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal">
                         {item.price} ₫

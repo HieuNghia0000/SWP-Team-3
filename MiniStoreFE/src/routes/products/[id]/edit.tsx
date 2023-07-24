@@ -7,13 +7,18 @@ import * as yup from "yup";
 import { Select } from "~/components/form/Select";
 import { CgClose } from "solid-icons/cg";
 import { FiSave } from "solid-icons/fi";
+import {useParams} from "@solidjs/router";
+import {createEffect, createResource, createSignal} from "solid-js";
+import axios from "axios";
+import getEndPoint from "~/utils/getEndPoint";
+import {Category, OrderItem, Product} from "~/types";
 
 type FormValues = {
   productName: string;
   description?: string;
   price: number;
   barcode?: string;
-  quantity: number;
+  inventory: number;
   categoryId?: number;
 };
 
@@ -27,7 +32,7 @@ const schema: yup.Schema<FormValues> = yup.object({
     .max(1000000, "Giá sản phẩm không được vượt quá 1 triệu")
     .required("Vui lòng nhập giá sản phẩm"),
   barcode: yup.string(),
-  quantity: yup
+  inventory: yup
     .number()
     .typeError("Dữ liệu không hợp lệ")
     .min(0, "Số lượng sản phẩm không được nhỏ hơn 0")
@@ -56,6 +61,49 @@ export default function EditProduct() {
     formHandler.resetForm();
   };
 
+  const [categories, setCategories] = createSignal<Category[]>();
+
+  createEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get<Category[]>(`${getEndPoint()}/categories/list`);
+        setCategories(response.data);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+
+    fetchCategories();
+  });
+
+  const idProduct = useParams<{id: string}>();
+
+  const [data] =  createResource(async () => {
+    const response = await axios.get(`${getEndPoint()}/products/${idProduct.id}`);
+    return response.data as Product;
+  });
+
+  const [productName, setProductName] = createSignal("");
+  const [description, setDescription] = createSignal("");
+  const [price, setPrice] = createSignal(0);
+  const [barcode, setBarcode] = createSignal("");
+  const [inventory, setInventory] = createSignal(0);
+  const [categoryId, setCategoryId] = createSignal(0);
+
+  createEffect(() => {
+    if (!data.error && data.state === "ready") {
+      console.log(data());
+
+      const productData = data();
+      setProductName(productData.name);
+      setDescription(productData.description || "");
+      setPrice(productData.price);
+      setBarcode(productData?.barCode || "");
+      setInventory(productData?.inventory);
+      setCategoryId(productData?.categoryId || 0);
+    }
+  });
+
   return (
     <main>
       <h1 class="mb-2 text-2xl font-medium">Edit Product</h1>
@@ -79,6 +127,7 @@ export default function EditProduct() {
                 label="Product Name"
                 placeholder="Type product name here"
                 formHandler={formHandler}
+                value={productName()}
               />
               <TextInput
                 id="description"
@@ -86,13 +135,14 @@ export default function EditProduct() {
                 label="Description"
                 placeholder="Type product description here"
                 formHandler={formHandler}
+                value={description()}
               />
               <TextInput
                 id="price"
                 type="number"
                 min={0}
                 step={1000}
-                value={0}
+                value={price()}
                 name="price"
                 label="Price (VND)"
                 placeholder="Type product price here"
@@ -110,15 +160,16 @@ export default function EditProduct() {
                 placeholder="Product barcode"
                 formHandler={formHandler}
                 classList={{ "flex-1": true }}
+                value={barcode()}
               />
               <TextInput
-                id="quantity"
+                id="inventory"
                 type="number"
                 min={0}
-                value={0}
-                name="quantity"
-                label="Quantity"
-                placeholder="Quantity"
+                value={inventory()}
+                name="inventory"
+                label="Inventory"
+                placeholder="Inventory"
                 formHandler={formHandler}
                 classList={{ "flex-1": true }}
               />
@@ -154,12 +205,13 @@ export default function EditProduct() {
                 id="category"
                 name="categoryId"
                 label="Product Category"
-                value={0}
+                value={categoryId()}
                 options={[
                   { value: 0, label: "Select a category" },
-                  { value: 1, label: "Watch" },
-                  { value: 2, label: "Drink Water" },
-                  { value: 3, label: "Food" },
+                  ...(categories() || []).map((category) => ({
+                    value: category.categoryId,
+                    label: category.name,
+                  })),
                 ]}
                 formHandler={formHandler}
               />

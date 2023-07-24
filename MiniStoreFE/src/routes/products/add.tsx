@@ -8,8 +8,10 @@ import { Select } from "~/components/form/Select";
 import { RiSystemAddFill } from "solid-icons/ri";
 import { CgClose } from "solid-icons/cg";
 import axios from "axios";
-import {Product} from "~/types";
+import {Category, Product} from "~/types";
 import getEndPoint from "~/utils/getEndPoint";
+import {createEffect, createSignal} from "solid-js";
+import {toastError, toastSuccess} from "~/utils/toast";
 
 type FormValues = {
   name: string;
@@ -44,9 +46,17 @@ export default function AddProduct() {
     event.preventDefault();
     try {
       await formHandler.validateForm();
-      await axios.post<Product>(`${getEndPoint()}/products/add`, formData());
-      alert("Data sent with success: " + JSON.stringify(formData()));
+      const {categoryId, ...productData} = formData();
+
+      const productWithCategory = {
+        ...productData,
+        ...(categoryId ? { category: { categoryId } } : {}),
+      };
+
+      await axios.post<Product>(`${getEndPoint()}/products/add`, productWithCategory);
+      toastSuccess("Product created successfully!");
     } catch (error) {
+      toastError("Error when create Product");
       console.error(error);
     }
   };
@@ -54,6 +64,21 @@ export default function AddProduct() {
   const reset = () => {
     formHandler.resetForm();
   };
+
+  const [categories, setCategories] = createSignal<Category[]>();
+
+  createEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get<Category[]>(`${getEndPoint()}/categories/list`);
+        setCategories(response.data);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+
+    fetchCategories();
+  });
 
   return (
     <main>
@@ -156,9 +181,10 @@ export default function AddProduct() {
                 value={0}
                 options={[
                   { value: 0, label: "Select a category" },
-                  { value: 1, label: "Watch" },
-                  { value: 2, label: "Drink Water" },
-                  { value: 3, label: "Food" },
+                  ...(categories() || []).map((category) => ({
+                    value: category.categoryId,
+                    label: category.name,
+                  })),
                 ]}
                 formHandler={formHandler}
               />

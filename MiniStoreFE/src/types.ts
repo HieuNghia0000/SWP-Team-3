@@ -202,6 +202,7 @@ export interface Product {
   description: string;
   price: number;
   quantity: number;
+  inventory: number;
   categoryId?: number;
 
   // relationship

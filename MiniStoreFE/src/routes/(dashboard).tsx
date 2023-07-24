@@ -2,8 +2,14 @@ import {FaSolidCoins} from "solid-icons/fa";
 import {BiRegularWorld} from "solid-icons/bi";
 import {Line} from "solid-chartjs";
 import {FiArrowUp} from "solid-icons/fi";
+import {Chart, Colors, Legend, Tooltip, Title} from "chart.js";
+import {onMount} from "solid-js";
 
 export default function Page() {
+
+    onMount(() => {
+        Chart.register(Title, Tooltip, Legend, Colors)
+    });
 
     const chartData = {
         labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
