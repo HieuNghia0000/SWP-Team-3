@@ -70,6 +70,16 @@ const Navbar: Component<NavbarProps> = (props) => {
           isOpen={isOpen}
         />
 
+        {/* Staff */}
+        <Show when={user()?.role === Role.ADMIN}>
+          <NavbarLink
+            href={routes.staffs}
+            icon={<BsPeople/>}
+            text="Staff&nbsp;Management"
+            isOpen={isOpen}
+          />
+        </Show>
+
         {/* Attendance & Timesheets */}
         <Show when={user()?.role === Role.ADMIN}>
           <NavbarDropDown
@@ -106,17 +116,6 @@ const Navbar: Component<NavbarProps> = (props) => {
             href={routes.attendanceId(user()?.staffId!)}
             text="Attendance"
             icon={<FaRegularCalendarCheck/>}
-            isOpen={isOpen}
-          />
-        </Show>
-
-
-        {/* Staff */}
-        <Show when={user()?.role === Role.ADMIN}>
-          <NavbarLink
-            href={routes.staffs}
-            icon={<BsPeople/>}
-            text="Staff&nbsp;Management"
             isOpen={isOpen}
           />
         </Show>

@@ -201,18 +201,21 @@ export interface Product {
   name: string;
   description: string;
   price: number;
-  quantity: number;
   inventory: number;
   categoryId?: number;
 
   // relationship
   category?: Category;
+
+  // add on
+  quantity: number;
 }
 
 export interface Category {
   categoryId: number;
   name: string;
   description: string;
+  numberOfProducts: number;
 
   // add on
   sales?: number;

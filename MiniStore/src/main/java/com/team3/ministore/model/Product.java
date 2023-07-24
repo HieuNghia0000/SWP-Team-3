@@ -3,7 +3,6 @@ package com.team3.ministore.model;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
 @Data
@@ -14,10 +13,6 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "product_id")
     private int productId;
-
-    @ManyToOne
-    @JoinColumn(name = "category_id", referencedColumnName = "category_id")
-    private Category category;
 
     @Column(name = "barcode", length = 20)
     private String barCode;
@@ -33,4 +28,8 @@ public class Product {
 
     @Column(name = "inventory")
     private int inventory;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
 }

@@ -1,8 +1,8 @@
+import { Component, Setter } from "solid-js";
+import { useSearchParams } from "solid-start";
+import { ParamType } from "~/components/products/types";
 import { AiOutlineSearch } from "solid-icons/ai";
 import { RiSystemAddFill } from "solid-icons/ri";
-import { useSearchParams } from "@solidjs/router";
-import { ParamType } from "~/components/cover-requests/types";
-import { Component, Setter } from "solid-js";
 
 const ToolBar: Component<{
   setShowCreateModal: Setter<boolean>;
@@ -44,7 +44,7 @@ const ToolBar: Component<{
             <span class="text-lg">
               <RiSystemAddFill/>
             </span>
-          <span>New Shift Cover</span>
+          <span>New Product</span>
         </button>
       </div>
     </div>

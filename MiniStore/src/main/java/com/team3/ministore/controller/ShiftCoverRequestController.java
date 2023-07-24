@@ -54,7 +54,7 @@ public class ShiftCoverRequestController {
         Optional<ShiftCoverDto> createdShiftCoverRequest = shiftCoverRequestService.createShiftCoverRequest(dto);
 
         if (createdShiftCoverRequest.isEmpty())
-            return ResponseHandler.getResponse("Staff or shift not found", HttpStatus.NOT_FOUND);
+            return ResponseHandler.getResponse(new Exception("Staff or shift not found"), HttpStatus.NOT_FOUND);
 
         return ResponseHandler.getResponse(createdShiftCoverRequest, HttpStatus.CREATED);
     }

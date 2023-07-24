@@ -1,69 +1,92 @@
 package com.team3.ministore.service.impl;
 
+import com.team3.ministore.dto.ProductDto;
+import com.team3.ministore.model.Category;
 import com.team3.ministore.model.Product;
+import com.team3.ministore.repository.CategoryRepository;
 import com.team3.ministore.repository.ProductRepository;
 import com.team3.ministore.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {
-    
+
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private CategoryRepository categoryRepository;
+
     @Override
-    public List<Product> getAllProduct() {
-        return productRepository.findAll();
+    public List<ProductDto> getAllProducts(String search, Integer page, Integer pageSize) {
+        Pageable pageable = PageRequest.of(page - 1, pageSize);
+        return productRepository
+                .findAllByNameContainingIgnoreCase(search, pageable)
+                .stream().map(ProductDto::new)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Product createProduct(Product product) {
-        return productRepository.save(product);
+    public List<ProductDto> getAllProducts(Integer page, Integer pageSize) {
+        Pageable pageable = PageRequest.of(page - 1, pageSize);
+        return productRepository
+                .findAll(pageable)
+                .stream().map(ProductDto::new)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Product getProductById(Integer id) {
-        return productRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid Product ID: " + id));
+    public Optional<Product> createProduct(ProductDto dto) {
+        Optional<Category> category = categoryRepository.findById(dto.getCategoryId());
+        if (dto.getCategoryId() != 0 && category.isEmpty()) return Optional.empty();
+
+        Product product = new Product();
+
+        product.setBarCode(dto.getBarCode());
+        product.setName(dto.getName());
+        product.setDescription(dto.getDescription());
+        category.ifPresent(product::setCategory);
+        product.setPrice(dto.getPrice());
+        product.setInventory(dto.getInventory());
+
+        return Optional.of(productRepository.save(product));
     }
 
     @Override
-    public Product updateProduct(Integer id, Product product) {
-        Product existingProduct = getProductById(id);
+    public Optional<Product> getProductById(Integer id) {
+        return productRepository.findById(id);
+    }
 
-        existingProduct.setBarCode(product.getBarCode());
-        existingProduct.setName(product.getName());
-        existingProduct.setDescription(product.getDescription());
-        existingProduct.setCategory(product.getCategory());
-        existingProduct.setPrice(product.getPrice());
-        existingProduct.setInventory(product.getInventory());
+    @Override
+    public Optional<Product> updateProduct(Integer id, ProductDto dto) {
+        Optional<Category> category = categoryRepository.findById(dto.getCategoryId());
+        if (dto.getCategoryId() != 0 && category.isEmpty()) return Optional.empty();
 
-        return productRepository.save(existingProduct);
+        Optional<Product> existingProduct = getProductById(id);
+        if (existingProduct.isEmpty()) return Optional.empty();
+
+        existingProduct.map(value -> {
+            value.setBarCode(dto.getBarCode());
+            value.setName(dto.getName());
+            value.setDescription(dto.getDescription());
+            value.setCategory(category.orElseGet(() -> null));
+            value.setPrice(dto.getPrice());
+            value.setInventory(dto.getInventory());
+            return value;
+        });
+
+        return Optional.of(productRepository.save(existingProduct.get()));
     }
 
     @Override
     public void deleteProduct(Integer id) {
         productRepository.deleteById(id);
-    }
-
-    @Override
-    public List<Product> getStaffByNameLike(String name) {
-        return productRepository.getProductsByNameLike(name);
-    }
-
-    @Override
-    public List<Product> findProductsByPriceBetween(Float fromAmount, Float toAmount) {
-        return productRepository.findProductsByPriceBetween(fromAmount, toAmount);
-    }
-
-    @Override
-    public Page<Product> findAllPagingProducts(int pageIndex, int pageSize) {
-        Pageable pageable = PageRequest.of(pageIndex - 1, pageSize);
-        return productRepository.findAllPagingProducts(pageable);
     }
 }
