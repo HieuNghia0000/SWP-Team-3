@@ -1,14 +1,16 @@
 package com.team3.ministore.service.impl;
 
+import com.team3.ministore.dto.CategoryDto;
 import com.team3.ministore.model.Category;
 import com.team3.ministore.repository.CategoryRepository;
 import com.team3.ministore.service.CategoryService;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -20,28 +22,38 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<Category> getAllCategory() {
+    public List<Category> getMetaCategories() {
         return categoryRepository.findAll();
     }
 
     @Override
-    public Category createCategory(Category category) {
+    public Category createCategory(CategoryDto dto) {
+        Category category = new Category();
+
+        category.setName(dto.getName());
+        category.setDescription(dto.getDescription());
+
         return categoryRepository.save(category);
     }
 
     @Override
-    public Category getCategoryById(Integer id) {
-        return categoryRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid category ID:" + id));
+    public Optional<Category> getCategoryById(Integer id) {
+        return categoryRepository.findById(id);
     }
 
     @Override
-    public Category updateCategory(Integer id, Category category) {
-        Category existingCategory = getCategoryById(id);
+    public Optional<Category> updateCategory(Integer id, CategoryDto dto) {
+        Optional<Category> existingCategory = getCategoryById(id);
 
-        existingCategory.setName(category.getName());
-        existingCategory.setDescription(category.getDescription());
+        if (existingCategory.isEmpty()) return Optional.empty();
 
-        return categoryRepository.save(existingCategory);
+        existingCategory.map(category -> {
+            category.setName(dto.getName());
+            category.setDescription(dto.getDescription());
+            return category;
+        });
+
+        return Optional.of(categoryRepository.save(existingCategory.get()));
     }
 
     @Override
@@ -50,13 +62,20 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<Category> getCategoryByNameLike(String name) {
-        return categoryRepository.getCategoryByNameLike(name);
+    public List<CategoryDto> getAllCategories(String search, Integer page, Integer pageSize) {
+        Pageable pageable = PageRequest.of(page - 1, pageSize);
+        return categoryRepository
+                .findAllByNameContainingIgnoreCase(search, pageable)
+                .stream().map(CategoryDto::new)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Page<Category> findAllPagingCategory(int pageIndex, int pageSize) {
-        Pageable pageable = PageRequest.of(pageIndex - 1, pageSize);
-        return categoryRepository.findAllPagingCategory(pageable);
+    public List<CategoryDto> getAllCategories(Integer page, Integer pageSize) {
+        Pageable pageable = PageRequest.of(page - 1, pageSize);
+        return categoryRepository
+                .findAll(pageable)
+                .stream().map(CategoryDto::new)
+                .collect(Collectors.toList());
     }
 }

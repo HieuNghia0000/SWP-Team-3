@@ -18,4 +18,6 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
 
     @Query("SELECT c FROM Category c")
     Page<Category> findAllPagingCategory(Pageable pageable);
+
+    List<Category> findAllByNameContainingIgnoreCase(String search, Pageable pageable);
 }

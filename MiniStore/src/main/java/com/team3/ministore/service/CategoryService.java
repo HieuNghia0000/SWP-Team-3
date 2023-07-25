@@ -1,23 +1,23 @@
 package com.team3.ministore.service;
 
+import com.team3.ministore.dto.CategoryDto;
 import com.team3.ministore.model.Category;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CategoryService {
-    List<Category> getAllCategory();
+    List<Category> getMetaCategories();
 
-    Category createCategory(Category category);
+    Category createCategory(CategoryDto category);
 
-    Category getCategoryById(Integer id);
+    Optional<Category> getCategoryById(Integer id);
 
-    Category updateCategory(Integer id, Category category);
+    Optional<Category> updateCategory(Integer id, CategoryDto category);
 
     void deleteCategory(Integer id);
 
-    List<Category> getCategoryByNameLike(String name);
+    List<CategoryDto> getAllCategories(String search, Integer page, Integer pageSize);
 
-    Page<Category> findAllPagingCategory(int pageIndex, int pageSize);
+    List<CategoryDto> getAllCategories(Integer page, Integer pageSize);
 }

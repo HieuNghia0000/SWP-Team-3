@@ -4,38 +4,34 @@ import { TextInput } from "~/components/form/TextInput";
 import { useFormHandler } from "solid-form-handler";
 import { yupSchema } from "solid-form-handler/yup";
 import * as yup from "yup";
-import { DataResponse, Product, } from "~/types";
+import { Category, DataResponse } from "~/types";
 import { TextArea } from "~/components/form/TextArea";
 import { createRouteAction } from "solid-start";
 import getEndPoint from "~/utils/getEndPoint";
-import { Select } from "~/components/form/Select";
 import handleFetchError from "~/utils/handleFetchError";
 import { toastSuccess } from "~/utils/toast";
 import axios from "axios";
 import { useRouteData } from "@solidjs/router";
-import { routeData } from "~/routes/products";
+import { useCategoryContext } from "~/context/Category";
+import { routeData } from "~/routes/categories";
 
-type CreateProduct = {
+type FormValues = {
+  categoryId: number;
   name: string;
   description?: string;
-  barCode?: string;
-  price: number;
-  inventory: number;
-  categoryId?: number;
 };
 
-const schema: yup.Schema<CreateProduct> = yup.object({
-  name: yup.string().required("Product name is required"),
-  description: yup.string().default(""),
-  barCode: yup.string().default(""),
-  price: yup.number().min(0, "Smallest price is 0").required("Price is required"),
-  inventory: yup.number().min(0, "Smallest amount is 0").required("Inventory is required"),
+const schema: yup.Schema<FormValues> = yup.object({
   categoryId: yup.number().default(0),
+  name: yup.string().required("Category name is required"),
+  description: yup.string(),
 });
 
-const createProduct = async (formData: CreateProduct) => {
+const updateCategory = async (formData: FormValues) => {
   try {
-    const { data } = await axios.post<DataResponse<Product>>(`${getEndPoint()}/products/add`, { ...formData });
+    const { data } = await axios.put<DataResponse<Category>>(
+      `${getEndPoint()}/categories/update/${formData.categoryId}`, { ...formData }
+    );
 
     console.log(data);
     if (!data) throw new Error("Invalid response from server");
@@ -45,17 +41,19 @@ const createProduct = async (formData: CreateProduct) => {
   }
 };
 
-const CreateProductModal: Component<{
+const EditCategoryModal: Component<{
   showModal: Accessor<boolean>;
   setShowModal: Setter<boolean>;
 }> = ({ setShowModal, showModal }) => {
-  const { categories } = useRouteData<typeof routeData>();
-  const [ echoing, echo ] = createRouteAction(createProduct);
+  const { data } = useRouteData<typeof routeData>();
+  const { chosenId } = useCategoryContext();
+  const [ echoing, echo ] = createRouteAction(updateCategory);
   const formHandler = useFormHandler(yupSchema(schema), { validateOn: [] });
   const { formData } = formHandler;
 
-  const categoryList = createMemo(() => !categories.error && categories() !== undefined ?
-    categories()?.map(c => ({ label: c.name, value: c.categoryId })) : []
+  const category = createMemo(() => !data.error && data() !== undefined
+    ? data()?.find((p) => p.categoryId === chosenId())
+    : undefined
   )
 
   const submit = async (e: Event) => {
@@ -69,7 +67,7 @@ const CreateProductModal: Component<{
     const success = await echo({ ...formData() });
 
     if (success) {
-      toastSuccess("Product was created successfully");
+      toastSuccess("Category was updated successfully");
       await formHandler.resetForm();
       setShowModal(false);
     }
@@ -82,7 +80,7 @@ const CreateProductModal: Component<{
 
   return (
     <PopupModal.Wrapper
-      title="New Product"
+      title="Edit Category"
       close={onCloseModal}
       open={showModal}
     >
@@ -95,49 +93,15 @@ const CreateProductModal: Component<{
                   id="name"
                   name="name"
                   label="Product Name"
-                  placeholder="e.g. iPhone 12 Pro Max"
+                  value={category()?.name || ""}
+                  placeholder="e.g. Energy Drink"
                   formHandler={formHandler}
                 />
-              </div>
-              <div class="flex-1 py-2.5 flex flex-col gap-1">
                 <TextInput
-                  id="barCode"
-                  name="barCode"
-                  label="Barcode"
-                  placeholder="e.g. 123456789"
-                  formHandler={formHandler}
-                />
-              </div>
-            </div>
-            <div class="flex gap-2">
-              <div class="flex-1 py-2.5 flex flex-col gap-1">
-                <TextInput
-                  id="price"
-                  name="price"
-                  label="Price"
-                  type="number"
-                  step={500}
-                  placeholder="Enter price (VND)"
-                  formHandler={formHandler}
-                />
-              </div>
-              <div class="flex-1 py-2.5 flex flex-col gap-1">
-                <TextInput
-                  id="inventory"
-                  name="inventory"
-                  label="Inventory"
-                  type="number"
-                  placeholder="Enter inventory"
-                  formHandler={formHandler}
-                />
-              </div>
-              <div class="flex-1 py-2.5 flex flex-col gap-1">
-                <Select
                   id="categoryId"
                   name="categoryId"
-                  label="Category"
-                  placeholder="Select category"
-                  options={categoryList()}
+                  hidden={true}
+                  value={category()?.categoryId}
                   formHandler={formHandler}
                 />
               </div>
@@ -148,7 +112,8 @@ const CreateProductModal: Component<{
                   id="description"
                   name="description"
                   label="Description"
-                  placeholder="Description of the product"
+                  value={category()?.description || ""}
+                  placeholder="Description of the category"
                   formHandler={formHandler}
                 />
               </div>
@@ -163,7 +128,7 @@ const CreateProductModal: Component<{
               onClick={submit}
               class="py-1.5 px-3 font-semibold text-white border border-blue-600 bg-blue-500 text-sm rounded hover:bg-blue-600"
             >
-              Create
+              Save
             </button>
           </div>
         </PopupModal.Footer>
@@ -172,4 +137,4 @@ const CreateProductModal: Component<{
   );
 };
 
-export default CreateProductModal;
+export default EditCategoryModal;

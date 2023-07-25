@@ -47,6 +47,9 @@ public class ProductServiceImpl implements ProductService {
         Optional<Category> category = categoryRepository.findById(dto.getCategoryId());
         if (dto.getCategoryId() != 0 && category.isEmpty()) return Optional.empty();
 
+        Optional<Product> sameBarcode = productRepository.findFirstByBarCode(dto.getBarCode());
+        if (sameBarcode.isPresent()) return Optional.empty();
+
         Product product = new Product();
 
         product.setBarCode(dto.getBarCode());
@@ -71,6 +74,12 @@ public class ProductServiceImpl implements ProductService {
 
         Optional<Product> existingProduct = getProductById(id);
         if (existingProduct.isEmpty()) return Optional.empty();
+
+        // Check if barcode is already existed
+        if (dto.getBarCode() != null && !dto.getBarCode().equals(existingProduct.get().getBarCode())) {
+            Optional<Product> sameBarcode = productRepository.findFirstByBarCode(dto.getBarCode());
+            if (sameBarcode.isPresent()) return Optional.empty();
+        }
 
         existingProduct.map(value -> {
             value.setBarCode(dto.getBarCode());

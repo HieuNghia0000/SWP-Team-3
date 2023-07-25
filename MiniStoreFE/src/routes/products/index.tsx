@@ -3,7 +3,7 @@ import { createSignal } from "solid-js";
 import { createRouteAction, createRouteData, useSearchParams } from "solid-start";
 import Breadcrumbs from "~/components/Breadcrumbs";
 import Pagination from "~/components/Pagination";
-import { DataResponse, Product } from "~/types";
+import { Category, DataResponse, Product } from "~/types";
 import handleFetchError from "~/utils/handleFetchError";
 import axios from "axios";
 import getEndPoint from "~/utils/getEndPoint";
@@ -49,7 +49,23 @@ export function routeData() {
     }
   );
 
-  return { data: products };
+  const categories = createRouteData(
+    async ([ key ]) => {
+      try {
+
+        const { data } = await axios.get<DataResponse<Category[]>>(`${getEndPoint()}/${key}/all`);
+        return data.content;
+      } catch (e) {
+        throw new Error(handleFetchError(e));
+      }
+    },
+    {
+      key: () => [ "categories" ],
+      reconcileOptions: { key: "categoryId" }
+    }
+  );
+
+  return { data: products, categories };
 }
 
 export default function Products() {

@@ -55,7 +55,7 @@ const EditProductModal: Component<{
   showModal: Accessor<boolean>;
   setShowModal: Setter<boolean>;
 }> = ({ setShowModal, showModal }) => {
-  const { data } = useRouteData<typeof routeData>();
+  const { data, categories } = useRouteData<typeof routeData>();
   const { chosenId } = useProductContext();
   const [ echoing, echo ] = createRouteAction(updateProduct);
   const formHandler = useFormHandler(yupSchema(schema), { validateOn: [] });
@@ -64,6 +64,10 @@ const EditProductModal: Component<{
   const product = createMemo(() => !data.error && data() !== undefined
     ? data()?.find((p) => p.productId === chosenId())
     : undefined
+  )
+
+  const categoryList = createMemo(() => !categories.error && categories() !== undefined ?
+    categories()?.map(c => ({ label: c.name, value: c.categoryId })) : []
   )
 
   const submit = async (e: Event) => {
@@ -157,16 +161,7 @@ const EditProductModal: Component<{
                   label="Category"
                   value={product()?.categoryId || 0}
                   placeholder="Select category"
-                  options={[
-                    {
-                      label: "Category 1",
-                      value: 1,
-                    },
-                    {
-                      label: "Category 2",
-                      value: 2,
-                    }
-                  ]}
+                  options={categoryList()}
                   formHandler={formHandler}
                 />
               </div>
@@ -193,7 +188,7 @@ const EditProductModal: Component<{
               onClick={submit}
               class="py-1.5 px-3 font-semibold text-white border border-blue-600 bg-blue-500 text-sm rounded hover:bg-blue-600"
             >
-              Create
+              Save
             </button>
           </div>
         </PopupModal.Footer>
