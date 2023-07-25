@@ -24,6 +24,8 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        if (staffService.getAllStaffs().size() > 0) return;
+
         // Create admin account
         RegisterDto dto = new RegisterDto();
         dto.setUsername("admin");
@@ -34,7 +36,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         dto.setStatus(StaffStatus.ACTIVE);
         dto.setImage("");
         dto.setPhoneNumber("0123456789");
-        dto.setWorkDays("Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday");
+        dto.setWorkDays("Whole week");
         dto.setLeaveBalance(0);
         dto.setHourlyWage("100000");
         dto.setEffectiveDate(LocalDate.now());
