@@ -13,7 +13,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 
     Page<Product> findAll(Pageable pageable);
 
-    Page<Product> findAllByNameContainingIgnoreCase(String name, Pageable pageable);
+    Page<Product> findAllByNameContainingIgnoreCaseOrBarCodeContainingIgnoreCase(String name, String barcode, Pageable pageable);
 
     Optional<Product> findFirstByBarCode(String barCode);
 }

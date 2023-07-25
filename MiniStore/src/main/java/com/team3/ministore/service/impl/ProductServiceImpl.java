@@ -28,7 +28,7 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductDto> getAllProducts(String search, Integer page, Integer pageSize) {
         Pageable pageable = PageRequest.of(page - 1, pageSize);
         return productRepository
-                .findAllByNameContainingIgnoreCase(search, pageable)
+                .findAllByNameContainingIgnoreCaseOrBarCodeContainingIgnoreCase(search, search, pageable)
                 .stream().map(ProductDto::new)
                 .collect(Collectors.toList());
     }
@@ -46,9 +46,6 @@ public class ProductServiceImpl implements ProductService {
     public Optional<Product> createProduct(ProductDto dto) {
         Optional<Category> category = categoryRepository.findById(dto.getCategoryId());
         if (dto.getCategoryId() != 0 && category.isEmpty()) return Optional.empty();
-
-        Optional<Product> sameBarcode = productRepository.findFirstByBarCode(dto.getBarCode());
-        if (sameBarcode.isPresent()) return Optional.empty();
 
         Product product = new Product();
 
@@ -68,18 +65,17 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public Optional<Product> getProductByBarcode(String barcode) {
+        return productRepository.findFirstByBarCode(barcode);
+    }
+
+    @Override
     public Optional<Product> updateProduct(Integer id, ProductDto dto) {
         Optional<Category> category = categoryRepository.findById(dto.getCategoryId());
         if (dto.getCategoryId() != 0 && category.isEmpty()) return Optional.empty();
 
         Optional<Product> existingProduct = getProductById(id);
         if (existingProduct.isEmpty()) return Optional.empty();
-
-        // Check if barcode is already existed
-        if (dto.getBarCode() != null && !dto.getBarCode().equals(existingProduct.get().getBarCode())) {
-            Optional<Product> sameBarcode = productRepository.findFirstByBarCode(dto.getBarCode());
-            if (sameBarcode.isPresent()) return Optional.empty();
-        }
 
         existingProduct.map(value -> {
             value.setBarCode(dto.getBarCode());
