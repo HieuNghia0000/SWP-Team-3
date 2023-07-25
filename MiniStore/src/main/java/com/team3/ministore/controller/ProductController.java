@@ -21,22 +21,37 @@ public class ProductController {
     private ProductService productService;
 
     @PostMapping("/add")
-    public ResponseEntity<Object> createProduct(@Valid @RequestBody ProductDto product, BindingResult errors) {
+    public ResponseEntity<Object> createProduct(@Valid @RequestBody ProductDto dto, BindingResult errors) {
         if (errors.hasErrors()) return ResponseHandler.getResponse(errors, HttpStatus.BAD_REQUEST);
 
-        Optional<Product> createdProduct = productService.createProduct(product);
+        // Check if barcode is already existed
+        if (dto.getBarCode() != null && !dto.getBarCode().isEmpty()) {
+            Optional<Product> sameBarcode = productService.getProductByBarcode(dto.getBarCode());
+            if (sameBarcode.isPresent())
+                return ResponseHandler.getResponse(new Exception("Barcode is already existed."), HttpStatus.BAD_REQUEST);
+        }
+
+        Optional<Product> createdProduct = productService.createProduct(dto);
         return createdProduct.map(value -> ResponseHandler.getResponse(new ProductDto(value), HttpStatus.CREATED))
-                .orElseGet(() -> ResponseHandler.getResponse(new Exception("Category not found. Or barcode is already existed."), HttpStatus.NOT_FOUND));
+                .orElseGet(() -> ResponseHandler.getResponse(new Exception("Category not found."), HttpStatus.NOT_FOUND));
 
     }
 
     @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateProduct(@Valid @PathVariable("id") Integer id, @RequestBody ProductDto dto, BindingResult errors) {
         if (errors.hasErrors()) return ResponseHandler.getResponse(errors, HttpStatus.BAD_REQUEST);
+
+        // Check if barcode is already existed
+        if (dto.getBarCode() != null && !dto.getBarCode().isEmpty()) {
+            Optional<Product> sameBarcode = productService.getProductByBarcode(dto.getBarCode());
+            if (sameBarcode.isPresent() && sameBarcode.get().getProductId() != id)
+                return ResponseHandler.getResponse(new Exception("Barcode is already existed."), HttpStatus.BAD_REQUEST);
+        }
+
         Optional<Product> updatedProduct = productService.updateProduct(id, dto);
 
         return updatedProduct.map(value -> ResponseHandler.getResponse(new ProductDto(value), HttpStatus.OK))
-                .orElseGet(() -> ResponseHandler.getResponse(new Exception("Product or category not found. Or barcode is already existed."), HttpStatus.NOT_FOUND));
+                .orElseGet(() -> ResponseHandler.getResponse(new Exception("Product or category not found."), HttpStatus.NOT_FOUND));
     }
 
     @DeleteMapping("/delete/{id}")

@@ -15,6 +15,8 @@ public interface ProductService {
 
     Optional<Product> getProductById(Integer id);
 
+    Optional<Product> getProductByBarcode(String barcode);
+
     Optional<Product> updateProduct(Integer id, ProductDto product);
 
     void deleteProduct(Integer id);
