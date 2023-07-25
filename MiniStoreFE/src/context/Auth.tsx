@@ -111,6 +111,7 @@ const fetchData: ResourceFetcher<
     return undefined;
   } catch (error) {
     handleFetchError(error);
+    clearItem("token");
   }
 };
 

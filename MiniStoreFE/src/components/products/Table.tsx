@@ -81,38 +81,38 @@ export default function Table() {
             {(item) => (
               <tr class="hover:bg-[#ceefff] odd:bg-white even:bg-gray-50 text-[#333c48]">
                 <td
-                  class="px-2.5 pl-[18px] text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                  class="px-2.5 pl-[18px] text-sm whitespace-nowrap truncate leading-10 border-[#e2e7ee] border-b">
                   {item.productId}
                 </td>
                 <td
                   style={{ "border-left": "1px dashed #d5dce6" }}
-                  class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                  class="px-2.5 text-sm whitespace-nowrap truncate leading-10 border-[#e2e7ee] border-b">
                   {item.barCode}
                 </td>
                 <td
                   style={{ "border-left": "1px dashed #d5dce6" }}
-                  class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                  class="px-2.5 text-sm whitespace-nowrap truncate leading-10 border-[#e2e7ee] border-b">
                   {item.name}
                 </td>
                 <td
                   style={{ "border-left": "1px dashed #d5dce6" }}
-                  class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                  class="px-2.5 text-sm whitespace-nowrap truncate leading-10 border-[#e2e7ee] border-b">
                   {item.category?.name || ""}
                 </td>
                 <td
                   style={{ "border-left": "1px dashed #d5dce6", }}
-                  class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                  class="px-2.5 text-sm whitespace-nowrap truncate leading-10 border-[#e2e7ee] border-b">
                   {item.inventory}
                 </td>
                 <td
                   style={{ "border-left": "1px dashed #d5dce6" }}
-                  class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b"
+                  class="px-2.5 text-sm whitespace-nowrap truncate leading-10 border-[#e2e7ee] border-b"
                 >
                   {formatNumberWithCommas(item.price || 0)} ₫
                 </td>
                 <td
                   style={{ "border-left": "1px dashed #d5dce6" }}
-                  class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                  class="px-2.5 text-sm whitespace-nowrap truncate leading-10 border-[#e2e7ee] border-b">
                   <div class="flex flex-row gap-1">
                     <div class="relative flex justify-center items-center">
                       <button

@@ -129,7 +129,7 @@ export default function Table() {
               return (
                 <tr class="hover:bg-[#ceefff] odd:bg-white even:bg-gray-50 text-[#333c48]">
                   <td
-                    class="px-2.5 pl-[18px] text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                    class="px-2.5 pl-[18px] text-sm whitespace-nowrap truncate leading-10 border-[#e2e7ee] border-b">
                     <A
                       href={routes.staff(timesheet.staffId)}
                       class="hover:text-indigo-500"
@@ -139,37 +139,37 @@ export default function Table() {
                   </td>
                   <td
                     style={{ "border-left": "1px dashed #d5dce6" }}
-                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                    class="px-2.5 text-sm whitespace-nowrap truncate leading-10 border-[#e2e7ee] border-b">
                     {timesheet.shift!.date}
                   </td>
                   <td
                     style={{ "border-left": "1px dashed #d5dce6" }}
-                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                    class="px-2.5 text-sm whitespace-nowrap truncate leading-10 border-[#e2e7ee] border-b">
                     {shiftTimes(timesheet.shift!.startTime, timesheet.shift!.endTime)}
                   </td>
                   <td
                     style={{ "border-left": "1px dashed #d5dce6" }}
-                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                    class="px-2.5 text-sm whitespace-nowrap truncate leading-10 border-[#e2e7ee] border-b">
                     {coefficient}
                   </td>
                   <td
                     style={{ "border-left": "1px dashed #d5dce6" }}
-                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                    class="px-2.5 text-sm whitespace-nowrap truncate leading-10 border-[#e2e7ee] border-b">
                     {formatNumberWithCommas(timesheet.salary?.hourlyWage || 0)} ₫
                   </td>
                   <td
                     style={{ "border-left": "1px dashed #d5dce6", }}
-                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                    class="px-2.5 text-sm whitespace-nowrap truncate leading-10 border-[#e2e7ee] border-b">
                     {moment(timesheet.shift?.endTime, "HH:mm:ss").diff(moment(timesheet.shift?.startTime, "HH:mm:ss"), "hours")} hrs
                   </td>
                   <td
                     style={{ "border-left": "1px dashed #d5dce6" }}
-                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                    class="px-2.5 text-sm whitespace-nowrap truncate leading-10 border-[#e2e7ee] border-b">
                     {formatNumberWithCommas((Number.parseFloat(timesheet.salary?.hourlyWage || "0")) * coefficient * moment(timesheet.shift?.endTime, "HH:mm:ss").diff(moment(timesheet.shift?.startTime, "HH:mm:ss"), "hours"))} ₫
                   </td>
                   <td
                     style={{ "border-left": "1px dashed #d5dce6" }}
-                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                    class="px-2.5 text-sm whitespace-nowrap truncate leading-10 border-[#e2e7ee] border-b">
                     <span
                       class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-bold rounded-full"
                       classList={{
@@ -183,7 +183,7 @@ export default function Table() {
                   </td>
                   <td
                     style={{ "border-left": "1px dashed #d5dce6" }}
-                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                    class="px-2.5 text-sm whitespace-nowrap truncate leading-10 border-[#e2e7ee] border-b">
                     <div class="flex flex-row gap-1">
                       <div class="relative flex justify-center items-center">
                         <button

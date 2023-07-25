@@ -136,12 +136,12 @@ export default function Table() {
                     grossPay
                   } ]}>
                   <td
-                    class="px-2.5 pl-[18px] text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal leading-10 border-[#e2e7ee] border-b">
+                    class="px-2.5 pl-[18px] text-sm whitespace-nowrap truncate leading-10 border-[#e2e7ee] border-b">
                     {staff.staffName}
                   </td>
                   <td
                     style={{ "border-left": "1px dashed #d5dce6" }}
-                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal text-center leading-10 border-[#e2e7ee] border-b">
+                    class="px-2.5 text-sm whitespace-nowrap truncate text-center leading-10 border-[#e2e7ee] border-b">
                     <span
                       class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-bold rounded-full"
                       classList={{
@@ -154,22 +154,22 @@ export default function Table() {
                   </td>
                   <td
                     style={{ "border-left": "1px dashed #d5dce6", }}
-                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal text-center leading-10 border-[#e2e7ee] border-b">
+                    class="px-2.5 text-sm whitespace-nowrap truncate text-center leading-10 border-[#e2e7ee] border-b">
                     {regularHours} hrs
                   </td>
                   <td
                     style={{ "border-left": "1px dashed #d5dce6" }}
-                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal text-center leading-10 border-[#e2e7ee] border-b">
+                    class="px-2.5 text-sm whitespace-nowrap truncate text-center leading-10 border-[#e2e7ee] border-b">
                     {leaveHours} hrs
                   </td>
                   <td
                     style={{ "border-left": "1px dashed #d5dce6" }}
-                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal text-center leading-10 border-[#e2e7ee] border-b">
+                    class="px-2.5 text-sm whitespace-nowrap truncate text-center leading-10 border-[#e2e7ee] border-b">
                     {regularHours - leaveHours} hrs
                   </td>
                   <td
                     style={{ "border-left": "1px dashed #d5dce6" }}
-                    class="px-2.5 text-sm whitespace-nowrap truncate md:hover:overflow-visible md:hover:whitespace-normal text-center leading-10 border-[#e2e7ee] border-b">
+                    class="px-2.5 text-sm whitespace-nowrap truncate text-center leading-10 border-[#e2e7ee] border-b">
                     {formatNumberWithCommas(grossPay)} ₫
                   </td>
                 </tr>
