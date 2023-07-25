@@ -157,9 +157,9 @@ export default function AddOrders() {
                                     <tr>
                                         <td class="px-4 py-2 text-indigo-500 font-bold">{product.productId}</td>
                                         <td class="px-4 py-2 font-medium">{product.name}</td>
-                                        <td class="px-4 py-2 text-gray-500 font-medium">{`$${product.price.toFixed(2)}`}</td>
+                                        <td class="px-4 py-2 text-gray-500 font-medium">{`${product.price} ₫`}</td>
                                         <td class="px-4 py-2 text-gray-500 font-medium">{`${product.quantity} pcs`}</td>
-                                        <td class="px-4 py-2 text-gray-500 font-medium">{`$${subtotal.toFixed(2)}`}</td>
+                                        <td class="px-4 py-2 text-gray-500 font-medium">{`${subtotal} ₫`}</td>
                                         <td class="px-4 py-2 text-gray-500 font-medium">
                                             <div class="relative flex justify-center">
                                                 <button
@@ -201,7 +201,7 @@ export default function AddOrders() {
                     {/*Grand total*/}
                     <div class="bg-indigo-200 p-3 mt-4">
                         <div class="text-indigo-500">
-                            <h2 class="text-3xl text-indigo-600 font-medium text-center">Grand Total: ${grandTotal().toFixed(2)}</h2>
+                            <h2 class="text-3xl text-indigo-600 font-medium text-center">Grand Total: {grandTotal()} ₫</h2>
                         </div>
                     </div>
 
@@ -267,7 +267,7 @@ export default function AddOrders() {
                                         <td class="px-4 py-2 text-indigo-500 font-bold">{item.productId}</td>
                                         <td class="px-4 py-2 font-medium">{item.name}</td>
                                         <td class="px-4 py-2 font-medium text-gray-500">{item.category?.name || "N/A"}</td>
-                                        <td class="px-4 py-2 text-gray-500 font-medium">${item.price.toFixed(2)}</td>
+                                        <td class="px-4 py-2 text-gray-500 font-medium">{item.price} ₫</td>
                                         <td class="px-4 py-2 text-gray-500 font-medium">
                                             <div class="relative flex justify-center">
                                                 <button class="peer text-base text-gray-500 hover:text-indigo-500"
