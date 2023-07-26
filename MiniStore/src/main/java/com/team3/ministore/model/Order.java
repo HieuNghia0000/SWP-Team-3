@@ -21,7 +21,7 @@ public class Order {
     private LocalDateTime orderDate;
 
     @Column(name = "grand_total")
-    private long grandTotal;
+    private Float grandTotal;
 
     @Column(name = "payment_status")
     @Enumerated(EnumType.ORDINAL)

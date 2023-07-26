@@ -112,7 +112,7 @@ export default function Table() {
                 </td>
                 <td
                   style={{ "border-left": "1px dashed #d5dce6" }}
-                  class="px-2.5 text-sm whitespace-nowrap truncate leading-10 border-[#e2e7ee] border-b">
+                  class="px-2.5 text-sm whitespace-nowrap leading-10 border-[#e2e7ee] border-b overflow-visible">
                   <div class="flex flex-row gap-1">
                     <div class="relative flex justify-center items-center">
                       <button

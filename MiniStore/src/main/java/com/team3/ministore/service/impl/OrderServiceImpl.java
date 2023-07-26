@@ -87,13 +87,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Optional<Order> updateOrders(Integer id, Order order) {
+    public Optional<Order> updateOrderStatus(Integer id, PaymentStatus status) {
         Optional<Order> existingOrder = getOrdersById(id);
         if (existingOrder.isEmpty()) return Optional.empty();
 
         existingOrder.map(o -> {
-            o.setOrderDate(order.getOrderDate());
-            o.setGrandTotal(order.getGrandTotal());
+            o.setPaymentStatus(status);
             return o;
         });
 

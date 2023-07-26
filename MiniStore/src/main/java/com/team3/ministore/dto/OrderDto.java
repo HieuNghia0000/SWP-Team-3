@@ -1,6 +1,7 @@
 package com.team3.ministore.dto;
 
 import com.team3.ministore.model.Order;
+import com.team3.ministore.utils.PaymentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,7 +25,9 @@ public class OrderDto {
     private LocalDateTime orderDate;
 
     @NotNull(message = "Grand total must not be null")
-    private long grandTotal;
+    private Float grandTotal;
+
+    private PaymentStatus paymentStatus;
 
     @NotNull(message = "Order items must not be null")
     private List<OrderItemDto> orderItems;
@@ -34,6 +37,7 @@ public class OrderDto {
         this.staffId = order.getStaff().getStaffId();
         this.orderDate = order.getOrderDate();
         this.grandTotal = order.getGrandTotal();
+        this.paymentStatus = order.getPaymentStatus();
         if (order.getOrderItems() != null)
             this.orderItems = order.getOrderItems()
                     .stream().map(OrderItemDto::new).collect(Collectors.toList());

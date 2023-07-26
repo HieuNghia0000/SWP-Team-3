@@ -2,6 +2,7 @@ package com.team3.ministore.service;
 
 import com.team3.ministore.dto.OrderDto;
 import com.team3.ministore.model.Order;
+import com.team3.ministore.utils.PaymentStatus;
 import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
@@ -15,7 +16,7 @@ public interface OrderService {
 
     Optional<Order> getOrdersById(Integer id);
 
-    Optional<Order> updateOrders(Integer id, Order order);
+    Optional<Order> updateOrderStatus(Integer id, PaymentStatus status);
 
     void deleteOrders(Integer id);
 

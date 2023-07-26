@@ -40,6 +40,12 @@ export enum LeaveType {
   OTHER = "OTHER",
 }
 
+export enum PaymentStatus {
+  PENDING = "PENDING",
+  SUCCESS = "SUCCESS",
+  FAILED = "FAILED",
+}
+
 export interface Staff extends Timestamp {
   staffId: number;
   staffName: string;
@@ -179,6 +185,8 @@ export interface Order extends Timestamp {
   orderId: number;
   orderDate: string;
   grandTotal: number;
+  staffId: number;
+  paymentStatus: PaymentStatus;
 
   // relationship
   orderItems: OrderItem[];

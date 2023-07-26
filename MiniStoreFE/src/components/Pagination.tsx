@@ -69,7 +69,7 @@ const Pagination: Component<PaginationProps> = ({ totalItems }) => {
               <button
                 onClick={prev}
                 disabled={curPage() === 1}
-                class="relative inline-flex shadow-sm w-8 h-8 justify-center items-center rounded-lg font-semibold bg-white text-indigo-500 ring-1 ring-inset ring-gray-300 hover:bg-indigo-100 focus:z-20 focus:outline-offset-0"
+                class="relative inline-flex shadow-sm w-8 h-8 justify-center items-center rounded-lg font-semibold bg-white text-indigo-500 ring-1 ring-inset ring-gray-300 hover:bg-indigo-100 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:bg-white"
               >
                 <span class="sr-only">Previous</span>
                 <svg
@@ -95,9 +95,10 @@ const Pagination: Component<PaginationProps> = ({ totalItems }) => {
                   >
                     <button
                       onClick={() => setPage(curPage() + pageNumber - 3)}
+                      disabled={curPage() === curPage() + pageNumber - 3}
                       class="relative inline-flex shadow-sm w-8 h-8 justify-center items-center font-semibold rounded-lg ring-1 ring-inset ring-gray-300 focus:z-20 focus:outline-offset-0"
                       classList={{
-                        "bg-indigo-500 text-white hover:bg-indigo-600 focus:outline-none focus:ring":
+                        "bg-indigo-500 text-white focus:outline-none focus:ring":
                           curPage() === curPage() + pageNumber - 3,
                         "text-indigo-500 bg-white hover:bg-indigo-100":
                           curPage() !== curPage() + pageNumber - 3,
@@ -111,7 +112,7 @@ const Pagination: Component<PaginationProps> = ({ totalItems }) => {
               <button
                 onClick={next}
                 disabled={curPage() === lastPage()}
-                class="relative inline-flex shadow-sm w-8 h-8 justify-center items-center font-semibold rounded-lg bg-white text-indigo-500 ring-1 ring-inset ring-gray-300 hover:bg-indigo-100 focus:z-20 focus:outline-offset-0"
+                class="relative inline-flex shadow-sm w-8 h-8 justify-center items-center font-semibold rounded-lg bg-white text-indigo-500 ring-1 ring-inset ring-gray-300 hover:bg-indigo-100 focus:z-20 focus:outline-offset-0 disabled:opacity-50 disabled:bg-white"
               >
                 <span class="sr-only">Next</span>
                 <svg
