@@ -239,6 +239,7 @@ public class OrdersController {
                     } else {
                         result.put("RspCode", "02");
                         result.put("message", "Order already confirmed");
+                        result.put("order", new OrderDto(order.get()));
                     }
                 } else {
                     result.put("RspCode", "04");
@@ -253,7 +254,7 @@ public class OrdersController {
             result.put("message", "Unknow error");
         }
 
-        if (result.get("RspCode").equals("00")) {
+        if (result.get("RspCode").equals("00") || result.get("RspCode").equals("02")) {
             return ResponseHandler.getResponse(result, HttpStatus.OK);
         } else {
             return ResponseHandler.getResponse(new Exception((String) result.get("message")), HttpStatus.BAD_REQUEST);
