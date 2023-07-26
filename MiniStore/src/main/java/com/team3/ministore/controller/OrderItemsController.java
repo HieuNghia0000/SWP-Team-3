@@ -1,8 +1,7 @@
 package com.team3.ministore.controller;
 
-import com.team3.ministore.model.OrderItems;
-import com.team3.ministore.model.Product;
-import com.team3.ministore.service.OrderItemsService;
+import com.team3.ministore.model.OrderItem;
+import com.team3.ministore.service.OrderItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,35 +14,35 @@ import java.util.List;
 public class OrderItemsController {
     
     @Autowired
-    private OrderItemsService orderItemsService;
+    private OrderItemService orderItemService;
 
     @PostMapping("/add")
-    public ResponseEntity<OrderItems> createOrderItems(@RequestBody OrderItems orderItems) {
-        OrderItems createdOrderItems = orderItemsService.createOrderItems(orderItems);
-        return new ResponseEntity<>(createdOrderItems, HttpStatus.CREATED);
+    public ResponseEntity<OrderItem> createOrderItems(@RequestBody OrderItem orderItem) {
+        OrderItem createdOrderItem = orderItemService.createOrderItems(orderItem);
+        return new ResponseEntity<>(createdOrderItem, HttpStatus.CREATED);
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<OrderItems>> getAllOrderItems() {
-        List<OrderItems> orderItemsList = orderItemsService.getAllOrderItems();
-        return new ResponseEntity<>(orderItemsList, HttpStatus.OK);
+    public ResponseEntity<List<OrderItem>> getAllOrderItems() {
+        List<OrderItem> orderItemList = orderItemService.getAllOrderItems();
+        return new ResponseEntity<>(orderItemList, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<List<OrderItems>> getOrderItemsByOrderId(@PathVariable("id") Integer id) {
-        List<OrderItems> orderItemsList = orderItemsService.getOrderItemsByOrderId(id);
-        return new ResponseEntity<>(orderItemsList, HttpStatus.OK);
+    public ResponseEntity<List<OrderItem>> getOrderItemsByOrderId(@PathVariable("id") Integer id) {
+        List<OrderItem> orderItemList = orderItemService.getOrderItemsByOrderId(id);
+        return new ResponseEntity<>(orderItemList, HttpStatus.OK);
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<OrderItems> updateOrderItems(@PathVariable("id") Integer id, @RequestBody OrderItems orderItems) {
-        OrderItems updatedOrderItems = orderItemsService.updateOrderItems(id, orderItems);
-        return new ResponseEntity<>(updatedOrderItems, HttpStatus.OK);
+    public ResponseEntity<OrderItem> updateOrderItems(@PathVariable("id") Integer id, @RequestBody OrderItem orderItem) {
+        OrderItem updatedOrderItem = orderItemService.updateOrderItems(id, orderItem);
+        return new ResponseEntity<>(updatedOrderItem, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteOrderItems(@PathVariable("id") Integer id) {
-        orderItemsService.deleteOrderItems(id);
+        orderItemService.deleteOrderItems(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

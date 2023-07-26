@@ -1,21 +1,21 @@
 package com.team3.ministore.controller;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import com.team3.ministore.common.responsehandler.ResponseHandler;
 import com.team3.ministore.config.VnPayConfig;
-import com.team3.ministore.dto.PaymentItems;
-import com.team3.ministore.model.Orders;
-import com.team3.ministore.service.OrdersService;
+import com.team3.ministore.dto.OrderDto;
+import com.team3.ministore.dto.PaymentDto;
+import com.team3.ministore.model.Order;
+import com.team3.ministore.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -31,88 +31,99 @@ import java.util.stream.Collectors;
 public class OrdersController {
 
     @Autowired
-    private OrdersService ordersService;
+    private OrderService orderService;
 
     @PostMapping("/add")
-    public ResponseEntity<Orders> createOrders(@RequestBody Orders orders) {
-        Orders createdOrders = ordersService.createOrders(orders);
-        return new ResponseEntity<>(createdOrders, HttpStatus.CREATED);
+    public ResponseEntity<Object> createOrders(@Valid @RequestBody OrderDto dto, BindingResult errors) {
+        if (errors.hasErrors()) return ResponseHandler.getResponse(errors, HttpStatus.BAD_REQUEST);
+
+        try {
+            Order createdOrder = orderService.createOrders(dto);
+            return ResponseHandler.getResponse(new OrderDto(createdOrder), HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            return ResponseHandler.getResponse(e, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return ResponseHandler.getResponse(e, HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Orders> getOrdersById(@PathVariable("id") Integer id) {
-        Orders orders = ordersService.getOrdersById(id);
-        return new ResponseEntity<>(orders, HttpStatus.OK);
+    public ResponseEntity<Object> getOrdersById(@PathVariable("id") Integer id) {
+        Optional<Order> order = orderService.getOrdersById(id);
+
+        return order.map(value -> ResponseHandler.getResponse(new OrderDto(value), HttpStatus.OK))
+                .orElseGet(() -> ResponseHandler.getResponse(new Exception("Order not found."), HttpStatus.NOT_FOUND));
+
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Orders> updateOrders(@PathVariable("id") Integer id, @RequestBody Orders orders) {
-        Orders updatedOrders = ordersService.updateOrders(id, orders);
-        return new ResponseEntity<>(updatedOrders, HttpStatus.OK);
+    public ResponseEntity<Object> updateOrders(@PathVariable("id") Integer id, @RequestBody Order order) {
+        Optional<Order> updatedOrder = orderService.updateOrders(id, order);
+        return updatedOrder.map(value -> ResponseHandler.getResponse(new OrderDto(value), HttpStatus.OK))
+                .orElseGet(() -> ResponseHandler.getResponse(new Exception("Order not found"), HttpStatus.NOT_FOUND));
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteOrders(@PathVariable("id") Integer id) {
-        ordersService.deleteOrders(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    public ResponseEntity<Object> deleteOrders(@PathVariable("id") Integer id) {
+        orderService.deleteOrders(id);
+        return ResponseHandler.getResponse(HttpStatus.OK);
     }
 
-    @GetMapping("")
-    public ResponseEntity<Page<Orders>> getOrders(@RequestParam("ago") Optional<String> agoParam,
-                                                  @RequestParam("from") Optional<String> fromDateParam,
-                                                  @RequestParam("to") Optional<String> toDateParam,
-                                                  @RequestParam("amount_from") Optional<Integer> fromAmountParam,
-                                                  @RequestParam("amount_to") Optional<Integer> toAmountParam,
-                                                  @RequestParam("curPage") Optional<Integer> curPageParam) {
-        List<Orders> ordersList;
-        Page<Orders> ordersPage;
+    @GetMapping()
+    public ResponseEntity<Page<Order>> getOrders(@RequestParam("ago") Optional<String> agoParam,
+                                                 @RequestParam("from") Optional<String> fromDateParam,
+                                                 @RequestParam("to") Optional<String> toDateParam,
+                                                 @RequestParam("amount_from") Optional<Integer> fromAmountParam,
+                                                 @RequestParam("amount_to") Optional<Integer> toAmountParam,
+                                                 @RequestParam("curPage") Optional<Integer> curPageParam) {
+        List<Order> orderList;
+        Page<Order> ordersPage;
 
         if (agoParam.isPresent()) {
             String ago = agoParam.get();
-            ordersList = ordersService.getOrdersFromTimeAgo(ago);
+            orderList = orderService.getOrdersFromTimeAgo(ago);
         } else if (fromDateParam.isPresent() && toDateParam.isPresent()) {
             LocalDateTime fromDateTime = parseDateTime(fromDateParam.get());
             LocalDateTime toDateTime = parseDateTime(toDateParam.get()).plusDays(1).minusSeconds(1);
 
-            ordersList = ordersService.getOrdersBetweenDate(fromDateTime, toDateTime);
+            orderList = orderService.getOrdersBetweenDate(fromDateTime, toDateTime);
 
         } else if (fromAmountParam.isPresent() && toAmountParam.isPresent()) {
             int fromAmount = fromAmountParam.get();
             int toAmount = toAmountParam.get();
 
-            ordersList = ordersService.getOrdersBetweenAmount(fromAmount, toAmount);
+            orderList = orderService.getOrdersBetweenAmount(fromAmount, toAmount);
         } else {
-            ordersList = ordersService.getAllOrders();
+            orderList = orderService.getAllOrders();
         }
 
         if (fromAmountParam.isPresent() && toAmountParam.isPresent()) {
             int fromAmount = fromAmountParam.get();
             int toAmount = toAmountParam.get();
 
-            ordersList = filterOrdersByAmount(ordersList, fromAmount, toAmount);
+            orderList = filterOrdersByAmount(orderList, fromAmount, toAmount);
         }
 
         if (curPageParam.isPresent()) {
             int curPage = curPageParam.get();
             int perPage = 10;
 
-            ordersPage = ordersService.findAllPagingOrders(curPage, perPage);
+            ordersPage = orderService.findAllPagingOrders(curPage, perPage);
             if (ordersPage.getSize() == 0) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
-        }
-        else {
+        } else {
             int curPage = 1;
             int perPage = 10;
 
-            ordersPage = ordersService.findAllPagingOrders(curPage, perPage);
+            ordersPage = orderService.findAllPagingOrders(curPage, perPage);
             if (ordersPage.getSize() == 0) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
         }
 
-        if (ordersList != null) {
-            List<Orders> filteredOrders = ordersPage.stream().filter(ordersList::contains).collect(Collectors.toList());
+        if (orderList != null) {
+            List<Order> filteredOrders = ordersPage.stream().filter(orderList::contains).collect(Collectors.toList());
 
             ordersPage = new PageImpl<>(filteredOrders, ordersPage.getPageable(), filteredOrders.size());
         }
@@ -121,15 +132,15 @@ public class OrdersController {
     }
 
     @PostMapping("/payment")
-    public ResponseEntity<String> createPayment(HttpServletRequest request, @RequestBody PaymentItems paymentItems) throws UnsupportedEncodingException {
+    public ResponseEntity<Object> createPayment(HttpServletRequest request, @RequestBody PaymentDto paymentDto) throws UnsupportedEncodingException {
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
 
-        long vnpAmount = paymentItems.getGrandTotal() * 100;
-        String vnp_TxnRef = VnPayConfig.getRandomNumber(8);
+        long vnpAmount = paymentDto.getGrandTotal() * 100;
+        String vnp_TxnRef = String.valueOf(paymentDto.getOrderId());
         String vnp_IpAddr = VnPayConfig.getIpAddress(request);
         String vnp_TmnCode = VnPayConfig.vnp_TmnCode;
-        String bankCode = "";
+        String bankCode = "NCB";
 
         Map<String, String> vnp_Params = new HashMap<>();
         vnp_Params.put("vnp_Version", vnp_Version);
@@ -137,14 +148,11 @@ public class OrdersController {
         vnp_Params.put("vnp_TmnCode", vnp_TmnCode);
         vnp_Params.put("vnp_Amount", String.valueOf(vnpAmount));
         vnp_Params.put("vnp_CurrCode", "VND");
-
-        if (bankCode != null && !bankCode.isEmpty()) {
-            vnp_Params.put("vnp_BankCode", bankCode);
-        }
+        vnp_Params.put("vnp_BankCode", bankCode);
 
         vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
         vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang:" + vnp_TxnRef);
-        vnp_Params.put("vnp_OrderType", paymentItems.getOrderType());
+        vnp_Params.put("vnp_OrderType", paymentDto.getOrderType());
         vnp_Params.put("vnp_Locale", "vn");
 
         vnp_Params.put("vnp_ReturnUrl", VnPayConfig.vnp_Returnurl);
@@ -187,12 +195,11 @@ public class OrdersController {
         queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
         String paymentUrl = VnPayConfig.vnp_PayUrl + "?" + queryUrl;
 
-        com.google.gson.JsonObject job = new JsonObject();
-        job.addProperty("code", "00");
-        job.addProperty("message", "success");
-        job.addProperty("data", paymentUrl);
-        Gson gson = new Gson();
-        return new ResponseEntity<>(gson.toJson(job), HttpStatus.OK);
+        Map<String, Object> job = new HashMap<>();
+        job.put("code", "00");
+        job.put("message", "success");
+        job.put("paymentUrl", paymentUrl);
+        return ResponseHandler.getResponse(job, HttpStatus.OK);
     }
 
     private LocalDateTime parseDateTime(String dateString) {
@@ -202,14 +209,14 @@ public class OrdersController {
         return date.atStartOfDay();
     }
 
-    private List<Orders> filterOrdersByAmount(List<Orders> ordersList, int fromAmount, int toAmount) {
-        List<Orders> filteredOrders = new ArrayList<>();
+    private List<Order> filterOrdersByAmount(List<Order> orderList, int fromAmount, int toAmount) {
+        List<Order> filteredOrders = new ArrayList<>();
 
-        for (Orders orders : ordersList) {
-            int orderAmount = orders.getGrandTotal();
+        for (Order order : orderList) {
+            long orderAmount = order.getGrandTotal();
 
             if (orderAmount >= fromAmount && orderAmount <= toAmount) {
-                filteredOrders.add(orders);
+                filteredOrders.add(order);
             }
         }
 

@@ -1,6 +1,5 @@
 package com.team3.ministore.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -8,7 +7,7 @@ import javax.persistence.*;
 @Entity
 @Data
 @Table(name = "orderitems")
-public class OrderItems {
+public class OrderItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,8 +16,7 @@ public class OrderItems {
 
     @ManyToOne
     @JoinColumn(name = "order_id", referencedColumnName = "order_id")
-    @JsonBackReference
-    private Orders orders;
+    private Order order;
 
     @ManyToOne
     @JoinColumn(name = "product_id", referencedColumnName = "product_id")
