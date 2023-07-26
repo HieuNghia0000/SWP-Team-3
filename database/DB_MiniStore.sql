@@ -147,7 +147,10 @@ CREATE TABLE Orders (
 	order_id INT AUTO_INCREMENT NOT NULL,
 	order_date DATETIME NOT NULL,
 	grand_total FLOAT,
-	PRIMARY KEY (order_id)
+    payment_status INT,
+    staff_id INT,
+	PRIMARY KEY (order_id),
+    FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id) ON DELETE SET NULL
 );
 
 CREATE TABLE OrderItems (
