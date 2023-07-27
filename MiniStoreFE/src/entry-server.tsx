@@ -11,7 +11,7 @@ export default createHandler(
   ({ forward }) => {
     return async (event) => {
       const cookie = event.request.headers.get("Cookie");
-      console.log(cookie);
+      // console.log(cookie);
       const token = getCookie(cookie, "token");
       let user: Staff | null = null;
 
@@ -23,7 +23,7 @@ export default createHandler(
             },
           });
           const { content } = (await data.json()) as DataResponse<Staff>;
-          console.log(content)
+          // console.log(content)
 
           if (content && content.status === StaffStatus.ACTIVATED) {
             // console.log(content);
@@ -81,7 +81,7 @@ export default createHandler(
         createCookieVariable("user", event.locals.user as string, 1)
       );
     }
-    console.log(event.locals.authError)
+    // console.log(event.locals.authError)
     if (event.locals.authError === "true") {
       event.responseHeaders.append("Set-Cookie", createCookieVariable("token", "", 0));
       event.responseHeaders.append("Set-Cookie", createCookieVariable("user", "", 0));

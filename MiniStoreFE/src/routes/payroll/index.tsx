@@ -1,6 +1,6 @@
 import { useSearchParams } from "@solidjs/router";
 import { ParamType } from "~/components/payroll/types";
-import { DataResponse, Holiday, Staff } from "~/types";
+import { DataResponse, Holiday, Role, Staff } from "~/types";
 import getEndPoint from "~/utils/getEndPoint";
 import handleFetchError from "~/utils/handleFetchError";
 import { createRouteData, useRouteData } from "solid-start";
@@ -11,12 +11,16 @@ import ToolBar from "~/components/payroll/Toolbar";
 import Table from "~/components/payroll/Table";
 import PayrollDetailsModal from "~/components/payroll/PayrollDetailsModal";
 import axios from "axios";
+import routes from "~/utils/routes";
+import checkAuth from "~/utils/checkAuth";
 
 export function routeData() {
   const [ params ] = useSearchParams<ParamType>();
   const timesheets = createRouteData(
     async ([ key, search, from, to ]) => {
       try {
+        checkAuth([ Role.ADMIN, Role.MANAGER ], routes.dashboard);
+
         if (!from || !to) return;
         const uri = new URLSearchParams({ search, from, to });
         const { data } = await axios.get<DataResponse<Staff[]>>(
@@ -42,6 +46,7 @@ export function routeData() {
   const holidays = createRouteData(
     async ([ key, from, to ]) => {
       try {
+
         if (!from || !to) return;
         const uri = new URLSearchParams({ from, to });
         const { data } = await axios.get<DataResponse<Holiday[]>>(

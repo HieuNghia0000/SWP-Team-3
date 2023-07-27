@@ -215,9 +215,6 @@ export interface Product {
 
   // relationship
   category?: Category;
-
-  // add on
-  quantity: number;
 }
 
 export interface Category {
@@ -249,3 +246,5 @@ export interface PageResponse<T> extends Response {
   first: boolean;
   numberOfElements: number;
 }
+
+export type UserAuth = Pick<Staff, "staffId" | "staffName" | "status" | "role" | "username">

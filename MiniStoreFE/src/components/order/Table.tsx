@@ -1,5 +1,5 @@
 import { useRouteData } from "@solidjs/router";
-import { batch, For, Show } from "solid-js";
+import { For, Show } from "solid-js";
 import formatNumberWithCommas from "~/utils/formatNumberWithCommas";
 import { IoEyeOutline, IoTrashOutline } from "solid-icons/io";
 import { routeData } from "~/routes/orders";
@@ -12,14 +12,7 @@ import routes from "~/utils/routes";
 
 export default function Table() {
   const { data } = useRouteData<typeof routeData>();
-  const { setChosenId, setShowDetailsModal, onDelete } = useOrderContext();
-
-  let onDetails = (id: number) => {
-    batch(() => {
-      setChosenId(id);
-      setShowDetailsModal(true);
-    });
-  };
+  const { onDelete } = useOrderContext();
 
   return (
     <div class="flex flex-col border border-gray-200 rounded-lg overflow-x-auto shadow-sm">
@@ -122,7 +115,7 @@ export default function Table() {
                       </A>
                       <p
                         class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
-                          Details
+                        Details
                       </p>
                     </div>
                     <div class="relative flex justify-center items-center">
@@ -133,7 +126,7 @@ export default function Table() {
                       </button>
                       <p
                         class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
-                          Delete
+                        Delete
                       </p>
                     </div>
                   </div>

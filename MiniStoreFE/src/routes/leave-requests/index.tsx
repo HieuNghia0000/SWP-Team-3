@@ -1,4 +1,4 @@
-import { createRouteAction, createRouteData, parseCookie, useRouteData, useServerContext, } from "solid-start";
+import { createRouteAction, createRouteData, useRouteData, useServerContext, } from "solid-start";
 import { DataResponse, LeaveRequest } from "~/types";
 import { createSignal, Show } from "solid-js";
 import Breadcrumbs from "~/components/Breadcrumbs";
@@ -13,8 +13,8 @@ import CreateLeaveRequestModal from "~/components/leave-requests/CreateLeaveRequ
 import EditLeaveRequestModal from "~/components/leave-requests/EditLeaveRequestModal";
 import { ModalContext } from "~/context/LeaveRequest";
 import { toastSuccess } from "~/utils/toast";
-import { isServer } from "solid-js/web";
 import axios from "axios";
+import cookie from "~/utils/cookie";
 
 const deleteLeaveRequest = async (id: number) => {
   try {
@@ -30,23 +30,18 @@ const deleteLeaveRequest = async (id: number) => {
 
 export function routeData() {
   const [ params ] = useSearchParams<ParamType>();
+
   const leaveRequests = createRouteData(
     async ([ key, perPage, curPage, search ]) => {
       try {
-        const uri = new URLSearchParams({ perPage, curPage, search });
         const event = useServerContext();
-        const cookie = () =>
-          parseCookie(
-            isServer
-              ? event.request.headers.get("cookie") ?? ""
-              : document.cookie
-          );
-        // console.log("ia", cookie());
+        const uri = new URLSearchParams({ perPage, curPage, search });
+
         const { data } = await axios.get<DataResponse<LeaveRequest[]>>(
           `${getEndPoint()}/${key}?${uri.toString()}`,
           {
             headers: {
-              Authorization: "Bearer " + cookie().token,
+              Authorization: "Bearer " + cookie(event).token,
             },
           }
         );

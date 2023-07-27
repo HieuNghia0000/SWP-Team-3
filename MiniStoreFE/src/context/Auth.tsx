@@ -1,7 +1,7 @@
 import { Accessor, Component, createContext, createSignal, JSX, useContext, } from "solid-js";
 import Cookies from "js-cookie";
 import { apiRoutes } from "~/utils/routes";
-import { DataResponse, Staff, StaffStatus } from "~/types";
+import { DataResponse, Staff, StaffStatus, UserAuth } from "~/types";
 import axios from "axios";
 import { toastSuccess } from "~/utils/toast";
 import handleFetchError from "~/utils/handleFetchError";
@@ -33,7 +33,6 @@ const clearItem = (key: string) => {
   Cookies.remove(key);
 };
 
-type UserAuth = Pick<Staff, "staffId" | "staffName" | "status" | "role" | "username">
 
 type AuthContextType = {
   user: Accessor<UserAuth | undefined>;

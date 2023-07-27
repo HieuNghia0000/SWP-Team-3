@@ -15,6 +15,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
             "WHERE (:from is null OR o.orderDate >= :from) " +
             "AND (:to is null OR o.orderDate <= :to) " +
             "AND (:grandTotal is null OR o.grandTotal >= :grandTotal ) " +
-            "AND (:grandTotal2 is null OR o.grandTotal <= :grandTotal2 )")
+            "AND (:grandTotal2 is null OR o.grandTotal <= :grandTotal2 ) " +
+            "ORDER BY o.orderDate DESC")
     Page<Order> findAllByFilters(LocalDateTime from, LocalDateTime to, Float grandTotal, Float grandTotal2, Pageable pageable);
 }
