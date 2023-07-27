@@ -1,10 +1,12 @@
 import { useRouteData } from "@solidjs/router";
 import { batch, For, Show } from "solid-js";
 import formatNumberWithCommas from "~/utils/formatNumberWithCommas";
-import { IoTrashOutline } from "solid-icons/io";
-import { OcPencil3 } from "solid-icons/oc";
+import { IoEyeOutline, IoTrashOutline } from "solid-icons/io";
 import { routeData } from "~/routes/orders";
 import { useOrderContext } from "~/context/Order";
+import moment from "moment";
+import { PaymentStatus } from "~/types";
+import { capitalize } from "~/utils/capitalize";
 
 export default function Table() {
   const { data } = useRouteData<typeof routeData>();
@@ -24,7 +26,7 @@ export default function Table() {
         <tr>
           <th
             scope="col"
-            class="px-2.5 py-[8.7px] w-32 pl-[18px] text-left text-sm font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
+            class="px-2.5 py-[8.7px] w-16 pl-[18px] text-left text-sm font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
           >
             ID
           </th>
@@ -51,6 +53,13 @@ export default function Table() {
           </th>
           <th
             scope="col"
+            class="px-2.5 py-[8.7px] w-32 text-sm font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
+            style={{ "border-left": "1px dashed #d5dce6" }}
+          >
+            Status
+          </th>
+          <th
+            scope="col"
             class="px-2.5 py-[8.7px] w-36 text-sm font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
             style={{ "border-left": "1px dashed #d5dce6" }}
           >
@@ -63,7 +72,7 @@ export default function Table() {
         <Show
           when={!data.error && !data.loading && data.state === "ready"}
           fallback={<div class="w-full h-full min-h-[300px] grid place-items-center">Something went wrong</div>}>
-          <For each={data()}>
+          <For each={data()?.content}>
             {(item) => (
               <tr class="hover:bg-[#ceefff] odd:bg-white even:bg-gray-50 text-[#333c48]">
                 <td
@@ -73,17 +82,31 @@ export default function Table() {
                 <td
                   style={{ "border-left": "1px dashed #d5dce6" }}
                   class="px-2.5 text-sm whitespace-nowrap truncate leading-10 border-[#e2e7ee] border-b">
-                  {item.orderItems[0].product.name} {item.orderItems.length > 1 ? `+ ${item.orderItems.length - 1} more` : ""}
+                  {item.orderItems.map(i => i.product.name).join(", ")}
                 </td>
                 <td
                   style={{ "border-left": "1px dashed #d5dce6" }}
                   class="px-2.5 text-sm whitespace-nowrap truncate leading-10 border-[#e2e7ee] border-b">
-                  {item.orderDate}
+                  {moment(item.orderDate).format("MMM Do YYYY")}
                 </td>
                 <td
                   style={{ "border-left": "1px dashed #d5dce6" }}
                   class="px-2.5 text-sm whitespace-nowrap truncate leading-10 border-[#e2e7ee] border-b">
                   {formatNumberWithCommas(item.grandTotal)} ₫
+                </td>
+                <td
+                  style={{ "border-left": "1px dashed #d5dce6" }}
+                  class="px-2.5 text-sm whitespace-nowrap truncate leading-10 border-[#e2e7ee] border-b">
+                    <span
+                      class="inline-block whitespace-nowrap px-2 py-0.5 text-xs text-center font-bold rounded-full"
+                      classList={{
+                        "text-orange-400 bg-orange-100": item.paymentStatus === PaymentStatus.PENDING,
+                        "text-green-400 bg-green-100": item.paymentStatus === PaymentStatus.SUCCESS,
+                        "text-red-400 bg-red-100": item.paymentStatus === PaymentStatus.FAILED,
+                      }}
+                    >
+                      {capitalize(item.paymentStatus)}
+                    </span>
                 </td>
                 <td
                   style={{ "border-left": "1px dashed #d5dce6" }}
@@ -93,11 +116,11 @@ export default function Table() {
                       <button
                         onClick={[ onDetails, item.orderId ]}
                         class="peer text-base text-gray-500 hover:text-indigo-500">
-                        <OcPencil3/>
+                        <IoEyeOutline/>
                       </button>
                       <span
                         class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
-                          Edit
+                          Details
                       </span>
                     </div>
                     <div class="relative flex justify-center items-center">

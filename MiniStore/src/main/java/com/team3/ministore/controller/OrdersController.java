@@ -18,9 +18,6 @@ import javax.validation.Valid;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @RestController
@@ -70,65 +67,21 @@ public class OrdersController {
 
     @GetMapping()
     public ResponseEntity<Object> getOrders(@RequestParam("ago") Optional<String> agoParam,
-                                            @RequestParam("from") Optional<String> fromDateParam,
-                                            @RequestParam("to") Optional<String> toDateParam,
-                                            @RequestParam("amount_from") Optional<Integer> fromAmountParam,
-                                            @RequestParam("amount_to") Optional<Integer> toAmountParam,
-                                            @RequestParam("curPage") Optional<Integer> curPageParam) {
-//        List<Order> orderList;
-//        Page<Order> ordersPage;
-//
-//        if (agoParam.isPresent()) {
-//            String ago = agoParam.get();
-//            orderList = orderService.getOrdersFromTimeAgo(ago);
-//        } else if (fromDateParam.isPresent() && toDateParam.isPresent()) {
-//            LocalDateTime fromDateTime = parseDateTime(fromDateParam.get());
-//            LocalDateTime toDateTime = parseDateTime(toDateParam.get()).plusDays(1).minusSeconds(1);
-//
-//            orderList = orderService.getOrdersBetweenDate(fromDateTime, toDateTime);
-//
-//        } else if (fromAmountParam.isPresent() && toAmountParam.isPresent()) {
-//            int fromAmount = fromAmountParam.get();
-//            int toAmount = toAmountParam.get();
-//
-//            orderList = orderService.getOrdersBetweenAmount(fromAmount, toAmount);
-//        } else {
-//            orderList = orderService.getAllOrders();
-//        }
-//
-//        if (fromAmountParam.isPresent() && toAmountParam.isPresent()) {
-//            int fromAmount = fromAmountParam.get();
-//            int toAmount = toAmountParam.get();
-//
-//            orderList = filterOrdersByAmount(orderList, fromAmount, toAmount);
-//        }
-//
-//        if (curPageParam.isPresent()) {
-//            int curPage = curPageParam.get();
-//            int perPage = 10;
-//
-//            ordersPage = orderService.findAllPagingOrders(curPage, perPage);
-//            if (ordersPage.getSize() == 0) {
-//                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-//            }
-//        } else {
-//            int curPage = 1;
-//            int perPage = 10;
-//
-//            ordersPage = orderService.findAllPagingOrders(curPage, perPage);
-//            if (ordersPage.getSize() == 0) {
-//                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-//            }
-//        }
-//
-//        if (orderList != null) {
-//            List<Order> filteredOrders = ordersPage.stream().filter(orderList::contains).collect(Collectors.toList());
-//
-//            ordersPage = new PageImpl<>(filteredOrders, ordersPage.getPageable(), filteredOrders.size());
-//        }
-
-//        return new ResponseEntity<>(ordersPage, HttpStatus.OK);
-        return ResponseHandler.getResponse(new ArrayList<>(), HttpStatus.OK);
+                                            @RequestParam("from") Optional<String> fromDate,
+                                            @RequestParam("to") Optional<String> toDate,
+                                            @RequestParam("amount_from") Optional<Float> fromAmount,
+                                            @RequestParam("amount_to") Optional<Float> toAmount,
+                                            @RequestParam("curPage") Optional<Integer> curPage,
+                                            @RequestParam("perPage") Optional<Integer> perPage) {
+        return ResponseHandler.getResponse(orderService.getAllOrders(
+                agoParam,
+                fromDate,
+                toDate,
+                fromAmount,
+                toAmount,
+                curPage.orElseGet(() -> 1),
+                perPage.orElseGet(() -> 10)
+        ).map(OrderDto::new), HttpStatus.OK);
     }
 
     @PostMapping("/payment")
@@ -180,14 +133,8 @@ public class OrdersController {
             String fieldValue = vnp_Params.get(fieldName);
             if (fieldValue != null && !fieldValue.isEmpty()) {
                 // Build hash data
-//                if (fieldName.equals("vnp_Amount")
-//                        || fieldName.equals("vnp_BankCode")
-//                        || fieldName.equals("vnp_OrderInfo")
-//                        || fieldName.equals("vnp_TmnCode")
-//                        || fieldName.equals("vnp_TxnRef")) {
                 hashData.append(fieldName).append('=')
                         .append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
-//                }
                 // Build query
                 query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII)).append('=')
                         .append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
@@ -261,24 +208,4 @@ public class OrdersController {
         }
     }
 
-    private LocalDateTime parseDateTime(String dateString) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate date = LocalDate.parse(dateString, formatter);
-
-        return date.atStartOfDay();
-    }
-
-    private List<Order> filterOrdersByAmount(List<Order> orderList, int fromAmount, int toAmount) {
-        List<Order> filteredOrders = new ArrayList<>();
-
-        for (Order order : orderList) {
-            float orderAmount = order.getGrandTotal();
-
-            if (orderAmount >= fromAmount && orderAmount <= toAmount) {
-                filteredOrders.add(order);
-            }
-        }
-
-        return filteredOrders;
-    }
 }

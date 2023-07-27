@@ -62,7 +62,7 @@ const EditProductModal: Component<{
   const { formData } = formHandler;
 
   const product = createMemo(() => !data.error && data() !== undefined
-    ? data()?.find((p) => p.productId === chosenId())
+    ? data()?.content.find((p) => p.productId === chosenId())
     : undefined
   )
 

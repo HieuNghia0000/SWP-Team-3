@@ -5,12 +5,18 @@ import com.team3.ministore.model.Order;
 import com.team3.ministore.utils.PaymentStatus;
 import org.springframework.data.domain.Page;
 
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 public interface OrderService {
-    List<Order> getAllOrders();
+    Page<Order> getAllOrders(
+            Optional<String> ago,
+            Optional<String> fromDate,
+            Optional<String> toDate,
+            Optional<Float> fromAmount,
+            Optional<Float> toAmount,
+            int page,
+            int pageSize
+    );
 
     Order createOrders(OrderDto dto) throws Exception;
 
@@ -20,11 +26,4 @@ public interface OrderService {
 
     void deleteOrders(Integer id);
 
-    List<Order> getOrdersFromTimeAgo(String ago);
-
-    List<Order> getOrdersBetweenDate(LocalDateTime fromDate, LocalDateTime toDate);
-
-    List<Order> getOrdersBetweenAmount(Integer fromAmount, Integer toAmount);
-
-    Page<Order> findAllPagingOrders(int pageIndex, int pageSize);
 }

@@ -7,13 +7,12 @@ import com.team3.ministore.repository.CategoryRepository;
 import com.team3.ministore.repository.ProductRepository;
 import com.team3.ministore.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -25,21 +24,17 @@ public class ProductServiceImpl implements ProductService {
     private CategoryRepository categoryRepository;
 
     @Override
-    public List<ProductDto> getAllProducts(String search, Integer page, Integer pageSize) {
+    public Page<ProductDto> getAllProducts(String search, Integer page, Integer pageSize) {
         Pageable pageable = PageRequest.of(page - 1, pageSize);
         return productRepository
                 .findAllByNameContainingIgnoreCaseOrBarCodeContainingIgnoreCase(search, search, pageable)
-                .stream().map(ProductDto::new)
-                .collect(Collectors.toList());
+                .map(ProductDto::new);
     }
 
     @Override
-    public List<ProductDto> getAllProducts(Integer page, Integer pageSize) {
+    public Page<ProductDto> getAllProducts(Integer page, Integer pageSize) {
         Pageable pageable = PageRequest.of(page - 1, pageSize);
-        return productRepository
-                .findAll(pageable)
-                .stream().map(ProductDto::new)
-                .collect(Collectors.toList());
+        return productRepository.findAll(pageable).map(ProductDto::new);
     }
 
     @Override

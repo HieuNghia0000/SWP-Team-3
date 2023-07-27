@@ -5,24 +5,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Integer> {
-
-    @Query("SELECT o FROM Order o WHERE o.orderDate >= :targetDate")
-    List<Order> findByOrderDateGreaterThanEqual(@Param("targetDate") LocalDateTime targetDate);
-
-    @Query("SELECT o FROM Order o WHERE o.orderDate >= :fromDate AND o.orderDate <= :toDate")
-    List<Order> findOrdersByOrderDateBetween(@Param("fromDate") LocalDateTime fromDate, @Param("toDate") LocalDateTime toDate);
-
-    @Query("SELECT o FROM Order o WHERE o.grandTotal >= :fromAmount AND o.grandTotal <= :toAmount")
-    List<Order> findOrdersByTotalAmountBetween(@Param("fromAmount") int fromAmount, @Param("toAmount") int toAmount);
-
-    @Query("SELECT o FROM Order o")
-    Page<Order> findAllPagingOrders(Pageable pageable);
+    @Query("SELECT o FROM Order o " +
+            "WHERE (:from is null OR o.orderDate >= :from) " +
+            "AND (:to is null OR o.orderDate <= :to) " +
+            "AND (:grandTotal is null OR o.grandTotal >= :grandTotal ) " +
+            "AND (:grandTotal2 is null OR o.grandTotal <= :grandTotal2 )")
+    Page<Order> findAllByFilters(LocalDateTime from, LocalDateTime to, Float grandTotal, Float grandTotal2, Pageable pageable);
 }

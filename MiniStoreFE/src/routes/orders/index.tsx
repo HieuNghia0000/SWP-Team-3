@@ -5,7 +5,7 @@ import Pagination from "~/components/Pagination";
 import { isServer } from "solid-js/web";
 import moment from "moment";
 import axios from "axios";
-import { DataResponse, Order } from "~/types";
+import { DataResponse, Order, PageResponse } from "~/types";
 import getEndPoint from "~/utils/getEndPoint";
 import handleFetchError from "~/utils/handleFetchError";
 import { ParamType } from "~/components/order/types";
@@ -33,9 +33,16 @@ export function routeData() {
   const orders = createRouteData(
     async ([ key, perPage, curPage, amount_from, amount_to, ago, from, to ]) => {
       try {
-        const uri = new URLSearchParams({ perPage, curPage, amount_from, amount_to, ago, from, to });
+        const uri = new URLSearchParams();
+        if (perPage) uri.append("perPage", perPage);
+        if (curPage) uri.append("curPage", curPage);
+        if (amount_from) uri.append("amount_from", amount_from);
+        if (amount_to) uri.append("amount_to", amount_to);
+        if (ago) uri.append("ago", ago);
+        if (from) uri.append("from", moment(from).format("YYYY-MM-DD[T]HH:mm:ss"));
+        if (to) uri.append("to", moment(to).format("YYYY-MM-DD[T]HH:mm:ss"));
 
-        const { data } = await axios.get<DataResponse<Order[]>>(
+        const { data } = await axios.get<DataResponse<PageResponse<Order>>>(
           `${getEndPoint()}/${key}?${uri.toString()}`
         );
 
@@ -47,14 +54,17 @@ export function routeData() {
     {
       key: () => [
         "orders",
-        params.perPage ?? "10",
-        params.curPage ?? "1",
-        params.amount_from ?? "",
-        params.amount_to ?? "",
-        params.ago ?? "",
-        params.from ?? "",
-        params.to ?? ""
-      ]
+        params.perPage,
+        params.curPage,
+        params.amount_from,
+        params.amount_to,
+        params.ago,
+        params.from,
+        params.to
+      ],
+      reconcileOptions:{
+        key: "content.orderId"
+      }
     }
   );
 
@@ -87,18 +97,18 @@ export default function Orders() {
   const [ showEditModal, setShowEditModal ] = createSignal(false);
   const [ chosenId, setChosenId ] = createSignal(0);
   const [ deleting, deleteAction ] = createRouteAction(deleteOrder);
-  const totalItems = () => data()?.length ?? 0;
+  const totalItems = () => (data.error ? 0 : data()?.totalElements ?? 0);
 
   const onDelete = async (id: number) => {
     if (deleting.pending) return;
-    if (!confirm("Are you sure you want to delete this product?"))
+    if (!confirm("Are you sure you want to delete this order?"))
       return;
 
     const success = await deleteAction(id);
     if (!success) return;
 
     if (showEditModal()) setShowEditModal(false);
-    toastSuccess("Product was deleted successfully");
+    toastSuccess("Order was deleted successfully");
   };
 
   return (

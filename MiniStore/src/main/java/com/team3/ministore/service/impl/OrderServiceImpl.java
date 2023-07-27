@@ -15,12 +15,10 @@ import com.team3.ministore.utils.StaffStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -39,8 +37,48 @@ public class OrderServiceImpl implements OrderService {
     private ProductService productService;
 
     @Override
-    public List<Order> getAllOrders() {
-        return orderRepository.findAll();
+    public Page<Order> getAllOrders(
+            Optional<String> ago,
+            Optional<String> fromDate,
+            Optional<String> toDate,
+            Optional<Float> fromAmount,
+            Optional<Float> toAmount,
+            int page,
+            int pageSize
+    ) {
+        LocalDateTime fromDateTime = fromDate.map(LocalDateTime::parse).orElseGet(() -> null);
+        LocalDateTime toDateTime = toDate.map(LocalDateTime::parse).orElseGet(() -> null);
+
+        if (ago.isPresent()) {
+            toDateTime = LocalDateTime.now();
+            switch (ago.get()) {
+                case "12months":
+                    fromDateTime = toDateTime.minusMonths(12);
+                    break;
+                case "30days":
+                    fromDateTime = toDateTime.minusDays(30);
+                    break;
+                case "7days":
+                    fromDateTime = toDateTime.minusDays(7);
+                    break;
+                case "24hours":
+                    fromDateTime = toDateTime.minusHours(24);
+                    break;
+                case "":
+                    fromDateTime = LocalDateTime.of(1900, 1, 1, 0, 0, 0);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid time: " + ago);
+            }
+        }
+
+        return orderRepository.findAllByFilters(
+                fromDateTime,
+                toDateTime,
+                fromAmount.orElseGet(() -> null),
+                toAmount.orElseGet(() -> null),
+                PageRequest.of(page - 1, pageSize)
+        );
     }
 
     @Override
@@ -55,7 +93,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = new Order();
         order.setOrderDate(dto.getOrderDate());
         order.setGrandTotal(dto.getGrandTotal());
-        order.setPaymentStatus(PaymentStatus.PENDING);
+        order.setPaymentStatus(dto.getPaymentStatus() != null ? dto.getPaymentStatus() : PaymentStatus.PENDING);
         order.setStaff(staff.get());
         order.setOrderItems(new ArrayList<>());
 
@@ -103,48 +141,4 @@ public class OrderServiceImpl implements OrderService {
     public void deleteOrders(Integer id) {
         orderRepository.deleteById(id);
     }
-
-    @Override
-    public List<Order> getOrdersFromTimeAgo(String ago) {
-        LocalDateTime currentDateTime = LocalDateTime.now();
-
-        switch (ago) {
-            case "12months":
-                currentDateTime = currentDateTime.minusMonths(12);
-                break;
-            case "30days":
-                currentDateTime = currentDateTime.minusDays(30);
-                break;
-            case "7days":
-                currentDateTime = currentDateTime.minusDays(7);
-                break;
-            case "24hours":
-                currentDateTime = currentDateTime.minusHours(24);
-                break;
-            case "":
-                currentDateTime = LocalDateTime.of(1900, 1, 1, 0, 0, 0);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid time: " + ago);
-        }
-
-        return orderRepository.findByOrderDateGreaterThanEqual(currentDateTime);
-    }
-
-    @Override
-    public List<Order> getOrdersBetweenDate(LocalDateTime fromDate, LocalDateTime toDate) {
-        return orderRepository.findOrdersByOrderDateBetween(fromDate, toDate);
-    }
-
-    @Override
-    public List<Order> getOrdersBetweenAmount(Integer fromAmount, Integer toAmount) {
-        return orderRepository.findOrdersByTotalAmountBetween(fromAmount, toAmount);
-    }
-
-    @Override
-    public Page<Order> findAllPagingOrders(int pageIndex, int pageSize) {
-        Pageable pageable = PageRequest.of(pageIndex - 1, pageSize);
-        return orderRepository.findAllPagingOrders(pageable);
-    }
-
 }

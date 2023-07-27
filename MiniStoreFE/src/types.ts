@@ -236,3 +236,15 @@ export interface DataResponse<T> extends Response {
   timestamp: string;
   status: number;
 }
+
+export interface PageResponse<T> extends Response {
+  content: T[];
+  last: boolean;
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  empty: boolean;
+  first: boolean;
+  numberOfElements: number;
+}

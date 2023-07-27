@@ -42,7 +42,7 @@ const ToolBar: Component = () => {
     instance: Instance
   ) => {
     if (selectedDates.length === 0) {
-      setSearchParams({ from: undefined, to: undefined });
+      // setSearchParams({ from: undefined, to: undefined });
       setDateStr("");
     }
     if (selectedDates.length === 2) {
@@ -62,7 +62,7 @@ const ToolBar: Component = () => {
   };
 
   const setGroupBtn = (ago: string | undefined) => {
-    setSearchParams({ ago });
+    setSearchParams({ ago, from: undefined, to: undefined });
     fp?.clear();
   };
 

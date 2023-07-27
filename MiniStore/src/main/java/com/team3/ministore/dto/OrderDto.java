@@ -32,6 +32,8 @@ public class OrderDto {
     @NotNull(message = "Order items must not be null")
     private List<OrderItemDto> orderItems;
 
+    private long totalElements;
+
     public OrderDto(Order order) {
         this.orderId = order.getOrderId();
         this.staffId = order.getStaff().getStaffId();

@@ -4,9 +4,9 @@ import { CgTrash } from "solid-icons/cg";
 import { AiOutlineSearch } from "solid-icons/ai";
 import { OcPaperairplane2 } from "solid-icons/oc";
 import { FaSolidArrowRotateRight, FaSolidPlus } from "solid-icons/fa";
-import { createRouteData, useSearchParams } from "solid-start";
+import { createRouteData, useNavigate, useSearchParams } from "solid-start";
 import axios from "axios";
-import { DataResponse, Product } from "~/types";
+import { DataResponse, PageResponse, PaymentStatus, Product } from "~/types";
 import getEndPoint from "~/utils/getEndPoint";
 import handleFetchError from "~/utils/handleFetchError";
 import { createSignal, For } from "solid-js";
@@ -15,6 +15,9 @@ import Pagination from "~/components/Pagination";
 import formatNumberWithCommas from "~/utils/formatNumberWithCommas";
 import moment from "moment";
 import { useAuth } from "~/context/Auth";
+import { toastError } from "~/utils/toast";
+import PopupModal from "~/components/PopupModal";
+import { TextInput } from "~/components/form/TextInput";
 
 type ParamType = {
   search?: string;
@@ -38,7 +41,7 @@ export function routeData() {
       try {
         const uri = new URLSearchParams({ perPage, curPage, search });
 
-        const { data } = await axios.get<DataResponse<Product[]>>(
+        const { data } = await axios.get<DataResponse<PageResponse<Product>>>(
           `${getEndPoint()}/${key}?${uri.toString()}`
         );
         return data.content;
@@ -48,21 +51,26 @@ export function routeData() {
     },
     {
       key: () => [ "products", searchParams.perPage ?? "10", searchParams.curPage ?? "1", searchParams.search ?? "" ],
-      reconcileOptions: { key: "productId" }
+      reconcileOptions: { key: "content.productId" }
     }
   );
   return { data: products };
 }
 
 export default function AddOrders() {
+  const navigate = useNavigate();
   const { data } = useRouteData<typeof routeData>();
   const { user } = useAuth();
   const [ , setSearchParams ] = useSearchParams<ParamType>();
 
   const [ selectedProducts, setSelectedProducts ] = createSignal<Product[]>([]);
   const [ totalPrice, setTotalPrice ] = createSignal<number>(0);
+  const [ paymentMethod, setPaymentMethod ] = createSignal<"cash" | "">("");
+  const [ showPaymentModal, setShowPaymentModal ] = createSignal<boolean>(false);
+  const [ cashReceive, setCashReceive ] = createSignal<number>(0);
+  const [ change, setChange ] = createSignal<number>(0);
 
-  const totalItems = () => data()?.length ?? 0;
+  const totalItems = () => (data.error ? 0 : data()?.totalElements ?? 0);
 
   const onSearchSubmit = (e: Event) => {
     e.preventDefault();
@@ -95,6 +103,16 @@ export default function AddOrders() {
   };
 
   const handlePayNow = async () => {
+    if (selectedProducts().length === 0) return toastError("Please select at least one product");
+    setShowPaymentModal(true);
+  };
+
+  const handlePayByCash = async () => {
+    setShowPaymentModal(false);
+    setPaymentMethod("cash");
+  }
+
+  const handlePayByCard = async () => {
     try {
       // Create order
       const { data: orderData } = await axios.post<DataResponse<{ orderId: number }>>(
@@ -124,7 +142,7 @@ export default function AddOrders() {
     } catch (e) {
       console.error(handleFetchError(e));
     }
-  };
+  }
 
   return (
     <main>
@@ -261,7 +279,7 @@ export default function AddOrders() {
             </button>
             <button
               type="submit"
-              class="flex items-center bg-green-700 px-12 py-2 text-white font-medium rounded-lg hover:bg-green-800"
+              class="flex items-center bg-green-600 px-12 py-2 text-white font-medium rounded-lg hover:bg-green-700"
               onclick={handlePayNow}>
               <span class="text-lg mr-2"><OcPaperairplane2/></span>
               <span>Pay now</span>
@@ -324,7 +342,7 @@ export default function AddOrders() {
 
               {/*Table row*/}
               <tbody>
-              <For each={data()}>
+              <For each={data()?.content}>
                 {(item) => (
                   <tr>
                     <td
@@ -359,6 +377,112 @@ export default function AddOrders() {
           </div>
         </div>
       </div>
+      <PopupModal.Wrapper title="Payment Methods" open={showPaymentModal} close={() => setShowPaymentModal(false)}>
+        <PopupModal.Body>
+          <div class="flex flex-row gap-3">
+            <button
+              class="flex-1 bg-white font-medium p-5 border border-gray-200 rounded-lg overflow-x-auto shadow-sm hover:bg-[#ceefff]"
+              onClick={handlePayByCash}
+            >
+              Pay by Cash
+            </button>
+            <button
+              class="flex-1 bg-white font-medium p-5 border border-gray-200 rounded-lg overflow-x-auto shadow-sm hover:bg-[#ceefff]"
+              onClick={handlePayByCard}
+            >
+              Pay by VNPAY
+            </button>
+          </div>
+        </PopupModal.Body>
+      </PopupModal.Wrapper>
+      <PopupModal.Wrapper title="Pay by Cash"
+                          open={() => paymentMethod() === "cash"}
+                          close={() => setPaymentMethod("")}>
+        <PopupModal.Body>
+          <div class="flex flex-col gap-3">
+            <div class="bg-indigo-200 p-3 flex flex-row justify-end rounded">
+              <div class="flex-1 text-indigo-500">
+                <p class="text-lg text-indigo-600 font-medium">
+                  Total:
+                </p>
+                <p class="text-lg text-indigo-600 font-medium">
+                  Tax (10%):
+                </p>
+                <p class="text-lg text-indigo-600 font-medium">
+                  Grand Total:
+                </p>
+              </div>
+              <div class="flex-1 text-indigo-500 text-end">
+                <p class="text-lg text-indigo-600 font-medium">
+                  {formatNumberWithCommas(totalPrice())}&nbsp;₫
+                </p>
+                <p class="text-lg text-indigo-600 font-medium">
+                  {formatNumberWithCommas(totalPrice() * 0.1)}&nbsp;₫
+                </p>
+                <p class="text-lg text-indigo-600 font-medium">
+                  {formatNumberWithCommas(totalPrice() + totalPrice() * 0.1)}&nbsp;₫
+                </p>
+              </div>
+            </div>
+            <TextInput
+              type="number"
+              id="cashReceive"
+              name="cashReceive"
+              label="Cash Receive"
+              step={1000}
+              min={0}
+              value={0}
+              onInput={(e) => {
+                setCashReceive(parseInt(e.currentTarget.value || "0"));
+                setChange(parseInt(e.currentTarget.value || "0") - totalPrice() - totalPrice() * 0.1);
+              }}
+            />
+            <TextInput
+              type="text"
+              id="change"
+              name="change"
+              label="Change"
+              value={`${formatNumberWithCommas(change())} ₫`}
+              disabled={true}
+            />
+            <div class="flex justify-between flex-row gap-3 pt-3">
+              <button
+                class="flex-1 text-white bg-red-600 font-medium p-3 border border-gray-200 rounded overflow-x-auto shadow-sm hover:bg-red-700"
+                onClick={() => {
+                  setPaymentMethod("");
+                  setChange(0);
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                class="flex-1 text-white bg-green-600 font-medium p-3 border border-gray-200 rounded overflow-x-auto shadow-sm hover:bg-green-700"
+                onClick={async () => {
+                  if (cashReceive() < totalPrice() + totalPrice() * 0.1) return toastError("Cash receive must be greater than or equal to grand total");
+                  if (!confirm("Are you sure to close this sale?")) return;
+
+                  const { data: orderData } = await axios.post<DataResponse<{ orderId: number }>>(
+                    `${getEndPoint()}/orders/add?returnData=false`, {
+                      grandTotal: `${totalPrice() + totalPrice() * 0.1}`,
+                      orderItems: selectedProducts().map((product) => ({
+                        productId: product.productId,
+                        quantity: product.quantity
+                      })),
+                      orderDate: moment().format("YYYY-MM-DD[T]HH:mm:ss"),
+                      paymentStatus: PaymentStatus.SUCCESS,
+                      staffId: user()?.staffId || 0
+                    }
+                  );
+                  if (!orderData) throw new Error("Invalid response from server");
+                  navigate(routes.order(orderData.content.orderId));
+                }}>
+                Close Sale
+              </button>
+
+            </div>
+          </div>
+        </PopupModal.Body>
+      </PopupModal.Wrapper>
     </main>
   )
 }

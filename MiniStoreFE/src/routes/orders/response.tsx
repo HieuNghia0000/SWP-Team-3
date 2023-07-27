@@ -26,7 +26,7 @@ export function routeData() {
         console.log(`${getEndPoint()}/${key}${search}`);
         const { data } = await axios.get<DataResponse<PaymentResponse>>(`${getEndPoint()}/${key}${search}`);
         // console.log(data.content);
-        return data.content;
+        return data.content.order;
 
       } catch (e) {
         throw new Error(handleFetchError(e));
@@ -40,6 +40,9 @@ export function routeData() {
 }
 
 export default function OrdersResponse() {
+  // TODO: Use createResource instead of createRouteData. We want to have a toast notification in the client side
+  // something like createResource(() => !isServer, () => {});
+  // remember to check how many times the resource fetcher is called. It should be called only once
   const { data } = useRouteData<typeof routeData>();
 
   return (
@@ -56,14 +59,10 @@ export default function OrdersResponse() {
           <p>Something went wrong</p>
         </Show>
         <Show when={!data.error && data() !== undefined}>
-          <p>Message: {data()!.message}</p>
-          <p>Response Code: {data()!.RspCode}</p>
-          <Show when={data()!.order !== undefined}>
-            <p>Order ID: {data()!.order!.orderId}</p>
-            <p>Order Status: {data()!.order!.orderDate}</p>
-            <p>Order Date: {data()!.order!.paymentStatus}</p>
-            <p>Grand Total: {data()!.order!.grandTotal}</p>
-          </Show>
+          <p>Order ID: {data()!.orderId}</p>
+          <p>Order Status: {data()!.orderDate}</p>
+          <p>Order Date: {data()!.paymentStatus}</p>
+          <p>Grand Total: {data()!.grandTotal}</p>
         </Show>
       </div>
     </main>
