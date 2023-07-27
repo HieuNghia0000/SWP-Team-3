@@ -57,6 +57,7 @@ const fetcher: ResourceFetcher<{ id: string } | undefined, Staff> = async (
       }`
     );
     console.log(data.content, source);
+    if (!data) throw new Error("Invalid response from server");
 
     return data.content[0];
   } catch (e) {
@@ -213,6 +214,11 @@ export default function Attendance() {
       <Show when={data.loading}>
         <div class="flex justify-center items-center h-[300px]">
           <Spinner/>
+        </div>
+      </Show>
+      <Show when={data.error}>
+        <div class="flex justify-center items-center h-[300px]">
+          <span>Something went wrong</span>
         </div>
       </Show>
       <Show when={!data.error && data() !== undefined}>

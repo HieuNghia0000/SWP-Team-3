@@ -32,7 +32,7 @@ public class OrderDto {
     @NotNull(message = "Order items must not be null")
     private List<OrderItemDto> orderItems;
 
-    private long totalElements;
+    private StaffDto staff;
 
     public OrderDto(Order order) {
         this.orderId = order.getOrderId();
@@ -45,4 +45,16 @@ public class OrderDto {
                     .stream().map(OrderItemDto::new).collect(Collectors.toList());
     }
 
+    public OrderDto(Order order, boolean withStaff) {
+        this.orderId = order.getOrderId();
+        this.staffId = order.getStaff().getStaffId();
+        this.orderDate = order.getOrderDate();
+        this.grandTotal = order.getGrandTotal();
+        this.paymentStatus = order.getPaymentStatus();
+        if (order.getOrderItems() != null)
+            this.orderItems = order.getOrderItems()
+                    .stream().map(OrderItemDto::new).collect(Collectors.toList());
+        if (withStaff)
+            this.staff = new StaffDto(order.getStaff());
+    }
 }

@@ -7,6 +7,8 @@ import { useOrderContext } from "~/context/Order";
 import moment from "moment";
 import { PaymentStatus } from "~/types";
 import { capitalize } from "~/utils/capitalize";
+import { A } from "solid-start";
+import routes from "~/utils/routes";
 
 export default function Table() {
   const { data } = useRouteData<typeof routeData>();
@@ -46,7 +48,7 @@ export default function Table() {
           </th>
           <th
             scope="col"
-            class="px-2.5 py-[8.7px] w-40 text-sm font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
+            class="px-2.5 py-[8.7px] w-32 text-sm font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
             style={{ "border-left": "1px dashed #d5dce6" }}
           >
             Grand Total
@@ -87,7 +89,7 @@ export default function Table() {
                 <td
                   style={{ "border-left": "1px dashed #d5dce6" }}
                   class="px-2.5 text-sm whitespace-nowrap truncate leading-10 border-[#e2e7ee] border-b">
-                  {moment(item.orderDate).format("MMM Do YYYY")}
+                  {moment(item.orderDate).format("MMM Do YYYY, h:mm:ss a")}
                 </td>
                 <td
                   style={{ "border-left": "1px dashed #d5dce6" }}
@@ -113,15 +115,15 @@ export default function Table() {
                   class="px-2.5 text-sm whitespace-nowrap leading-10 border-[#e2e7ee] border-b overflow-visible">
                   <div class="flex flex-row gap-1">
                     <div class="relative flex justify-center items-center">
-                      <button
-                        onClick={[ onDetails, item.orderId ]}
+                      <A
+                        href={routes.order(item.orderId)}
                         class="peer text-base text-gray-500 hover:text-indigo-500">
                         <IoEyeOutline/>
-                      </button>
-                      <span
+                      </A>
+                      <p
                         class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
                           Details
-                      </span>
+                      </p>
                     </div>
                     <div class="relative flex justify-center items-center">
                       <button
@@ -129,10 +131,10 @@ export default function Table() {
                         class="peer text-base text-gray-500 hover:text-indigo-500">
                         <IoTrashOutline/>
                       </button>
-                      <span
+                      <p
                         class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
                           Delete
-                      </span>
+                      </p>
                     </div>
                   </div>
                 </td>

@@ -190,6 +190,7 @@ export interface Order extends Timestamp {
 
   // relationship
   orderItems: OrderItem[];
+  staff?: Staff;
 }
 
 export interface OrderItem {

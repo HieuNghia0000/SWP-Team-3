@@ -15,7 +15,7 @@ import Pagination from "~/components/Pagination";
 import formatNumberWithCommas from "~/utils/formatNumberWithCommas";
 import moment from "moment";
 import { useAuth } from "~/context/Auth";
-import { toastError } from "~/utils/toast";
+import { toastError, toastSuccess } from "~/utils/toast";
 import PopupModal from "~/components/PopupModal";
 import { TextInput } from "~/components/form/TextInput";
 
@@ -110,6 +110,28 @@ export default function AddOrders() {
   const handlePayByCash = async () => {
     setShowPaymentModal(false);
     setPaymentMethod("cash");
+  }
+
+  const handleCloseSale = async () => {
+    if (cashReceive() < totalPrice() + totalPrice() * 0.1) return toastError("Cash receive must be greater than or equal to grand total");
+    if (!confirm("Are you sure to close this sale?")) return;
+
+    const { data: orderData } = await axios.post<DataResponse<{ orderId: number }>>(
+      `${getEndPoint()}/orders/add?returnData=false`, {
+        grandTotal: `${totalPrice() + totalPrice() * 0.1}`,
+        orderItems: selectedProducts().map((product) => ({
+          productId: product.productId,
+          quantity: product.quantity
+        })),
+        orderDate: moment().format("YYYY-MM-DD[T]HH:mm:ss"),
+        paymentStatus: PaymentStatus.SUCCESS,
+        staffId: user()?.staffId || 0
+      }
+    );
+    if (!orderData) throw new Error("Invalid response from server");
+
+    toastSuccess("Order created successfully");
+    navigate(routes.invoice(orderData.content.orderId));
   }
 
   const handlePayByCard = async () => {
@@ -246,7 +268,7 @@ export default function AddOrders() {
                 Total:
               </p>
               <p class="text-lg text-indigo-600 font-medium">
-                Tax (10%):
+                VAT (10%):
               </p>
               <p class="text-lg text-indigo-600 font-medium">
                 Grand Total:
@@ -395,9 +417,7 @@ export default function AddOrders() {
           </div>
         </PopupModal.Body>
       </PopupModal.Wrapper>
-      <PopupModal.Wrapper title="Pay by Cash"
-                          open={() => paymentMethod() === "cash"}
-                          close={() => setPaymentMethod("")}>
+      <PopupModal.Wrapper title="Pay by Cash" open={() => paymentMethod() === "cash"} close={() => setPaymentMethod("")}>
         <PopupModal.Body>
           <div class="flex flex-col gap-3">
             <div class="bg-indigo-200 p-3 flex flex-row justify-end rounded">
@@ -406,7 +426,7 @@ export default function AddOrders() {
                   Total:
                 </p>
                 <p class="text-lg text-indigo-600 font-medium">
-                  Tax (10%):
+                  VAT (10%):
                 </p>
                 <p class="text-lg text-indigo-600 font-medium">
                   Grand Total:
@@ -457,25 +477,7 @@ export default function AddOrders() {
               </button>
               <button
                 class="flex-1 text-white bg-green-600 font-medium p-3 border border-gray-200 rounded overflow-x-auto shadow-sm hover:bg-green-700"
-                onClick={async () => {
-                  if (cashReceive() < totalPrice() + totalPrice() * 0.1) return toastError("Cash receive must be greater than or equal to grand total");
-                  if (!confirm("Are you sure to close this sale?")) return;
-
-                  const { data: orderData } = await axios.post<DataResponse<{ orderId: number }>>(
-                    `${getEndPoint()}/orders/add?returnData=false`, {
-                      grandTotal: `${totalPrice() + totalPrice() * 0.1}`,
-                      orderItems: selectedProducts().map((product) => ({
-                        productId: product.productId,
-                        quantity: product.quantity
-                      })),
-                      orderDate: moment().format("YYYY-MM-DD[T]HH:mm:ss"),
-                      paymentStatus: PaymentStatus.SUCCESS,
-                      staffId: user()?.staffId || 0
-                    }
-                  );
-                  if (!orderData) throw new Error("Invalid response from server");
-                  navigate(routes.order(orderData.content.orderId));
-                }}>
+                onClick={handleCloseSale}>
                 Close Sale
               </button>
 

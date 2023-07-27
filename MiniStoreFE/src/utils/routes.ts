@@ -8,6 +8,7 @@ const routes = {
   staff: (id: string | number) => `/staffs?staffId=${id}`,
   orders: "/orders",
   order: (id: string | number) => `/orders/${id}`,
+  invoice: (id: string | number) => `/orders/${id}/invoice`,
   orderAdd: "/orders/add",
   products: "/products",
   product: (id: string | number) => `/products/${id}`,

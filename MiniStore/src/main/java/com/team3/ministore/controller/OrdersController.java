@@ -54,7 +54,7 @@ public class OrdersController {
     public ResponseEntity<Object> getOrdersById(@PathVariable("id") Integer id) {
         Optional<Order> order = orderService.getOrdersById(id);
 
-        return order.map(value -> ResponseHandler.getResponse(new OrderDto(value), HttpStatus.OK))
+        return order.map(value -> ResponseHandler.getResponse(new OrderDto(value, true), HttpStatus.OK))
                 .orElseGet(() -> ResponseHandler.getResponse(new Exception("Order not found."), HttpStatus.NOT_FOUND));
 
     }
