@@ -28,6 +28,13 @@ export default createHandler(
             // console.log(content);
             user = content;
             event.locals.token = token;
+            event.locals.user = JSON.stringify({
+              staffId: content.staffId,
+              staffName: content.staffName,
+              username: content.username,
+              role: content.role,
+              status: content.status,
+            });
           }
         } catch (error) {
           console.log(error);
@@ -35,6 +42,7 @@ export default createHandler(
       }
 
       const accessUrl = new URL(event.request.url);
+
       // if user accesses a non public route, and he is not authenticated - redirect him to the login page
       if (!publicRoutes.includes(accessUrl.pathname) && !user) {
         return redirect(routes.login);
@@ -43,9 +51,7 @@ export default createHandler(
       // if user accesses a public route, and he is authenticated - redirect him to the main page
       if (publicRoutes.includes(accessUrl.pathname) && user) {
         return redirect(routes.dashboard, {
-          headers: {
-            "Set-Cookie": createCookieVariable("token", token!, 1),
-          }
+          headers: { "Set-Cookie": createCookieVariable("token", token!, 1) }
         });
       }
 
@@ -63,6 +69,12 @@ export default createHandler(
       event.responseHeaders.set(
         "Set-Cookie",
         createCookieVariable("token", event.locals.token as string, 1)
+      );
+    }
+    if (event.locals.user !== undefined) {
+      event.responseHeaders.set(
+        "Set-Cookie",
+        createCookieVariable("user", event.locals.user as string, 1)
       );
     }
 

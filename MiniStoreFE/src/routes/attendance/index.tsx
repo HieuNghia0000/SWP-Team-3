@@ -7,7 +7,7 @@ export default function Attendance() {
   const { user } = useAuth();
 
   return (
-    <Show when={!user.error && user() !== undefined}>
+    <Show when={user() !== undefined}>
       <Navigate href={routes.attendanceId(user()!.staffId)}/>
     </Show>
   );

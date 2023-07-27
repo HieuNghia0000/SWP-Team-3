@@ -1,26 +1,13 @@
-import {
-  Component,
-  createContext,
-  createEffect,
-  createResource,
-  createSignal,
-  JSX,
-  onMount,
-  Resource,
-  ResourceFetcher,
-  useContext,
-} from "solid-js";
+import { Accessor, Component, createContext, createSignal, JSX, useContext, } from "solid-js";
 import Cookies from "js-cookie";
 import { apiRoutes } from "~/utils/routes";
 import { DataResponse, Staff, StaffStatus } from "~/types";
 import axios from "axios";
-import getEndPoint from "~/utils/getEndPoint";
 import { toastSuccess } from "~/utils/toast";
 import handleFetchError from "~/utils/handleFetchError";
-
-export const apiInstance = axios.create({
-  baseURL: getEndPoint(),
-});
+import { parseCookie, useServerContext } from "solid-start";
+import { isServer } from "solid-js/web";
+import getEndPoint from "~/utils/getEndPoint";
 
 const addItem = (key: string, value = "") => {
   /**
@@ -46,79 +33,14 @@ const clearItem = (key: string) => {
   Cookies.remove(key);
 };
 
-const isTokenExists = () => {
-  /**
-   *  Using the local storage code....
-   */
-  // const token = localStorage.getItem('token');
-
-  /**
-   *  Using the Cookies code...
-   */
-  const token = Cookies.get("token");
-
-  // JWT decode & check token validity & expiration.
-  if (token) {
-    setApiAuthorization(token);
-    return true;
-  }
-  return false;
-};
-
-const setApiAuthorization = (token: string) => {
-  apiInstance.defaults.headers.common["Authorization"] = "Bearer " + token;
-};
-
-const fetchData: ResourceFetcher<
-  boolean,
-  Staff | undefined,
-  { username: string; password: string }
-> = async (source, { refetching }) => {
-  try {
-    // run when login form is submitted
-    if (typeof refetching === "object") {
-      const { data } = await apiInstance.post<DataResponse<string>>(
-        apiRoutes.login,
-        {
-          username: refetching.username,
-          password: refetching.password,
-        }
-      );
-      if (data.content !== undefined) {
-        addItem("token", data.content);
-        setApiAuthorization(data.content);
-      }
-    }
-
-    // get current user data by token
-    if (isTokenExists()) {
-      const { data } = await apiInstance.get<DataResponse<Staff>>(
-        apiRoutes.currentUser
-      );
-
-      if (
-        data.content === undefined ||
-        data.content.status === StaffStatus.DISABLED
-      ) {
-        clearItem("token");
-        setApiAuthorization("");
-        return undefined;
-      }
-
-      toastSuccess("Authorization succeeded");
-      return data.content;
-    }
-    return undefined;
-  } catch (error) {
-    handleFetchError(error);
-    clearItem("token");
-  }
-};
+type UserAuth = Pick<Staff, "staffId" | "staffName" | "status" | "role" | "username">
 
 type AuthContextType = {
-  user: Resource<Staff | undefined>;
+  user: Accessor<UserAuth | undefined>;
   logOut: () => void;
   logIn: (username: string, password: string) => void;
+  loggingIn: Accessor<boolean>;
+  loginError: Accessor<string>;
 };
 
 export const AuthContext = createContext<AuthContextType>();
@@ -128,35 +50,59 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: Component<AuthProviderProps> = (props) => {
-  const [ isClient, setIsClient ] = createSignal(false);
-
-  const [ user, { mutate, refetch } ] = createResource(isClient, fetchData);
-
-  onMount(() => {
-    setIsClient(true);
-  });
-
-  createEffect(() => {
-    // remember to check if error is existed before using the data resource. If not, it will throw error out in the UI
-    if (user.error) {
-      console.log("user.error", user.error);
-      clearItem("token");
-    } else if (user()) {
-      console.log("user", user());
-    }
-  });
+  const event = useServerContext();
+  const cookie = () => parseCookie(isServer ? event.request.headers.get("cookie") ?? "" : document.cookie);
+  const userCookie = JSON.parse(cookie().user || "null") as UserAuth | null;
+  const [ user, setUser ] = createSignal<UserAuth | undefined>(userCookie || undefined);
+  const [ loggingIn, setloggingIn ] = createSignal<boolean>(false);
+  const [ error, setError ] = createSignal<string>("");
 
   const logOut = () => {
-    mutate(undefined);
+    setUser(undefined);
     clearItem("token");
+    clearItem("user");
   };
 
-  const logIn = (username: string, password: string) => {
-    refetch({ username, password });
-  };
+  const logIn = async (username: string, password: string) => {
+    if (loggingIn()) return;
+    try {
+      setloggingIn(true);
+      setError("");
+      const { data: token } = await axios.post<DataResponse<string>>(
+        `${getEndPoint()}${apiRoutes.login}`,
+        { username, password }
+      );
+
+      if (token.content === undefined) throw new Error("Token is undefined");
+      addItem("token", token.content);
+
+      // get current user data by token
+      const { data } = await axios.get<DataResponse<Staff>>(
+        `${getEndPoint()}${apiRoutes.currentUser}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token.content}`,
+          }
+        }
+      );
+
+      if (data.content === undefined || data.content.status === StaffStatus.DISABLED)
+        throw new Error("User is disabled");
+
+      toastSuccess("Authorization succeeded");
+      addItem("user", JSON.stringify(data.content));
+      setUser(data.content);
+    } catch (error) {
+      setError(handleFetchError(error));
+      clearItem("token");
+      clearItem("user");
+    } finally {
+      setloggingIn(false);
+    }
+  }
 
   return (
-    <AuthContext.Provider value={{ user, logOut, logIn }}>
+    <AuthContext.Provider value={{ user, logOut, logIn, loggingIn, loginError: error }}>
       {props.children}
     </AuthContext.Provider>
   );

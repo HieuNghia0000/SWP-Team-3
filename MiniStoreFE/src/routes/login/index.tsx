@@ -20,14 +20,14 @@ const schema: yup.Schema<Login> = yup.object({
 
 export default function Login() {
   const navigate = useNavigate();
-  const { logIn, user } = useAuth();
+  const { logIn, user, loggingIn, loginError } = useAuth();
   const formHandler = useFormHandler(yupSchema(schema), {
     validateOn: ["change"],
   });
   const { formData } = formHandler;
 
   createEffect(() => {
-    if (!user.error && user() && user()?.status === StaffStatus.ACTIVATED) {
+    if (user() && user()?.status === StaffStatus.ACTIVATED) {
       navigate(routes.dashboard);
     }
   });
@@ -48,17 +48,15 @@ export default function Login() {
   return (
     <div
       class="h-screen grid place-items-center"
-      classList={{
-        "cursor-progress": user.state === "unresolved" || user.loading,
-      }}
+      classList={{ "cursor-progress": loggingIn() }}
     >
       <div
         class="bg-white w-full max-w-xs mx-auto p-8 rounded-lg shadow-md"
         x-data="loginForm"
       >
         <h2 class="text-2xl font-bold mb-4 text-center">Log In</h2>
-        <Show when={user.error}>
-          <p class="text-center text-sm text-red-400">{user.error.message}</p>
+        <Show when={!!loginError()}>
+          <p class="text-center text-sm text-red-400">{loginError()}</p>
         </Show>
         <form class="space-y-4" onSubmit={submit}>
           <div>
@@ -85,7 +83,7 @@ export default function Login() {
             <button
               class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-4 rounded focus:shadow-outline w-full disabled:bg-indigo-200"
               type="submit"
-              disabled={user.loading || user.state === "unresolved"}
+              disabled={loggingIn()}
             >
               Log In
             </button>
