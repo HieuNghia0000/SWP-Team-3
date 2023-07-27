@@ -11,7 +11,7 @@ export default createHandler(
   ({ forward }) => {
     return async (event) => {
       const cookie = event.request.headers.get("Cookie");
-      // console.log(cookie);
+      console.log(cookie);
       const token = getCookie(cookie, "token");
       let user: Staff | null = null;
 
@@ -23,6 +23,7 @@ export default createHandler(
             },
           });
           const { content } = (await data.json()) as DataResponse<Staff>;
+          console.log(content)
 
           if (content && content.status === StaffStatus.ACTIVATED) {
             // console.log(content);
@@ -35,9 +36,12 @@ export default createHandler(
               role: content.role,
               status: content.status,
             });
+          }else{
+            event.locals.authError = "true";
           }
         } catch (error) {
           console.log(error);
+          event.locals.authError = "true";
         }
       }
 
@@ -65,17 +69,22 @@ export default createHandler(
       createCookieVariable("endpoint", process.env.API_ENDPOINT!, 1)
     );
     // console.log(event.locals.token);
-    if (event.locals.token !== undefined) {
+    if (event.locals.token !== undefined && event.locals.authError !== "true") {
       event.responseHeaders.set(
         "Set-Cookie",
         createCookieVariable("token", event.locals.token as string, 1)
       );
     }
-    if (event.locals.user !== undefined) {
+    if (event.locals.user !== undefined && event.locals.authError !== "true") {
       event.responseHeaders.set(
         "Set-Cookie",
         createCookieVariable("user", event.locals.user as string, 1)
       );
+    }
+    console.log(event.locals.authError)
+    if (event.locals.authError === "true") {
+      event.responseHeaders.append("Set-Cookie", createCookieVariable("token", "", 0));
+      event.responseHeaders.append("Set-Cookie", createCookieVariable("user", "", 0));
     }
 
     return <StartServer event={event}/>;

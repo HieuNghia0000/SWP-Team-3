@@ -91,9 +91,9 @@ export default function Table() {
           fallback={<div class="w-full h-full min-h-[300px] grid place-items-center">Something went wrong</div>}>
           <For each={data()}>
             {(staff) => {
-              const isApproved = staff.shifts.findIndex((shift) => !shift.timesheet || shift.timesheet.status !== TimesheetStatus.APPROVED) === -1;
+              const isApproved = staff.shifts.findIndex((shift) => !!shift.timesheet && shift.timesheet.status !== TimesheetStatus.APPROVED) === -1;
               const regularHours = staff.shifts.reduce((acc, shift) => {
-                return acc + moment(shift.endTime, "HH:mm:ss").diff(moment(shift.startTime, "HH:mm:ss"), "hours");
+                return acc + moment(shift.endTime, "HH:mm:ss").diff(moment(shift.startTime, "HH:mm:ss"), "hours", true);
               }, 0);
               const leaveHours = staff.shifts.reduce((acc, shift) => {
                 const isAbsent = moment(`${shift.date} ${shift.endTime}`).isBefore(moment());
@@ -107,13 +107,13 @@ export default function Table() {
                       .isBetween(leave.startDate, leave.endDate, undefined, "[]"))
                   )
                 )
-                  return acc + moment(shift.endTime, "HH:mm:ss").diff(moment(shift.startTime, "HH:mm:ss"), "hours");
+                  return acc + moment(shift.endTime, "HH:mm:ss").diff(moment(shift.startTime, "HH:mm:ss"), "hours", true);
 
                 return acc;
               }, 0);
 
               const grossPay = staff.shifts.reduce((acc, shift) => {
-                const shiftHours = moment(shift.endTime, "HH:mm:ss").diff(moment(shift.startTime, "HH:mm:ss"), "hours");
+                const shiftHours = moment(shift.endTime, "HH:mm:ss").diff(moment(shift.startTime, "HH:mm:ss"), "hours", true);
                 const holiday = isHoliday(shift);
                 const coefficient = holiday ? holiday.coefficient : shift.salaryCoefficient;
 

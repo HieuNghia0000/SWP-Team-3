@@ -101,11 +101,11 @@ const PayrollDetailsModal: Component = () => {
                 <For each={dates()}>
                   {(date) => {
                     const isApproved = staff()?.shifts
-                      .findIndex((shift) => moment(shift.date).isSame(date) && (!shift.timesheet || shift.timesheet.status !== TimesheetStatus.APPROVED)) === -1;
+                      .findIndex((shift) => moment(shift.date).isSame(date) && (!!shift.timesheet && shift.timesheet.status !== TimesheetStatus.APPROVED)) === -1;
 
                     const regularHours = staff()?.shifts.reduce((acc, shift) => {
                       if (moment(shift.date).isSame(date))
-                        return acc + moment(shift.endTime, "HH:mm:ss").diff(moment(shift.startTime, "HH:mm:ss"), "hours");
+                        return acc + moment(shift.endTime, "HH:mm:ss").diff(moment(shift.startTime, "HH:mm:ss"), "hours", true);
                       return acc;
                     }, 0) || 0;
 
@@ -121,7 +121,7 @@ const PayrollDetailsModal: Component = () => {
                             .isBetween(leave.startDate, leave.endDate, undefined, "[]"))
                         )
                       )
-                        return acc + moment(shift.endTime, "HH:mm:ss").diff(moment(shift.startTime, "HH:mm:ss"), "hours");
+                        return acc + moment(shift.endTime, "HH:mm:ss").diff(moment(shift.startTime, "HH:mm:ss"), "hours", true);
 
                       return acc;
                     }, 0) || 0;
@@ -129,7 +129,7 @@ const PayrollDetailsModal: Component = () => {
                     const grossPay = staff()?.shifts.reduce((acc, shift) => {
                       if (!moment(shift.date).isSame(date)) return acc;
 
-                      const shiftHours = moment(shift.endTime, "HH:mm:ss").diff(moment(shift.startTime, "HH:mm:ss"), "hours");
+                      const shiftHours = moment(shift.endTime, "HH:mm:ss").diff(moment(shift.startTime, "HH:mm:ss"), "hours", true);
                       const holiday = isHoliday(shift);
                       const coefficient = holiday ? holiday.coefficient : shift.salaryCoefficient;
 

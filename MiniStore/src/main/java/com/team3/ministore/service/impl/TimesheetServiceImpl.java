@@ -202,6 +202,7 @@ public class TimesheetServiceImpl implements TimesheetService {
                     .filter(ShiftDto::getPublished)
                     // Get salary for each timesheet
                     .peek(shiftDto ->{
+                        if (shiftDto.getTimesheet() == null) return;
                         Optional<Salary> salary = salaryService.getSalaryById(shiftDto.getTimesheet().getTimesheetId());
                         if (salary.isEmpty()) return;
                         shiftDto.getTimesheet().setSalary(new SalaryDto(salary.get()));
