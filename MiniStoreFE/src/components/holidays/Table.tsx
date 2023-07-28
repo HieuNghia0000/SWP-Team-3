@@ -62,7 +62,7 @@ export default function Table() {
         <Show
           when={!data.error && data() !== undefined}
           fallback={<div class="w-full h-full min-h-[300px] grid place-items-center">Something went wrong</div>}>
-          <For each={data()}>
+          <For each={data()!.content}>
             {(item) => (
               <tr class="hover:bg-[#ceefff] odd:bg-white even:bg-gray-50 text-[#333c48]">
                 <td

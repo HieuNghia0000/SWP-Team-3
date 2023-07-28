@@ -11,6 +11,7 @@ import com.team3.ministore.service.StaffService;
 import com.team3.ministore.utils.Role;
 import com.team3.ministore.utils.StaffStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -92,19 +93,17 @@ public class StaffServiceImpl implements StaffService {
     }
 
     @Override
-    public List<StaffDto> getAllStaff(String search, int page, int pageSize) {
+    public Page<StaffDto> getAllStaff(String search, int page, int pageSize) {
         Pageable pageable = PageRequest.of(page - 1, pageSize);
         return staffRepository.findByStaffNameContainingIgnoreCaseOrderByStaffIdDesc(search, pageable)
-                .stream().map(staff -> new StaffDto(staff, salaryService.getSalaryByStaffId(staff.getStaffId())))
-                .collect(Collectors.toList());
+                .map(staff -> new StaffDto(staff, salaryService.getSalaryByStaffId(staff.getStaffId())));
     }
 
     @Override
-    public List<StaffDto> getAllStaff(int page, int pageSize) {
+    public Page<StaffDto> getAllStaff(int page, int pageSize) {
         Pageable pageable = PageRequest.of(page - 1, pageSize);
         return staffRepository.findAll(pageable)
-                .stream().map(staff -> new StaffDto(staff, salaryService.getSalaryByStaffId(staff.getStaffId())))
-                .collect(Collectors.toList());
+                .map(staff -> new StaffDto(staff, salaryService.getSalaryByStaffId(staff.getStaffId())));
     }
 
     @Override

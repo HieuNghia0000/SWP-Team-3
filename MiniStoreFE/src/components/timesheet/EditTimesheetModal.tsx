@@ -56,7 +56,7 @@ const EditTimesheetModal: Component = () => {
   const [ updating, updateAction ] = createRouteAction(updateTimesheet);
   const timesheet = createMemo(() =>
     !data.error && data() !== undefined
-      ? data()?.find((t) => t.timesheetId === chosenId())
+      ? data()?.content.find((t) => t.timesheetId === chosenId())
       : undefined
   );
 

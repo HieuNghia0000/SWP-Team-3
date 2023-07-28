@@ -2,6 +2,7 @@ package com.team3.ministore.service;
 
 import com.team3.ministore.dto.CategoryDto;
 import com.team3.ministore.model.Category;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +18,5 @@ public interface CategoryService {
 
     void deleteCategory(Integer id);
 
-    List<CategoryDto> getAllCategories(String search, Integer page, Integer pageSize);
-
-    List<CategoryDto> getAllCategories(Integer page, Integer pageSize);
+    Page<CategoryDto> getAllCategories(String search, Integer page, Integer pageSize);
 }

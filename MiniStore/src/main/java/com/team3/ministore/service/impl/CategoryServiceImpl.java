@@ -4,13 +4,13 @@ import com.team3.ministore.dto.CategoryDto;
 import com.team3.ministore.model.Category;
 import com.team3.ministore.repository.CategoryRepository;
 import com.team3.ministore.service.CategoryService;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -62,20 +62,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<CategoryDto> getAllCategories(String search, Integer page, Integer pageSize) {
+    public Page<CategoryDto> getAllCategories(String search, Integer page, Integer pageSize) {
         Pageable pageable = PageRequest.of(page - 1, pageSize);
-        return categoryRepository
-                .findAllByNameContainingIgnoreCase(search, pageable)
-                .stream().map(CategoryDto::new)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<CategoryDto> getAllCategories(Integer page, Integer pageSize) {
-        Pageable pageable = PageRequest.of(page - 1, pageSize);
-        return categoryRepository
-                .findAll(pageable)
-                .stream().map(CategoryDto::new)
-                .collect(Collectors.toList());
+        return categoryRepository.findAllByNameContainingIgnoreCase(search, pageable).map(CategoryDto::new);
     }
 }

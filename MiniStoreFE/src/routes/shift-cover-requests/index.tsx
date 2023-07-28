@@ -63,7 +63,7 @@ export function routeData() {
         params.curPage ?? "1",
         params.search ?? "",
       ],
-      reconcileOptions: { key: "shiftCoverRequestId" },
+      reconcileOptions: { key: "content.shiftCoverRequestId" },
     }
   );
 

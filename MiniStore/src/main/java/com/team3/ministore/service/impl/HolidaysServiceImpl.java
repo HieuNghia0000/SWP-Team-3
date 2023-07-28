@@ -5,6 +5,7 @@ import com.team3.ministore.model.Holiday;
 import com.team3.ministore.repository.HolidaysRepository;
 import com.team3.ministore.service.HolidaysService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,16 +22,15 @@ public class HolidaysServiceImpl implements HolidaysService {
     private HolidaysRepository holidaysRepository;
 
     @Override
-    public List<HolidayDto> getHolidays(String search, int page, int pageSize) {
+    public Page<HolidayDto> getHolidays(String search, int page, int pageSize) {
         Pageable pageable = PageRequest.of(page - 1, pageSize);
-        return holidaysRepository.findByNameContainingIgnoreCase(search, pageable)
-                .stream().map(HolidayDto::new).collect(Collectors.toList());
+        return holidaysRepository.findByNameContainingIgnoreCase(search, pageable).map(HolidayDto::new);
     }
 
     @Override
-    public List<HolidayDto> getHolidays(int page, int pageSize) {
+    public Page<HolidayDto> getHolidays(int page, int pageSize) {
         Pageable pageable = PageRequest.of(page - 1, pageSize);
-        return holidaysRepository.findAll(pageable).stream().map(HolidayDto::new).collect(Collectors.toList());
+        return holidaysRepository.findAll(pageable).map(HolidayDto::new);
     }
 
     @Override

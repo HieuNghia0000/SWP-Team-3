@@ -57,7 +57,7 @@ export function routeData() {
         params.curPage ?? "1",
         params.search ?? "",
       ],
-      reconcileOptions: { key: "leaveRequestId" },
+      reconcileOptions: { key: "content.leaveRequestId" },
     }
   );
   return { data: leaveRequests };

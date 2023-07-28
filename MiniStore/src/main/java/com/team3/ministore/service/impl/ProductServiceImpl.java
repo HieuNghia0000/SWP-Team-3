@@ -1,7 +1,6 @@
 package com.team3.ministore.service.impl;
 
 import com.team3.ministore.dto.ProductDto;
-import com.team3.ministore.dto.SellingProduct;
 import com.team3.ministore.model.Category;
 import com.team3.ministore.model.Product;
 import com.team3.ministore.repository.CategoryRepository;
@@ -29,7 +28,7 @@ public class ProductServiceImpl implements ProductService {
     public Page<ProductDto> getAllProducts(String search, Integer page, Integer pageSize) {
         Pageable pageable = PageRequest.of(page - 1, pageSize);
         return productRepository
-                .findAllByNameContainingIgnoreCaseOrBarCodeContainingIgnoreCase(search, search, pageable)
+                .findAllByNameContainingIgnoreCaseOrBarCodeContainingIgnoreCaseOrCategory_NameContainingIgnoreCase(search, search, search, pageable)
                 .map(ProductDto::new);
     }
 

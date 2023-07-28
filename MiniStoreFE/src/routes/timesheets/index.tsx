@@ -1,5 +1,5 @@
 import { createRouteAction, createRouteData, useRouteData } from "solid-start";
-import { DataResponse, Holiday, Timesheet } from "~/types";
+import { DataResponse, Holiday, PageResponse, Timesheet } from "~/types";
 import { createSignal, Show } from "solid-js";
 import Breadcrumbs from "~/components/Breadcrumbs";
 import Pagination from "~/components/Pagination";
@@ -33,7 +33,7 @@ export function routeData() {
       try {
         if (!from || !to) return;
         const uri = new URLSearchParams({ perPage, curPage, search, from, to });
-        const { data } = await axios.get<DataResponse<Timesheet[]>>(
+        const { data } = await axios.get<DataResponse<PageResponse<Timesheet>>>(
           `${getEndPoint()}/${key}?${uri.toString()}`
         );
         return data.content;
@@ -50,7 +50,7 @@ export function routeData() {
         params.from ?? "",
         params.to ?? "",
       ],
-      reconcileOptions: { key: "timesheetId" },
+      reconcileOptions: { key: "content.timesheetId" },
     }
   );
 
@@ -82,7 +82,7 @@ export default function Timesheets() {
   const [ chosenId, setChosenId ] = createSignal(0);
   const [ deleting, deleteAction ] = createRouteAction(deleteTimesheet);
 
-  const totalItems = () => (data.error ? 0 : data()?.length ?? 0);
+  const totalItems = () => (data.error ? 0 : data()?.totalElements ?? 0);
 
   const onDelete = async (id: number) => {
     if (deleting.pending) return;

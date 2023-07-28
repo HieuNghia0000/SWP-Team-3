@@ -52,7 +52,7 @@ export default function Table() {
               "border-left": "1px dashed #d5dce6",
             }}
           >
-            Regular Hours
+            Planned Hours
           </th>
           <th
             scope="col"
@@ -61,7 +61,7 @@ export default function Table() {
               "border-left": "1px dashed #d5dce6",
             }}
           >
-            Leave Hours
+            Absent Hours
           </th>
           <th
             scope="col"
@@ -70,7 +70,7 @@ export default function Table() {
               "border-left": "1px dashed #d5dce6",
             }}
           >
-            Total Hours
+            Worked Hours
           </th>
           <th
             scope="col"
@@ -95,6 +95,7 @@ export default function Table() {
               const regularHours = staff.shifts.reduce((acc, shift) => {
                 return acc + moment(shift.endTime, "HH:mm:ss").diff(moment(shift.startTime, "HH:mm:ss"), "hours", true);
               }, 0);
+              // Leave hours are the hours that the staff is absent but still get paid
               const leaveHours = staff.shifts.reduce((acc, shift) => {
                 const isAbsent = moment(`${shift.date} ${shift.endTime}`).isBefore(moment());
                 const isStarted = moment(`${shift.date} ${shift.startTime}`).isSameOrBefore(moment());
@@ -108,6 +109,16 @@ export default function Table() {
                   )
                 )
                   return acc + moment(shift.endTime, "HH:mm:ss").diff(moment(shift.startTime, "HH:mm:ss"), "hours", true);
+
+                return acc;
+              }, 0);
+
+              const workedHours = staff.shifts.reduce((acc, shift) => {
+                const shiftHours = moment(shift.endTime, "HH:mm:ss").diff(moment(shift.startTime, "HH:mm:ss"), "hours", true);
+
+                if (shift.timesheet && shift.timesheet.status === TimesheetStatus.APPROVED) {
+                  return acc + shiftHours;
+                }
 
                 return acc;
               }, 0);
@@ -132,7 +143,7 @@ export default function Table() {
                     isApproved,
                     regularHours,
                     leaveHours,
-                    totalHours: regularHours - leaveHours,
+                    totalHours: workedHours,
                     grossPay
                   } ]}>
                   <td
@@ -165,7 +176,7 @@ export default function Table() {
                   <td
                     style={{ "border-left": "1px dashed #d5dce6" }}
                     class="px-2.5 text-sm whitespace-nowrap truncate text-center leading-10 border-[#e2e7ee] border-b">
-                    {regularHours - leaveHours} hrs
+                    {workedHours} hrs
                   </td>
                   <td
                     style={{ "border-left": "1px dashed #d5dce6" }}

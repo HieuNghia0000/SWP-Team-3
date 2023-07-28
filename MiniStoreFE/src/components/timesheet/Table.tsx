@@ -120,7 +120,7 @@ export default function Table() {
         <Show
           when={!data.error && !data.loading && data.state === "ready"}
           fallback={<div class="w-full h-full min-h-[300px] grid place-items-center">Something went wrong</div>}>
-          <For each={data()}>
+          <For each={data()!.content}>
             {(timesheet) => {
 
               const holiday = isHoliday(timesheet.shift!);
@@ -160,12 +160,12 @@ export default function Table() {
                   <td
                     style={{ "border-left": "1px dashed #d5dce6", }}
                     class="px-2.5 text-sm whitespace-nowrap truncate leading-10 border-[#e2e7ee] border-b">
-                    {moment(timesheet.shift?.endTime, "HH:mm:ss").diff(moment(timesheet.shift?.startTime, "HH:mm:ss"), "hours")} hrs
+                    {moment(timesheet.shift?.endTime, "HH:mm:ss").diff(moment(timesheet.shift?.startTime, "HH:mm:ss"), "hours", true)} hrs
                   </td>
                   <td
                     style={{ "border-left": "1px dashed #d5dce6" }}
                     class="px-2.5 text-sm whitespace-nowrap truncate leading-10 border-[#e2e7ee] border-b">
-                    {formatNumberWithCommas((Number.parseFloat(timesheet.salary?.hourlyWage || "0")) * coefficient * moment(timesheet.shift?.endTime, "HH:mm:ss").diff(moment(timesheet.shift?.startTime, "HH:mm:ss"), "hours"))} ₫
+                    {formatNumberWithCommas((Number.parseFloat(timesheet.salary?.hourlyWage || "0")) * coefficient * moment(timesheet.shift?.endTime, "HH:mm:ss").diff(moment(timesheet.shift?.startTime, "HH:mm:ss"), "hours", true))} ₫
                   </td>
                   <td
                     style={{ "border-left": "1px dashed #d5dce6" }}

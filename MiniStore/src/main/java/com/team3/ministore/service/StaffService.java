@@ -5,6 +5,7 @@ import com.team3.ministore.dto.StaffDto;
 import com.team3.ministore.dto.StaffMetaInfo;
 import com.team3.ministore.dto.UpdateStaffDto;
 import com.team3.ministore.model.Staff;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,9 +23,9 @@ public interface StaffService {
 
     void deleteStaff(Integer id);
 
-    List<StaffDto> getAllStaff(String search, int page, int pageSize);
+    Page<StaffDto> getAllStaff(String search, int page, int pageSize);
 
-    List<StaffDto> getAllStaff(int page, int pageSize);
+    Page<StaffDto> getAllStaff(int page, int pageSize);
 
     Optional<Staff> getStaffByEmail(String email);
 

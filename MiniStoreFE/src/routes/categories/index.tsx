@@ -2,7 +2,7 @@ import { createSignal } from "solid-js";
 import { createRouteAction, createRouteData, useRouteData, useSearchParams } from "solid-start";
 import Breadcrumbs from "~/components/Breadcrumbs";
 import Pagination from "~/components/Pagination";
-import { Category, DataResponse } from "~/types";
+import { Category, DataResponse, PageResponse } from "~/types";
 import axios from "axios";
 import getEndPoint from "~/utils/getEndPoint";
 import handleFetchError from "~/utils/handleFetchError";
@@ -34,7 +34,7 @@ export function routeData() {
       try {
         const uri = new URLSearchParams({ perPage, curPage, search });
 
-        const { data } = await axios.get<DataResponse<Category[]>>(
+        const { data } = await axios.get<DataResponse<PageResponse<Category>>>(
           `${getEndPoint()}/${key}?${uri.toString()}`
         );
         return data.content;
@@ -44,7 +44,7 @@ export function routeData() {
     },
     {
       key: () => [ "categories", searchParams.perPage ?? "10", searchParams.curPage ?? "1", searchParams.search ?? "" ],
-      reconcileOptions: { key: "categoryId" }
+      reconcileOptions: { key: "content.categoryId" }
     }
   );
 
@@ -58,7 +58,7 @@ export default function Categories() {
   const [ chosenId, setChosenId ] = createSignal(0);
   const [ deleting, deleteAction ] = createRouteAction(deleteCategory);
 
-  const totalItems = () => data()?.length ?? 0;
+  const totalItems = () => (data.error ? 0 : data()?.totalElements ?? 0);
 
   const onDelete = async (id: number) => {
     if (deleting.pending) return;

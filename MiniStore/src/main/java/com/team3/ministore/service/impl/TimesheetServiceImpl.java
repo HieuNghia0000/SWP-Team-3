@@ -12,6 +12,7 @@ import com.team3.ministore.utils.LeaveStatus;
 import com.team3.ministore.utils.ShiftCoverStatus;
 import com.team3.ministore.utils.TimesheetStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -47,9 +48,9 @@ public class TimesheetServiceImpl implements TimesheetService {
     private ShiftCoverRequestService shiftCoverRequestService;
 
     @Override
-    public List<TimesheetDto> getAllTimeSheets(int page, int pageSize, LocalDate fromDate, LocalDate toDate) {
+    public Page<TimesheetDto> getAllTimeSheets(int page, int pageSize, LocalDate fromDate, LocalDate toDate) {
         Pageable pageable = PageRequest.of(page - 1, pageSize);
-        return timesheetRepository.findAllByShift_DateBetween(fromDate, toDate, pageable).stream().map(t -> {
+        return timesheetRepository.findAllByShift_DateBetween(fromDate, toDate, pageable).map(t -> {
                     // Get the salary and leave requests of the staff
                     List<LeaveRequestDto> leaveRequestDtos = leaveRequestService
                             .getLeaveRequestsByStaffIdAndDates(t.getStaff().getStaffId(), fromDate, toDate)
@@ -60,16 +61,15 @@ public class TimesheetServiceImpl implements TimesheetService {
                     TimesheetDto dto = new TimesheetDto(t, true, true, true);
                     dto.getStaff().setLeaveRequests(leaveRequestDtos);
                     return dto;
-                })
-                .collect(Collectors.toList());
+                });
     }
 
     @Override
-    public List<TimesheetDto> getAllTimeSheets(String search, int page, int pageSize, LocalDate fromDate, LocalDate toDate) {
+    public Page<TimesheetDto> getAllTimeSheets(String search, int page, int pageSize, LocalDate fromDate, LocalDate toDate) {
         Pageable pageable = PageRequest.of(page - 1, pageSize);
 
         return timesheetRepository.findByStaff_StaffNameContainingIgnoreCaseAndShift_DateBetweenOrderByTimesheetIdDesc(search, fromDate, toDate, pageable)
-                .stream().map(t -> {
+                .map(t -> {
                     List<LeaveRequestDto> leaveRequestDtos = leaveRequestService
                             .getLeaveRequestsByStaffIdAndDates(t.getStaff().getStaffId(), fromDate, toDate)
                             .stream().filter(leaveRequestDto -> leaveRequestDto.getStatus().equals(LeaveStatus.APPROVED))
@@ -79,8 +79,7 @@ public class TimesheetServiceImpl implements TimesheetService {
                     TimesheetDto dto = new TimesheetDto(t, true, true, true);
                     dto.getStaff().setLeaveRequests(leaveRequestDtos);
                     return dto;
-                })
-                .collect(Collectors.toList());
+                });
     }
 
     @Override
@@ -203,7 +202,7 @@ public class TimesheetServiceImpl implements TimesheetService {
                     // Get salary for each timesheet
                     .peek(shiftDto ->{
                         if (shiftDto.getTimesheet() == null) return;
-                        Optional<Salary> salary = salaryService.getSalaryById(shiftDto.getTimesheet().getTimesheetId());
+                        Optional<Salary> salary = salaryService.getSalaryById(shiftDto.getTimesheet().getSalaryId());
                         if (salary.isEmpty()) return;
                         shiftDto.getTimesheet().setSalary(new SalaryDto(salary.get()));
                     })

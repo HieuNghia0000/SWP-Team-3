@@ -52,7 +52,7 @@ const EditCategoryModal: Component<{
   const { formData } = formHandler;
 
   const category = createMemo(() => !data.error && data() !== undefined
-    ? data()?.find((p) => p.categoryId === chosenId())
+    ? data()?.content.find((p) => p.categoryId === chosenId())
     : undefined
   )
 

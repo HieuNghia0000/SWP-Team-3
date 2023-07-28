@@ -47,7 +47,7 @@ const EditHolidayModal: Component = () => {
 
   const curHoliday = createMemo(() =>
     !data.error && data() !== undefined
-      ? data()?.find((sc) => sc.holidayId === chosenId())
+      ? data()?.content.find((sc) => sc.holidayId === chosenId())
       : undefined
   );
 

@@ -58,7 +58,10 @@ public class CategoryController {
     public ResponseEntity<Object> getCategories(@RequestParam("search") Optional<String> search,
                                                 @RequestParam("curPage") Integer curPage,
                                                 @RequestParam("perPage") Integer perPage) {
-        return search.map(s -> ResponseHandler.getResponse(categoryService.getAllCategories(s, curPage, perPage), HttpStatus.OK))
-                .orElseGet(() -> ResponseHandler.getResponse(categoryService.getAllCategories(curPage, perPage), HttpStatus.OK));
+        return ResponseHandler.getResponse(categoryService.getAllCategories(
+                search.orElseGet(() -> null),
+                curPage,
+                perPage
+        ), HttpStatus.OK);
     }
 }

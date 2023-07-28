@@ -2,7 +2,7 @@ import Breadcrumbs from "~/components/Breadcrumbs";
 import { createRouteAction, createRouteData, useRouteData, useSearchParams, } from "solid-start";
 import Pagination from "~/components/Pagination";
 import { createSignal, Show } from "solid-js";
-import { DataResponse, Staff, StaffStatus } from "~/types";
+import { DataResponse, PageResponse, Staff, StaffStatus } from "~/types";
 import getEndPoint from "~/utils/getEndPoint";
 import handleFetchError from "~/utils/handleFetchError";
 import { ParamType } from "~/components/staffs/types";
@@ -41,7 +41,7 @@ export function routeData() {
     async ([ key, perPage, curPage, search ]) => {
       try {
         const uri = new URLSearchParams({ perPage, curPage, search });
-        const { data } = await axios.get<DataResponse<Staff[]>>(
+        const { data } = await axios.get<DataResponse<PageResponse<Staff>>>(
           `${getEndPoint()}/${key}?${uri.toString()}`
         );
         return data.content;
@@ -56,7 +56,7 @@ export function routeData() {
         params.curPage ?? "1",
         params.search ?? "",
       ],
-      reconcileOptions: { key: "staffId" },
+      reconcileOptions: { key: "content.staffId" },
     }
   );
 
@@ -71,7 +71,7 @@ export default function Staffs() {
   const [ chosenId, setChosenId ] = createSignal<number>(0);
   const [ disabling, disableAction ] = createRouteAction(disableStaff);
 
-  const totalItems = () => data()?.length ?? 0;
+  const totalItems = () => (data.error ? 0 : data()?.totalElements ?? 0);
 
   const onDelete = async (staff: Staff) => {
     if (disabling.pending) return;

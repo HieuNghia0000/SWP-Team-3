@@ -114,9 +114,11 @@ const CreateProductModal: Component<{
                 <TextInput
                   id="price"
                   name="price"
-                  label="Price"
+                  label="Price (VND)"
                   type="number"
                   step={500}
+                  min={0}
+                  value={0}
                   placeholder="Enter price (VND)"
                   formHandler={formHandler}
                 />
@@ -127,6 +129,7 @@ const CreateProductModal: Component<{
                   name="inventory"
                   label="Inventory"
                   type="number"
+                  value={0}
                   placeholder="Enter inventory"
                   formHandler={formHandler}
                 />

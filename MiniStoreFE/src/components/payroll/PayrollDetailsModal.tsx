@@ -75,17 +75,17 @@ const PayrollDetailsModal: Component = () => {
               <div
                 class="px-2.5 py-[8.7px] flex-1 text-center text-sm font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-t leading-6"
                 style={{ "border-left": "1px dashed #d5dce6" }}>
-                Regular Hours
+                Planned Hours
               </div>
               <div
                 class="px-2.5 py-[8.7px] flex-1 text-center text-sm font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-t leading-6"
                 style={{ "border-left": "1px dashed #d5dce6" }}>
-                Leave Hours
+                Absent Hours
               </div>
               <div
                 class="px-2.5 py-[8.7px] flex-1 text-center text-sm font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-t leading-6"
                 style={{ "border-left": "1px dashed #d5dce6" }}>
-                Total Hours
+                Worked Hours
               </div>
               <div
                 class="px-2.5 py-[8.7px] flex-1 text-center text-sm font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-t leading-6"
@@ -122,6 +122,18 @@ const PayrollDetailsModal: Component = () => {
                         )
                       )
                         return acc + moment(shift.endTime, "HH:mm:ss").diff(moment(shift.startTime, "HH:mm:ss"), "hours", true);
+
+                      return acc;
+                    }, 0) || 0;
+
+                    const workedHours = staff()?.shifts.reduce((acc, shift) => {
+                      if (!moment(shift.date).isSame(date)) return acc;
+
+                      const shiftHours = moment(shift.endTime, "HH:mm:ss").diff(moment(shift.startTime, "HH:mm:ss"), "hours", true);
+
+                      if (shift.timesheet && shift.timesheet.status === TimesheetStatus.APPROVED) {
+                        return acc + shiftHours;
+                      }
 
                       return acc;
                     }, 0) || 0;
@@ -164,7 +176,7 @@ const PayrollDetailsModal: Component = () => {
                         </div>
                         <div style={{ "border-left": "1px dashed #d5dce6" }}
                              class="flex-1 px-2.5 text-sm whitespace-nowrap text-center truncate leading-10 border-[#e2e7ee] border-t">
-                          {regularHours - leaveHours} hrs
+                          {workedHours} hrs
                         </div>
                         <div style={{ "border-left": "1px dashed #d5dce6" }}
                              class="flex-1 px-2.5 text-sm whitespace-nowrap text-center truncate leading-10 border-[#e2e7ee] border-t">

@@ -1,8 +1,6 @@
 import { AiOutlineSearch } from "solid-icons/ai";
 import { useSearchParams } from "@solidjs/router";
 import { ParamType } from "~/components/leave-requests/types";
-import DropDownBtn from "~/components/DropDownBtn";
-import { BiRegularSlider } from "solid-icons/bi";
 import { Component, createEffect, createSignal, on, onCleanup, onMount } from "solid-js";
 import { FiCalendar } from "solid-icons/fi";
 import flatpickr from "flatpickr";
@@ -11,12 +9,6 @@ import moment from "moment";
 const ToolBar: Component = ({}) => {
   const [ searchParams, setSearchParams ] = useSearchParams<ParamType>();
   const [ dateStr, setDateStr ] = createSignal<string>("");
-  const [ amountFrom, setAmountFrom ] = createSignal<number>(
-    Number.parseInt(searchParams.amount_from || "0")
-  );
-  const [ amountTo, setAmountTo ] = createSignal<number>(
-    Number.parseInt(searchParams.amount_to || "0")
-  );
   let dateRef: HTMLInputElement | undefined = undefined;
   let fp: flatpickr.Instance | undefined = undefined;
 
@@ -94,80 +86,6 @@ const ToolBar: Component = ({}) => {
             <AiOutlineSearch/>
           </button>
         </form>
-
-        <DropDownBtn text="Filters" icon={<BiRegularSlider/>}>
-          <div class="flex flex-col gap-2 justify-center items-center p-3 text-sm">
-            <div class="w-full">
-              <label for="amount_from" class="block">
-                From: {amountFrom()} ₫
-              </label>
-              <input
-                type="range"
-                step={1000}
-                min={0}
-                max={1000000}
-                id="amount_from"
-                name="amount_from"
-                value={searchParams.amount_from ?? "0"}
-                onInput={(e) => {
-                  const value = Number.parseInt(e.currentTarget.value);
-                  setAmountFrom(value);
-                  if (amountTo() < value) setAmountTo(value);
-                }}
-                class="w-full"
-              />
-            </div>
-            <div class="w-full">
-              <label for="amount_to" class="block">
-                To: {amountTo() < amountFrom() ? amountFrom() : amountTo()} ₫
-              </label>
-              <input
-                type="range"
-                step={1000}
-                min={amountFrom()}
-                max={2000000}
-                id="amount_to"
-                name="amount_to"
-                value={searchParams.amount_to ?? "0"}
-                onInput={(e) => {
-                  const value = Number.parseInt(e.currentTarget.value);
-                  if (amountTo() < amountFrom()) setAmountTo(amountFrom());
-                  else setAmountTo(value);
-                }}
-                class="w-full"
-              />
-            </div>
-            <div class="w-full flex justify-end items-center">
-              <button
-                type="button"
-                onClick={() => {
-                  setAmountFrom(0);
-                  setAmountTo(0);
-                  setSearchParams({
-                    amount_from: undefined,
-                    amount_to: undefined,
-                  });
-                }}
-                class="inline-block px-3 py-1 text-gray-600 text-center hover:text-black"
-              >
-                Clear
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setSearchParams({
-                    amount_from: amountFrom(),
-                    amount_to: amountTo(),
-                  });
-                }}
-                class="inline-block px-3 py-1 font-medium text-center text-white bg-blue-500 border border-blue-500 rounded hover:bg-blue-600 hover:text-white"
-              >
-                Apply
-              </button>
-            </div>
-          </div>
-        </DropDownBtn>
-
         <button
           ref={dateRef}
           type="button"

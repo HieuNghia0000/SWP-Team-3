@@ -64,7 +64,7 @@ const UpdateStaffModal: Component = () => {
 
   const staff = createMemo(() =>
     !data.error && data() !== undefined
-      ? data()?.find((t) => t.staffId === chosenId())
+      ? data()?.content.find((t) => t.staffId === chosenId())
       : undefined
   );
 

@@ -1,5 +1,5 @@
 import { createRouteAction, createRouteData, useRouteData } from "solid-start";
-import { DataResponse, Holiday } from "~/types";
+import { DataResponse, Holiday, PageResponse } from "~/types";
 import { createSignal, Show } from "solid-js";
 import Breadcrumbs from "~/components/Breadcrumbs";
 import Pagination from "~/components/Pagination";
@@ -33,7 +33,7 @@ export function routeData() {
     async ([ key, perPage, curPage, search ]) => {
       try {
         const uri = new URLSearchParams({ perPage, curPage, search });
-        const { data } = await axios.get<DataResponse<Holiday[]>>(
+        const { data } = await axios.get<DataResponse<PageResponse<Holiday>>>(
           `${getEndPoint()}/${key}?${uri.toString()}`
         );
         return data.content;
@@ -48,7 +48,7 @@ export function routeData() {
         params.curPage ?? "1",
         params.search ?? "",
       ],
-      reconcileOptions: { key: "holidayId" },
+      reconcileOptions: { key: "content.holidayId" },
     }
   );
   return { data: holidays };
@@ -61,7 +61,7 @@ export default function Holidays() {
   const [ chosenId, setChosenId ] = createSignal(0);
   const [ deleting, deleteAction ] = createRouteAction(deleteHoliday);
 
-  const totalItems = () => (data.error ? 0 : data()?.length ?? 0);
+  const totalItems = () => (data.error ? 0 : data()?.totalElements ?? 0);
 
   const onDelete = async (id: number) => {
     if (deleting.pending) return;
