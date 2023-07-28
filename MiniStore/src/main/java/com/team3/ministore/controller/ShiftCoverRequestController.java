@@ -32,19 +32,23 @@ public class ShiftCoverRequestController {
 
     @GetMapping()
     public ResponseEntity<Object> getAllShiftCoverRequests(@RequestParam("search") Optional<String> search,
-                                                           @RequestParam("curPage") Integer curPage,
-                                                           @RequestParam("perPage") Integer perPage,
+                                                           @RequestParam("curPage") Optional<Integer> curPage,
+                                                           @RequestParam("perPage") Optional<Integer> perPage,
                                                            HttpServletRequest request) {
         if (jwt.getJwtTokenFromRequest(request) != null) {
             Optional<Staff> staff = staffService.getStaffByUsername(jwt.getUsernameFromToken(jwt.getJwtTokenFromRequest(request)));
 
             if (staff.isPresent() && !staff.get().getRole().equals(Role.ADMIN)) {
-                return ResponseHandler.getResponse(shiftCoverRequestService.getShiftCoverRequestsByStaffId(staff.get().getStaffId(), curPage, perPage), HttpStatus.OK);
+                return ResponseHandler.getResponse(
+                        shiftCoverRequestService.getShiftCoverRequestsByStaffId(staff.get().getStaffId(), curPage.orElseGet(() -> null), perPage.orElseGet(() -> null))
+                                .map(sc -> new ShiftCoverDto(sc, true, true)),
+                        HttpStatus.OK);
             }
         }
 
-        return search.map(s -> ResponseHandler.getResponse(shiftCoverRequestService.getAllShiftCoverRequests(s, curPage, perPage), HttpStatus.OK))
-                .orElseGet(() -> ResponseHandler.getResponse(shiftCoverRequestService.getAllShiftCoverRequests(curPage, perPage), HttpStatus.OK));
+        return ResponseHandler.getResponse(
+                shiftCoverRequestService.getAllShiftCoverRequests(search, curPage.orElseGet(() -> null), perPage.orElseGet(() -> null))
+                        .map(sc -> new ShiftCoverDto(sc, true, true)), HttpStatus.OK);
     }
 
     @PostMapping("/add")

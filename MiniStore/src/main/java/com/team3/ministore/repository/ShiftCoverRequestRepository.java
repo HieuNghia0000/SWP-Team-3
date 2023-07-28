@@ -15,7 +15,8 @@ public interface ShiftCoverRequestRepository extends JpaRepository<ShiftCoverReq
     @Query("SELECT sc FROM ShiftCoverRequest sc ORDER BY sc.shiftCoverRequestId DESC")
     Page<ShiftCoverRequest> findAll(Pageable pageable);
 
-    Page<ShiftCoverRequest> findAllByStaff_StaffNameContainingIgnoreCaseOrderByShiftCoverRequestIdDesc(String staffName, Pageable pageable);
+    @Query("SELECT scr FROM ShiftCoverRequest scr WHERE (:name is null OR LOWER(scr.staff.staffName) LIKE %:name% ) ORDER BY scr.shiftCoverRequestId DESC")
+    Page<ShiftCoverRequest> findAllByFilter(String name, Pageable pageable);
 
     Page<ShiftCoverRequest> findAllByStaff_StaffIdOrderByShiftCoverRequestIdDesc(Integer staffId, Pageable pageable);
 

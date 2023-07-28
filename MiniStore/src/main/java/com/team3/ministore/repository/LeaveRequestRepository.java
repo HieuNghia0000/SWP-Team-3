@@ -21,7 +21,8 @@ public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Inte
     @Query("SELECT l FROM LeaveRequest l ORDER BY l.leaveRequestId DESC")
     Page<LeaveRequest> findAll(Pageable pageable);
 
-    Page<LeaveRequest> findAllByStaff_StaffNameContainingIgnoreCaseOrderByLeaveRequestIdDesc(String staff_staffName, Pageable pageable);
+    @Query("SELECT lr FROM LeaveRequest lr WHERE (:name is null OR LOWER(lr.staff.staffName) LIKE %:name% ) ORDER BY lr.leaveRequestId DESC")
+    Page<LeaveRequest> findAllByFilter(String name, Pageable pageable);
 
     Page<LeaveRequest> findAllByStaff_StaffIdOrderByLeaveRequestIdDesc(Integer staffId, Pageable pageable);
 }

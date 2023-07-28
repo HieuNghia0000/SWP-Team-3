@@ -1,5 +1,5 @@
 import { createRouteAction, createRouteData, useRouteData, useServerContext, } from "solid-start";
-import { DataResponse, LeaveRequest } from "~/types";
+import { DataResponse, LeaveRequest, PageResponse } from "~/types";
 import { createSignal, Show } from "solid-js";
 import Breadcrumbs from "~/components/Breadcrumbs";
 import Pagination from "~/components/Pagination";
@@ -37,7 +37,7 @@ export function routeData() {
         const event = useServerContext();
         const uri = new URLSearchParams({ perPage, curPage, search });
 
-        const { data } = await axios.get<DataResponse<LeaveRequest[]>>(
+        const { data } = await axios.get<DataResponse<PageResponse<LeaveRequest>>>(
           `${getEndPoint()}/${key}?${uri.toString()}`,
           {
             headers: {
@@ -70,7 +70,7 @@ export default function LeaveRequests() {
   const [ chosenLeaveRequestId, setChosenLeaveRequestId ] = createSignal(0);
   const [ deleting, deleteAction ] = createRouteAction(deleteLeaveRequest);
 
-  const totalItems = () => (data.error ? 0 : data()?.length ?? 0);
+  const totalItems = () => (data.error ? 0 : data()?.totalElements ?? 0);
 
   const onDelete = async (id: number) => {
     if (deleting.pending) return;

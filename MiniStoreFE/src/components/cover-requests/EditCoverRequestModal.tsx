@@ -60,7 +60,7 @@ const EditCoverRequestModal: Component<{
 
   const curCoverRequest = createMemo(() =>
     !data.error && data() !== undefined
-      ? data()?.find((sc) => sc.shiftCoverRequestId === chosenRequestId())
+      ? data()?.content.find((sc) => sc.shiftCoverRequestId === chosenRequestId())
       : undefined
   );
 

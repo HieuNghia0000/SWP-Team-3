@@ -63,7 +63,7 @@ const EditLeaveRequestModal: Component<{
 
   const curLeaveRequest = createMemo(() =>
     !data.error && data.state === "ready"
-      ? data()?.find((lr) => lr.leaveRequestId === chosenLeaveRequestId())
+      ? data()?.content.find((lr) => lr.leaveRequestId === chosenLeaveRequestId())
       : undefined
   );
 

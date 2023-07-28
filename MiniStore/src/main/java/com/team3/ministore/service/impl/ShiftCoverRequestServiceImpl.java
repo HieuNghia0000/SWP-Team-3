@@ -9,6 +9,7 @@ import com.team3.ministore.repository.ShiftRepository;
 import com.team3.ministore.repository.StaffRepository;
 import com.team3.ministore.service.ShiftCoverRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -31,30 +32,16 @@ public class ShiftCoverRequestServiceImpl implements ShiftCoverRequestService {
     private ShiftRepository shiftRepository;
 
     @Override
-    public List<ShiftCoverDto> getAllShiftCoverRequests(Integer page, Integer pageSize) {
+    public Page<ShiftCoverRequest> getAllShiftCoverRequests(Optional<String> search, Integer page, Integer pageSize) {
         Pageable pageable = PageRequest.of(page - 1, pageSize);
-        return shiftCoverRequestRepository
-                .findAll(pageable)
-                .stream().map(sc -> new ShiftCoverDto(sc, true, true))
-                .collect(Collectors.toList());
+        return shiftCoverRequestRepository.findAllByFilter(search.orElseGet(() -> null), pageable);
     }
 
     @Override
-    public List<ShiftCoverDto> getAllShiftCoverRequests(String search, Integer page, Integer pageSize) {
+    public Page<ShiftCoverRequest> getShiftCoverRequestsByStaffId(Integer staffId, Integer page, Integer pageSize) {
         Pageable pageable = PageRequest.of(page - 1, pageSize);
         return shiftCoverRequestRepository
-                .findAllByStaff_StaffNameContainingIgnoreCaseOrderByShiftCoverRequestIdDesc(search, pageable)
-                .stream().map(sc -> new ShiftCoverDto(sc, true, true))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<ShiftCoverDto> getShiftCoverRequestsByStaffId(Integer staffId, Integer page, Integer pageSize) {
-        Pageable pageable = PageRequest.of(page - 1, pageSize);
-        return shiftCoverRequestRepository
-                .findAllByStaff_StaffIdOrderByShiftCoverRequestIdDesc(staffId, pageable)
-                .stream().map(sc -> new ShiftCoverDto(sc, true, true))
-                .collect(Collectors.toList());
+                .findAllByStaff_StaffIdOrderByShiftCoverRequestIdDesc(staffId, pageable);
     }
 
     @Override

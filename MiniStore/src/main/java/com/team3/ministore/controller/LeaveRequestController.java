@@ -43,19 +43,27 @@ public class LeaveRequestController {
 
     @GetMapping("/list")
     public ResponseEntity<Object> getAllLeaveRequest(@RequestParam("search") Optional<String> search,
-                                                     @RequestParam("curPage") Integer curPage,
-                                                     @RequestParam("perPage") Integer perPage,
+                                                     @RequestParam("curPage") Optional<Integer> curPage,
+                                                     @RequestParam("perPage") Optional<Integer> perPage,
                                                      HttpServletRequest request) {
         if (jwt.getJwtTokenFromRequest(request) != null) {
             Optional<Staff> staff = staffService.getStaffByUsername(jwt.getUsernameFromToken(jwt.getJwtTokenFromRequest(request)));
 
             if (staff.isPresent() && !staff.get().getRole().equals(Role.ADMIN)) {
-                return ResponseHandler.getResponse(leaveRequestService.getLeaveRequestsByStaffId(staff.get().getStaffId(), curPage, perPage), HttpStatus.OK);
+                return ResponseHandler.getResponse(
+                        leaveRequestService.getLeaveRequestsByStaffId(
+                                staff.get().getStaffId(),
+                                curPage.orElseGet(() -> 1),
+                                perPage.orElseGet(() -> 10)
+                        ).map(LeaveRequestDto::new), HttpStatus.OK);
             }
         }
 
-        return search.map(s -> ResponseHandler.getResponse(leaveRequestService.getAllLeaveRequest(s, curPage, perPage), HttpStatus.OK))
-                .orElseGet(() -> ResponseHandler.getResponse(leaveRequestService.getAllLeaveRequest(curPage, perPage), HttpStatus.OK));
+        return ResponseHandler.getResponse(leaveRequestService.getAllLeaveRequest(
+                search,
+                curPage.orElseGet(() -> 1),
+                perPage.orElseGet(() -> 10)
+        ).map(LeaveRequestDto::new), HttpStatus.OK);
     }
 
     @PutMapping("/update/{id}")

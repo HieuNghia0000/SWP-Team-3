@@ -1,5 +1,5 @@
 import { createRouteAction, createRouteData, parseCookie, useRouteData, useServerContext, } from "solid-start";
-import { DataResponse, LeaveRequest, ShiftCoverRequest, StaffInfo, } from "~/types";
+import { DataResponse, LeaveRequest, PageResponse, ShiftCoverRequest, StaffInfo, } from "~/types";
 import { createSignal, Show } from "solid-js";
 import Breadcrumbs from "~/components/Breadcrumbs";
 import Pagination from "~/components/Pagination";
@@ -43,7 +43,7 @@ export function routeData() {
               : document.cookie
           );
 
-        const { data } = await axios.get<DataResponse<ShiftCoverRequest[]>>(
+        const { data } = await axios.get<DataResponse<PageResponse<ShiftCoverRequest>>>(
           `${getEndPoint()}/${key}?${uri.toString()}`,
           {
             headers: {
@@ -93,7 +93,7 @@ export default function ShiftCoverRequests() {
   const [ chosenRequestId, setChosenRequestId ] = createSignal(0);
   const [ deleting, deleteAction ] = createRouteAction(deleteCoverRequest);
 
-  const totalItems = () => (data.error ? 0 : data()?.length ?? 0);
+  const totalItems = () => (data.error ? 0 : data()?.totalElements ?? 0);
 
   const onDelete = async (id: number) => {
     if (deleting.pending) return;

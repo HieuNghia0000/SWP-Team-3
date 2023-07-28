@@ -8,6 +8,7 @@ import com.team3.ministore.repository.StaffRepository;
 import com.team3.ministore.service.LeaveRequestService;
 import com.team3.ministore.utils.StaffStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,25 +28,17 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
     private StaffRepository staffRepository;
 
     @Override
-    public List<LeaveRequestDto> getAllLeaveRequest(int page, int pageSize) {
+    public Page<LeaveRequest> getAllLeaveRequest(Optional<String> search, int page, int pageSize) {
         Pageable pageable = PageRequest.of(page - 1, pageSize);
-        return leaveRequestRepository.findAll(pageable).stream().map(LeaveRequestDto::new).collect(Collectors.toList());
+
+        return leaveRequestRepository.findAllByFilter(search.orElseGet(() -> null), pageable);
     }
 
     @Override
-    public List<LeaveRequestDto> getAllLeaveRequest(String search, int page, int pageSize) {
+    public Page<LeaveRequest> getLeaveRequestsByStaffId(int staffId, int page, int pageSize) {
         Pageable pageable = PageRequest.of(page - 1, pageSize);
 
-        return leaveRequestRepository.findAllByStaff_StaffNameContainingIgnoreCaseOrderByLeaveRequestIdDesc(search, pageable)
-                .stream().map(LeaveRequestDto::new).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<LeaveRequestDto> getLeaveRequestsByStaffId(int staffId, int page, int pageSize) {
-        Pageable pageable = PageRequest.of(page - 1, pageSize);
-
-        return leaveRequestRepository.findAllByStaff_StaffIdOrderByLeaveRequestIdDesc(staffId, pageable)
-                .stream().map(LeaveRequestDto::new).collect(Collectors.toList());
+        return leaveRequestRepository.findAllByStaff_StaffIdOrderByLeaveRequestIdDesc(staffId, pageable);
     }
 
     @Override

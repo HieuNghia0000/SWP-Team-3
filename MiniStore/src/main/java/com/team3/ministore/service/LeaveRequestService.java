@@ -1,7 +1,8 @@
 package com.team3.ministore.service;
 
 import com.team3.ministore.dto.LeaveRequestDto;
-import org.springframework.validation.BindingResult;
+import com.team3.ministore.model.LeaveRequest;
+import org.springframework.data.domain.Page;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -9,9 +10,7 @@ import java.util.Optional;
 
 public interface LeaveRequestService {
 
-    List<LeaveRequestDto> getAllLeaveRequest(int page, int pageSize);
-
-    List<LeaveRequestDto> getAllLeaveRequest(String search, int page, int pageSize);
+    Page<LeaveRequest> getAllLeaveRequest(Optional<String> search, int page, int pageSize);
 
     Optional<LeaveRequestDto> createLeaveRequest(LeaveRequestDto leaveRequest);
 
@@ -21,5 +20,5 @@ public interface LeaveRequestService {
 
     void deleteLeaveRequest(Integer id);
 
-    List<LeaveRequestDto> getLeaveRequestsByStaffId(int staffId, int page, int pageSize);
+    Page<LeaveRequest> getLeaveRequestsByStaffId(int staffId, int page, int pageSize);
 }
