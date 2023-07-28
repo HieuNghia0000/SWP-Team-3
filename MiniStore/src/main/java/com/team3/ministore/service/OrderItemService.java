@@ -19,5 +19,5 @@ public interface OrderItemService {
 
     List<OrderItem> getOrderItemsByOrderId(Integer id);
 
-    Page<SellingProduct> getTopSellingProduct(Integer page, Integer pageSize);
+    List<SellingProduct> getTopSellingProduct();
 }

@@ -9,30 +9,21 @@ import {DataResponse, Order, OrderItem, PageResponse, PaymentStatus, Product, Se
 import getEndPoint from "~/utils/getEndPoint";
 import {useRouteData} from "@solidjs/router";
 import {createRouteData, useSearchParams} from "solid-start";
-import Pagination from "~/components/Pagination";
-
-type ParamTypes = {
-  curPage?: string;
-  perPage?: string;
-}
 
 export function routeData() {
-  const [ searchParams ] = useSearchParams<ParamTypes>();
 
   const sellingProducts = createRouteData(
-      async ([perPage, curPage]) => {
+      async () => {
         try {
-          const uri = new URLSearchParams({perPage, curPage});
-          const {data} = await axios.get<DataResponse<PageResponse<SellingProduct>>>(
-              `${getEndPoint()}/order-items/selling-product?${uri.toString()}`
+          const {data} = await axios.get<DataResponse<SellingProduct[]>>(
+              `${getEndPoint()}/order-items/selling-product`
           );
           return data.content;
         }
         catch (error) {
           console.error(error);
         }
-      },
-      {key: () => [searchParams.perPage ?? "10", searchParams.curPage ?? "1"]}
+      }
   );
 
   return {data : sellingProducts};
@@ -154,8 +145,6 @@ export default function Page() {
 
   //Top-selling product
   const {data} = useRouteData<typeof routeData>();
-  const totalItems = () => (data.error ? 0 : data()?.totalElements ?? 0);
-
   onMount(() => {
     Chart.register(Title, Tooltip, Legend, Colors)
   });
@@ -330,52 +319,58 @@ export default function Page() {
               <div class="border-black/12.5 rounded-t-2xl border-b-0 border-solid bg-white p-6 pb-0">
                 <h2 class="text-lg font-bold mb-1">Top selling product</h2>
 
-                <div class="flex flex-col mt-8">
-                  <table class="min-w-full table-fixed">
-                    <thead class="">
-                    <tr>
-                      <th
-                          class="px-4 py-2"
-                          scope="col">Product Name
-                      </th>
-                      <th
-                          class="px-4 py-2"
-                          scope="col">Quantity
-                      </th>
-                      <th
-                          class="px-4 py-2"
-                          scope="col">Price
-                      </th>
-                      <th
-                          class="px-4 py-2"
-                          scope="col">Total Price
-                      </th>
-                    </tr>
-                    </thead>
+                <div class="flex flex-col mt-6 mb-6">
+                  <div class="flex flex-col border border-gray-200 rounded-lg overflow-x-auto shadow-sm">
+                    <table class="min-w-full table-fixed">
+                      <thead class="bg-[#f8fafc] text-left">
+                      <tr>
+                        <th
+                            class="px-6 py-2 text-left text-sm font-bold text-[#637286] border-b"
+                            scope="col">Product Name
+                        </th>
+                        <th
+                            class="px-4 py-2 text-left text-sm font-bold text-[#637286] border-b"
+                            style={{ "border-left": "1px dashed #d5dce6" }}
+                            scope="col">Quantity
+                        </th>
+                        <th
+                            class="px-4 py-2 text-right text-sm font-bold text-[#637286] border-b"
+                            style={{ "border-left": "1px dashed #d5dce6" }}
+                            scope="col">Price
+                        </th>
+                        <th
+                            class="px-6 py-2 text-right text-sm font-bold text-[#637286] border-b"
+                            style={{ "border-left": "1px dashed #d5dce6" }}
+                            scope="col">Total Price
+                        </th>
+                      </tr>
+                      </thead>
 
-                    <tbody>
-                      <For each={data()?.content}>
+                      <tbody>
+                      <For each={data()}>
                         {(product) => (
-                            <tr>
-                              <th class="px-4 py-2">
+                            <tr class="hover:bg-[#ceefff] odd:bg-white even:bg-gray-50 text-[#333c48]">
+                              <th class="px-6 py-2 font-semibold text-left text-gray-500">
                                 {product.productName}
                               </th>
-                              <th class="px-4 py-2">
+                              <th class="px-4 py-2 font-semibold text-left text-gray-500"
+                                  style={{ "border-left": "1px dashed #d5dce6" }}>
                                 {product.totalQuantity}
                               </th>
-                              <th class="px-4 py-2">
+                              <th class="px-4 py-2 font-semibold text-right text-gray-500"
+                                  style={{ "border-left": "1px dashed #d5dce6" }}>
                                 {product.price.toLocaleString()}&nbsp;₫
                               </th>
-                              <th class="px-4 py-2">
+                              <th class="px-6 py-2 font-semibold text-right text-gray-500"
+                                  style={{ "border-left": "1px dashed #d5dce6" }}>
                                 {(product.price * product.totalQuantity).toLocaleString()}&nbsp;₫
                               </th>
                             </tr>
                         )}
                       </For>
-                    </tbody>
-                  </table>
-
-                  <Pagination totalItems={totalItems}/>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>

@@ -56,8 +56,8 @@ public class OrderItemServiceImpl implements OrderItemService {
     }
 
     @Override
-    public Page<SellingProduct> getTopSellingProduct(Integer page, Integer pageSize) {
-        Pageable pageable = PageRequest.of(page - 1, pageSize);
-        return orderItemRepository.getTopSellingProduct(pageable);
+    public List<SellingProduct> getTopSellingProduct() {
+        List<SellingProduct> topSellingProduct = orderItemRepository.getTopSellingProduct();
+        return topSellingProduct.subList(0, Math.min(5, topSellingProduct.size()));
     }
 }

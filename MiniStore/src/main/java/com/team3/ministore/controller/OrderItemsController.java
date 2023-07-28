@@ -48,8 +48,7 @@ public class OrderItemsController {
     }
 
     @GetMapping("/selling-product")
-    public ResponseEntity<Object> getTopSellingProducts(@RequestParam("curPage") Integer curPage,
-                                                        @RequestParam("perPage") Integer perPage) {
-        return ResponseHandler.getResponse(orderItemService.getTopSellingProduct(curPage, perPage), HttpStatus.OK);
+    public ResponseEntity<Object> getTopSellingProducts() {
+        return ResponseHandler.getResponse(orderItemService.getTopSellingProduct(), HttpStatus.OK);
     }
 }

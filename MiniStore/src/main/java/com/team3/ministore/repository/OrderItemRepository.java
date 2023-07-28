@@ -25,5 +25,5 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Integer> {
             "AND YEAR (o.orderDate) = YEAR(CURRENT_DATE) " +
             "GROUP BY p.productId, p.name, p.price " +
             "ORDER BY SUM(oi.quantity) DESC")
-    Page<SellingProduct> getTopSellingProduct(Pageable pageable);
+    List<SellingProduct> getTopSellingProduct();
 }
