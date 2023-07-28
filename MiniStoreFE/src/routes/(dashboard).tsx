@@ -39,7 +39,15 @@ export default function Page() {
 
       const orders: Order[] = response.data.content;
 
-      const successOrders = orders.filter(
+      const currentDate = new Date();
+
+      const currentMonthOrders = orders.filter(
+          (order) =>
+              new Date(order.orderDate).getMonth() === currentDate.getMonth() &&
+              new Date(order.orderDate).getFullYear() === currentDate.getFullYear()
+      );
+
+      const successOrders = currentMonthOrders.filter(
           (order) => order.paymentStatus === PaymentStatus.SUCCESS
       );
 
