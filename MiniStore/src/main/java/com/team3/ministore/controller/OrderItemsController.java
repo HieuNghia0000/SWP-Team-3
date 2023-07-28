@@ -1,5 +1,6 @@
 package com.team3.ministore.controller;
 
+import com.team3.ministore.common.responsehandler.ResponseHandler;
 import com.team3.ministore.model.OrderItem;
 import com.team3.ministore.service.OrderItemService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,5 +45,11 @@ public class OrderItemsController {
     public ResponseEntity<Void> deleteOrderItems(@PathVariable("id") Integer id) {
         orderItemService.deleteOrderItems(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/selling-product")
+    public ResponseEntity<Object> getTopSellingProducts(@RequestParam("curPage") Integer curPage,
+                                                        @RequestParam("perPage") Integer perPage) {
+        return ResponseHandler.getResponse(orderItemService.getTopSellingProduct(curPage, perPage), HttpStatus.OK);
     }
 }

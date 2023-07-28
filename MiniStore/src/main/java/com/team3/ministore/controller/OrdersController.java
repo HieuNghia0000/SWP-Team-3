@@ -19,6 +19,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/orders")
@@ -26,6 +27,21 @@ public class OrdersController {
 
     @Autowired
     private OrderService orderService;
+
+    @GetMapping("/all")
+    public ResponseEntity<Object> getAllOrders() {
+        List<Order> orders = orderService.getListOrders();
+
+        if (!orders.isEmpty()) {
+            List<OrderDto> orderDto = orders.stream()
+                    .map(order -> new OrderDto(order, true))
+                    .collect(Collectors.toList());
+
+            return ResponseHandler.getResponse(orderDto, HttpStatus.OK);
+        } else {
+            return ResponseHandler.getResponse(new Exception("No orders found."), HttpStatus.NOT_FOUND);
+        }
+    }
 
     @PostMapping("/add")
     public ResponseEntity<Object> createOrders(@Valid @RequestBody OrderDto dto,

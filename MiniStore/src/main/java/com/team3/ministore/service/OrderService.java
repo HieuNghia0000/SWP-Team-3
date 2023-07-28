@@ -5,6 +5,7 @@ import com.team3.ministore.model.Order;
 import com.team3.ministore.utils.PaymentStatus;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface OrderService {
@@ -26,4 +27,5 @@ public interface OrderService {
 
     void deleteOrders(Integer id);
 
+    List<Order> getListOrders();
 }

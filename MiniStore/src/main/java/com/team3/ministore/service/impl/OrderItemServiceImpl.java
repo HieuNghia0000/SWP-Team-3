@@ -1,9 +1,14 @@
 package com.team3.ministore.service.impl;
 
+import com.team3.ministore.dto.SellingProduct;
 import com.team3.ministore.model.OrderItem;
 import com.team3.ministore.repository.OrderItemRepository;
 import com.team3.ministore.service.OrderItemService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -48,5 +53,11 @@ public class OrderItemServiceImpl implements OrderItemService {
     @Override
     public List<OrderItem> getOrderItemsByOrderId(Integer id) {
         return orderItemRepository.getOrderItemsByOrderId(id);
+    }
+
+    @Override
+    public Page<SellingProduct> getTopSellingProduct(Integer page, Integer pageSize) {
+        Pageable pageable = PageRequest.of(page - 1, pageSize);
+        return orderItemRepository.getTopSellingProduct(pageable);
     }
 }
