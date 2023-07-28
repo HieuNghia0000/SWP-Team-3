@@ -1,9 +1,9 @@
-DROP DATABASE IF EXISTS MiniStore;
-CREATE DATABASE IF NOT EXISTS MiniStore;
-USE MiniStore;
+DROP DATABASE IF EXISTS ministore;
+CREATE DATABASE IF NOT EXISTS ministore;
+USE ministore;
 
 -- Create Tables
-CREATE TABLE Staffs (
+CREATE TABLE staffs (
     staff_id INT AUTO_INCREMENT NOT NULL,
     staff_name NVARCHAR(100) NOT NULL,
     role NVARCHAR(50),
@@ -18,7 +18,7 @@ CREATE TABLE Staffs (
     PRIMARY KEY (staff_id)
 );
 
-CREATE TABLE Timesheets (
+CREATE TABLE timesheets (
 	timesheet_id INT AUTO_INCREMENT NOT NULL,
     shift_id INT NOT NULL,
     staff_id INT NOT NULL,
@@ -31,17 +31,17 @@ CREATE TABLE Timesheets (
     PRIMARY KEY (timesheet_id)
 );
 
-CREATE TABLE ShiftCoverRequests (
+CREATE TABLE shiftcoverrequests (
 	shift_cover_request_id INT AUTO_INCREMENT NOT NULL,
     shift_id INT NOT NULL,
     staff_id INT,
     note NVARCHAR(400),
     status INT,
     PRIMARY KEY (shift_cover_request_id),
-    FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id) ON DELETE SET NULL
+    FOREIGN KEY (staff_id) REFERENCES staffs(staff_id) ON DELETE SET NULL
 );
 
-CREATE TABLE ShiftTemplates (
+CREATE TABLE shifttemplates (
 	shift_template_id INT AUTO_INCREMENT NOT NULL,
     start_time TIME,
     end_time TIME,
@@ -51,7 +51,7 @@ CREATE TABLE ShiftTemplates (
     PRIMARY KEY (shift_template_id)
 );
 
-CREATE TABLE Shifts (
+CREATE TABLE shifts (
 	shift_id INT AUTO_INCREMENT NOT NULL,
     staff_id INT NOT NULL,
     timesheet_id INT,
@@ -64,12 +64,12 @@ CREATE TABLE Shifts (
     salary_coefficient FLOAT,
     role NVARCHAR(50),
 	PRIMARY KEY (shift_id),
-    FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id) ON DELETE cascade,
-    FOREIGN KEY (timesheet_id) REFERENCES Timesheets(timesheet_id) ON DELETE SET NULL,
-    FOREIGN KEY (shift_cover_request_id) REFERENCES ShiftCoverRequests(shift_cover_request_id) ON DELETE SET NULL
+    FOREIGN KEY (staff_id) REFERENCES staffs(staff_id) ON DELETE cascade,
+    FOREIGN KEY (timesheet_id) REFERENCES timesheets(timesheet_id) ON DELETE SET NULL,
+    FOREIGN KEY (shift_cover_request_id) REFERENCES shiftcoverrequests(shift_cover_request_id) ON DELETE SET NULL
 );
 
-CREATE TABLE ScheduleTemplates (
+CREATE TABLE scheduletemplates (
 	schedule_template_id INT AUTO_INCREMENT NOT NULL,
     name NVARCHAR(100) NOT NULL,
     description NVARCHAR(400),
@@ -77,7 +77,7 @@ CREATE TABLE ScheduleTemplates (
     PRIMARY KEY (schedule_template_id)
 );
 
-CREATE TABLE ScheduleShiftTemplates (
+CREATE TABLE scheduleshifttemplates (
     schedule_shift_template_id INT AUTO_INCREMENT NOT NULL,
     schedule_template_id INT NOT NULL,
     staff_id INT NOT NULL,
@@ -88,11 +88,11 @@ CREATE TABLE ScheduleShiftTemplates (
     name NVARCHAR(50),
     role NVARCHAR(50),
     PRIMARY KEY (schedule_shift_template_id),
-    FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id) ON DELETE cascade,
-    FOREIGN KEY (schedule_template_id) REFERENCES ScheduleTemplates(schedule_template_id) ON DELETE cascade
+    FOREIGN KEY (staff_id) REFERENCES staffs(staff_id) ON DELETE cascade,
+    FOREIGN KEY (schedule_template_id) REFERENCES scheduletemplates(schedule_template_id) ON DELETE cascade
 );
 
-CREATE TABLE LeaveRequests (
+CREATE TABLE leaverequests (
 	leave_request_id INT AUTO_INCREMENT NOT NULL,
 	staff_id INT NOT NULL,
     leave_type NVARCHAR(20),
@@ -102,20 +102,20 @@ CREATE TABLE LeaveRequests (
 	reason NVARCHAR(500),
     admin_reply NVARCHAR(500),
 	PRIMARY KEY (leave_request_id),
-	FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id) ON DELETE cascade
+	FOREIGN KEY (staff_id) REFERENCES staffs(staff_id) ON DELETE cascade
 );
 
-CREATE TABLE Salaries (
+CREATE TABLE salaries (
 	salary_id INT AUTO_INCREMENT NOT NULL,
     staff_id INT NOT NULL,
     hourly_wage NVARCHAR(10),
     effective_date DATE,
     termination_date DATE,
     PRIMARY KEY (salary_id),
-    FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id) ON DELETE cascade
+    FOREIGN KEY (staff_id) REFERENCES staffs(staff_id) ON DELETE cascade
 );
 
-CREATE TABLE Holidays (
+CREATE TABLE holidays (
 	holiday_id INT AUTO_INCREMENT NOT NULL,
 	name NVARCHAR(100) NOT NULL,
     start_date DATE,
@@ -124,14 +124,14 @@ CREATE TABLE Holidays (
 	PRIMARY KEY (holiday_id)
 );
 
-CREATE TABLE Categories (
+CREATE TABLE categories (
 	category_id INT AUTO_INCREMENT NOT NULL,
 	name NVARCHAR(100),
     description NVARCHAR(300),
 	PRIMARY KEY (category_id)
 );
 
-CREATE TABLE Products (
+CREATE TABLE products (
 	product_id INT AUTO_INCREMENT NOT NULL,
 	category_id INT,
 	barcode NVARCHAR(20),
@@ -140,31 +140,31 @@ CREATE TABLE Products (
 	price FLOAT,
 	inventory INT,
 	PRIMARY KEY (product_id),
-	FOREIGN KEY (category_id) REFERENCES Categories(category_id) ON DELETE SET NULL
+	FOREIGN KEY (category_id) REFERENCES categories(category_id) ON DELETE SET NULL
 );
 
-CREATE TABLE Orders (
+CREATE TABLE orders (
 	order_id INT AUTO_INCREMENT NOT NULL,
 	order_date DATETIME NOT NULL,
 	grand_total FLOAT,
     payment_status INT,
     staff_id INT,
 	PRIMARY KEY (order_id),
-    FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id) ON DELETE SET NULL
+    FOREIGN KEY (staff_id) REFERENCES staffs(staff_id) ON DELETE SET NULL
 );
 
-CREATE TABLE OrderItems (
+CREATE TABLE orderitems (
 	order_item_id INT AUTO_INCREMENT NOT NULL,
 	order_id INT NOT NULL,
 	product_id INT NOT NULL,
 	quantity INT,
 	PRIMARY KEY (order_item_id),
-	FOREIGN KEY (order_id) REFERENCES Orders(order_id) ON DELETE cascade,
-	FOREIGN KEY (product_id) REFERENCES Products(product_id) ON DELETE cascade
+	FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE cascade,
+	FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE cascade
 );
 
 
-alter table Timesheets add FOREIGN KEY (shift_id) REFERENCES Shifts(shift_id) ON DELETE cascade;
-alter table Timesheets add FOREIGN KEY (staff_id) REFERENCES Staffs(staff_id) ON DELETE cascade;
-alter table Timesheets add FOREIGN KEY (salary_id) REFERENCES Salaries(salary_id) ON DELETE SET NULL;
-alter table ShiftCoverRequests add FOREIGN KEY (shift_id) REFERENCES Shifts(shift_id) ON DELETE cascade;
+alter table timesheets add FOREIGN KEY (shift_id) REFERENCES shifts(shift_id) ON DELETE cascade;
+alter table timesheets add FOREIGN KEY (staff_id) REFERENCES staffs(staff_id) ON DELETE cascade;
+alter table timesheets add FOREIGN KEY (salary_id) REFERENCES salaries(salary_id) ON DELETE SET NULL;
+alter table shiftcoverrequests add FOREIGN KEY (shift_id) REFERENCES shifts(shift_id) ON DELETE cascade;
