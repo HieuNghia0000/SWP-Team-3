@@ -5,14 +5,16 @@ import { IoEyeOutline, IoTrashOutline } from "solid-icons/io";
 import { routeData } from "~/routes/orders";
 import { useOrderContext } from "~/context/Order";
 import moment from "moment";
-import { PaymentStatus } from "~/types";
+import { PaymentStatus, Role } from "~/types";
 import { capitalize } from "~/utils/capitalize";
 import { A } from "solid-start";
 import routes from "~/utils/routes";
+import { useAuth } from "~/context/Auth";
 
 export default function Table() {
   const { data } = useRouteData<typeof routeData>();
   const { onDelete } = useOrderContext();
+  const { user } = useAuth();
 
   return (
     <div class="flex flex-col border border-gray-200 rounded-lg overflow-x-auto shadow-sm">
@@ -118,17 +120,19 @@ export default function Table() {
                         Details
                       </p>
                     </div>
-                    <div class="relative flex justify-center items-center">
-                      <button
-                        onClick={[ onDelete, item.orderId ]}
-                        class="peer text-base text-gray-500 hover:text-indigo-500">
-                        <IoTrashOutline/>
-                      </button>
-                      <p
-                        class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
-                        Delete
-                      </p>
-                    </div>
+                    <Show when={user()?.role === Role.ADMIN || user()?.role === Role.MANAGER}>
+                      <div class="relative flex justify-center items-center">
+                        <button
+                          onClick={[ onDelete, item.orderId ]}
+                          class="peer text-base text-gray-500 hover:text-indigo-500">
+                          <IoTrashOutline/>
+                        </button>
+                        <p
+                          class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
+                          Delete
+                        </p>
+                      </div>
+                    </Show>
                   </div>
                 </td>
               </tr>

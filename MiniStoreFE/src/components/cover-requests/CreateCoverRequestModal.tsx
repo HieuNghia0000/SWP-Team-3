@@ -158,14 +158,16 @@ const CreateCoverRequestModal: Component<{
                   label="Assign to Staff Member"
                   value={0}
                   placeholder={"Select staff member"}
-                  options={tableData.staffs
+                  options={(user()?.role === Role.ADMIN ? tableData.staffs : tableData.staffsInfo!)
+                    .filter((staff) => staff.role !== Role.ADMIN)
                     .map((staff) => ({
                       label: staff.staffName,
                       value: staff.staffId,
                     }))
                     .filter(
                       (staff) => staff.value !== shiftModalData()?.staffId
-                    )}
+                    )
+                  }
                   formHandler={formHandler}
                 />
               </div>

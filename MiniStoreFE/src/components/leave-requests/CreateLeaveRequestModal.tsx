@@ -1,11 +1,11 @@
 import PopupModal from "~/components/PopupModal";
-import { Accessor, Component, Setter } from "solid-js";
+import { Accessor, Component, Setter, Show } from "solid-js";
 import { TextInput } from "~/components/form/TextInput";
 import { useAuth } from "~/context/Auth";
 import { useFormHandler } from "solid-form-handler";
 import { yupSchema } from "solid-form-handler/yup";
 import * as yup from "yup";
-import { DataResponse, LeaveRequest, LeaveRequestStatus, LeaveType, } from "~/types";
+import { DataResponse, LeaveRequest, LeaveRequestStatus, LeaveType, Role, } from "~/types";
 import { TextArea } from "~/components/form/TextArea";
 import { createRouteAction } from "solid-start";
 import getEndPoint from "~/utils/getEndPoint";
@@ -178,22 +178,24 @@ const CreateLeaveRequestModal: Component<{
         </PopupModal.Body>
         <PopupModal.Footer>
           <div class="w-full flex justify-end items-center gap-2">
-            <button
-              type="button"
-              disabled={echoing.pending}
-              onClick={[ submit, LeaveRequestStatus.REJECTED ]}
-              class="py-1.5 px-3 font-semibold text-white border border-red-600 bg-red-500 text-sm rounded hover:bg-red-600"
-            >
-              Save & Deny
-            </button>
-            <button
-              type="button"
-              disabled={echoing.pending}
-              onClick={[ submit, LeaveRequestStatus.APPROVED ]}
-              class="py-1.5 px-3 font-semibold text-white border border-green-600 bg-green-500 text-sm rounded hover:bg-green-600"
-            >
-              Save & Approve
-            </button>
+            <Show when={user()?.role === Role.ADMIN}>
+              <button
+                type="button"
+                disabled={echoing.pending}
+                onClick={[ submit, LeaveRequestStatus.REJECTED ]}
+                class="py-1.5 px-3 font-semibold text-white border border-red-600 bg-red-500 text-sm rounded hover:bg-red-600"
+              >
+                Save & Deny
+              </button>
+              <button
+                type="button"
+                disabled={echoing.pending}
+                onClick={[ submit, LeaveRequestStatus.APPROVED ]}
+                class="py-1.5 px-3 font-semibold text-white border border-green-600 bg-green-500 text-sm rounded hover:bg-green-600"
+              >
+                Save & Approve
+              </button>
+            </Show>
             <button
               type="button"
               disabled={echoing.pending}

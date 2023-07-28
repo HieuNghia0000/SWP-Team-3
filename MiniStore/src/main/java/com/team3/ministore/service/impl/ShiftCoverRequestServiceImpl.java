@@ -41,7 +41,7 @@ public class ShiftCoverRequestServiceImpl implements ShiftCoverRequestService {
     public Page<ShiftCoverRequest> getShiftCoverRequestsByStaffId(Integer staffId, Integer page, Integer pageSize) {
         Pageable pageable = PageRequest.of(page - 1, pageSize);
         return shiftCoverRequestRepository
-                .findAllByStaff_StaffIdOrderByShiftCoverRequestIdDesc(staffId, pageable);
+                .findAllByShift_Staff_StaffIdOrderByShiftCoverRequestIdDesc(staffId, pageable);
     }
 
     @Override

@@ -227,19 +227,21 @@ const EditLeaveRequestModal: Component<{
         </PopupModal.Body>
         <PopupModal.Footer>
           <div class="w-full flex justify-between items-center gap-2">
-            <div class="flex gap-2 justify-center items-center">
-              <button
-                type="button"
-                disabled={updating.pending}
-                onClick={[ onDelete, curLeaveRequest()?.leaveRequestId || 0 ]}
-                class="flex gap-2 justify-center items-center px-3 text-gray-500 text-sm hover:text-gray-700"
-              >
+            <Show when={curLeaveRequest()?.status === LeaveRequestStatus.PENDING || user()?.role === Role.ADMIN}>
+              <div class="flex gap-2 justify-center items-center">
+                <button
+                  type="button"
+                  disabled={updating.pending}
+                  onClick={[ onDelete, curLeaveRequest()?.leaveRequestId || 0 ]}
+                  class="flex gap-2 justify-center items-center px-3 text-gray-500 text-sm hover:text-gray-700"
+                >
                 <span>
                   <FaSolidTrash/>
                 </span>
-                <span>Delete</span>
-              </button>
-            </div>
+                  <span>Delete</span>
+                </button>
+              </div>
+            </Show>
             <div class="flex gap-2 justify-center items-center">
               <Show when={user()?.role === Role.ADMIN}>
                 <button
@@ -285,17 +287,19 @@ const EditLeaveRequestModal: Component<{
                     : "Save & Approve"}
                 </button>
               </Show>
-              <button
-                type="button"
-                disabled={updating.pending}
-                onClick={[
-                  submit,
-                  curLeaveRequest()?.status || LeaveRequestStatus.PENDING,
-                ]}
-                class="py-1.5 px-3 font-semibold text-white border border-blue-600 bg-blue-500 text-sm rounded hover:bg-blue-600"
-              >
-                Save
-              </button>
+              <Show when={curLeaveRequest()?.status === LeaveRequestStatus.PENDING || user()?.role === Role.ADMIN}>
+                <button
+                  type="button"
+                  disabled={updating.pending}
+                  onClick={[
+                    submit,
+                    curLeaveRequest()?.status || LeaveRequestStatus.PENDING,
+                  ]}
+                  class="py-1.5 px-3 font-semibold text-white border border-blue-600 bg-blue-500 text-sm rounded hover:bg-blue-600"
+                >
+                  Save
+                </button>
+              </Show>
             </div>
           </div>
         </PopupModal.Footer>

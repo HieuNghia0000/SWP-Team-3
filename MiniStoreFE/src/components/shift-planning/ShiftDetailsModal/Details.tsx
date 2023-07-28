@@ -51,10 +51,13 @@ const Details: Component<DetailsProps> = ({ shiftCard, setState, onDelete, openC
         >
           {shiftCard()?.published ? "Published" : "Not Published"}
         </div>
-        <Show when={shiftCard()?.shiftCoverRequest}>
+        <Show when={shiftCard()?.shiftCoverRequest && user()?.role === Role.ADMIN}>
           <p class="text-center text-sm text-red-500">
             This shift has been reassigned
-            for {tableData.staffs.find(s => s.staffId === shiftCard()?.shiftCoverRequest?.staffId)?.staffName || "you"}.
+            for {
+            tableData.staffs.find(s => s.staffId === shiftCard()?.shiftCoverRequest?.staffId)?.staffName
+            || tableData.staffsInfo?.find(s => s.staffId === shiftCard()?.shiftCoverRequest?.staffId)?.staffName
+          }.
           </p>
         </Show>
         <div class="border-t border-gray-300 border-dotted text-gray-600 text-sm">
@@ -172,7 +175,7 @@ const Details: Component<DetailsProps> = ({ shiftCard, setState, onDelete, openC
               Edit Shift
             </button>
           </Show>
-          <Show when={!shiftCard()?.shiftCoverRequest}>
+          <Show when={!shiftCard()?.shiftCoverRequest && shiftCard()?.staff === null}>
             <button
               type="button"
               onClick={openCreateCoverModal}

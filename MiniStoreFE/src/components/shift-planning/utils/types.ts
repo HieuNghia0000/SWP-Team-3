@@ -1,12 +1,14 @@
-import { Staff, Shift, LeaveRequest, Holiday } from "~/types";
+import { Holiday, LeaveRequest, Shift, Staff, StaffInfo } from "~/types";
 
 export type ParamType = {
   picked_date: string;
 };
+
 export interface FetcherData {
   dates: string[];
   staffs: Staff[];
   holidays: Holiday[];
+  staffsInfo?: StaffInfo[];
 }
 
 export type Rule = {
@@ -14,10 +16,11 @@ export type Rule = {
   description: string;
   passed: boolean;
 };
+
 export interface DataTable extends FetcherData {
   shifts: { [key: Shift["shiftId"]]: Shift };
   cells: { [key: string]: Shift["shiftId"][] };
-  cellInfos: { [key: string]: {staffId: Staff["staffId"], date: string} };
+  cellInfos: { [key: string]: { staffId: Staff["staffId"], date: string } };
   shiftsRules: { [key: Shift["shiftId"]]: Rule[] };
   leaveRequests: LeaveRequest[];
 }

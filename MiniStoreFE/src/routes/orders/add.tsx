@@ -149,8 +149,8 @@ export default function AddOrders() {
   }
 
   const handlePayByCard = async () => {
-    if (selectedProducts.grandTotal < 5000)
-      return toastError("Grand total must be greater than or equal to 5.000 VND (VNPAY requirement)");
+    if (selectedProducts.grandTotal < 10000)
+      return toastError("Grand total must be greater than or equal to 10.000 VND (VNPAY requirement)");
 
     try {
       // Create order
@@ -166,6 +166,7 @@ export default function AddOrders() {
         }
       );
       if (!orderData) throw new Error("Invalid response from server");
+      console.log(orderData.content)
 
       // Get VNPAY payment URL
       const { data } = await axios.post<DataResponse<PaymentDetails>>(
@@ -176,8 +177,10 @@ export default function AddOrders() {
       );
       if (!data) throw new Error("Invalid response from server");
 
+      console.log(data.content.paymentUrl)
+
       // Redirect to VNPAY payment URL
-      window.location.href = data.content.paymentUrl;
+      // window.location.href = data.content.paymentUrl;
     } catch (e) {
       console.error(handleFetchError(e));
     }
@@ -487,8 +490,10 @@ export default function AddOrders() {
               value={formatNumberWithCommas(cashReceive())}
               onInput={(e) => {
                 const value = Number(e.currentTarget.value.replace(/\D/g, ""));
-                setCashReceive(value);
-                setChange(value - selectedProducts.grandTotal);
+                batch(() => {
+                  setCashReceive(value);
+                  setChange(value - selectedProducts.grandTotal);
+                });
               }}
             />
             <TextInput

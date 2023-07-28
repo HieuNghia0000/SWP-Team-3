@@ -128,7 +128,7 @@ const Errors: Component<ErrorsProps> = ({ shiftCard, setModalState, onDelete, op
               Edit Shift
             </button>
           </Show>
-          <Show when={!shiftCard()?.shiftCoverRequest}>
+          <Show when={!shiftCard()?.shiftCoverRequest && shiftCard()?.staff === null}>
             <button
               type="button"
               onClick={openCreateCoverModal}

@@ -8,14 +8,17 @@ import { RiSystemCloseLine } from "solid-icons/ri";
 import routes from "~/utils/routes";
 import { Instance } from "flatpickr/dist/types/instance";
 import flatpickr from "flatpickr";
+import { useAuth } from "~/context/Auth";
+import { Role } from "~/types";
 
 const ToolBar: Component = () => {
-  const [searchParams, setSearchParams] = useSearchParams<ParamType>();
-  const [dateStr, setDateStr] = createSignal<string>("");
-  const [amountFrom, setAmountFrom] = createSignal<number>(
+  const [ searchParams, setSearchParams ] = useSearchParams<ParamType>();
+  const { user } = useAuth();
+  const [ dateStr, setDateStr ] = createSignal<string>("");
+  const [ amountFrom, setAmountFrom ] = createSignal<number>(
     Number.parseInt(searchParams.amount_from || "0")
   );
-  const [amountTo, setAmountTo] = createSignal<number>(
+  const [ amountTo, setAmountTo ] = createSignal<number>(
     Number.parseInt(searchParams.amount_to || "0")
   );
   let dateRef: HTMLInputElement | undefined = undefined;
@@ -26,7 +29,7 @@ const ToolBar: Component = () => {
     fp = flatpickr(dateRef!, {
       mode: "range",
       dateFormat: "Y-m-d",
-      defaultDate: [searchParams.from, searchParams.to],
+      defaultDate: [ searchParams.from, searchParams.to ],
       onChange: updateDateStr,
       onReady: updateDateStr,
     });
@@ -92,12 +95,14 @@ const ToolBar: Component = () => {
             setParam={setGroupBtn}
           />
         </div>
-        <A
-          href={routes.orderAdd}
-          class="text-sm font-semibold text-white bg-indigo-600 py-2 px-3.5 rounded-lg hover:bg-indigo-700"
-        >
-          + Add Order
-        </A>
+        <Show when={user()?.role === Role.CASHIER}>
+          <A
+            href={routes.orderAdd}
+            class="text-sm font-semibold text-white bg-indigo-600 py-2 px-3.5 rounded-lg hover:bg-indigo-700"
+          >
+            + Add Order
+          </A>
+        </Show>
       </div>
       <div class="flex justify-center items-center gap-4">
         <div class="flex justify-center items-center gap-2">
@@ -210,7 +215,7 @@ function DateRangeButton(props: {
   setParam: (ago: string | undefined) => void;
 }) {
   const { text, param, setParam } = props;
-  const [searchParams] = useSearchParams<ParamType>();
+  const [ searchParams ] = useSearchParams<ParamType>();
 
   return (
     <button

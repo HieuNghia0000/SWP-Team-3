@@ -81,15 +81,15 @@ const StaffDetailsModal: Component<{
         </div>
       </PopupModal.Body>
       <PopupModal.Footer>
-        <A
-          href={routes.staff(modalData()?.staffId ?? 0)}
-          class="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-2"
-        >
-          <span class="">
-            <FaSolidPencil />
-          </span>
-          Edit Staff
-        </A>
+        {/*<A*/}
+        {/*  href={routes.staff(modalData()?.staffId ?? 0)}*/}
+        {/*  class="text-gray-500 hover:text-gray-700 text-sm flex items-center gap-2"*/}
+        {/*>*/}
+        {/*  <span class="">*/}
+        {/*    <FaSolidPencil />*/}
+        {/*  </span>*/}
+        {/*  Edit Staff*/}
+        {/*</A>*/}
       </PopupModal.Footer>
     </PopupModal.Wrapper>
   );

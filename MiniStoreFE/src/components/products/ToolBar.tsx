@@ -1,13 +1,16 @@
-import { Component, Setter } from "solid-js";
+import { Component, Setter, Show } from "solid-js";
 import { useSearchParams } from "solid-start";
 import { ParamType } from "~/components/products/types";
 import { AiOutlineSearch } from "solid-icons/ai";
 import { RiSystemAddFill } from "solid-icons/ri";
+import { Role } from "~/types";
+import { useAuth } from "~/context/Auth";
 
 const ToolBar: Component<{
   setShowCreateModal: Setter<boolean>;
 }> = ({ setShowCreateModal }) => {
   const [ searchParams, setSearchParams ] = useSearchParams<ParamType>();
+  const { user } = useAuth();
 
   const onSearchSubmit = (e: Event) => {
     e.preventDefault();
@@ -37,15 +40,17 @@ const ToolBar: Component<{
         </form>
       </div>
       <div class="flex justify-center items-center">
-        <button
-          class="flex gap-1 justify-center items-center pl-3 pr-4 py-2 text-sm text-white bg-indigo-500 font-medium rounded-lg hover:bg-indigo-600"
-          onClick={[ setShowCreateModal, true ]}
-        >
+        <Show when={user()?.role === Role.ADMIN || user()?.role === Role.MANAGER}>
+          <button
+            class="flex gap-1 justify-center items-center pl-3 pr-4 py-2 text-sm text-white bg-indigo-500 font-medium rounded-lg hover:bg-indigo-600"
+            onClick={[ setShowCreateModal, true ]}
+          >
             <span class="text-lg">
               <RiSystemAddFill/>
             </span>
-          <span>New Product</span>
-        </button>
+            <span>New Product</span>
+          </button>
+        </Show>
       </div>
     </div>
   )

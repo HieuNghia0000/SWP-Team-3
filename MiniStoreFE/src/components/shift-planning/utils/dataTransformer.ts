@@ -14,6 +14,7 @@ export function transformData(
     holidays: data.holidays,
     shiftsRules: {},
     leaveRequests: [],
+    staffsInfo: data.staffsInfo,
   };
 
   if (data.staffs.length === 0) return transformedData;

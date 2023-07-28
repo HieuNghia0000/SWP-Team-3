@@ -1,7 +1,7 @@
 import Breadcrumbs from "~/components/Breadcrumbs";
 import { createStore } from "solid-js/store";
 import { createEffect, createResource, createSignal, on, ResourceFetcher, Show, } from "solid-js";
-import { DataResponse, Holiday, Role, ShiftTemplate, Staff } from "~/types";
+import { DataResponse, Holiday, Role, ShiftTemplate, Staff, StaffInfo } from "~/types";
 import { getWeekDateStings } from "~/utils/getWeekDates";
 import getEndPoint from "~/utils/getEndPoint";
 import { ModalContext, PageDataContext, ShiftCard, } from "~/context/ShiftPlanning";
@@ -42,6 +42,10 @@ const fetcher: ResourceFetcher<
 
     const response = await axios.get<DataResponse<Staff[]>>(endpoint);
 
+    if (!response.data) throw new Error("Invalid response from server");
+
+    const staffsInfo = source?.role !== Role.ADMIN ? await axios.get<DataResponse<StaffInfo[]>>(`${getEndPoint()}/staffs/meta-infos`) : undefined;
+
     const { data: holidays } = await axios.get<DataResponse<Holiday[]>>(
       `${getEndPoint()}/holidays/all?from=${from}&to=${to}`
     );
@@ -50,6 +54,7 @@ const fetcher: ResourceFetcher<
       dates,
       staffs: response.data.content,
       holidays: holidays.content,
+      staffsInfo: staffsInfo?.data.content,
     };
   } catch (e) {
     throw new Error(handleFetchError(e));
@@ -76,6 +81,7 @@ export default function ShiftPlanning() {
         dates: [],
         staffs: [],
         holidays: [],
+        staffsInfo: undefined,
       },
     }
   );
@@ -91,6 +97,7 @@ export default function ShiftPlanning() {
     holidays: [],
     shiftsRules: {},
     leaveRequests: [],
+    staffsInfo: undefined,
   });
 
   const [ showShiftModal, setShowShiftModal ] = createSignal<boolean>(false);
@@ -148,6 +155,7 @@ export default function ShiftPlanning() {
       dates: [],
       staffs: [],
       holidays: [],
+      staffsInfo: undefined,
     });
     setTableData({
       cells: {},

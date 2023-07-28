@@ -6,11 +6,13 @@ import routes from "~/utils/routes";
 import { useRouteData } from "@solidjs/router";
 import { routeData } from "~/routes/leave-requests";
 import { A } from "solid-start";
-import { LeaveRequestStatus } from "~/types";
+import { LeaveRequestStatus, Role } from "~/types";
 import { useLRContext } from "~/context/LeaveRequest";
+import { useAuth } from "~/context/Auth";
 
 export default function Table() {
   const { data } = useRouteData<typeof routeData>();
+  const { user } = useAuth();
   const { setChosenLeaveRequestId, setShowEditModal, onDelete } = useLRContext();
 
   let onEdit = (id: number) => {
@@ -165,17 +167,19 @@ export default function Table() {
                           Edit
                       </span>
                     </div>
-                    <div class="relative flex justify-center items-center">
-                      <button
-                        onClick={[ onDelete, item.leaveRequestId ]}
-                        class="peer text-base text-gray-500 hover:text-indigo-500">
-                        <IoTrashOutline/>
-                      </button>
-                      <span
-                        class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
+                    <Show when={item.status === LeaveRequestStatus.PENDING || user()?.role === Role.ADMIN}>
+                      <div class="relative flex justify-center items-center">
+                        <button
+                          onClick={[ onDelete, item.leaveRequestId ]}
+                          class="peer text-base text-gray-500 hover:text-indigo-500">
+                          <IoTrashOutline/>
+                        </button>
+                        <span
+                          class="peer-hover:visible peer-hover:opacity-100 invisible opacity-0 absolute bottom-full left-1/2 transform -translate-x-1/2 px-2 py-1 bg-black text-white text-sm rounded whitespace-nowrap z-10 transition-opacity duration-200 ease-in-out">
                           Delete
                       </span>
-                    </div>
+                      </div>
+                    </Show>
                   </div>
                 </td>
               </tr>
