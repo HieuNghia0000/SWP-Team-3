@@ -204,6 +204,13 @@ export interface OrderItem {
   order?: Order;
 }
 
+export interface SellingProduct {
+  productName: string;
+  totalQuantity: number;
+  price: number;
+}
+
+
 export interface Product {
   productId: number;
   barCode: string;

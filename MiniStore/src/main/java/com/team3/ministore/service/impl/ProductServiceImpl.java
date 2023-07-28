@@ -1,6 +1,7 @@
 package com.team3.ministore.service.impl;
 
 import com.team3.ministore.dto.ProductDto;
+import com.team3.ministore.dto.SellingProduct;
 import com.team3.ministore.model.Category;
 import com.team3.ministore.model.Product;
 import com.team3.ministore.repository.CategoryRepository;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -88,5 +90,10 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void deleteProduct(Integer id) {
         productRepository.deleteById(id);
+    }
+
+    @Override
+    public List<Product> getListProducts() {
+        return productRepository.findAll();
     }
 }

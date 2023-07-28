@@ -11,7 +11,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/products")
@@ -19,6 +21,22 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
+
+    @GetMapping("/all")
+    public ResponseEntity<Object> getListProducts() {
+        List<Product> productsList = productService.getListProducts();
+
+        if (productsList != null) {
+            List<ProductDto> productDto = productsList.stream()
+                    .map(ProductDto::new)
+                    .collect(Collectors.toList());
+
+            return ResponseHandler.getResponse(productDto, HttpStatus.OK);
+        }
+        else {
+            return ResponseHandler.getResponse(new Exception("No orders found."), HttpStatus.NOT_FOUND);
+        }
+    }
 
     @PostMapping("/add")
     public ResponseEntity<Object> createProduct(@Valid @RequestBody ProductDto dto, BindingResult errors) {

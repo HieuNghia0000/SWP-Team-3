@@ -1,6 +1,8 @@
 package com.team3.ministore.service;
 
+import com.team3.ministore.dto.SellingProduct;
 import com.team3.ministore.model.OrderItem;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -16,4 +18,6 @@ public interface OrderItemService {
     void deleteOrderItems(Integer id);
 
     List<OrderItem> getOrderItemsByOrderId(Integer id);
+
+    Page<SellingProduct> getTopSellingProduct(Integer page, Integer pageSize);
 }
