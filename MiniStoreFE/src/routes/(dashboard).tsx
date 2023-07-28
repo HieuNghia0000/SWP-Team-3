@@ -1,7 +1,7 @@
 import {FaSolidCoins} from "solid-icons/fa";
 import {BiRegularWorld} from "solid-icons/bi";
 import {Line} from "solid-chartjs";
-import {FiArrowUp} from "solid-icons/fi";
+import {FiArrowDown, FiArrowUp} from "solid-icons/fi";
 import {Chart, Colors, Legend, Title, Tooltip} from "chart.js";
 import {createEffect, createSignal, For, onMount} from "solid-js";
 import axios from "axios";
@@ -61,6 +61,11 @@ export default function Page() {
   const [labels, setLabels] = createSignal<string[]>([]);
   const [chartData, setChartData] = createSignal<number[]>([]);
 
+  const [thisMonthSales, setThisMonthSales] = createSignal<number>(0);
+  const [lastMonthSales, setLastMonthSales] = createSignal<number>(0);
+  const [percentageChange, setPercentageChange] = createSignal<number>(0);
+  const [isUp, setIsUp] = createSignal<boolean>(true);
+
   // Function to update the chart data based on fetched orders
   const updateChartData = (orders: Order[]) => {
     // Generate the last 10 days from today in the "dd-MM" format
@@ -118,6 +123,30 @@ export default function Page() {
           (order) => order.paymentStatus === PaymentStatus.SUCCESS &&
               new Date(order.orderDate) >= new Date(Date.now() - 10 * 24 * 60 * 60 * 1000)
       );
+
+      //Sales compare
+      const today = new Date();
+      const thisMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+      const thisMonthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+      const thisMonthOrders = successOrders.filter(
+          (order) => new Date(order.orderDate) >= thisMonthStart && new Date(order.orderDate) <= thisMonthEnd
+      );
+      const thisMonthCountOfSales = thisMonthOrders.length;
+      setThisMonthSales(thisMonthCountOfSales);
+
+      const lastMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+      const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0);
+      const lastMonthOrders = successOrders.filter(
+          (order) => new Date(order.orderDate) >= lastMonthStart && new Date(order.orderDate) <= lastMonthEnd
+      );
+      const lastMonthCountOfSales = lastMonthOrders.length;
+      setLastMonthSales(lastMonthCountOfSales);
+
+      const change = thisMonthCountOfSales - lastMonthCountOfSales;
+      const percentage = (change / lastMonthCountOfSales) * 100;
+      setPercentageChange(percentage);
+      setIsUp(percentage >= 0);
+
       updateChartData(saleData);
     }
     catch (error) {
@@ -279,14 +308,21 @@ export default function Page() {
               <div class="border-black/12.5 rounded-t-2xl border-b-0 border-solid bg-white p-6 pb-0">
                 <h2 class="text-lg font-bold mb-1">Sales overview</h2>
                 <div class="flex gap-6">
-                  <p class="leading-normal text-sm flex">
-                    <span class="text-lime-500 text-lg"><FiArrowUp/></span>
-                    <span class="font-semibold mr-1">4% more</span> Last month
-                  </p>
-                  <p class="leading-normal text-sm flex">
-                    <span class="text-lime-500 text-lg"><FiArrowUp/></span>
-                    <span class="font-semibold mr-1">4% more</span> This month
-                  </p>
+                  {isUp() ? (
+                      <p class="leading-normal text-sm flex">
+                        <span class="text-lime-500 text-lg">
+                          <FiArrowUp />
+                        </span>
+                        <span class="font-semibold mr-1">{percentageChange().toFixed(2)}% </span> Last month
+                      </p>
+                  ) : (
+                      <p class="leading-normal text-sm flex">
+                        <span class="text-red-500 text-lg">
+                          <FiArrowDown />
+                        </span>
+                        <span class="font-semibold mr-1">{Math.abs(Number(percentageChange().toFixed(2)))}% </span> Last month
+                      </p>
+                  )}
                 </div>
               </div>
               <div class="flex-auto p-4">
@@ -316,7 +352,7 @@ export default function Page() {
         <div class="flex flex-wrap mt-6 -mx-3">
           <div class="w-full px-3 mt-0 lg:w-100 lg:flex-none">
             <div class="border-black/12.5 shadow-soft-xl relative z-20 flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid bg-white bg-clip-border shadow-lg">
-              <div class="border-black/12.5 rounded-t-2xl border-b-0 border-solid bg-white p-6 pb-0">
+              <div class="border-black/12.5 rounded-2xl border-b-0 border-solid bg-white p-6 pb-0">
                 <h2 class="text-lg font-bold mb-1">Top selling product</h2>
 
                 <div class="flex flex-col mt-6 mb-6">
