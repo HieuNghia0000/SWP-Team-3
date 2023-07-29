@@ -60,13 +60,13 @@ const Copy: Component<CopyProps> = ({ shiftCard, setModalState, onDelete, setSho
       if (!confirm) return;
 
       if (enableMultiWeeks()) {
-        shifts = getDatesUntilWeek(formData().days, formData().untilDate!)
+        shifts = getDatesUntilWeek(formData().days, formData().untilDate!, shiftCard()?.date!)
           .filter(d => d !== shiftCard()?.date && !isDayInThePast(d))
           .map((date) => {
             return {
               date,
               staffId: shiftCard()?.staffId,
-              published: false,
+              published: publish,
               startTime: shiftCard()?.startTime,
               endTime: shiftCard()?.endTime,
               name: shiftCard()?.name,
@@ -79,7 +79,7 @@ const Copy: Component<CopyProps> = ({ shiftCard, setModalState, onDelete, setSho
           return {
             date,
             staffId: shiftCard()?.staffId,
-            published: false,
+            published: publish,
             startTime: shiftCard()?.startTime,
             endTime: shiftCard()?.endTime,
             name: shiftCard()?.name,
