@@ -9,7 +9,7 @@ import moment from "moment";
 export default function getSameWeekDay(dateA: string, dateB:string) {
   const dayOfWeekA = moment(dateA).format('dddd');
   const startOfWeekB = moment(dateB).startOf('week');
-  console.log(startOfWeekB, startOfWeekB.clone().day(dayOfWeekA).format("YYYY-MM-DD"))
+  // console.log(startOfWeekB, startOfWeekB.clone().day(dayOfWeekA).format("YYYY-MM-DD"))
 
   // Find the first occurrence of the dayOfWeekA in the week of dateB
   let newDate = startOfWeekB.clone().day(dayOfWeekA);
