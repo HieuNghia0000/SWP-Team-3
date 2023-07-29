@@ -220,7 +220,7 @@ const Copy: Component<CopyProps> = ({ shiftCard, setModalState, onDelete, setSho
               type="checkbox"
               checked={enableMultiWeeks()}
               onChange={async () => {
-                await formHandler.resetForm();
+                // await formHandler.resetForm();
                 setEnableMultiWeeks(!enableMultiWeeks());
               }}
             />

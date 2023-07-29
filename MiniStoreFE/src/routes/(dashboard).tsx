@@ -361,7 +361,7 @@ export default function Page() {
           <div class="w-full px-3 mt-0 lg:w-100 lg:flex-none">
             <div class="border-black/12.5 shadow-soft-xl relative z-20 flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid bg-white bg-clip-border shadow-lg">
               <div class="border-black/12.5 rounded-2xl border-b-0 border-solid bg-white p-6 pb-0">
-                <h2 class="text-lg font-bold mb-1">Top selling product</h2>
+                <h2 class="text-lg font-bold mb-1">Top 5 selling product</h2>
 
                 <div class="flex flex-col mt-6 mb-6">
                   <div class="flex flex-col border border-gray-200 rounded-lg overflow-x-auto shadow-sm">
