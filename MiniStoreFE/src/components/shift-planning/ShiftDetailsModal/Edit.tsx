@@ -314,7 +314,7 @@ const Edit: Component<EditProps> = ({
               </span>
               <span>Delete</span>
             </button>
-            <Show when={!modalData()?.shiftCoverRequest}>
+            {/*<Show when={!modalData()?.shiftCoverRequest}>*/}
               <button
                 type="button"
                 onClick={openCreateCoverModal}
@@ -325,7 +325,7 @@ const Edit: Component<EditProps> = ({
                 </span>
                 <span>New Shift Cover</span>
               </button>
-            </Show>
+            {/*</Show>*/}
           </div>
           <Show when={!isOldShift}>
             <div class="flex gap-2 justify-center items-center">

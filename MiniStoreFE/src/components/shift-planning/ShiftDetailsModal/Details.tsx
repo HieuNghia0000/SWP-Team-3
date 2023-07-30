@@ -175,7 +175,7 @@ const Details: Component<DetailsProps> = ({ shiftCard, setState, onDelete, openC
               Edit Shift
             </button>
           </Show>
-          <Show when={!shiftCard()?.shiftCoverRequest && shiftCard()?.staff === null}>
+          {/*<Show when={!shiftCard()?.shiftCoverRequest && shiftCard()?.staff === null}>*/}
             <button
               type="button"
               onClick={openCreateCoverModal}
@@ -186,7 +186,7 @@ const Details: Component<DetailsProps> = ({ shiftCard, setState, onDelete, openC
             </span>
               New Shift Cover
             </button>
-          </Show>
+          {/*</Show>*/}
         </div>
       </PopupModal.Footer>
     </>
