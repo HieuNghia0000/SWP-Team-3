@@ -1,5 +1,7 @@
 package com.team3.ministore.config;
 
+import org.springframework.beans.factory.annotation.Value;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
@@ -10,10 +12,17 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 public class VnPayConfig {
-    public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    public static String vnp_Returnurl = "http://localhost:3000/orders/response";
-    public static String vnp_TmnCode = "PZDM65FE";
-    public static String vnp_HashSecret = "AHDCFBFRMVTIQLTQRKAFDLQHFHGHSIBL";
+    @Value("${vnpay.pay-url}")
+    public static String vnp_PayUrl;
+
+    @Value("${vnpay.return-url}")
+    public static String vnp_Returnurl;
+
+    @Value("${vnpay.tmn-code}")
+    public static String vnp_TmnCode;
+
+    @Value("${vnpay.hash-secret}")
+    public static String vnp_HashSecret;
     public static String vnp_apiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
 
     public static String md5(String message) {
