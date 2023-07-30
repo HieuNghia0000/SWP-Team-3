@@ -1,6 +1,7 @@
 package com.team3.ministore.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -11,21 +12,22 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
+@Component
 public class VnPayConfig {
     @Value("${vnpay.pay-url}")
-    public static String vnp_PayUrl;
+    public String vnp_PayUrl;
 
     @Value("${vnpay.return-url}")
-    public static String vnp_Returnurl;
+    public String vnp_Returnurl;
 
     @Value("${vnpay.tmn-code}")
-    public static String vnp_TmnCode;
+    public String vnp_TmnCode;
 
     @Value("${vnpay.hash-secret}")
-    public static String vnp_HashSecret;
-    public static String vnp_apiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
+    public String vnp_HashSecret;
+    public String vnp_apiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
 
-    public static String md5(String message) {
+    public String md5(String message) {
         String digest = null;
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
@@ -43,7 +45,7 @@ public class VnPayConfig {
         return digest;
     }
 
-    public static String Sha256(String message) {
+    public String Sha256(String message) {
         String digest = null;
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -62,7 +64,7 @@ public class VnPayConfig {
     }
 
     //Util for VNPAY
-    public static String hashAllFields(Map<String, String> fields) {
+    public String hashAllFields(Map<String, String> fields) {
         List<String> fieldNames = new ArrayList<>(fields.keySet());
         Collections.sort(fieldNames);
         StringBuilder sb = new StringBuilder();
@@ -89,7 +91,7 @@ public class VnPayConfig {
         return hmacSHA512(vnp_HashSecret, sb.toString());
     }
 
-    public static String hmacSHA512(final String key, final String data) {
+    public String hmacSHA512(final String key, final String data) {
         try {
 
             if (key == null || data == null) {
@@ -112,7 +114,7 @@ public class VnPayConfig {
         }
     }
 
-    public static String getIpAddress(HttpServletRequest request) {
+    public String getIpAddress(HttpServletRequest request) {
         String ipAdress;
         try {
             ipAdress = request.getHeader("X-FORWARDED-FOR");

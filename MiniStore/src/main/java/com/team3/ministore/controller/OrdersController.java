@@ -28,6 +28,9 @@ public class OrdersController {
     @Autowired
     private OrderService orderService;
 
+    @Autowired
+    private VnPayConfig vnPayConfig;
+
     @GetMapping("/all")
     public ResponseEntity<Object> getAllOrders() {
         List<Order> orders = orderService.getListOrders();
@@ -109,8 +112,8 @@ public class OrdersController {
 
         long vnpAmount = paymentDto.getGrandTotal() * 100;
         String vnp_TxnRef = String.valueOf(paymentDto.getOrderId());
-        String vnp_IpAddr = VnPayConfig.getIpAddress(request);
-        String vnp_TmnCode = VnPayConfig.vnp_TmnCode;
+        String vnp_IpAddr = vnPayConfig.getIpAddress(request);
+        String vnp_TmnCode = vnPayConfig.vnp_TmnCode;
         String bankCode = "NCB";
 
         Map<String, String> vnp_Params = new HashMap<>();
@@ -125,7 +128,7 @@ public class OrdersController {
         vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang:" + vnp_TxnRef);
         vnp_Params.put("vnp_Locale", "vn");
 
-        vnp_Params.put("vnp_ReturnUrl", VnPayConfig.vnp_Returnurl);
+        vnp_Params.put("vnp_ReturnUrl", vnPayConfig.vnp_Returnurl);
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
         Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
@@ -162,9 +165,9 @@ public class OrdersController {
         }
 
         String queryUrl = query.toString();
-        String vnp_SecureHash = VnPayConfig.hmacSHA512(VnPayConfig.vnp_HashSecret, hashData.toString());
+        String vnp_SecureHash = vnPayConfig.hmacSHA512(vnPayConfig.vnp_HashSecret, hashData.toString());
         queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
-        String paymentUrl = VnPayConfig.vnp_PayUrl + "?" + queryUrl;
+        String paymentUrl = vnPayConfig.vnp_PayUrl + "?" + queryUrl;
 
         Map<String, Object> job = new HashMap<>();
         job.put("code", "00");

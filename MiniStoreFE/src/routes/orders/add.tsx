@@ -180,6 +180,7 @@ export default function AddOrders() {
       console.log(data.content.paymentUrl)
 
       // Redirect to VNPAY payment URL
+      console.log(data.content.paymentUrl)
       window.location.href = data.content.paymentUrl;
     } catch (e) {
       console.error(handleFetchError(e));
