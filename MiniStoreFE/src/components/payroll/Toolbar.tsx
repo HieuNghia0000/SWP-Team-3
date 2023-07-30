@@ -1,16 +1,24 @@
 import { AiOutlineSearch } from "solid-icons/ai";
 import { useSearchParams } from "@solidjs/router";
 import { ParamType } from "~/components/payroll/types";
-import { Component, createEffect, createSignal, on, onCleanup, onMount } from "solid-js";
+import {
+  Component,
+  createEffect,
+  createSignal,
+  on,
+  onCleanup,
+  onMount,
+} from "solid-js";
 import { FiCalendar } from "solid-icons/fi";
-import flatpickr from "flatpickr";
+
 import moment from "moment";
+import { Instance } from "flatpickr/dist/types/instance";
 
 const ToolBar: Component = ({}) => {
-  const [ searchParams, setSearchParams ] = useSearchParams<ParamType>();
-  const [ dateStr, setDateStr ] = createSignal<string>("");
+  const [searchParams, setSearchParams] = useSearchParams<ParamType>();
+  const [dateStr, setDateStr] = createSignal<string>("");
   let dateRef: HTMLInputElement | undefined = undefined;
-  let fp: flatpickr.Instance | undefined = undefined;
+  let fp: Instance | undefined = undefined;
 
   const onSearchSubmit = (e: Event) => {
     e.preventDefault();
@@ -20,13 +28,10 @@ const ToolBar: Component = ({}) => {
   };
 
   createEffect(
-    on(
-      [ () => searchParams.from, () => searchParams.to ],
-      () => {
-        if (searchParams.from === undefined || searchParams.to === undefined)
-          fp?.setDate(moment().toDate(), true);
-      }
-    )
+    on([() => searchParams.from, () => searchParams.to], () => {
+      if (searchParams.from === undefined || searchParams.to === undefined)
+        fp?.setDate(moment().toDate(), true);
+    })
   );
 
   onMount(() => {
@@ -35,10 +40,11 @@ const ToolBar: Component = ({}) => {
       : moment().subtract(1, "month").format("YYYY-MM-DD");
     let to = moment(searchParams.to).format("YYYY-MM-DD");
 
+    // @ts-ignore
     fp = flatpickr(dateRef!, {
       mode: "range",
       dateFormat: "Y-m-d",
-      defaultDate: [ from, to ],
+      defaultDate: [from, to],
       onChange: updateDateStr,
       onReady: updateDateStr,
     });
@@ -51,7 +57,7 @@ const ToolBar: Component = ({}) => {
   const updateDateStr = (
     selectedDates: Date[],
     dateStr: string,
-    instance: flatpickr.Instance
+    instance: Instance
   ) => {
     if (selectedDates.length === 0) {
       setSearchParams({ from: undefined, to: undefined });
@@ -60,7 +66,10 @@ const ToolBar: Component = ({}) => {
     if (selectedDates.length === 2) {
       const from = moment(selectedDates[0]);
       const to = moment(selectedDates[1]);
-      setSearchParams({ from: from.format("YYYY-MM-DD"), to: to.format("YYYY-MM-DD") });
+      setSearchParams({
+        from: from.format("YYYY-MM-DD"),
+        to: to.format("YYYY-MM-DD"),
+      });
       const start = instance.formatDate(from.toDate(), "F j");
       const end = instance.formatDate(to.toDate(), "F j, Y");
       setDateStr(`${start} - ${end}`);
@@ -83,7 +92,7 @@ const ToolBar: Component = ({}) => {
             type="submit"
             title="Search"
           >
-            <AiOutlineSearch/>
+            <AiOutlineSearch />
           </button>
         </form>
         <button
@@ -91,13 +100,12 @@ const ToolBar: Component = ({}) => {
           type="button"
           class="range_flatpicker flex flex-row gap-2 justify-center items-center border border-gray-300 rounded-lg py-2 px-3.5 font-medium text-sm text-gray-500 hover:text-indigo-600 hover:border-indigo-600"
         >
-          <FiCalendar/>
+          <FiCalendar />
           {dateStr() || "Select Dates"}
         </button>
-
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default ToolBar;

@@ -1,5 +1,5 @@
 import { A } from "@solidjs/router";
-import { RiSystemArrowRightSLine } from "solid-icons/ri";
+import { RiArrowsArrowRightSLine } from "solid-icons/ri";
 import { Component, For, Show } from "solid-js";
 import routes from "~/utils/routes";
 
@@ -17,7 +17,7 @@ const Breadcrumbs: Component<{
         {(item) => (
           <>
             <span class="text-gray-500 text-lg">
-              <RiSystemArrowRightSLine />
+              <RiArrowsArrowRightSLine />
             </span>
             <Show
               when={item.link}

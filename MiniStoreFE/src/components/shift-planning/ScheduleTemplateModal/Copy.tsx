@@ -11,7 +11,7 @@ import {
   onMount,
   ResourceFetcher,
   Setter,
-  Suspense
+  Suspense,
 } from "solid-js";
 import ResourceWrapper from "~/components/ResourceWrapper";
 import SidePopupModal from "~/components/SidePopupModal";
@@ -19,9 +19,12 @@ import { ScheduleTemplateModalState, useSPData } from "~/context/ShiftPlanning";
 import { DataResponse, Role, Shift, Staff } from "~/types";
 import { shiftDetailsTime } from "../utils/shiftTimes";
 import { roles } from "~/utils/roles";
-import flatpickr from "flatpickr";
+
 import moment from "moment";
-import { getWeekDateStings, getWeekFirstAndLastDates, } from "~/utils/getWeekDates";
+import {
+  getWeekDateStings,
+  getWeekFirstAndLastDates,
+} from "~/utils/getWeekDates";
 import { transformData } from "../utils/dataTransformer";
 import { DataTable } from "../utils/types";
 import getEndPoint from "~/utils/getEndPoint";
@@ -31,6 +34,7 @@ import Spinner from "~/components/Spinner";
 import { toastSuccess } from "~/utils/toast";
 import getSameWeekDay from "~/utils/getSameWeekDay";
 import isDayInThePast from "~/utils/isDayInThePast";
+import { Instance } from "flatpickr/dist/types/instance";
 
 interface CopyProps {
   modalState: Accessor<ScheduleTemplateModalState>;
@@ -47,8 +51,9 @@ const fetcher: ResourceFetcher<
     const from = dates[0];
     const to = dates[dates.length - 1];
 
-    const { data: staffs } = await axios
-      .get<DataResponse<Staff[]>>(`${getEndPoint()}/shift-planning?from=${from}&to=${to}`);
+    const { data: staffs } = await axios.get<DataResponse<Staff[]>>(
+      `${getEndPoint()}/shift-planning?from=${from}&to=${to}`
+    );
 
     return transformData({ dates, staffs: staffs.content, holidays: [] });
   } catch (e) {
@@ -58,19 +63,23 @@ const fetcher: ResourceFetcher<
 
 const Copy: Component<CopyProps> = ({ setModalState }) => {
   const { pickedDate: curPickedDate, saveChanges } = useSPData();
-  const [ datePicked, setDatePicked ] = createSignal<string | undefined>();
-  const [ dateStr, setDateStr ] = createSignal<string>("");
-  const [ coping, setCoping ] = createSignal<boolean>(false);
-  const [ data ] = createResource(datePicked, fetcher);
+  const [datePicked, setDatePicked] = createSignal<string | undefined>();
+  const [dateStr, setDateStr] = createSignal<string>("");
+  const [coping, setCoping] = createSignal<boolean>(false);
+  const [data] = createResource(datePicked, fetcher);
   let dateRef: HTMLInputElement | undefined = undefined;
-  let fp: flatpickr.Instance | undefined = undefined;
+  let fp: Instance | undefined = undefined;
 
   const shiftIds = () =>
     !data.error && data() ? flatten(Object.values(data()!.cells)) : [];
 
   onMount(() => {
-    const defaultDate = moment(curPickedDate()).subtract(7, "days").format("YYYY-MM-DD");
+    const defaultDate = moment(curPickedDate())
+      .subtract(7, "days")
+      .format("YYYY-MM-DD");
     setDatePicked(defaultDate);
+
+    // @ts-ignore
     fp = flatpickr(dateRef!, {
       mode: "single",
       dateFormat: "Y-m-d",
@@ -87,7 +96,7 @@ const Copy: Component<CopyProps> = ({ setModalState }) => {
   const updateDateStr = (
     selectedDates: Date[],
     dateStr: string,
-    instance: flatpickr.Instance
+    instance: Instance
   ) => {
     if (selectedDates.length === 0) {
       batch(() => {
@@ -97,7 +106,7 @@ const Copy: Component<CopyProps> = ({ setModalState }) => {
     }
     if (selectedDates.length === 1) {
       const pickedDate = dateStr;
-      const [ from, to ] = getWeekFirstAndLastDates(pickedDate);
+      const [from, to] = getWeekFirstAndLastDates(pickedDate);
       const start = instance.formatDate(from.toDate(), "F j");
       const end = instance.formatDate(to.toDate(), "F j, Y");
       // console.log(pickedDate);
@@ -112,20 +121,25 @@ const Copy: Component<CopyProps> = ({ setModalState }) => {
     if (coping()) return;
 
     try {
-      const shifts: Shift[] = shiftIds().map((id) => {
-        return {
-          ...data()!.shifts[id],
-          date: getSameWeekDay(data()!.shifts[id].date, moment(curPickedDate()).format("YYYY-MM-DD")),
-        } as Shift;
-      })
+      const shifts: Shift[] = shiftIds()
+        .map((id) => {
+          return {
+            ...data()!.shifts[id],
+            date: getSameWeekDay(
+              data()!.shifts[id].date,
+              moment(curPickedDate()).format("YYYY-MM-DD")
+            ),
+          } as Shift;
+        })
         // only copy shifts that are not in the past
-        .filter(s => !isDayInThePast(s.date));
+        .filter((s) => !isDayInThePast(s.date));
 
-      if (curPickedDate() === undefined)
-        throw new Error("No date picked");
+      if (curPickedDate() === undefined) throw new Error("No date picked");
 
-      if (getWeekDateStings(curPickedDate()!).some(d => isDayInThePast(d))){
-        const confirm = window.confirm("The current chosen week has some past days. Only days that are not in the past will create shifts. Continue?");
+      if (getWeekDateStings(curPickedDate()!).some((d) => isDayInThePast(d))) {
+        const confirm = window.confirm(
+          "The current chosen week has some past days. Only days that are not in the past will create shifts. Continue?"
+        );
         if (!confirm) return;
       }
 
@@ -150,7 +164,13 @@ const Copy: Component<CopyProps> = ({ setModalState }) => {
   };
 
   return (
-    <Suspense fallback={<div class="h-full w-full grid place-items-center"><Spinner/></div>}>
+    <Suspense
+      fallback={
+        <div class="h-full w-full grid place-items-center">
+          <Spinner />
+        </div>
+      }
+    >
       <ErrorBoundary fallback={<div>Something went wrong</div>}>
         <SidePopupModal.Body classList={{ "cursor-progress": coping() }}>
           <div class="text-sm mb-2">
@@ -168,8 +188,7 @@ const Copy: Component<CopyProps> = ({ setModalState }) => {
           <div class="text-sm mb-4 text-gray-400 leading-[1.5] tracking-wide">
             The week you want to copy to this week.
           </div>
-          <div
-            class="text-[#637286] bg-[#f8fafc] font-semibold py-2.5 px-5 border-y border-[#d5dce6] -mx-5 mt-5 mb-3.5 text-sm">
+          <div class="text-[#637286] bg-[#f8fafc] font-semibold py-2.5 px-5 border-y border-[#d5dce6] -mx-5 mt-5 mb-3.5 text-sm">
             Targeted Shifts
           </div>
           <ResourceWrapper data={data}>
@@ -182,7 +201,10 @@ const Copy: Component<CopyProps> = ({ setModalState }) => {
               {(shiftId) => (
                 <div
                   class="rounded mx-1 p-2 relative text-left mb-1"
-                  classList={{ "bg-[repeating-linear-gradient(-45deg,white,white_5px,#eaf0f6_5px,#eaf0f6_10px)]": true }}
+                  classList={{
+                    "bg-[repeating-linear-gradient(-45deg,white,white_5px,#eaf0f6_5px,#eaf0f6_10px)]":
+                      true,
+                  }}
                 >
                   <i
                     class="absolute top-1.5 left-1.5 bottom-1.5 w-1.5 rounded"
@@ -207,9 +229,15 @@ const Copy: Component<CopyProps> = ({ setModalState }) => {
                     )}
                   </p>
                   <p class="ml-3.5 font-normal text-xs text-[13px] tracking-wider">
-                    {data()!.staffs.find(s => s.staffId === data()!.shifts[shiftId].staffId)!.staffName || "No staff assigned"}
-                    {" "}•{" "}
-                    {roles.find((r) => r.value === data()!.shifts[shiftId].role)?.label}
+                    {data()!.staffs.find(
+                      (s) => s.staffId === data()!.shifts[shiftId].staffId
+                    )!.staffName || "No staff assigned"}{" "}
+                    •{" "}
+                    {
+                      roles.find(
+                        (r) => r.value === data()!.shifts[shiftId].role
+                      )?.label
+                    }
                   </p>
                 </div>
               )}

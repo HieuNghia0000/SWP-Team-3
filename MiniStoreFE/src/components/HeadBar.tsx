@@ -1,6 +1,6 @@
 import { A } from "@solidjs/router";
 import Dismiss from "solid-dismiss";
-import { RiSystemArrowDownSLine, RiSystemArrowUpSLine } from "solid-icons/ri";
+import { RiArrowsArrowDownSLine, RiArrowsArrowUpSLine } from "solid-icons/ri";
 import { Component, createSignal, Show } from "solid-js";
 import routes from "~/utils/routes";
 import { useAuth } from "~/context/Auth";
@@ -14,12 +14,11 @@ type HeadBarProps = {
 const HeadBar: Component<HeadBarProps> = (props) => {
   const { isOpen, setIsNavOpen } = props;
   const { user } = useAuth();
-  const [ isDropdownOpen, setIsDropdownOpen ] = createSignal(false);
+  const [isDropdownOpen, setIsDropdownOpen] = createSignal(false);
   let btnEl;
 
   return (
-    <nav
-      class="flex flex-row justify-between items-center py-4 px-6 gap-4 h-[72px] bg-white border-b-1 border-gray-200 shadow-md">
+    <nav class="flex flex-row justify-between items-center py-4 px-6 gap-4 h-[72px] bg-white border-b-1 border-gray-200 shadow-md">
       <button onClick={() => setIsNavOpen(!isOpen())}>
         <img alt="nav-button" src="/buger_icon.svg" class="bx bx-menu"></img>
       </button>
@@ -31,19 +30,23 @@ const HeadBar: Component<HeadBarProps> = (props) => {
           >
             <img
               class="h-8 w-8 rounded-full bg-gray-400"
-              src={`https://api.dicebear.com/5.x/adventurer/svg?seed=${user()?.username}`}
+              src={`https://api.dicebear.com/5.x/adventurer/svg?seed=${
+                user()?.username
+              }`}
               alt="Profile Image"
             />
             <div class="text-start hidden sm:block">
               <p class="font-semibold">{user()?.staffName}</p>
-              <p class="text-xs text-gray-500 font-medium">{capitalize(user()?.role || "")}</p>
+              <p class="text-xs text-gray-500 font-medium">
+                {capitalize(user()?.role || "")}
+              </p>
             </div>
             <span class="text-lg hidden sm:block">
               <Show
                 when={!isDropdownOpen()}
-                fallback={<RiSystemArrowUpSLine/>}
+                fallback={<RiArrowsArrowUpSLine />}
               >
-                <RiSystemArrowDownSLine/>
+                <RiArrowsArrowDownSLine />
               </Show>
             </span>
           </button>
